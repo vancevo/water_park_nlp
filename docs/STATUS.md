@@ -27,6 +27,8 @@
 | T22 Admin POI CRUD | DONE | API/admin agents | T10–T11, T20 | Real backend contract + Next production build + adapter tests |
 | T23 Workflow/audit | DONE | API/admin agents | T22 | Submit/approve/reject/reason/audit + status-driven UI |
 | T24–T25 Media/narration | IN_PROGRESS | API/mobile/admin agents | T21–T23 | Workflow, signer, admin preview and mobile player pass; B03 real storage smoke + offline audio cache remain |
+| T25A–T25E Configurable narration locales | TODO | Công backend / Tú clients | T24–T25 | Contract-first parallel split in `docs/plans/CONG_TU_WORK_SPLIT.md`; final adapter integration only |
+| AI00–AI08 AI/TTS/search hardening | TODO | Công backend / Tú UX+eval | T41–T42 | Parallel mock-first plan; AI06 requires explicit GO; I01–I04 are final integration gates |
 | T30 Mobile map | DONE | mobile agent | T21 contract | Typecheck + 10 shared mobile tests pass |
 | T31 GPS session | DONE | mobile agent | T30 | Permission/signal state machine + explicit follow mode |
 | T32 Walkway graph | DONE | geo agent | W1 | 7-node/8-edge fixture, topology validator and migration 004 |

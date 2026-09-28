@@ -47,6 +47,8 @@ Không ghi chi tiết implementation dài tại đây. Link tới README, OpenAP
 | POI-WORKFLOW | ready | submit/approve/reject | API content + admin web | HTTP + adapter/workflow tests | T23 | Dedicated transitions; rejection reason + audit |
 | MEDIA-UPLOAD | in_progress | `POST /v1/admin/media/presign` + signed playback | `apps/api/src/narration/media-*` | unit/HTTP; real MinIO smoke blocked by B03 | T24 | 5-min PUT/10-min GET; verifies object metadata before review |
 | NARRATION | in_progress | Public/admin APIs + editor + mobile player | `apps/api/src/narration/`, `apps/admin-web/components/narration-panel.tsx`, `apps/mobile/src/features/poi/` | HTTP/DB + 7 admin + 11 mobile narration/playback tests | T25 | Transcript fallback/player ready; real S3 smoke B03 and offline byte cache remain |
+| NARRATION-LOCALE-CONFIG | planned | `GET /v1/narration-locales` + config file | `docs/plans/CONFIGURABLE_MULTILINGUAL_NARRATION_PLAN.md` | config/API/UI contract + migration smoke | T25A–T25E | Narration locales become runtime-configured; UI/POI locales remain vi/en |
+| AI-TTS-GENERATION | planned | Async reviewed TTS generation + provider registry | `docs/plans/AI_TTS_AND_TRAINING_ROADMAP.md` | licensed corpus benchmark + provider/HTTP/UI/ops checks | AI00–AI08 | Piper baseline; ZeroTTS/MOSS benchmark; fine-tune only after explicit GO |
 
 ## Map, GPS and routing
 
