@@ -1,0 +1,39 @@
+{
+  "name": "damsen-smart-guide",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Dam Sen multilingual guide and navigation monorepo",
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=11.5 <12"
+  },
+  "packageManager": "npm@11.5.1",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @damsen/shared-types && npm run build --workspace @damsen/config && npm run build --workspace @damsen/api-client && npm run build --workspace @damsen/worker && npm run build --workspace @damsen/api && npm run build --workspace @damsen/admin-web && npm run build --workspace @damsen/visitor-web",
+    "dev:api": "npm run dev --workspace @damsen/api",
+    "dev:visitor": "npm run dev --workspace @damsen/visitor-web",
+    "dev:worker": "npm run dev --workspace @damsen/worker",
+    "db:migrate": "node scripts/migrate.mjs",
+    "data:research:generate": "python3 data/research-damsen/generate.py",
+    "data:research:validate": "python3 data/research-damsen/validate.py",
+    "smoke:media": "node scripts/smoke-media.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.13.0",
+    "@types/node": "^24.0.0",
+    "eslint": "9.13.0",
+    "prettier": "3.3.3",
+    "typescript": "5.6.3",
+    "typescript-eslint": "8.11.0",
+    "vitest": "2.1.4"
+  }
+}

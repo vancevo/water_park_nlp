@@ -1,0 +1,1016 @@
+openapi: 3.0.3
+info:
+  title: Dam Sen Smart Guide API
+  version: 0.1.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HealthResponse' }
+  /v1/auth/register:
+    post:
+      operationId: register
+      summary: Create a visitor account and refresh session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterRequest' }
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /v1/auth/login:
+    post:
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /v1/auth/refresh:
+    post:
+      operationId: refresh
+      description: Rotates the supplied refresh token; the previous token is revoked.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RefreshRequest' }
+      responses:
+        '200':
+          description: Rotated session
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /v1/auth/logout:
+    post:
+      operationId: logout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RefreshRequest' }
+      responses:
+        '204': { description: Active refresh session revoked }
+  /v1/admin/pois:
+    get:
+      operationId: listAdminPois
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: All POIs including unpublished records
+          content:
+            application/json:
+              schema:
+                {
+                  type: array,
+                  items: { $ref: '#/components/schemas/AdminPoi' },
+                }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      operationId: createAdminPoi
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AdminPoiInput' }
+      responses:
+        '201':
+          description: Draft created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminPoi' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /v1/admin/pois/{id}:
+    patch:
+      operationId: updateAdminPoi
+      security: [{ bearerAuth: [] }]
+      parameters:
+        [
+          {
+            name: id,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          },
+        ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AdminPoiInput' }
+      responses:
+        '200':
+          description: Draft updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminPoi' }
+    delete:
+      operationId: deleteAdminPoi
+      security: [{ bearerAuth: [] }]
+      parameters:
+        [
+          {
+            name: id,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          },
+        ]
+      responses:
+        '204': { description: Draft or rejected POI deleted }
+  /v1/admin/pois/{id}/submit:
+    post:
+      operationId: submitAdminPoi
+      security: [{ bearerAuth: [] }]
+      parameters:
+        [
+          {
+            name: id,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          },
+        ]
+      responses:
+        '200':
+          description: Content version pending review
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminPoi' }
+  /v1/admin/content/{versionId}/approve:
+    post:
+      operationId: approveContent
+      security: [{ bearerAuth: [] }]
+      parameters:
+        [
+          {
+            name: versionId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          },
+        ]
+      responses:
+        '200':
+          description: Version published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminPoi' }
+  /v1/admin/content/{versionId}/reject:
+    post:
+      operationId: rejectContent
+      security: [{ bearerAuth: [] }]
+      parameters:
+        [
+          {
+            name: versionId,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          },
+        ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WorkflowReasonRequest' }
+      responses:
+        '200':
+          description: Version rejected with reason
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminPoi' }
+  /v1/admin/audit-logs:
+    get:
+      operationId: listAuditLogs
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: POI mutation audit trail; ADMIN only
+          content:
+            application/json:
+              schema:
+                {
+                  type: array,
+                  items: { $ref: '#/components/schemas/AuditLogEntry' },
+                }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /v1/pois:
+    get:
+      operationId: listPois
+      summary: List published POIs
+      parameters:
+        - {
+            name: lat,
+            in: query,
+            schema: { type: number, minimum: -90, maximum: 90 },
+          }
+        - {
+            name: lng,
+            in: query,
+            schema: { type: number, minimum: -180, maximum: 180 },
+          }
+        - {
+            name: radius,
+            in: query,
+            schema: { type: number, minimum: 1, maximum: 5000 },
+          }
+        - {
+            name: category,
+            in: query,
+            schema: { type: string, pattern: '^[a-z][a-z0-9_-]{0,49}$' },
+          }
+        - { name: openNow, in: query, schema: { type: boolean } }
+        - {
+            name: locale,
+            in: query,
+            schema: { $ref: '#/components/schemas/SupportedLocale' },
+          }
+      responses:
+        '200':
+          description: Published POIs, ordered by distance when coordinates are present
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PoiListResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+  /v1/search:
+    get:
+      operationId: search
+      summary: Lexically search published POIs with optional spatial filters
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 200 }
+        - name: locale
+          in: query
+          schema: { $ref: '#/components/schemas/SupportedLocale' }
+        - {
+            name: category,
+            in: query,
+            schema: { type: string, pattern: '^[a-z][a-z0-9_-]{0,49}$' },
+          }
+        - { name: openNow, in: query, schema: { type: boolean } }
+        - {
+            name: lat,
+            in: query,
+            schema: { type: number, minimum: -90, maximum: 90 },
+          }
+        - {
+            name: lng,
+            in: query,
+            schema: { type: number, minimum: -180, maximum: 180 },
+          }
+        - {
+            name: radius,
+            in: query,
+            schema: { type: number, minimum: 1, maximum: 5000 },
+          }
+        - {
+            name: limit,
+            in: query,
+            schema: { type: integer, minimum: 1, maximum: 50, default: 20 },
+          }
+        - {
+            name: offset,
+            in: query,
+            schema: { type: integer, minimum: 0, maximum: 10000, default: 0 },
+          }
+      responses:
+        '200':
+          description: Ranked published POIs with a stable POI-ID tie-break
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SearchResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+  /v1/pois/{id}:
+    get:
+      operationId: getPoi
+      summary: Get one published POI
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: locale
+          in: query
+          schema: { $ref: '#/components/schemas/SupportedLocale' }
+      responses:
+        '200':
+          description: Published POI detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PoiDetail' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404':
+          description: POI does not exist or is not published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+  /v1/pois/{poiId}/narration:
+    get:
+      operationId: getPoiNarration
+      summary: Get the exact-locale published narration for a published POI
+      parameters:
+        - name: poiId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: locale
+          in: query
+          schema: { $ref: '#/components/schemas/SupportedLocale' }
+      responses:
+        '200':
+          description: Published transcript and optional reviewed audio metadata
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PoiNarration' }
+        '404':
+          description: POI or exact-locale published narration was not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+  /v1/admin/pois/{poiId}/narrations:
+    get:
+      operationId: listAdminNarrations
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: poiId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: All narration revisions, including unpublished revisions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AdminNarration' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      operationId: createAdminNarration
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: poiId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NarrationInput' }
+      responses:
+        '201':
+          description: Draft narration revision created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminNarration' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /v1/admin/media/presign:
+    post:
+      operationId: createAudioUploadIntent
+      summary: Create a five-minute signed PUT for one immutable audio object
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MediaUploadIntentRequest' }
+      responses:
+        '201':
+          description: Policy-bound upload intent; all required headers must be sent
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaUploadIntent' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '503':
+          description: Object storage is disabled or unavailable
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+  /v1/admin/narrations/{id}:
+    patch:
+      operationId: updateAdminNarration
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NarrationUpdate' }
+      responses:
+        '200':
+          description: Draft or rejected narration updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminNarration' }
+    delete:
+      operationId: deleteAdminNarration
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204': { description: Draft or rejected narration deleted }
+  /v1/admin/narrations/{id}/submit:
+    post:
+      operationId: submitAdminNarration
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Narration submitted for review
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminNarration' }
+  /v1/admin/narrations/{id}/approve:
+    post:
+      operationId: approveAdminNarration
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Pending narration published; previous revision superseded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminNarration' }
+  /v1/admin/narrations/{id}/reject:
+    post:
+      operationId: rejectAdminNarration
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WorkflowReasonRequest' }
+      responses:
+        '200':
+          description: Pending narration rejected with a reason
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminNarration' }
+  /v1/routes:
+    post:
+      operationId: createRoute
+      summary: Route from the visitor position to a published POI's primary entrance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RouteRequest' }
+      responses:
+        '201':
+          description: Pedestrian route snapped to the internal walkway graph
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RouteResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404':
+          description: Published POI or active primary entrance was not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+        '422':
+          description: Origin is outside the routable area or no eligible route exists
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+  /v1/events/batch:
+    post:
+      operationId: ingestAnalyticsBatch
+      summary: Ingest a consented, privacy-safe analytics batch
+      description: >-
+        Authentication is optional. Without a bearer token, anonymousSessionId is
+        required. Exact location, GPS trails, route geometry and direct PII are rejected.
+      security: [{}, { bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AnalyticsBatchRequest' }
+      responses:
+        '201':
+          description: Batch processed; duplicate IDs were not inserted again
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AnalyticsBatchResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    BadRequest:
+      description: Query validation failed
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+    Unauthorized:
+      description: Missing or invalid credential
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+    Forbidden:
+      description: Authenticated user lacks the required role
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+    Conflict:
+      description: Resource state conflict
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+  schemas:
+    UserRole:
+      type: string
+      enum: [VISITOR, EDITOR, REVIEWER, ADMIN]
+    RegisterRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 10, writeOnly: true }
+        preferredLocale: { $ref: '#/components/schemas/SupportedLocale' }
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, writeOnly: true }
+    RefreshRequest:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken: { type: string, writeOnly: true }
+    AuthResponse:
+      type: object
+      required: [user, accessToken, refreshToken, accessTokenExpiresIn]
+      properties:
+        user:
+          type: object
+          required: [id, email, preferredLocale, roles]
+          properties:
+            id: { type: string, format: uuid }
+            email: { type: string, format: email }
+            preferredLocale: { $ref: '#/components/schemas/SupportedLocale' }
+            roles:
+              { type: array, items: { $ref: '#/components/schemas/UserRole' } }
+        accessToken: { type: string, writeOnly: true }
+        refreshToken: { type: string, writeOnly: true }
+        accessTokenExpiresIn: { type: integer }
+    AdminPoiInput:
+      type: object
+      required:
+        [slug, category, location, translations, entrances, operatingHours]
+      properties:
+        slug: { type: string }
+        category: { type: string }
+        location: { $ref: '#/components/schemas/GeoPoint' }
+        translations: { type: array, items: { type: object } }
+        entrances: { type: array, items: { type: object } }
+        operatingHours:
+          {
+            type: array,
+            items: { $ref: '#/components/schemas/PoiOperatingHours' },
+          }
+    AdminPoi:
+      allOf:
+        - { $ref: '#/components/schemas/AdminPoiInput' }
+        - type: object
+          required: [id, status]
+          properties:
+            id: { type: string, format: uuid }
+            status:
+              {
+                type: string,
+                enum: [draft, pending_review, published, rejected],
+              }
+            pendingVersionId: { type: string, format: uuid }
+            rejectionReason: { type: string }
+    WorkflowReasonRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason: { type: string, minLength: 3, maxLength: 1000 }
+    AuditLogEntry:
+      type: object
+      required:
+        [id, actorId, action, entityType, entityId, before, after, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        actorId: { type: string, format: uuid }
+        action: { type: string }
+        entityType: { type: string, enum: [poi] }
+        entityId: { type: string, format: uuid }
+        before: { nullable: true }
+        after: { nullable: true }
+        createdAt: { type: string, format: date-time }
+    SupportedLocale:
+      type: string
+      enum: [vi, en]
+      default: vi
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [ok] }
+    GeoPoint:
+      type: object
+      required: [latitude, longitude]
+      properties:
+        latitude: { type: number }
+        longitude: { type: number }
+    RouteRequest:
+      type: object
+      required: [from, poiId]
+      properties:
+        from:
+          type: object
+          required: [lat, lng]
+          properties:
+            lat: { type: number, minimum: -90, maximum: 90 }
+            lng: { type: number, minimum: -180, maximum: 180 }
+        poiId: { type: string, format: uuid }
+        accessible: { type: boolean, default: false }
+    GeoJsonLineString:
+      type: object
+      required: [type, coordinates]
+      properties:
+        type: { type: string, enum: [LineString] }
+        coordinates:
+          type: array
+          minItems: 2
+          items:
+            type: array
+            minItems: 2
+            maxItems: 2
+            items: { type: number }
+    RouteStep:
+      type: object
+      required: [sequence, instruction, distanceMeters]
+      properties:
+        sequence: { type: integer, minimum: 1 }
+        instruction: { type: string }
+        distanceMeters: { type: number, minimum: 0 }
+    RouteResponse:
+      type: object
+      required: [routeId, version, geometry, distanceMeters, etaSeconds, steps]
+      properties:
+        routeId: { type: string, format: uuid }
+        version: { type: integer, minimum: 1 }
+        geometry: { $ref: '#/components/schemas/GeoJsonLineString' }
+        distanceMeters: { type: number, minimum: 0 }
+        etaSeconds: { type: integer, minimum: 0 }
+        steps:
+          type: array
+          items: { $ref: '#/components/schemas/RouteStep' }
+    NarrationAudioInput:
+      type: object
+      required:
+        [
+          objectKey,
+          mimeType,
+          sizeBytes,
+          sha256,
+          durationSeconds,
+          rightsOwner,
+          rightsSource,
+          usageRights,
+        ]
+      properties:
+        objectKey:
+          type: string
+          description: Immutable private object key; never returned by the public API
+        mimeType:
+          type: string
+          enum: [audio/mpeg, audio/mp4, audio/ogg, audio/wav]
+        sizeBytes: { type: integer, minimum: 1, maximum: 52428800 }
+        sha256: { type: string, pattern: '^[0-9a-f]{64}$' }
+        durationSeconds: { type: number, exclusiveMinimum: 0, maximum: 1800 }
+        rightsOwner: { type: string }
+        rightsSource: { type: string }
+        usageRights: { type: string }
+    MediaUploadIntentRequest:
+      type: object
+      required: [poiId, locale, mimeType, sizeBytes, sha256]
+      properties:
+        poiId: { type: string, format: uuid }
+        locale: { $ref: '#/components/schemas/SupportedLocale' }
+        mimeType:
+          type: string
+          enum: [audio/mpeg, audio/mp4, audio/ogg, audio/wav]
+        sizeBytes: { type: integer, minimum: 1, maximum: 52428800 }
+        sha256: { type: string, pattern: '^[0-9a-f]{64}$' }
+    MediaUploadIntent:
+      type: object
+      required: [objectKey, uploadUrl, method, expiresAt, requiredHeaders]
+      properties:
+        objectKey: { type: string }
+        uploadUrl: { type: string, format: uri }
+        method: { type: string, enum: [PUT] }
+        expiresAt: { type: string, format: date-time }
+        requiredHeaders:
+          type: object
+          required:
+            [
+              content-type,
+              content-length,
+              x-amz-checksum-sha256,
+              x-amz-meta-sha256,
+            ]
+          properties:
+            content-type: { type: string }
+            content-length: { type: string }
+            x-amz-checksum-sha256: { type: string }
+            x-amz-meta-sha256: { type: string }
+    NarrationInput:
+      type: object
+      required: [locale, transcript]
+      properties:
+        locale: { $ref: '#/components/schemas/SupportedLocale' }
+        transcript: { type: string, minLength: 20, maxLength: 20000 }
+        audio:
+          allOf: [{ $ref: '#/components/schemas/NarrationAudioInput' }]
+          nullable: true
+    NarrationUpdate:
+      type: object
+      properties:
+        transcript: { type: string, minLength: 20, maxLength: 20000 }
+        audio:
+          allOf: [{ $ref: '#/components/schemas/NarrationAudioInput' }]
+          nullable: true
+    AdminNarration:
+      allOf:
+        - { $ref: '#/components/schemas/NarrationInput' }
+        - type: object
+          required: [id, poiId, revision, status, createdAt, updatedAt]
+          properties:
+            id: { type: string, format: uuid }
+            poiId: { type: string, format: uuid }
+            revision: { type: integer, minimum: 1 }
+            status:
+              type: string
+              enum: [draft, pending_review, published, rejected, superseded]
+            rejectionReason: { type: string }
+            createdAt: { type: string, format: date-time }
+            updatedAt: { type: string, format: date-time }
+    PublicNarrationAudio:
+      type: object
+      required:
+        [
+          mimeType,
+          sizeBytes,
+          sha256,
+          durationSeconds,
+          rightsOwner,
+          rightsSource,
+          usageRights,
+          playbackUrl,
+          playbackExpiresAt,
+        ]
+      properties:
+        mimeType:
+          type: string
+          enum: [audio/mpeg, audio/mp4, audio/ogg, audio/wav]
+        sizeBytes: { type: integer, minimum: 1 }
+        sha256: { type: string }
+        durationSeconds: { type: number }
+        rightsOwner: { type: string }
+        rightsSource: { type: string }
+        usageRights: { type: string }
+        playbackUrl:
+          type: string
+          format: uri
+          description: Ten-minute signed GET URL for reviewed published audio
+        playbackExpiresAt: { type: string, format: date-time }
+    PoiNarration:
+      type: object
+      required:
+        [
+          id,
+          poiId,
+          requestedLocale,
+          resolvedLocale,
+          fallbackUsed,
+          transcript,
+          audio,
+        ]
+      properties:
+        id: { type: string, format: uuid }
+        poiId: { type: string, format: uuid }
+        requestedLocale: { $ref: '#/components/schemas/SupportedLocale' }
+        resolvedLocale: { $ref: '#/components/schemas/SupportedLocale' }
+        fallbackUsed: { type: boolean, enum: [false] }
+        transcript: { type: string }
+        audio:
+          allOf: [{ $ref: '#/components/schemas/PublicNarrationAudio' }]
+          nullable: true
+    PoiSummary:
+      type: object
+      required:
+        [
+          id,
+          slug,
+          category,
+          location,
+          requestedLocale,
+          resolvedLocale,
+          fallbackUsed,
+          name,
+          shortDescription,
+          isOpen,
+        ]
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string }
+        category: { type: string }
+        location: { $ref: '#/components/schemas/GeoPoint' }
+        requestedLocale: { $ref: '#/components/schemas/SupportedLocale' }
+        resolvedLocale: { $ref: '#/components/schemas/SupportedLocale' }
+        fallbackUsed: { type: boolean }
+        name: { type: string }
+        shortDescription: { type: string }
+        distanceMeters: { type: integer, minimum: 0 }
+        isOpen: { type: boolean }
+    SearchReason:
+      type: string
+      enum: [exact_name, accent_insensitive_name, text_match, nearby, open_now]
+    SearchResult:
+      allOf:
+        - { $ref: '#/components/schemas/PoiSummary' }
+        - type: object
+          required: [score, reasons]
+          properties:
+            score: { type: number, minimum: 0 }
+            reasons:
+              type: array
+              minItems: 1
+              items: { $ref: '#/components/schemas/SearchReason' }
+    SearchResponse:
+      type: object
+      required: [items, total, limit, offset]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/SearchResult' }
+        total: { type: integer, minimum: 0 }
+        limit: { type: integer, minimum: 1, maximum: 50 }
+        offset: { type: integer, minimum: 0 }
+        nextOffset: { type: integer, minimum: 0 }
+    PoiEntrance:
+      type: object
+      required: [id, label, location, graphNodeRef, isPrimary, accessibility]
+      properties:
+        id: { type: string, format: uuid }
+        label: { type: string }
+        location: { $ref: '#/components/schemas/GeoPoint' }
+        graphNodeRef: { type: string }
+        isPrimary: { type: boolean }
+        accessibility: { type: string, enum: [standard, step_free] }
+    PoiOperatingHours:
+      type: object
+      required: [dayOfWeek, opensAt, closesAt]
+      properties:
+        dayOfWeek: { type: integer, minimum: 0, maximum: 6 }
+        opensAt: { type: string }
+        closesAt: { type: string }
+    PoiDetail:
+      allOf:
+        - { $ref: '#/components/schemas/PoiSummary' }
+        - type: object
+          required: [longDescription, entrances, operatingHours]
+          properties:
+            longDescription: { type: string }
+            entrances:
+              type: array
+              items: { $ref: '#/components/schemas/PoiEntrance' }
+            operatingHours:
+              type: array
+              items: { $ref: '#/components/schemas/PoiOperatingHours' }
+    PoiListResponse:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/PoiSummary' }
+        total: { type: integer, minimum: 0 }
+    AnalyticsEventType:
+      type: string
+      enum:
+        [
+          app_opened,
+          poi_viewed,
+          narration_started,
+          narration_completed,
+          route_requested,
+          route_started,
+          route_completed,
+        ]
+    AnalyticsEventPayload:
+      type: object
+      description: >-
+        Event-specific coarse context only. Unknown fields and any GPS/PII-like
+        fields are rejected by the endpoint.
+      additionalProperties: false
+      properties:
+        poiId: { type: string, format: uuid }
+        locale: { $ref: '#/components/schemas/SupportedLocale' }
+        accessible: { type: boolean }
+    AnalyticsEventInput:
+      type: object
+      additionalProperties: false
+      required: [eventId, schemaVersion, eventType, occurredAt, payload]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+          description: Client-generated UUID v4 idempotency key
+        schemaVersion: { type: integer, enum: [1] }
+        eventType: { $ref: '#/components/schemas/AnalyticsEventType' }
+        occurredAt: { type: string, format: date-time }
+        payload: { $ref: '#/components/schemas/AnalyticsEventPayload' }
+    AnalyticsBatchRequest:
+      type: object
+      additionalProperties: false
+      required: [consent, events]
+      properties:
+        anonymousSessionId:
+          type: string
+          format: uuid
+          description: Required when bearer authentication is absent
+        consent:
+          type: object
+          additionalProperties: false
+          required: [analytics, policyVersion]
+          properties:
+            analytics: { type: boolean, enum: [true] }
+            policyVersion: { type: string, minLength: 1, maxLength: 40 }
+        events:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items: { $ref: '#/components/schemas/AnalyticsEventInput' }
+    AnalyticsBatchResponse:
+      type: object
+      required: [acceptedEventIds, duplicateEventIds]
+      properties:
+        acceptedEventIds:
+          type: array
+          items: { type: string, format: uuid }
+        duplicateEventIds:
+          type: array
+          items: { type: string, format: uuid }
+    ApiErrorEnvelope:
+      type: object
+      required: [code, message, details, requestId]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        details: { nullable: true }
+        requestId: { type: string }

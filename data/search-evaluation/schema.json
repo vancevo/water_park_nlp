@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/search-evaluation-v1.json",
+  "title": "Synthetic POI search relevance judgments",
+  "type": "object",
+  "required": ["dataset_id", "version", "source_fixture", "scope", "queries"],
+  "additionalProperties": false,
+  "properties": {
+    "dataset_id": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "source_fixture": {"type": "string", "minLength": 1},
+    "scope": {"type": "string", "minLength": 1},
+    "queries": {
+      "type": "array",
+      "minItems": 50,
+      "items": {
+        "type": "object",
+        "required": ["id", "locale", "text", "case_type", "relevant"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^q[0-9]{3}$"},
+          "locale": {"enum": ["vi", "en"]},
+          "text": {"type": "string", "minLength": 1},
+          "case_type": {"enum": ["exact", "no_diacritic", "semantic_intent", "typo", "category_location", "zero_result"]},
+          "relevant": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["poi_id", "grade"],
+              "additionalProperties": false,
+              "properties": {
+                "poi_id": {"type": "string", "minLength": 1},
+                "grade": {"type": "integer", "minimum": 1, "maximum": 3}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "result_mapping": {
+      "description": "Input accepted by evaluate.py",
+      "type": "object",
+      "required": ["results"],
+      "properties": {
+        "dataset_id": {"type": "string"},
+        "results": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {"type": "string"},
+            "uniqueItems": true
+          }
+        }
+      }
+    }
+  }
+}

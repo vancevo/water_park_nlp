@@ -1,0 +1,408 @@
+{
+  "type": "FeatureCollection",
+  "name": "damsen_research_walk_nodes",
+  "research_only": true,
+  "navigation_use": "prohibited_until_field_verified",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "9235d7ae-de5f-5670-8afa-128109895370",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.7659
+        ]
+      },
+      "properties": {
+        "external_id": "R01",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8550434c-f367-5215-9ace-b1009d3cee6b",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.7659
+        ]
+      },
+      "properties": {
+        "external_id": "R02",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "370116c5-2a00-5613-a89d-51db44d351aa",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.7659
+        ]
+      },
+      "properties": {
+        "external_id": "R03",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4e5f3dcc-4ad9-5d9f-a7ba-c9ccb1453c37",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.7659
+        ]
+      },
+      "properties": {
+        "external_id": "R04",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "410df99c-21c4-59fc-b1d0-1b87bf1430dd",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.7659
+        ]
+      },
+      "properties": {
+        "external_id": "R05",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b2afb7fb-9612-5a73-b674-a177330c8306",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.76645
+        ]
+      },
+      "properties": {
+        "external_id": "R06",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "0bdeb2ab-0054-5a95-b27d-9f316fec1083",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.76645
+        ]
+      },
+      "properties": {
+        "external_id": "R07",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "16b14ab5-4fcf-58bc-bcd0-9ca6d9a3c8ea",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.76645
+        ]
+      },
+      "properties": {
+        "external_id": "R08",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b54f807f-f808-5830-9cab-169df87bc9fd",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.76645
+        ]
+      },
+      "properties": {
+        "external_id": "R09",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4e9d53ea-cdf9-5022-9955-de0db7a2bcc2",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.76645
+        ]
+      },
+      "properties": {
+        "external_id": "R10",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a3d994f7-e8ba-5973-8e19-42080e01e35f",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.767
+        ]
+      },
+      "properties": {
+        "external_id": "R11",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c2ff5e2a-7b8f-5c96-9233-b07d40251b14",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.767
+        ]
+      },
+      "properties": {
+        "external_id": "R12",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "deca1904-a1e0-5cdf-b3ed-bb4a9b03f3c8",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.767
+        ]
+      },
+      "properties": {
+        "external_id": "R13",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8681b204-2e0d-5c13-9285-275505774bdc",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.767
+        ]
+      },
+      "properties": {
+        "external_id": "R14",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ee8c58aa-9c5a-5252-bd3f-37ceb5caa99f",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.767
+        ]
+      },
+      "properties": {
+        "external_id": "R15",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "65d68b9c-e38b-5e39-a7c2-0325841fd72b",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.76755
+        ]
+      },
+      "properties": {
+        "external_id": "R16",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "211f07f7-3ed4-5d57-bbb2-585a2be4e50c",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.76755
+        ]
+      },
+      "properties": {
+        "external_id": "R17",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2126c135-c259-5d1a-93ea-4ea3bbea991f",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.76755
+        ]
+      },
+      "properties": {
+        "external_id": "R18",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "05dcdb28-84aa-56a1-8dd1-f96f704d8a1f",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.76755
+        ]
+      },
+      "properties": {
+        "external_id": "R19",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "484761f4-87f5-5c7b-b56d-4ff409adf7d1",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.76755
+        ]
+      },
+      "properties": {
+        "external_id": "R20",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ad03afa2-c784-52f1-b331-abd52ea14f39",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.7681
+        ]
+      },
+      "properties": {
+        "external_id": "R21",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8933f340-50e6-562a-8850-e37f7a60dc9a",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.7681
+        ]
+      },
+      "properties": {
+        "external_id": "R22",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3e640f28-2e12-5e0e-972f-c82aa589ef88",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.7681
+        ]
+      },
+      "properties": {
+        "external_id": "R23",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "181e8cdf-73d8-5d5f-b60e-e831ed16c2ce",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.7681
+        ]
+      },
+      "properties": {
+        "external_id": "R24",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a7914acf-ce22-577f-b574-027b2140738d",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.7681
+        ]
+      },
+      "properties": {
+        "external_id": "R25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false
+      }
+    }
+  ]
+}

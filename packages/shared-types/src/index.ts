@@ -1,0 +1,333 @@
+export interface ApiErrorEnvelope {
+  code: string;
+  message: string;
+  details: unknown;
+  requestId: string;
+}
+
+export interface HealthResponse {
+  status: 'ok';
+}
+
+export type SupportedLocale = 'vi' | 'en';
+
+export interface GeoPoint {
+  latitude: number;
+  longitude: number;
+}
+
+export interface LocalizedContent {
+  requestedLocale: SupportedLocale;
+  resolvedLocale: SupportedLocale;
+  fallbackUsed: boolean;
+  name: string;
+  shortDescription: string;
+}
+
+export interface PoiEntrance {
+  id: string;
+  label: string;
+  location: GeoPoint;
+  graphNodeRef: string;
+  isPrimary: boolean;
+  accessibility: 'standard' | 'step_free';
+}
+
+export interface PoiOperatingHours {
+  dayOfWeek: number;
+  opensAt: string;
+  closesAt: string;
+}
+
+export interface PoiSummary extends LocalizedContent {
+  id: string;
+  slug: string;
+  category: string;
+  location: GeoPoint;
+  distanceMeters?: number;
+  isOpen?: boolean;
+}
+
+export interface PoiDetail extends PoiSummary {
+  longDescription: string;
+  entrances: PoiEntrance[];
+  operatingHours: PoiOperatingHours[];
+}
+
+export interface PoiListResponse {
+  items: PoiSummary[];
+  total: number;
+}
+
+export interface PoiListQuery {
+  lat?: number;
+  lng?: number;
+  radius?: number;
+  category?: string;
+  openNow?: boolean;
+  locale?: SupportedLocale;
+}
+
+export type SearchReason =
+  | 'exact_name'
+  | 'accent_insensitive_name'
+  | 'text_match'
+  | 'nearby'
+  | 'open_now';
+
+export interface SearchQuery {
+  q: string;
+  locale?: SupportedLocale;
+  category?: string;
+  openNow?: boolean;
+  lat?: number;
+  lng?: number;
+  radius?: number;
+  limit?: number;
+  offset?: number;
+}
+
+export interface SearchResult extends PoiSummary {
+  score: number;
+  reasons: SearchReason[];
+}
+
+export interface SearchResponse {
+  items: SearchResult[];
+  total: number;
+  limit: number;
+  offset: number;
+  nextOffset?: number;
+}
+
+export type UserRole = 'VISITOR' | 'EDITOR' | 'REVIEWER' | 'ADMIN';
+export type PoiWorkflowStatus =
+  | 'draft'
+  | 'pending_review'
+  | 'published'
+  | 'rejected';
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  preferredLocale: SupportedLocale;
+  roles: UserRole[];
+}
+
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiresIn: number;
+}
+
+export interface AuthResponse extends AuthTokens {
+  user: AuthUser;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  preferredLocale?: SupportedLocale;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RefreshRequest {
+  refreshToken: string;
+}
+
+export interface LogoutRequest {
+  refreshToken: string;
+}
+
+export interface AdminPoiTranslationInput {
+  locale: SupportedLocale;
+  name: string;
+  shortDescription: string;
+  longDescription: string;
+}
+
+export interface AdminPoiEntranceInput {
+  id?: string;
+  labelVi: string;
+  labelEn: string;
+  location: GeoPoint;
+  graphNodeRef: string;
+  isPrimary: boolean;
+  accessibility: 'standard' | 'step_free';
+}
+
+export interface AdminPoiInput {
+  slug: string;
+  category: string;
+  location: GeoPoint;
+  translations: AdminPoiTranslationInput[];
+  entrances: AdminPoiEntranceInput[];
+  operatingHours: PoiOperatingHours[];
+}
+
+export interface AdminPoi extends AdminPoiInput {
+  id: string;
+  status: PoiWorkflowStatus;
+  pendingVersionId?: string;
+  rejectionReason?: string;
+}
+
+export interface WorkflowReasonRequest {
+  reason: string;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  actorId: string;
+  action: string;
+  entityType: 'poi';
+  entityId: string;
+  before: unknown;
+  after: unknown;
+  createdAt: string;
+}
+
+export interface RouteOrigin {
+  lat: number;
+  lng: number;
+}
+
+export interface RouteRequest {
+  from: RouteOrigin;
+  poiId: string;
+  accessible?: boolean;
+}
+
+export interface GeoJsonLineString {
+  type: 'LineString';
+  coordinates: [number, number][];
+}
+
+export interface RouteStep {
+  sequence: number;
+  instruction: string;
+  distanceMeters: number;
+}
+
+export interface RouteResponse {
+  routeId: string;
+  version: number;
+  geometry: GeoJsonLineString;
+  distanceMeters: number;
+  etaSeconds: number;
+  steps: RouteStep[];
+}
+
+export type AnalyticsEventType =
+  | 'app_opened'
+  | 'poi_viewed'
+  | 'narration_started'
+  | 'narration_completed'
+  | 'route_requested'
+  | 'route_started'
+  | 'route_completed';
+
+export type AnalyticsEventPayload = {
+  poiId?: string;
+  locale?: SupportedLocale;
+  accessible?: boolean;
+};
+
+export interface AnalyticsEventInput {
+  /** Client-generated UUID v4 used as the idempotency key. */
+  eventId: string;
+  schemaVersion: 1;
+  eventType: AnalyticsEventType;
+  occurredAt: string;
+  payload: AnalyticsEventPayload;
+}
+
+export interface AnalyticsBatchRequest {
+  /** Required only when no valid access token is supplied. */
+  anonymousSessionId?: string;
+  consent: {
+    analytics: true;
+    policyVersion: string;
+  };
+  events: AnalyticsEventInput[];
+}
+
+export interface AnalyticsBatchResponse {
+  acceptedEventIds: string[];
+  duplicateEventIds: string[];
+}
+
+export type NarrationWorkflowStatus =
+  | 'draft'
+  | 'pending_review'
+  | 'published'
+  | 'rejected'
+  | 'superseded';
+
+export interface NarrationAudioMetadataInput {
+  objectKey: string;
+  mimeType: 'audio/mpeg' | 'audio/mp4' | 'audio/ogg' | 'audio/wav';
+  sizeBytes: number;
+  sha256: string;
+  durationSeconds: number;
+  rightsOwner: string;
+  rightsSource: string;
+  usageRights: string;
+}
+
+export interface NarrationInput {
+  locale: SupportedLocale;
+  transcript: string;
+  audio?: NarrationAudioMetadataInput | null;
+}
+
+export interface NarrationAudioMetadata
+  extends Omit<NarrationAudioMetadataInput, 'objectKey'> {
+  playbackUrl: string;
+  playbackExpiresAt: string;
+}
+
+export interface PoiNarration {
+  id: string;
+  poiId: string;
+  requestedLocale: SupportedLocale;
+  resolvedLocale: SupportedLocale;
+  fallbackUsed: false;
+  transcript: string;
+  audio: NarrationAudioMetadata | null;
+}
+
+export interface AdminNarration extends NarrationInput {
+  id: string;
+  poiId: string;
+  revision: number;
+  status: NarrationWorkflowStatus;
+  rejectionReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MediaUploadIntentRequest {
+  poiId: string;
+  locale: SupportedLocale;
+  mimeType: NarrationAudioMetadataInput['mimeType'];
+  sizeBytes: number;
+  sha256: string;
+}
+
+export interface MediaUploadIntent {
+  objectKey: string;
+  uploadUrl: string;
+  method: 'PUT';
+  expiresAt: string;
+  requiredHeaders: {
+    'content-type': string;
+    'content-length': string;
+    'x-amz-checksum-sha256': string;
+    'x-amz-meta-sha256': string;
+  };
+}

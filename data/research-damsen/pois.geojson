@@ -1,0 +1,824 @@
+{
+  "type": "FeatureCollection",
+  "name": "damsen_research_pois",
+  "research_only": true,
+  "navigation_use": "prohibited_until_field_verified",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "1bfa08e0-f86f-57c7-8cb4-0f747d14c845",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.7659
+        ]
+      },
+      "properties": {
+        "slug": "thuy-cung",
+        "category": "exhibit",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Thủy cung",
+            "short_description": "Điểm tham quan chủ đề sinh vật thủy sinh.",
+            "long_description": "Điểm tham quan chủ đề sinh vật thủy sinh. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Aquarium",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dc99eec4-ebf2-57a4-9e56-9d7ef3ba4c46",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.7659
+        ]
+      },
+      "properties": {
+        "slug": "bang-dang",
+        "category": "exhibit",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/category/cac-tro-choi-tai-cong-vien-van-hoa-dam-sen/tro-choi-giai-tri-dam-sen-kho/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Băng đăng",
+            "short_description": "Không gian tham quan các tác phẩm điêu khắc băng.",
+            "long_description": "Không gian tham quan các tác phẩm điêu khắc băng. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Ice Sculpture Hall",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "14ad7551-925e-519d-b387-fc88e733ac17",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.7659
+        ]
+      },
+      "properties": {
+        "slug": "du-quay-dung",
+        "category": "ride",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/category/cac-tro-choi-tai-cong-vien-van-hoa-dam-sen/tro-choi-giai-tri-dam-sen-kho/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Đu quay đứng Ferris wheel",
+            "short_description": "Trò chơi vòng quay quan sát từ trên cao.",
+            "long_description": "Trò chơi vòng quay quan sát từ trên cao. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Ferris Wheel",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "db561c68-4648-5896-964e-40f8f77b89dc",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.7659
+        ]
+      },
+      "properties": {
+        "slug": "monorail",
+        "category": "ride",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/category/cac-tro-choi-tai-cong-vien-van-hoa-dam-sen/tro-choi-giai-tri-dam-sen-kho/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Monorail",
+            "short_description": "Tuyến tàu tham quan trong khu vui chơi.",
+            "long_description": "Tuyến tàu tham quan trong khu vui chơi. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Monorail",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "35f1ab49-17e1-5fec-9354-47d2539f5c71",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.7659
+        ]
+      },
+      "properties": {
+        "slug": "dap-vit-pedalo",
+        "category": "ride",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/category/cac-tro-choi-tai-cong-vien-van-hoa-dam-sen/tro-choi-giai-tri-dam-sen-kho/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Đạp vịt Pedalo",
+            "short_description": "Hoạt động đạp thuyền giải trí trên mặt nước.",
+            "long_description": "Hoạt động đạp thuyền giải trí trên mặt nước. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Pedalo Boats",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b9da6bd7-5481-592e-b45d-94306f4844f7",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.76645
+        ]
+      },
+      "properties": {
+        "slug": "lau-dai-ky-thu",
+        "category": "interactive",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/category/cac-tro-choi-tai-cong-vien-van-hoa-dam-sen/tro-choi-tuong-tac-ao-dam-sen-kho/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Lâu đài kỳ thú",
+            "short_description": "Khu trải nghiệm tương tác dành cho nhiều nhóm tuổi.",
+            "long_description": "Khu trải nghiệm tương tác dành cho nhiều nhóm tuổi. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Wonder Castle",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "94836fa9-4d6b-5e14-b4f4-370743173113",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.76645
+        ]
+      },
+      "properties": {
+        "slug": "cinemax-8d",
+        "category": "interactive",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/category/cac-tro-choi-tai-cong-vien-van-hoa-dam-sen/tro-choi-tuong-tac-ao-dam-sen-kho/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Cinemax 8D",
+            "short_description": "Không gian phim tương tác với hiệu ứng chuyển động.",
+            "long_description": "Không gian phim tương tác với hiệu ứng chuyển động. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Cinemax 8D",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "182e033d-ab8a-59b7-b738-da0a08a9fcc1",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.76645
+        ]
+      },
+      "properties": {
+        "slug": "9d-virtual-reality",
+        "category": "interactive",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/category/cac-tro-choi-tai-cong-vien-van-hoa-dam-sen/tro-choi-tuong-tac-ao-dam-sen-kho/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "9D Virtual Reality",
+            "short_description": "Trải nghiệm nội dung thực tế ảo đa chiều.",
+            "long_description": "Trải nghiệm nội dung thực tế ảo đa chiều. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "9D Virtual Reality",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "646a5702-157f-5cb7-bc10-bd2d023bab84",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.76645
+        ]
+      },
+      "properties": {
+        "slug": "turbo-racing",
+        "category": "interactive",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/category/cac-tro-choi-tai-cong-vien-van-hoa-dam-sen/tro-choi-tuong-tac-ao-dam-sen-kho/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Đua xe Turbo Racing",
+            "short_description": "Trò chơi mô phỏng điều khiển xe đua.",
+            "long_description": "Trò chơi mô phỏng điều khiển xe đua. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Turbo Racing",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "627dc321-49e4-5e8d-b1f4-80586b2c470c",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.76645
+        ]
+      },
+      "properties": {
+        "slug": "run-raider",
+        "category": "interactive",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/category/cac-tro-choi-tai-cong-vien-van-hoa-dam-sen/tro-choi-tuong-tac-ao-dam-sen-kho/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Bắn súng Run Raider",
+            "short_description": "Trò chơi bắn súng tương tác theo nhóm.",
+            "long_description": "Trò chơi bắn súng tương tác theo nhóm. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Run Raider",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "100a3d4d-e7f2-5cdf-b7ff-649bbab51591",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.767
+        ]
+      },
+      "properties": {
+        "slug": "tau-luon-sieu-toc",
+        "category": "thrill_ride",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/tro-choi-cam-giac-manh/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Tàu lượn siêu tốc",
+            "short_description": "Trò chơi tàu lượn dành cho người đáp ứng điều kiện an toàn.",
+            "long_description": "Trò chơi tàu lượn dành cho người đáp ứng điều kiện an toàn. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Roller Coaster",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5208419a-434c-5374-b6b9-9ff2f4d50426",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.767
+        ]
+      },
+      "properties": {
+        "slug": "tau-vuot-thac",
+        "category": "thrill_ride",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/tro-choi-cam-giac-manh/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Tàu vượt thác",
+            "short_description": "Trò chơi đường nước có các đoạn lên và xuống dốc.",
+            "long_description": "Trò chơi đường nước có các đoạn lên và xuống dốc. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Log Flume",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e33a7a52-adda-50af-b2dc-f5ccfbe9eb9d",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.767
+        ]
+      },
+      "properties": {
+        "slug": "tau-xoay-cao-toc",
+        "category": "thrill_ride",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/tro-choi-cam-giac-manh/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Tàu xoay cao tốc",
+            "short_description": "Trò chơi tàu chạy tốc độ cao kết hợp chuyển động xoay.",
+            "long_description": "Trò chơi tàu chạy tốc độ cao kết hợp chuyển động xoay. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Spinning Coaster",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9a0533a3-0545-510f-b8e4-a9d01abf8099",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.767
+        ]
+      },
+      "properties": {
+        "slug": "ca-chep-nhao-lon",
+        "category": "thrill_ride",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/tro-choi-cam-giac-manh/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Cá chép nhào lộn",
+            "short_description": "Trò chơi chuyển động mạnh theo vòng quay.",
+            "long_description": "Trò chơi chuyển động mạnh theo vòng quay. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Flying Carp",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1cfc6e90-9050-5e4a-b382-39239606f624",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.767
+        ]
+      },
+      "properties": {
+        "slug": "phuong-hoang-bay",
+        "category": "thrill_ride",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/tro-choi-cam-giac-manh/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Phượng hoàng bay",
+            "short_description": "Trò chơi cảm giác mạnh với chuyển động trên cao.",
+            "long_description": "Trò chơi cảm giác mạnh với chuyển động trên cao. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Flying Phoenix",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "657f86f3-ff13-5ae1-8872-ef7518e2edcb",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.76755
+        ]
+      },
+      "properties": {
+        "slug": "tham-bay",
+        "category": "thrill_ride",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/tro-choi-cam-giac-manh/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Thảm bay",
+            "short_description": "Trò chơi chuyển động qua lại và nâng cao.",
+            "long_description": "Trò chơi chuyển động qua lại và nâng cao. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Flying Carpet",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "543d67d2-16ce-5026-bbd4-47ff94d1c1a4",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.76755
+        ]
+      },
+      "properties": {
+        "slug": "vong-quay-khong-gian",
+        "category": "thrill_ride",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/tro-choi-cam-giac-manh/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Vòng quay không gian",
+            "short_description": "Trò chơi vòng quay tốc độ cao.",
+            "long_description": "Trò chơi vòng quay tốc độ cao. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Space Spinner",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e16d4e26-2d2f-5229-b804-8f10702e54d9",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.76755
+        ]
+      },
+      "properties": {
+        "slug": "xe-dien-dung",
+        "category": "ride",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/category/cac-tro-choi-tai-cong-vien-van-hoa-dam-sen/tro-choi-giai-tri-dam-sen-kho/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Xe điện đụng",
+            "short_description": "Khu điều khiển xe điện va chạm giải trí.",
+            "long_description": "Khu điều khiển xe điện va chạm giải trí. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Bumper Cars",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dd4117ac-26d0-5e0d-ab9b-9b7b57c5e634",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.76755
+        ]
+      },
+      "properties": {
+        "slug": "kids-playground",
+        "category": "children",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/tro-choi-lien-hoan/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Kids Playground",
+            "short_description": "Khu vận động và vui chơi dành cho trẻ em.",
+            "long_description": "Khu vận động và vui chơi dành cho trẻ em. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Kids Playground",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "239f6751-034b-55f3-988b-e0a81823f137",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.76755
+        ]
+      },
+      "properties": {
+        "slug": "pokids",
+        "category": "children",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/tro-choi-lien-hoan/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Trạm không gian sáng tạo Pokids",
+            "short_description": "Khu hoạt động sáng tạo và khám phá cho trẻ em.",
+            "long_description": "Khu hoạt động sáng tạo và khám phá cho trẻ em. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Pokids Creative Station",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ad6482d1-a85f-58dc-89d5-3d4c67515e1a",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.7681
+        ]
+      },
+      "properties": {
+        "slug": "nam-tu-thuong-uyen",
+        "category": "garden",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Nam Tú Thượng Uyển",
+            "short_description": "Không gian vườn cảnh phục vụ tham quan.",
+            "long_description": "Không gian vườn cảnh phục vụ tham quan. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Nam Tu Garden",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "73ab432a-a382-5be9-bdda-a2dea26ab37a",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.7681
+        ]
+      },
+      "properties": {
+        "slug": "quang-truong-la-ma",
+        "category": "landmark",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/category/cac-tro-choi-tai-cong-vien-van-hoa-dam-sen/tro-choi-giai-tri-dam-sen-kho/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Quảng trường La Mã",
+            "short_description": "Không gian quảng trường và điểm hẹn trong công viên.",
+            "long_description": "Không gian quảng trường và điểm hẹn trong công viên. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Roman Square",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dfd1303a-a8c8-5311-8369-fb40efbf8240",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.7681
+        ]
+      },
+      "properties": {
+        "slug": "san-khau-ngoi-sao",
+        "category": "show",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/lien-hoan-ban-nhac-sinh-vien-2019-chao-mung-quoc-khanh/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Sân khấu Ngôi Sao",
+            "short_description": "Khu vực tổ chức chương trình biểu diễn và sự kiện.",
+            "long_description": "Khu vực tổ chức chương trình biểu diễn và sự kiện. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Star Stage",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "43625d44-b74e-5c1c-b952-02cce517e24d",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.7681
+        ]
+      },
+      "properties": {
+        "slug": "cong-1a",
+        "category": "entrance",
+        "status": "draft",
+        "source": "official_fact_research",
+        "source_url": "https://damsenpark.vn/",
+        "source_checked_at": "2026-09-25",
+        "coordinate_accuracy": "synthetic_approximation",
+        "field_verified": false,
+        "navigation_use": "prohibited_until_field_verified",
+        "translations": {
+          "vi": {
+            "name": "Cổng 1A",
+            "short_description": "Một trong các cổng được website chính thức nhắc đến.",
+            "long_description": "Một trong các cổng được website chính thức nhắc đến. Nội dung nghiên cứu được viết mới; vị trí trên bản đồ hiện là giả lập."
+          },
+          "en": {
+            "name": "Gate 1A",
+            "short_description": "Research-only attraction record with an approximate synthetic position.",
+            "long_description": "This original research description does not reproduce official promotional copy. The map position is synthetic and must not be used for navigation."
+          }
+        }
+      }
+    }
+  ]
+}

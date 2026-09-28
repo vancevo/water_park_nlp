@@ -1,0 +1,26 @@
+{
+  "type": "FeatureCollection",
+  "name": "synthetic_fixture_pois",
+  "features": [
+    {
+      "type": "Feature", "id": "00000000-0000-4000-8000-000000000101", "geometry": {"type": "Point", "coordinates": [106.63500, 10.76700]},
+      "properties": {"slug": "vuon-cau-vong", "category": "garden", "status": "published", "source": "synthetic_fixture", "entrance_id": "00000000-0000-4000-8000-000000000201", "tags": ["garden", "family"], "translations": {"vi": {"name": "Vườn Cầu Vồng", "short_description": "Khu vườn giả lập nhiều màu dành cho bài kiểm thử.", "long_description": "Khu vườn giả lập nhiều màu dành cho bài kiểm thử. Nội dung này là dữ liệu giả lập phục vụ phát triển và kiểm thử."}, "en": {"name": "Rainbow Garden", "short_description": "A colourful fictional garden used for testing.", "long_description": "A colourful fictional garden used for testing. This synthetic content is for development and testing only."}}}
+    },
+    {
+      "type": "Feature", "id": "00000000-0000-4000-8000-000000000102", "geometry": {"type": "Point", "coordinates": [106.63535, 10.76700]},
+      "properties": {"slug": "tram-kham-pha-nuoc", "category": "exhibit", "status": "published", "source": "synthetic_fixture", "entrance_id": "00000000-0000-4000-8000-000000000202", "tags": ["water", "education"], "translations": {"vi": {"name": "Trạm Khám Phá Nước", "short_description": "Điểm trưng bày giả lập về vòng tuần hoàn nước.", "long_description": "Điểm trưng bày giả lập về vòng tuần hoàn nước. Nội dung này là dữ liệu giả lập phục vụ phát triển và kiểm thử."}, "en": {"name": "Water Discovery Station", "short_description": "A fictional exhibit about the water cycle.", "long_description": "A fictional exhibit about the water cycle. This synthetic content is for development and testing only."}}}
+    },
+    {
+      "type": "Feature", "id": "00000000-0000-4000-8000-000000000103", "geometry": {"type": "Point", "coordinates": [106.63570, 10.76700]},
+      "properties": {"slug": "san-khau-gio", "category": "show", "status": "published", "source": "synthetic_fixture", "entrance_id": "00000000-0000-4000-8000-000000000203", "tags": ["show", "music"], "translations": {"vi": {"name": "Sân Khấu Gió", "short_description": "Sân khấu mẫu dùng kiểm thử lịch và audio.", "long_description": "Sân khấu mẫu dùng kiểm thử lịch và audio. Nội dung này là dữ liệu giả lập phục vụ phát triển và kiểm thử."}, "en": {"name": "Wind Stage", "short_description": "A sample stage for schedule and audio tests.", "long_description": "A sample stage for schedule and audio tests. This synthetic content is for development and testing only."}}}
+    },
+    {
+      "type": "Feature", "id": "00000000-0000-4000-8000-000000000104", "geometry": {"type": "Point", "coordinates": [106.63535, 10.76730]},
+      "properties": {"slug": "nha-kham-pha-xanh", "category": "indoor", "status": "published", "source": "synthetic_fixture", "entrance_id": "00000000-0000-4000-8000-000000000204", "tags": ["indoor", "family"], "translations": {"vi": {"name": "Nhà Khám Phá Xanh", "short_description": "Không gian trong nhà giả lập cho gia đình.", "long_description": "Không gian trong nhà giả lập cho gia đình. Nội dung này là dữ liệu giả lập phục vụ phát triển và kiểm thử."}, "en": {"name": "Green Discovery House", "short_description": "A fictional indoor family space.", "long_description": "A fictional indoor family space. This synthetic content is for development and testing only."}}}
+    },
+    {
+      "type": "Feature", "id": "00000000-0000-4000-8000-000000000105", "geometry": {"type": "Point", "coordinates": [106.63570, 10.76730]},
+      "properties": {"slug": "quang-truong-may", "category": "landmark", "status": "published", "source": "synthetic_fixture", "entrance_id": "00000000-0000-4000-8000-000000000205", "tags": ["meeting", "landmark"], "translations": {"vi": {"name": "Quảng Trường Mây", "short_description": "Mốc gặp mặt giả lập trong bộ dữ liệu mẫu.", "long_description": "Mốc gặp mặt giả lập trong bộ dữ liệu mẫu. Nội dung này là dữ liệu giả lập phục vụ phát triển và kiểm thử."}, "en": {"name": "Cloud Square", "short_description": "A fictional meeting landmark in the fixture.", "long_description": "A fictional meeting landmark in the fixture. This synthetic content is for development and testing only."}}}
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "type": "FeatureCollection", "name": "synthetic_fixture_entrances", "features": [
+    {"type": "Feature", "id": "00000000-0000-4000-8000-000000000201", "geometry": {"type": "Point", "coordinates": [106.63500, 10.76700]}, "properties": {"poi_id": "00000000-0000-4000-8000-000000000101", "label_vi": "Cổng chính", "label_en": "Main entrance", "graph_node_ref": "N2", "is_primary": true, "is_active": true, "accessibility": "standard"}},
+    {"type": "Feature", "id": "00000000-0000-4000-8000-000000000202", "geometry": {"type": "Point", "coordinates": [106.63535, 10.76700]}, "properties": {"poi_id": "00000000-0000-4000-8000-000000000102", "label_vi": "Cổng chính", "label_en": "Main entrance", "graph_node_ref": "N3", "is_primary": true, "is_active": true, "accessibility": "standard"}},
+    {"type": "Feature", "id": "00000000-0000-4000-8000-000000000203", "geometry": {"type": "Point", "coordinates": [106.63570, 10.76700]}, "properties": {"poi_id": "00000000-0000-4000-8000-000000000103", "label_vi": "Cổng chính", "label_en": "Main entrance", "graph_node_ref": "N4", "is_primary": true, "is_active": true, "accessibility": "standard"}},
+    {"type": "Feature", "id": "00000000-0000-4000-8000-000000000204", "geometry": {"type": "Point", "coordinates": [106.63535, 10.76730]}, "properties": {"poi_id": "00000000-0000-4000-8000-000000000104", "label_vi": "Cổng không bậc", "label_en": "Step-free entrance", "graph_node_ref": "N6", "is_primary": true, "is_active": true, "accessibility": "step_free"}},
+    {"type": "Feature", "id": "00000000-0000-4000-8000-000000000205", "geometry": {"type": "Point", "coordinates": [106.63570, 10.76730]}, "properties": {"poi_id": "00000000-0000-4000-8000-000000000105", "label_vi": "Cổng chính", "label_en": "Main entrance", "graph_node_ref": "N7", "is_primary": true, "is_active": true, "accessibility": "standard"}}
+  ]
+}

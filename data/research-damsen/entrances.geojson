@@ -1,0 +1,512 @@
+{
+  "type": "FeatureCollection",
+  "name": "damsen_research_entrances",
+  "research_only": true,
+  "navigation_use": "prohibited_until_field_verified",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "ee5aebb3-fb39-5845-810a-058efeda7c44",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.7659
+        ]
+      },
+      "properties": {
+        "poi_id": "1bfa08e0-f86f-57c7-8cb4-0f747d14c845",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R01",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c12ddcc9-e1fc-5edf-b72e-98548cebb312",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.7659
+        ]
+      },
+      "properties": {
+        "poi_id": "dc99eec4-ebf2-57a4-9e56-9d7ef3ba4c46",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R02",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7d80d9a8-4b39-5fe2-8ad5-c6c9d6ab086c",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.7659
+        ]
+      },
+      "properties": {
+        "poi_id": "14ad7551-925e-519d-b387-fc88e733ac17",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R03",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f1753dcb-36f2-5dd5-8796-7a19fd8db2dd",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.7659
+        ]
+      },
+      "properties": {
+        "poi_id": "db561c68-4648-5896-964e-40f8f77b89dc",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R04",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d94b1d93-6b11-56e5-a3c7-475d7c711a11",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.7659
+        ]
+      },
+      "properties": {
+        "poi_id": "35f1ab49-17e1-5fec-9354-47d2539f5c71",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R05",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d4120053-cd02-5a96-a9a4-3ad2882be2ae",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.76645
+        ]
+      },
+      "properties": {
+        "poi_id": "b9da6bd7-5481-592e-b45d-94306f4844f7",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R06",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "973ef67f-9ff8-5441-89cc-dd48f9011b3a",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.76645
+        ]
+      },
+      "properties": {
+        "poi_id": "94836fa9-4d6b-5e14-b4f4-370743173113",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R07",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8d077e2c-e6a1-56dc-8590-45c6f57fb7d8",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.76645
+        ]
+      },
+      "properties": {
+        "poi_id": "182e033d-ab8a-59b7-b738-da0a08a9fcc1",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R08",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5e658fe9-bb70-53a3-bde9-6f2efcbf3dbd",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.76645
+        ]
+      },
+      "properties": {
+        "poi_id": "646a5702-157f-5cb7-bc10-bd2d023bab84",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R09",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "cdeb4b6a-6d96-587a-8e1c-b95a14c797a6",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.76645
+        ]
+      },
+      "properties": {
+        "poi_id": "627dc321-49e4-5e8d-b1f4-80586b2c470c",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R10",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "286c60e2-aca6-5a1a-bc75-71cde24c5473",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.767
+        ]
+      },
+      "properties": {
+        "poi_id": "100a3d4d-e7f2-5cdf-b7ff-649bbab51591",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R11",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "dc3d0d62-1053-5971-99f4-9c53b59eee74",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.767
+        ]
+      },
+      "properties": {
+        "poi_id": "5208419a-434c-5374-b6b9-9ff2f4d50426",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R12",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8126bc53-92a8-580f-aca4-caef4b8ad31a",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.767
+        ]
+      },
+      "properties": {
+        "poi_id": "e33a7a52-adda-50af-b2dc-f5ccfbe9eb9d",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R13",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "72f14705-5825-58b2-805e-22fd8bfda435",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.767
+        ]
+      },
+      "properties": {
+        "poi_id": "9a0533a3-0545-510f-b8e4-a9d01abf8099",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R14",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "053a8429-9f78-5ffa-a7c4-072e0a58dde0",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.767
+        ]
+      },
+      "properties": {
+        "poi_id": "1cfc6e90-9050-5e4a-b382-39239606f624",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R15",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7bc4010b-dd9c-54ca-9052-d781ed7f08c9",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.76755
+        ]
+      },
+      "properties": {
+        "poi_id": "657f86f3-ff13-5ae1-8872-ef7518e2edcb",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R16",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "1539dbba-353c-5e1a-b049-71e48bde7497",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.76755
+        ]
+      },
+      "properties": {
+        "poi_id": "543d67d2-16ce-5026-bbd4-47ff94d1c1a4",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R17",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2ded3f59-fee3-59fa-9ae0-f917ebe3b732",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.76755
+        ]
+      },
+      "properties": {
+        "poi_id": "e16d4e26-2d2f-5229-b804-8f10702e54d9",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R18",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5f8db883-b648-5384-91fa-384cd8c3798d",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.76755
+        ]
+      },
+      "properties": {
+        "poi_id": "dd4117ac-26d0-5e0d-ab9b-9b7b57c5e634",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R19",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "9603c803-8d47-50d2-af1f-ed09992b2535",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6361,
+          10.76755
+        ]
+      },
+      "properties": {
+        "poi_id": "239f6751-034b-55f3-988b-e0a81823f137",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R20",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "8d3231a9-0d2a-56be-9b5c-7c7ebc5755aa",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.6339,
+          10.7681
+        ]
+      },
+      "properties": {
+        "poi_id": "ad6482d1-a85f-58dc-89d5-3d4c67515e1a",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R21",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3db5f3a5-c93d-5aa3-8907-d5051c89732d",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63445,
+          10.7681
+        ]
+      },
+      "properties": {
+        "poi_id": "73ab432a-a382-5be9-bdda-a2dea26ab37a",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R22",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d3e4da86-080c-54f4-891f-c8deb087f409",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.635,
+          10.7681
+        ]
+      },
+      "properties": {
+        "poi_id": "dfd1303a-a8c8-5311-8369-fb40efbf8240",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R23",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a69edb54-8dcf-550b-8e1b-ef9782742d24",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.63555,
+          10.7681
+        ]
+      },
+      "properties": {
+        "poi_id": "43625d44-b74e-5c1c-b952-02cce517e24d",
+        "label_vi": "Lối vào nghiên cứu",
+        "label_en": "Research entrance",
+        "graph_node_ref": "R24",
+        "is_primary": true,
+        "is_active": true,
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    }
+  ]
+}

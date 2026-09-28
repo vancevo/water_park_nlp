@@ -1,0 +1,1128 @@
+{
+  "type": "FeatureCollection",
+  "name": "damsen_research_walk_edges",
+  "research_only": true,
+  "navigation_use": "prohibited_until_field_verified",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "165add50-1402-52bc-959a-8d02c8fcf757",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6339,
+            10.7659
+          ],
+          [
+            106.63445,
+            10.7659
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE01",
+        "source": "R01",
+        "target": "R02",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2ecf5d7e-1553-5d63-8d4b-1438c8342daa",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6339,
+            10.7659
+          ],
+          [
+            106.6339,
+            10.76645
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE02",
+        "source": "R01",
+        "target": "R06",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6c496e85-aaf9-50ec-ae44-eb74ec45b3e6",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63445,
+            10.7659
+          ],
+          [
+            106.635,
+            10.7659
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE03",
+        "source": "R02",
+        "target": "R03",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e8641e19-9cdc-51d0-81d6-f92251fdf501",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63445,
+            10.7659
+          ],
+          [
+            106.63445,
+            10.76645
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE04",
+        "source": "R02",
+        "target": "R07",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2340fc42-6955-5422-95b8-7dd91afc0c32",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.635,
+            10.7659
+          ],
+          [
+            106.63555,
+            10.7659
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE05",
+        "source": "R03",
+        "target": "R04",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "7c5d3dcc-c1ee-5a72-bead-67ca49b80845",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.635,
+            10.7659
+          ],
+          [
+            106.635,
+            10.76645
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE06",
+        "source": "R03",
+        "target": "R08",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "796ea7a7-96b7-5966-91a7-5627f6bb99fd",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63555,
+            10.7659
+          ],
+          [
+            106.6361,
+            10.7659
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE07",
+        "source": "R04",
+        "target": "R05",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d3592b84-ecf4-50b3-92ed-aa4732cb68ab",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63555,
+            10.7659
+          ],
+          [
+            106.63555,
+            10.76645
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE08",
+        "source": "R04",
+        "target": "R09",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "57135dc1-fc84-5b95-a768-ed447c8e3f61",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6361,
+            10.7659
+          ],
+          [
+            106.6361,
+            10.76645
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE09",
+        "source": "R05",
+        "target": "R10",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "f9f2efed-5ee1-535c-adb3-6d6b01dff0c4",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6339,
+            10.76645
+          ],
+          [
+            106.63445,
+            10.76645
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE10",
+        "source": "R06",
+        "target": "R07",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "64da9e1c-7a20-575e-b477-c3ca7b31da55",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6339,
+            10.76645
+          ],
+          [
+            106.6339,
+            10.767
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE11",
+        "source": "R06",
+        "target": "R11",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b36d3047-813f-561a-af29-81f7c5c6aa68",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63445,
+            10.76645
+          ],
+          [
+            106.635,
+            10.76645
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE12",
+        "source": "R07",
+        "target": "R08",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ea6f26d9-e41a-5e2f-998e-2a3b249ca93d",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63445,
+            10.76645
+          ],
+          [
+            106.63445,
+            10.767
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE13",
+        "source": "R07",
+        "target": "R12",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "19175995-22a0-55db-a3e4-0c2aa834e24a",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.635,
+            10.76645
+          ],
+          [
+            106.63555,
+            10.76645
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE14",
+        "source": "R08",
+        "target": "R09",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "5f245271-5ea9-5adc-bb80-57a6da73a54e",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.635,
+            10.76645
+          ],
+          [
+            106.635,
+            10.767
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE15",
+        "source": "R08",
+        "target": "R13",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6c579d28-c2ff-579c-be11-83ea5a835ba1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63555,
+            10.76645
+          ],
+          [
+            106.6361,
+            10.76645
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE16",
+        "source": "R09",
+        "target": "R10",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e51bfb7a-93b1-503f-b9e4-01bd25d27027",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63555,
+            10.76645
+          ],
+          [
+            106.63555,
+            10.767
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE17",
+        "source": "R09",
+        "target": "R14",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "45f3ee9a-15a2-577c-a2ad-7e8b1d1db031",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6361,
+            10.76645
+          ],
+          [
+            106.6361,
+            10.767
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE18",
+        "source": "R10",
+        "target": "R15",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "051d1a45-535d-5d28-ba7a-74e035b4d933",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6339,
+            10.767
+          ],
+          [
+            106.63445,
+            10.767
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE19",
+        "source": "R11",
+        "target": "R12",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "234693f3-d23f-565f-8ecd-e47269b2af7a",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6339,
+            10.767
+          ],
+          [
+            106.6339,
+            10.76755
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE20",
+        "source": "R11",
+        "target": "R16",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "56635dab-a6d5-515a-a740-3074c532b06f",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63445,
+            10.767
+          ],
+          [
+            106.635,
+            10.767
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE21",
+        "source": "R12",
+        "target": "R13",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "6548392d-15db-54e8-97bf-a1e57a87d163",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63445,
+            10.767
+          ],
+          [
+            106.63445,
+            10.76755
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE22",
+        "source": "R12",
+        "target": "R17",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "06f4744e-4bfa-50df-bf5f-5e13cda4c165",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.635,
+            10.767
+          ],
+          [
+            106.63555,
+            10.767
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE23",
+        "source": "R13",
+        "target": "R14",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "b9cffb48-e7ff-5ee9-8ad0-0588101163cf",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.635,
+            10.767
+          ],
+          [
+            106.635,
+            10.76755
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE24",
+        "source": "R13",
+        "target": "R18",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "c76ed30c-a16d-51e6-bb4f-b82c1e95b0d5",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63555,
+            10.767
+          ],
+          [
+            106.6361,
+            10.767
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE25",
+        "source": "R14",
+        "target": "R15",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "e79373ef-c583-5adf-be1b-b511be2ae454",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63555,
+            10.767
+          ],
+          [
+            106.63555,
+            10.76755
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE26",
+        "source": "R14",
+        "target": "R19",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "2d0cfbb7-4256-51aa-aa72-3372873b96ad",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6361,
+            10.767
+          ],
+          [
+            106.6361,
+            10.76755
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE27",
+        "source": "R15",
+        "target": "R20",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "d979aa96-2bba-51a6-b206-8e3f5cfa418d",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6339,
+            10.76755
+          ],
+          [
+            106.63445,
+            10.76755
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE28",
+        "source": "R16",
+        "target": "R17",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fa81b551-32c7-5104-803d-3873f2d9176d",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6339,
+            10.76755
+          ],
+          [
+            106.6339,
+            10.7681
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE29",
+        "source": "R16",
+        "target": "R21",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "36c10884-5790-51e9-8b97-62ac39776fb5",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63445,
+            10.76755
+          ],
+          [
+            106.635,
+            10.76755
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE30",
+        "source": "R17",
+        "target": "R18",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "218580d8-82b7-52eb-8f61-25d595c274df",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63445,
+            10.76755
+          ],
+          [
+            106.63445,
+            10.7681
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE31",
+        "source": "R17",
+        "target": "R22",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ad7f98ac-8b15-522f-9d54-bc0fcbd28302",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.635,
+            10.76755
+          ],
+          [
+            106.63555,
+            10.76755
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE32",
+        "source": "R18",
+        "target": "R19",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "206b11e2-5712-589f-8759-14178c8ee672",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.635,
+            10.76755
+          ],
+          [
+            106.635,
+            10.7681
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE33",
+        "source": "R18",
+        "target": "R23",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "336d2b56-8ef1-54d7-83f8-6a56a44168e7",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63555,
+            10.76755
+          ],
+          [
+            106.6361,
+            10.76755
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE34",
+        "source": "R19",
+        "target": "R20",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "09be0693-e075-5727-94a8-767d1ef39950",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63555,
+            10.76755
+          ],
+          [
+            106.63555,
+            10.7681
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE35",
+        "source": "R19",
+        "target": "R24",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a44d75ff-1f61-5d7d-83ce-b38c5a7fd6ad",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6361,
+            10.76755
+          ],
+          [
+            106.6361,
+            10.7681
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE36",
+        "source": "R20",
+        "target": "R25",
+        "length_m": 60.8,
+        "cost": 60.8,
+        "reverse_cost": 60.8,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "269ba4c8-93c7-5e44-a389-f9bbad0e1df1",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.6339,
+            10.7681
+          ],
+          [
+            106.63445,
+            10.7681
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE37",
+        "source": "R21",
+        "target": "R22",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "df58e87f-7895-524a-88cd-49bad736770f",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63445,
+            10.7681
+          ],
+          [
+            106.635,
+            10.7681
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE38",
+        "source": "R22",
+        "target": "R23",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "a9c2e96e-21f3-5a34-9ce9-068092facb1e",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.635,
+            10.7681
+          ],
+          [
+            106.63555,
+            10.7681
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE39",
+        "source": "R23",
+        "target": "R24",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "650c83d7-fb53-5738-aa2e-45aaeaa1b3a2",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            106.63555,
+            10.7681
+          ],
+          [
+            106.6361,
+            10.7681
+          ]
+        ]
+      },
+      "properties": {
+        "external_id": "RE40",
+        "source": "R24",
+        "target": "R25",
+        "length_m": 60.15,
+        "cost": 60.15,
+        "reverse_cost": 60.15,
+        "status": "research_only",
+        "accessibility": "unknown",
+        "field_verified": false
+      }
+    }
+  ]
+}

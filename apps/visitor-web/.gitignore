@@ -1,0 +1,3 @@
+.next/
+public/maplibre/
+.env*.local

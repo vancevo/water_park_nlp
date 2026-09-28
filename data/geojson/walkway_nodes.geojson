@@ -1,0 +1,11 @@
+{
+  "type": "FeatureCollection", "name": "synthetic_fixture_walkway_nodes", "features": [
+    {"type": "Feature", "id": "N1", "geometry": {"type": "Point", "coordinates": [106.63470, 10.76700]}, "properties": {"db_id": 1, "kind": "visitor_start", "source": "synthetic_fixture"}},
+    {"type": "Feature", "id": "N2", "geometry": {"type": "Point", "coordinates": [106.63500, 10.76700]}, "properties": {"db_id": 2, "kind": "poi_entrance", "source": "synthetic_fixture"}},
+    {"type": "Feature", "id": "N3", "geometry": {"type": "Point", "coordinates": [106.63535, 10.76700]}, "properties": {"db_id": 3, "kind": "poi_entrance", "source": "synthetic_fixture"}},
+    {"type": "Feature", "id": "N4", "geometry": {"type": "Point", "coordinates": [106.63570, 10.76700]}, "properties": {"db_id": 4, "kind": "poi_entrance", "source": "synthetic_fixture"}},
+    {"type": "Feature", "id": "N5", "geometry": {"type": "Point", "coordinates": [106.63500, 10.76730]}, "properties": {"db_id": 5, "kind": "junction", "source": "synthetic_fixture"}},
+    {"type": "Feature", "id": "N6", "geometry": {"type": "Point", "coordinates": [106.63535, 10.76730]}, "properties": {"db_id": 6, "kind": "poi_entrance", "source": "synthetic_fixture"}},
+    {"type": "Feature", "id": "N7", "geometry": {"type": "Point", "coordinates": [106.63570, 10.76730]}, "properties": {"db_id": 7, "kind": "poi_entrance", "source": "synthetic_fixture"}}
+  ]
+}

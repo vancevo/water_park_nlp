@@ -1,0 +1,57 @@
+name: damsen-smart-guide
+
+services:
+  postgres:
+    platform: linux/amd64
+    build:
+      context: ./postgres
+    image: damsen/postgres-spatial:16
+    environment:
+      POSTGRES_DB: damsen
+      POSTGRES_USER: damsen
+      POSTGRES_PASSWORD: damsen_local_only
+    ports:
+      - "64321:5432"
+    volumes:
+      - damsen_postgres_data:/var/lib/postgresql/data
+      - ./init-postgres.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U damsen -d damsen"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - damsen_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  object-storage:
+    image: quay.io/minio/minio:RELEASE.2025-09-06T17-38-46Z
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: damsen_local
+      MINIO_ROOT_PASSWORD: damsen_local_password
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - damsen_object_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  damsen_postgres_data:
+  damsen_redis_data:
+  damsen_object_data:

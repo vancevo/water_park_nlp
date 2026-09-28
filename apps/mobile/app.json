@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Dam Sen Guide",
+    "slug": "damsen-guide",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Dam Sen Guide uses your location to show where you are and guide you to attractions."
+        }
+      ],
+      "@maplibre/maplibre-react-native",
+      "expo-audio"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "vn.damsen.guide"
+    },
+    "android": {
+      "package": "vn.damsen.guide",
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+    }
+  }
+}

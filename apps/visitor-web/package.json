@@ -1,0 +1,27 @@
+{
+  "name": "@damsen/visitor-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/copy-maplibre-worker.mjs",
+    "dev": "next dev -p 3002",
+    "prebuild": "node scripts/copy-maplibre-worker.mjs",
+    "build": "next build",
+    "start": "next start -p 3002",
+    "lint": "eslint app components lib next.config.ts --no-error-on-unmatched-pattern",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@damsen/api-client": "0.0.0",
+    "@damsen/shared-types": "0.0.0",
+    "maplibre-gl": "6.11.2",
+    "next": "16.3.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0"
+  }
+}
