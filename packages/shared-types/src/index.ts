@@ -102,7 +102,10 @@ export interface SearchResponse {
 
 export type UserRole = 'VISITOR' | 'EDITOR' | 'REVIEWER' | 'ADMIN';
 export type PoiWorkflowStatus =
-  'draft' | 'pending_review' | 'published' | 'rejected';
+  | 'draft'
+  | 'pending_review'
+  | 'published'
+  | 'rejected';
 
 export interface AuthUser {
   id: string;
@@ -259,7 +262,11 @@ export interface AnalyticsBatchResponse {
 }
 
 export type NarrationWorkflowStatus =
-  'draft' | 'pending_review' | 'published' | 'rejected' | 'superseded';
+  | 'draft'
+  | 'pending_review'
+  | 'published'
+  | 'rejected'
+  | 'superseded';
 
 export interface NarrationAudioMetadataInput {
   objectKey: string;
@@ -278,10 +285,8 @@ export interface NarrationInput {
   audio?: NarrationAudioMetadataInput | null;
 }
 
-export interface NarrationAudioMetadata extends Omit<
-  NarrationAudioMetadataInput,
-  'objectKey'
-> {
+export interface NarrationAudioMetadata
+  extends Omit<NarrationAudioMetadataInput, 'objectKey'> {
   playbackUrl: string;
   playbackExpiresAt: string;
 }
@@ -351,7 +356,11 @@ export interface NarrationLocaleCatalog {
 }
 
 export type TtsJobStatus =
-  'queued' | 'running' | 'succeeded' | 'failed' | 'cancelled';
+  | 'queued'
+  | 'running'
+  | 'succeeded'
+  | 'failed'
+  | 'cancelled';
 
 export interface TtsGenerationJob {
   id: string;
