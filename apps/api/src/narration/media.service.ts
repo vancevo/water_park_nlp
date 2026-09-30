@@ -6,6 +6,7 @@ import type {
 
 import { POI_REPOSITORY, type PoiRepository } from '../poi/poi.models.js';
 import { MEDIA_STORAGE, type MediaStorage } from './media-storage.js';
+import { NarrationLocalesService } from './narration-locales.service.js';
 
 const EXTENSION_BY_MIME: Record<MediaUploadIntentRequest['mimeType'], string> =
   {
@@ -20,6 +21,8 @@ export class MediaService {
   constructor(
     @Inject(MEDIA_STORAGE) private readonly storage: MediaStorage,
     @Inject(POI_REPOSITORY) private readonly pois: PoiRepository,
+    @Inject(NarrationLocalesService)
+    private readonly locales: NarrationLocalesService,
   ) {}
 
   async createUploadIntent(
@@ -28,8 +31,9 @@ export class MediaService {
     if (!(await this.pois.findForAdmin(input.poiId))) {
       throw new NotFoundException('POI not found');
     }
+    const locale = this.locales.requireEnabled(input.locale);
     const extension = EXTENSION_BY_MIME[input.mimeType];
-    const objectKey = `poi/${input.poiId}/${input.locale}/${input.sha256}.${extension}`;
+    const objectKey = `poi/${input.poiId}/${locale}/${input.sha256}.${extension}`;
     const signed = await this.storage.signUpload({
       objectKey,
       mimeType: input.mimeType,

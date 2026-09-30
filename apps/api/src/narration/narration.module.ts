@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { createRequire } from 'node:module';
+import { loadNarrationLocaleConfig } from '@damsen/config';
 
 import { AuthModule } from '../auth/auth.module.js';
 import type { SqlClient } from '../poi/postgres-poi.repository.js';
@@ -12,6 +13,9 @@ import {
   type NarrationRepository,
 } from './narration.models.js';
 import { NarrationController } from './narration.controller.js';
+import { NarrationLocalesController } from './narration-locales.controller.js';
+import { NarrationLocalesService } from './narration-locales.service.js';
+import { NARRATION_LOCALE_CONFIG } from './narration-locales.models.js';
 import { NarrationService } from './narration.service.js';
 import { PostgresNarrationRepository } from './postgres-narration.repository.js';
 import { createMediaStorage, MEDIA_STORAGE } from './media-storage.js';
@@ -36,10 +40,19 @@ function createRepository(): NarrationRepository {
 
 @Module({
   imports: [AuthModule, PoiModule],
-  controllers: [NarrationController, AdminNarrationController],
+  controllers: [
+    NarrationController,
+    NarrationLocalesController,
+    AdminNarrationController,
+  ],
   providers: [
     NarrationService,
+    NarrationLocalesService,
     MediaService,
+    {
+      provide: NARRATION_LOCALE_CONFIG,
+      useFactory: () => loadNarrationLocaleConfig(),
+    },
     { provide: NARRATION_CLOCK, useValue: () => new Date() },
     {
       provide: NARRATION_REPOSITORY,

@@ -339,7 +339,7 @@ paths:
           schema: { type: string, format: uuid }
         - name: locale
           in: query
-          schema: { $ref: '#/components/schemas/SupportedLocale' }
+          schema: { $ref: '#/components/schemas/NarrationLocaleCode' }
       responses:
         '200':
           description: Published transcript and optional reviewed audio metadata
@@ -803,7 +803,7 @@ components:
       required: [poiId, locale, mimeType, sizeBytes, sha256]
       properties:
         poiId: { type: string, format: uuid }
-        locale: { $ref: '#/components/schemas/SupportedLocale' }
+        locale: { $ref: '#/components/schemas/NarrationLocaleCode' }
         mimeType:
           type: string
           enum: [audio/mpeg, audio/mp4, audio/ogg, audio/wav]
@@ -835,7 +835,7 @@ components:
       type: object
       required: [locale, transcript]
       properties:
-        locale: { $ref: '#/components/schemas/SupportedLocale' }
+        locale: { $ref: '#/components/schemas/NarrationLocaleCode' }
         transcript: { type: string, minLength: 20, maxLength: 20000 }
         audio:
           allOf: [{ $ref: '#/components/schemas/NarrationAudioInput' }]
@@ -847,6 +847,11 @@ components:
         audio:
           allOf: [{ $ref: '#/components/schemas/NarrationAudioInput' }]
           nullable: true
+    NarrationLocaleCode:
+      type: string
+      maxLength: 35
+      description: BCP 47 narration locale code (dynamic; not limited to vi/en)
+      example: vi
     NarrationLocaleOption:
       type: object
       required: [code, nativeLabel, speechTag]
@@ -956,9 +961,9 @@ components:
       properties:
         id: { type: string, format: uuid }
         poiId: { type: string, format: uuid }
-        requestedLocale: { $ref: '#/components/schemas/SupportedLocale' }
-        resolvedLocale: { $ref: '#/components/schemas/SupportedLocale' }
-        fallbackUsed: { type: boolean, enum: [false] }
+        requestedLocale: { $ref: '#/components/schemas/NarrationLocaleCode' }
+        resolvedLocale: { $ref: '#/components/schemas/NarrationLocaleCode' }
+        fallbackUsed: { type: boolean }
         transcript: { type: string }
         audio:
           allOf: [{ $ref: '#/components/schemas/PublicNarrationAudio' }]

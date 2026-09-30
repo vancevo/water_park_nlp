@@ -12,16 +12,26 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import type { SupportedLocale } from '@damsen/shared-types';
+import type { NarrationLocaleCode } from '@damsen/shared-types';
+
+/**
+ * Minimal BCP 47 form check shared by narration write/read DTOs. Enabled-ness is
+ * enforced against the runtime catalog at the service boundary, not here.
+ */
+export const NARRATION_LOCALE_PATTERN = /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$/;
 
 export class NarrationLocaleQueryDto {
-  @IsIn(['vi', 'en'])
-  locale: SupportedLocale = 'vi';
+  @IsString()
+  @MaxLength(35)
+  @Matches(NARRATION_LOCALE_PATTERN)
+  locale: NarrationLocaleCode = 'vi';
 }
 
 export class NarrationAudioDto {
   @IsString()
-  @Matches(/^poi\/[0-9a-f-]{36}\/(vi|en)\/[0-9a-f]{64}\.(mp3|m4a|ogg|wav)$/)
+  @Matches(
+    /^poi\/[0-9a-f-]{36}\/[A-Za-z0-9-]{2,35}\/[0-9a-f]{64}\.(mp3|m4a|ogg|wav)$/,
+  )
   objectKey!: string;
 
   @IsIn(['audio/mpeg', 'audio/mp4', 'audio/ogg', 'audio/wav'])
@@ -57,8 +67,10 @@ export class NarrationAudioDto {
 }
 
 export class CreateNarrationDto {
-  @IsIn(['vi', 'en'])
-  locale!: SupportedLocale;
+  @IsString()
+  @MaxLength(35)
+  @Matches(NARRATION_LOCALE_PATTERN)
+  locale!: NarrationLocaleCode;
 
   @IsString()
   @MinLength(20)
