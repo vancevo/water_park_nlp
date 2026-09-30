@@ -853,7 +853,8 @@ components:
       properties:
         code: { type: string, description: BCP 47 locale code }
         nativeLabel: { type: string }
-        speechTag: { type: string, description: Web Speech / speechSynthesis tag }
+        speechTag:
+          { type: string, description: Web Speech / speechSynthesis tag }
         fallbackLocale: { type: string }
     NarrationLocaleCatalog:
       type: object
@@ -875,7 +876,17 @@ components:
         model: { type: string }
     TtsGenerationJob:
       type: object
-      required: [id, narrationId, status, provider, model, modelVersion, createdAt, updatedAt]
+      required:
+        [
+          id,
+          narrationId,
+          status,
+          provider,
+          model,
+          modelVersion,
+          createdAt,
+          updatedAt,
+        ]
       properties:
         id: { type: string, format: uuid }
         narrationId: { type: string, format: uuid }

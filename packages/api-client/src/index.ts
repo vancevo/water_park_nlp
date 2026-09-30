@@ -249,10 +249,9 @@ export class DamSenApiClient {
   }
 
   getTtsJob(jobId: string, accessToken: string): Promise<TtsGenerationJob> {
-    return this.request(
-      `/v1/admin/tts-jobs/${encodeURIComponent(jobId)}`,
-      { accessToken },
-    );
+    return this.request(`/v1/admin/tts-jobs/${encodeURIComponent(jobId)}`, {
+      accessToken,
+    });
   }
 
   cancelTtsJob(jobId: string, accessToken: string): Promise<TtsGenerationJob> {
