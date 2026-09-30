@@ -280,7 +280,7 @@ export interface NarrationAudioMetadataInput {
 }
 
 export interface NarrationInput {
-  locale: SupportedLocale;
+  locale: NarrationLocaleCode;
   transcript: string;
   audio?: NarrationAudioMetadataInput | null;
 }
@@ -294,9 +294,9 @@ export interface NarrationAudioMetadata
 export interface PoiNarration {
   id: string;
   poiId: string;
-  requestedLocale: SupportedLocale;
-  resolvedLocale: SupportedLocale;
-  fallbackUsed: false;
+  requestedLocale: NarrationLocaleCode;
+  resolvedLocale: NarrationLocaleCode;
+  fallbackUsed: boolean;
   transcript: string;
   audio: NarrationAudioMetadata | null;
 }
@@ -313,7 +313,7 @@ export interface AdminNarration extends NarrationInput {
 
 export interface MediaUploadIntentRequest {
   poiId: string;
-  locale: SupportedLocale;
+  locale: NarrationLocaleCode;
   mimeType: NarrationAudioMetadataInput['mimeType'];
   sizeBytes: number;
   sha256: string;

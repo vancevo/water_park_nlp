@@ -1,15 +1,28 @@
-import { IsIn, IsInt, IsUUID, Matches, Max, Min } from 'class-validator';
+import {
+  IsIn,
+  IsInt,
+  IsString,
+  IsUUID,
+  Matches,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 import type {
   MediaUploadIntentRequest,
-  SupportedLocale,
+  NarrationLocaleCode,
 } from '@damsen/shared-types';
+
+import { NARRATION_LOCALE_PATTERN } from './narration.dto.js';
 
 export class MediaUploadIntentDto implements MediaUploadIntentRequest {
   @IsUUID('4')
   poiId!: string;
 
-  @IsIn(['vi', 'en'])
-  locale!: SupportedLocale;
+  @IsString()
+  @MaxLength(35)
+  @Matches(NARRATION_LOCALE_PATTERN)
+  locale!: NarrationLocaleCode;
 
   @IsIn(['audio/mpeg', 'audio/mp4', 'audio/ogg', 'audio/wav'])
   mimeType!: MediaUploadIntentRequest['mimeType'];

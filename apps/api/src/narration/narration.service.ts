@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common';
 import type {
   AdminNarration,
+  NarrationLocaleCode,
   PoiNarration,
-  SupportedLocale,
 } from '@damsen/shared-types';
 
 import { POI_REPOSITORY, type PoiRepository } from '../poi/poi.models.js';
@@ -25,6 +25,7 @@ import {
   type NarrationRecord,
   type NarrationRepository,
 } from './narration.models.js';
+import { NarrationLocalesService } from './narration-locales.service.js';
 
 @Injectable()
 export class NarrationService {
@@ -34,27 +35,40 @@ export class NarrationService {
     @Inject(POI_REPOSITORY) private readonly pois: PoiRepository,
     @Inject(NARRATION_CLOCK) private readonly now: () => Date,
     @Inject(MEDIA_STORAGE) private readonly mediaStorage: MediaStorage,
+    @Inject(NarrationLocalesService)
+    private readonly locales: NarrationLocalesService,
   ) {}
 
   async published(
     poiId: string,
-    locale: SupportedLocale,
+    locale: NarrationLocaleCode,
   ): Promise<PoiNarration> {
     if (!(await this.pois.findPublishedById(poiId))) {
       throw new NotFoundException('POI not found');
     }
-    const narration = await this.narrations.findPublished(poiId, locale);
-    if (!narration)
+    const { requested, chain } = this.locales.resolveRequest(locale);
+    let narration: NarrationRecord | null = null;
+    let resolvedLocale: NarrationLocaleCode | null = null;
+    for (const candidate of chain) {
+      const found = await this.narrations.findPublished(poiId, candidate);
+      if (found) {
+        narration = found;
+        resolvedLocale = candidate;
+        break;
+      }
+    }
+    if (!narration || resolvedLocale === null) {
       throw new NotFoundException('Published narration not found');
+    }
     const playback = narration.audio
       ? await this.mediaStorage.signPlayback(narration.audio.objectKey)
       : null;
     return {
       id: narration.id,
       poiId,
-      requestedLocale: locale,
-      resolvedLocale: locale,
-      fallbackUsed: false,
+      requestedLocale: requested,
+      resolvedLocale,
+      fallbackUsed: resolvedLocale !== requested,
       transcript: narration.transcript,
       audio: narration.audio
         ? {
@@ -85,11 +99,12 @@ export class NarrationService {
     actorId: string,
   ): Promise<AdminNarration> {
     await this.requireAdminPoi(poiId);
+    const locale = this.locales.requireEnabled(input.locale);
     const existing = await this.narrations.findByPoi(poiId);
     if (
       existing.some(
         (item) =>
-          item.locale === input.locale &&
+          item.locale === locale &&
           ['draft', 'pending_review'].includes(item.status),
       )
     ) {
@@ -97,13 +112,13 @@ export class NarrationService {
         'An editable or pending narration already exists for this locale',
       );
     }
-    this.assertObjectKey(poiId, input.locale, input.audio ?? null);
+    this.assertObjectKey(poiId, locale, input.audio ?? null);
     const at = this.now();
     const record: NarrationRecord = {
       id: randomUUID(),
       poiId,
-      locale: input.locale,
-      revision: await this.narrations.nextRevision(poiId, input.locale),
+      locale,
+      revision: await this.narrations.nextRevision(poiId, locale),
       transcript: input.transcript.trim(),
       status: 'draft',
       audio: input.audio ? { ...input.audio } : null,
@@ -201,7 +216,7 @@ export class NarrationService {
 
   private assertObjectKey(
     poiId: string,
-    locale: SupportedLocale,
+    locale: NarrationLocaleCode,
     audio: NarrationRecord['audio'],
   ): void {
     if (!audio) return;

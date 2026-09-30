@@ -1,0 +1,19 @@
+{
+  "defaultLocale": "vi",
+  "locales": [
+    {
+      "code": "vi",
+      "nativeLabel": "Tiếng Việt",
+      "speechTag": "vi-VN",
+      "enabled": true,
+      "fallbackLocale": null
+    },
+    {
+      "code": "en",
+      "nativeLabel": "English",
+      "speechTag": "en-US",
+      "enabled": true,
+      "fallbackLocale": "vi"
+    }
+  ]
+}

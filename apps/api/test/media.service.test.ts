@@ -8,6 +8,8 @@ import {
   UnavailableMediaStorage,
 } from '../src/narration/media-storage.js';
 import { MediaService } from '../src/narration/media.service.js';
+import { NarrationLocalesService } from '../src/narration/narration-locales.service.js';
+import { DEFAULT_NARRATION_LOCALE_CONFIG } from '@damsen/config';
 
 const POI_ID = '00000000-0000-4000-8000-000000000101';
 
@@ -29,7 +31,11 @@ function fakeStorage(): MediaStorage {
 describe('MediaService', () => {
   it('creates a deterministic, policy-bound upload intent', async () => {
     const storage = fakeStorage();
-    const service = new MediaService(storage, new InMemoryPoiRepository());
+    const service = new MediaService(
+      storage,
+      new InMemoryPoiRepository(),
+      new NarrationLocalesService(DEFAULT_NARRATION_LOCALE_CONFIG),
+    );
     const sha256 = 'a'.repeat(64);
 
     const intent = await service.createUploadIntent({

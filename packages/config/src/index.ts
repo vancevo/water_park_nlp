@@ -1,3 +1,5 @@
+export * from './narration-locales.js';
+
 export interface RuntimeConfig {
   nodeEnv: 'development' | 'test' | 'production';
   port: number;

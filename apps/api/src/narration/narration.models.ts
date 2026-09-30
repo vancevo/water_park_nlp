@@ -1,13 +1,13 @@
 import type {
   NarrationAudioMetadataInput,
   NarrationWorkflowStatus,
-  SupportedLocale,
+  NarrationLocaleCode,
 } from '@damsen/shared-types';
 
 export interface NarrationRecord {
   id: string;
   poiId: string;
-  locale: SupportedLocale;
+  locale: NarrationLocaleCode;
   revision: number;
   transcript: string;
   status: NarrationWorkflowStatus;
@@ -22,11 +22,11 @@ export interface NarrationRecord {
 export interface NarrationRepository {
   findPublished(
     poiId: string,
-    locale: SupportedLocale,
+    locale: NarrationLocaleCode,
   ): Promise<NarrationRecord | null>;
   findByPoi(poiId: string): Promise<NarrationRecord[]>;
   findById(id: string): Promise<NarrationRecord | null>;
-  nextRevision(poiId: string, locale: SupportedLocale): Promise<number>;
+  nextRevision(poiId: string, locale: NarrationLocaleCode): Promise<number>;
   save(record: NarrationRecord): Promise<void>;
   delete(id: string): Promise<void>;
   publish(id: string, reviewerId: string, reviewedAt: Date): Promise<void>;

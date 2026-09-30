@@ -68,6 +68,7 @@ import type {
   MediaUploadIntentRequest,
   AnalyticsBatchRequest,
   AnalyticsBatchResponse,
+  NarrationLocaleCode,
   NarrationLocaleCatalog,
   TtsGenerationJob,
   CreateTtsJobRequest,
@@ -140,10 +141,10 @@ export class DamSenApiClient {
 
   getPoiNarration(
     poiId: string,
-    locale: 'vi' | 'en' = 'vi',
+    locale: NarrationLocaleCode = 'vi',
   ): Promise<PoiNarration> {
     return this.get(
-      `/v1/pois/${encodeURIComponent(poiId)}/narration?locale=${locale}`,
+      `/v1/pois/${encodeURIComponent(poiId)}/narration?locale=${encodeURIComponent(locale)}`,
     );
   }
 
