@@ -373,3 +373,5 @@ export interface CreateTtsJobRequest {
   provider?: string;
   model?: string;
 }
+
+// Contract v1 locked — see docs/plans/CONG_TU_WORK_SPLIT.md
