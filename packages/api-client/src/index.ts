@@ -34,6 +34,12 @@ export type {
   MediaUploadIntentRequest,
   AnalyticsBatchRequest,
   AnalyticsBatchResponse,
+  NarrationLocaleCode,
+  NarrationLocaleOption,
+  NarrationLocaleCatalog,
+  TtsJobStatus,
+  TtsGenerationJob,
+  CreateTtsJobRequest,
 } from '@damsen/shared-types';
 
 import type {
@@ -62,6 +68,9 @@ import type {
   MediaUploadIntentRequest,
   AnalyticsBatchRequest,
   AnalyticsBatchResponse,
+  NarrationLocaleCatalog,
+  TtsGenerationJob,
+  CreateTtsJobRequest,
 } from '@damsen/shared-types';
 
 export interface ApiClientOptions {
@@ -219,6 +228,36 @@ export class DamSenApiClient {
     return this.request(
       `/v1/admin/narrations/${encodeURIComponent(narrationId)}/reject`,
       { method: 'POST', body: input, accessToken },
+    );
+  }
+
+  // --- Configurable narration locales + TTS jobs (contract v1) ---
+
+  getNarrationLocales(): Promise<NarrationLocaleCatalog> {
+    return this.get('/v1/narration-locales');
+  }
+
+  createTtsJob(
+    narrationId: string,
+    input: CreateTtsJobRequest,
+    accessToken: string,
+  ): Promise<TtsGenerationJob> {
+    return this.request(
+      `/v1/admin/narrations/${encodeURIComponent(narrationId)}/tts-jobs`,
+      { method: 'POST', body: input, accessToken },
+    );
+  }
+
+  getTtsJob(jobId: string, accessToken: string): Promise<TtsGenerationJob> {
+    return this.request(`/v1/admin/tts-jobs/${encodeURIComponent(jobId)}`, {
+      accessToken,
+    });
+  }
+
+  cancelTtsJob(jobId: string, accessToken: string): Promise<TtsGenerationJob> {
+    return this.request(
+      `/v1/admin/tts-jobs/${encodeURIComponent(jobId)}/cancel`,
+      { method: 'POST', accessToken },
     );
   }
 

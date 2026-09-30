@@ -331,3 +331,56 @@ export interface MediaUploadIntent {
     'x-amz-meta-sha256': string;
   };
 }
+
+// ============================================================================
+// Configurable multilingual narration — contract v1 (C01)
+// Locked shape per docs/plans/CONG_TU_WORK_SPLIT.md. Do not change without an
+// ADR/proposal + a single integration commit that updates mock + OpenAPI.
+// ============================================================================
+
+/** BCP 47 locale code, e.g. "vi", "en", "fr". Free-form string on the wire. */
+export type NarrationLocaleCode = string;
+
+export interface NarrationLocaleOption {
+  code: NarrationLocaleCode;
+  nativeLabel: string;
+  /** Tag passed to Web Speech / speechSynthesis, e.g. "vi-VN". */
+  speechTag: string;
+  fallbackLocale?: NarrationLocaleCode;
+}
+
+export interface NarrationLocaleCatalog {
+  defaultLocale: NarrationLocaleCode;
+  /** Enabled locales only, in configured order. */
+  locales: NarrationLocaleOption[];
+}
+
+export type TtsJobStatus =
+  | 'queued'
+  | 'running'
+  | 'succeeded'
+  | 'failed'
+  | 'cancelled';
+
+export interface TtsGenerationJob {
+  id: string;
+  narrationId: string;
+  status: TtsJobStatus;
+  provider: string;
+  model: string;
+  modelVersion: string;
+  createdAt: string;
+  updatedAt: string;
+  /** Stable error code only — never a stack, transcript or provider key. */
+  errorCode?: string;
+}
+
+export interface CreateTtsJobRequest {
+  /** Locale to synthesize; must be an enabled catalog locale. */
+  locale: NarrationLocaleCode;
+  /** Optional override; defaults to the configured provider/model. */
+  provider?: string;
+  model?: string;
+}
+
+// Contract v1 locked — see docs/plans/CONG_TU_WORK_SPLIT.md

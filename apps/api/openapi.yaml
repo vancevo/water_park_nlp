@@ -491,6 +491,69 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/AdminNarration' }
+  /v1/narration-locales:
+    get:
+      operationId: getNarrationLocales
+      summary: Enabled narration locales in configured order
+      responses:
+        '200':
+          description: Locale catalog (enabled locales only, configured order)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NarrationLocaleCatalog' }
+  /v1/admin/narrations/{narrationId}/tts-jobs:
+    post:
+      operationId: createTtsJob
+      summary: Queue a TTS generation job for a draft narration
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: narrationId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTtsJobRequest' }
+      responses:
+        '202':
+          description: Job accepted and queued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TtsGenerationJob' }
+  /v1/admin/tts-jobs/{jobId}:
+    get:
+      operationId: getTtsJob
+      summary: Poll a TTS generation job
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Current job state
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TtsGenerationJob' }
+  /v1/admin/tts-jobs/{jobId}/cancel:
+    post:
+      operationId: cancelTtsJob
+      summary: Request cancellation of a queued or running job
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Job after cancellation request
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TtsGenerationJob' }
   /v1/routes:
     post:
       operationId: createRoute
@@ -784,6 +847,56 @@ components:
         audio:
           allOf: [{ $ref: '#/components/schemas/NarrationAudioInput' }]
           nullable: true
+    NarrationLocaleOption:
+      type: object
+      required: [code, nativeLabel, speechTag]
+      properties:
+        code: { type: string, description: BCP 47 locale code }
+        nativeLabel: { type: string }
+        speechTag:
+          { type: string, description: Web Speech / speechSynthesis tag }
+        fallbackLocale: { type: string }
+    NarrationLocaleCatalog:
+      type: object
+      required: [defaultLocale, locales]
+      properties:
+        defaultLocale: { type: string }
+        locales:
+          type: array
+          items: { $ref: '#/components/schemas/NarrationLocaleOption' }
+    TtsJobStatus:
+      type: string
+      enum: [queued, running, succeeded, failed, cancelled]
+    CreateTtsJobRequest:
+      type: object
+      required: [locale]
+      properties:
+        locale: { type: string, description: Must be an enabled catalog locale }
+        provider: { type: string }
+        model: { type: string }
+    TtsGenerationJob:
+      type: object
+      required:
+        [
+          id,
+          narrationId,
+          status,
+          provider,
+          model,
+          modelVersion,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id: { type: string, format: uuid }
+        narrationId: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/TtsJobStatus' }
+        provider: { type: string }
+        model: { type: string }
+        modelVersion: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        errorCode: { type: string, description: Stable error code only }
     AdminNarration:
       allOf:
         - { $ref: '#/components/schemas/NarrationInput' }
