@@ -6,3 +6,7 @@ coverage/
 .env
 .DS_Store
 *.tsbuildinfo
+
+# Piper voice binaries (large) and generated benchmark report
+config/piper-voices/
+config/tts-benchmark-report.json

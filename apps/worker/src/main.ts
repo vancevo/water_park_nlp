@@ -56,6 +56,38 @@ export type {
   TtsSynthesisResult,
 } from './tts/types.js';
 
+export {
+  PiperTtsProvider,
+  PiperSynthesisError,
+  PiperTimeoutError,
+  spawnPiperRunner,
+} from './tts/piper/piper-tts-provider.js';
+export type {
+  PiperProviderConfig,
+  PiperRunner,
+  PiperRunInput,
+} from './tts/piper/piper-tts-provider.js';
+export {
+  parsePiperVoiceManifest,
+  loadPiperVoiceManifest,
+  toTtsModelRegistry,
+  buildPiperProvider,
+  PiperVoiceManifestError,
+} from './tts/piper/piper-voices.js';
+export type {
+  PiperVoiceManifest,
+  PiperVoiceManifestEntry,
+} from './tts/piper/piper-voices.js';
+export { runTtsBenchmark } from './tts/piper/tts-benchmark.js';
+export type {
+  BenchmarkReport,
+  BenchmarkSentence,
+  BenchmarkSampleResult,
+  BenchmarkOptions,
+} from './tts/piper/tts-benchmark.js';
+export { parseWav, WavParseError } from './tts/piper/wav.js';
+export type { WavInfo } from './tts/piper/wav.js';
+
 export function startWorker(): void {
   // Queue/CLI composition belongs here once a production embedding provider and
   // database client are selected. The domain service itself remains injectable.
