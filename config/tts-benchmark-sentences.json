@@ -1,0 +1,54 @@
+{
+  "schema": "tts-benchmark-sentences/v1",
+  "note": "Small backend-owned fixture for C04 baseline. Full evaluation corpus is Tú's AI01 (data/tts-evaluation).",
+  "sentences": [
+    {
+      "id": "vi-poi-1",
+      "locale": "vi",
+      "category": "poi-name",
+      "text": "Chào mừng bạn đến với Công viên Văn hóa Đầm Sen."
+    },
+    {
+      "id": "vi-number-1",
+      "locale": "vi",
+      "category": "number-date",
+      "text": "Công viên mở cửa từ 8 giờ sáng đến 21 giờ, ngày 02 tháng 9."
+    },
+    {
+      "id": "vi-abbrev-1",
+      "locale": "vi",
+      "category": "abbreviation",
+      "text": "Khu vực TP.HCM có hơn 30 trò chơi dành cho mọi lứa tuổi."
+    },
+    {
+      "id": "vi-long-1",
+      "locale": "vi",
+      "category": "long",
+      "text": "Từ cổng chính, bạn đi thẳng khoảng một trăm mét, rẽ phải tại hồ nước trung tâm, sau đó tiếp tục men theo lối đi lát gạch để tới khu vườn nhiệt đới."
+    },
+    {
+      "id": "vi-codeswitch-1",
+      "locale": "vi",
+      "category": "code-switch",
+      "text": "Khu trò chơi Water World có đường trượt dài nhất công viên."
+    },
+    {
+      "id": "en-poi-1",
+      "locale": "en",
+      "category": "poi-name",
+      "text": "Welcome to Dam Sen Cultural Park in Ho Chi Minh City."
+    },
+    {
+      "id": "en-number-1",
+      "locale": "en",
+      "category": "number-date",
+      "text": "The park is open from 8 a.m. to 9 p.m., and tickets cost 200,000 dong."
+    },
+    {
+      "id": "en-long-1",
+      "locale": "en",
+      "category": "long",
+      "text": "From the main entrance, walk straight for about one hundred meters, turn right at the central lake, and follow the paved path to reach the tropical garden."
+    }
+  ]
+}

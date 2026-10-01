@@ -21,6 +21,7 @@
     "data:research:generate": "python3 data/research-damsen/generate.py",
     "data:research:validate": "python3 data/research-damsen/validate.py",
     "smoke:media": "node scripts/smoke-media.mjs",
+    "tts:setup-voices": "node scripts/setup-piper-voices.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
