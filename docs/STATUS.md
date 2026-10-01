@@ -7,8 +7,8 @@
 - Current wave: `W5/W6 — Search, analytics and release hardening`
 - Integration status: `SEARCH_ANALYTICS_POSTGIS_PASS`
 - Active blockers: B01 blocks public map/content release; B03 blocks local real-object-storage smoke only
-- Last updated: 2026-09-30
-- Updated by: Công (C02 backend)
+- Last updated: 2026-10-01
+- Updated by: Công (C03 backend)
 
 ## Task board
 
@@ -28,7 +28,7 @@
 | T23 Workflow/audit | DONE | API/admin agents | T22 | Submit/approve/reject/reason/audit + status-driven UI |
 | T24–T25 Media/narration | IN_PROGRESS | API/mobile/admin agents | T21–T23 | Workflow, signer, admin preview and mobile player pass; B03 real storage smoke + offline audio cache remain |
 | T25A/T25B Configurable narration locales (backend, C02) | IN_PROGRESS | Công backend | T24–T25, C01 | Config loader + `GET /v1/narration-locales` + fallback + write validation + migration 009 + ADR 0007 on `codex/cong-c02-locale-backend`; T25C–E (Tú) + integration I01 pending |
-| AI00–AI08 AI/TTS/search hardening | TODO | Công backend / Tú UX+eval | T41–T42 | Parallel mock-first plan; AI06 requires explicit GO; I01–I04 are final integration gates |
+| AI00–AI08 AI/TTS/search hardening | IN_PROGRESS | Công backend / Tú UX+eval | T41–T42 | AI02 TTS worker foundation (C03) done on `codex/cong-c03-tts-worker` (provider port + idempotent service + registry + migration 010 + ADR 0008); AI03 Piper, AI04 admin API next; AI06 requires explicit GO; I01–I04 are final gates |
 | T30 Mobile map | DONE | mobile agent | T21 contract | Typecheck + 10 shared mobile tests pass |
 | T31 GPS session | DONE | mobile agent | T30 | Permission/signal state machine + explicit follow mode |
 | T32 Walkway graph | DONE | geo agent | W1 | 7-node/8-edge fixture, topology validator and migration 004 |
