@@ -35,7 +35,9 @@ import {
   sha256Hex,
   validateAudioFile,
 } from '@/lib/narration-media';
+import { getTtsGenerationPort } from '@/lib/tts-generation';
 import { StatusBadge } from './status-badge';
+import { TtsGenerationPanel } from './tts-generation-panel';
 
 type CatalogState =
   | { status: 'loading' }
@@ -184,7 +186,7 @@ export function NarrationPanel({ poiId }: { poiId: string }) {
         aria-labelledby={locale ? `narration-tab-${locale}` : undefined}
         className="narration-locale-panel"
       >
-        {loading && session && (
+        {loading && session && items.length === 0 && (
           <div className="empty-inline" role="status">
             Đang tải thuyết minh…
           </div>
@@ -197,27 +199,32 @@ export function NarrationPanel({ poiId }: { poiId: string }) {
             </button>
           </div>
         )}
-        {!loading && !error && session && locale && localeOption && (
-          <NarrationEditor
-            key={`${locale}:${selected?.id ?? 'new'}:${generation}`}
-            poiId={poiId}
-            locale={locale}
-            localeOption={localeOption}
-            fallbackLabel={
-              localeOption.fallbackLocale
-                ? localeLabel(catalog, localeOption.fallbackLocale)
-                : ''
-            }
-            current={selected}
-            permissions={permissions}
-            onChanged={async () => {
-              setGeneration(0);
-              await load();
-            }}
-            startNew={generation > 0}
-            onStartNew={() => setGeneration((value) => value + 1)}
-          />
-        )}
+        {(!loading || items.length > 0) &&
+          !error &&
+          session &&
+          locale &&
+          localeOption && (
+            <NarrationEditor
+              key={`${locale}:${selected?.id ?? 'new'}:${generation}`}
+              poiId={poiId}
+              locale={locale}
+              localeOption={localeOption}
+              fallbackLabel={
+                localeOption.fallbackLocale
+                  ? localeLabel(catalog, localeOption.fallbackLocale)
+                  : ''
+              }
+              current={selected}
+              permissions={permissions}
+              roles={session.user.roles}
+              onChanged={async () => {
+                setGeneration(0);
+                await load();
+              }}
+              startNew={generation > 0}
+              onStartNew={() => setGeneration((value) => value + 1)}
+            />
+          )}
         {revisions.length > 0 && localeOption && (
           <div className="narration-history">
             <h3>Lịch sử phiên bản · {localeOption.nativeLabel}</h3>
@@ -340,6 +347,7 @@ function NarrationEditor({
   fallbackLabel,
   current,
   permissions,
+  roles,
   onChanged,
   startNew,
   onStartNew,
@@ -350,6 +358,7 @@ function NarrationEditor({
   fallbackLabel: string;
   current?: AdminNarration;
   permissions: ReturnType<typeof narrationPermissions>;
+  roles: AdminAuthSession['user']['roles'];
   onChanged: () => Promise<void>;
   startNew: boolean;
   onStartNew: () => void;
@@ -367,6 +376,7 @@ function NarrationEditor({
   const [usageRights, setUsageRights] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  const ttsPort = getTtsGenerationPort();
   const hasUnsavedChanges =
     transcript.trim() !== (current?.transcript ?? '').trim() || Boolean(file);
 
@@ -630,6 +640,17 @@ function NarrationEditor({
             </button>
           )}
       </div>
+      {ttsPort && (
+        <TtsGenerationPanel
+          port={ttsPort}
+          narration={current}
+          isNewRevision={isNew}
+          localeOption={localeOption}
+          roles={roles}
+          hasUnsavedChanges={hasUnsavedChanges}
+          onSucceeded={() => void onChanged()}
+        />
+      )}
     </div>
   );
 }
