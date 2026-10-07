@@ -35,7 +35,9 @@ import {
   sha256Hex,
   validateAudioFile,
 } from '@/lib/narration-media';
+import { useTtsJob } from '@/hooks/use-tts-job';
 import { getTtsGenerationPort } from '@/lib/tts-generation';
+import { TTS_IN_FLIGHT_REASON } from '@/lib/tts-job-machine';
 import { StatusBadge } from './status-badge';
 import { TtsGenerationPanel } from './tts-generation-panel';
 
@@ -377,6 +379,12 @@ function NarrationEditor({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const ttsPort = getTtsGenerationPort();
+  const tts = useTtsJob(ttsPort, isNew ? undefined : current?.id, () => {
+    void onChanged();
+  });
+  // Saving or submitting while a TTS job is in flight would let the generated
+  // audio land on a transcript/workflow state it was not made for.
+  const ttsInFlight = tts.inFlight;
   const hasUnsavedChanges =
     transcript.trim() !== (current?.transcript ?? '').trim() || Boolean(file);
 
@@ -404,6 +412,7 @@ function NarrationEditor({
   }
 
   async function save() {
+    if (ttsInFlight) return setMessage(TTS_IN_FLIGHT_REASON);
     const cleanTranscript = transcript.trim();
     if (cleanTranscript.length < 20 || cleanTranscript.length > 20_000) {
       setMessage('Nội dung phải từ 20 đến 20.000 ký tự.');
@@ -464,6 +473,8 @@ function NarrationEditor({
 
   async function workflow(action: 'submit' | 'approve' | 'reject') {
     if (!current || startNew) return;
+    if (action === 'submit' && ttsInFlight)
+      return setMessage(TTS_IN_FLIGHT_REASON);
     let reason = '';
     if (action === 'reject') {
       reason = window.prompt('Lý do từ chối (ít nhất 3 ký tự):')?.trim() ?? '';
@@ -497,7 +508,7 @@ function NarrationEditor({
           </h3>
           {fallbackLabel && (
             <p className="helper">
-              Ngôn ngữ dự phòng cho khách: {fallbackLabel} (dùng khi
+              Ngôn ngữ dự phòng cho khách: {fallbackLabel} (dùng khi{' '}
               {localeOption.nativeLabel} chưa có bản xuất bản).
             </p>
           )}
@@ -593,18 +604,26 @@ function NarrationEditor({
       )}
       <div className="button-row narration-actions">
         {editable && (
-          <button className="button primary" disabled={busy} onClick={save}>
+          <button
+            className="button primary"
+            disabled={busy || ttsInFlight}
+            aria-describedby={ttsInFlight ? 'tts-in-flight-reason' : undefined}
+            onClick={save}
+          >
             {busy ? 'Đang xử lý…' : 'Lưu thuyết minh'}
           </button>
         )}
         {!startNew && current?.status === 'draft' && permissions.canEdit && (
           <button
             className="button ghost"
-            disabled={busy || hasUnsavedChanges}
+            disabled={busy || hasUnsavedChanges || ttsInFlight}
+            aria-describedby={ttsInFlight ? 'tts-in-flight-reason' : undefined}
             title={
-              hasUnsavedChanges
-                ? 'Lưu các thay đổi trước khi gửi duyệt.'
-                : undefined
+              ttsInFlight
+                ? TTS_IN_FLIGHT_REASON
+                : hasUnsavedChanges
+                  ? 'Lưu các thay đổi trước khi gửi duyệt.'
+                  : undefined
             }
             onClick={() => void workflow('submit')}
           >
@@ -640,15 +659,20 @@ function NarrationEditor({
             </button>
           )}
       </div>
+      {ttsInFlight && (
+        <p className="helper" id="tts-in-flight-reason">
+          {TTS_IN_FLIGHT_REASON}
+        </p>
+      )}
       {ttsPort && (
         <TtsGenerationPanel
           port={ttsPort}
+          tts={tts}
           narration={current}
           isNewRevision={isNew}
           localeOption={localeOption}
           roles={roles}
           hasUnsavedChanges={hasUnsavedChanges}
-          onSucceeded={() => void onChanged()}
         />
       )}
     </div>

@@ -96,7 +96,13 @@ try {
   await page.getByRole('button', { name: 'Tạo audio AI' }).click();
   assert.equal(await status.getAttribute('aria-live'), 'polite');
   await waitForStatus(/Đang chờ|Đang tạo/);
+  // A draft must not be saved or submitted while generation is in flight.
+  const submit = page.getByRole('button', { name: 'Gửi duyệt' });
+  const save = page.getByRole('button', { name: 'Lưu thuyết minh' });
+  assert.ok(await submit.isDisabled(), 'submit blocked while job in flight');
+  assert.ok(await save.isDisabled(), 'save blocked while job in flight');
   await waitForStatus(/^Đã tạo xong/);
+  assert.ok(await submit.isEnabled(), 'submit allowed after success');
   assert.match(
     await page.locator('.tts-generation').innerText(),
     /AI-generated/,
@@ -107,6 +113,16 @@ try {
   );
 
   await page.getByRole('button', { name: 'Tạo lại audio AI' }).click();
+  await waitForStatus(/Đang chờ|Đang tạo/);
+  // Switching locale tabs remounts the editor; the running job is resumed.
+  await page.locator('[role=tab][aria-selected=true]').focus();
+  await page.keyboard.press('End');
+  await page.keyboard.press('Home');
+  await waitForStatus(/Đang chờ|Đang tạo/);
+  assert.ok(
+    await page.getByRole('button', { name: 'Gửi duyệt' }).isDisabled(),
+    'submit still blocked after tab switch',
+  );
   await page.getByRole('button', { name: 'Huỷ tạo audio' }).click();
   await waitForStatus(/^Đã huỷ/);
   await page.getByRole('button', { name: 'Thử lại' }).click();

@@ -4,11 +4,15 @@ import {
   MAX_POLL_FAILURES,
   canCancelJob,
   canRetryJob,
+  inFlightTtsJob,
   initialTtsJobState,
+  isTtsJobInFlight,
   nextPollDelayMs,
+  rememberTtsJob,
   shouldPoll,
   ttsErrorLabel,
   ttsGenerationGuard,
+  trackingStateFor,
   ttsJobReducer,
   type TtsJobEvent,
   type TtsJobUiState,
@@ -116,6 +120,59 @@ describe('TTS job UI state machine', () => {
     });
   });
 
+  it('drops a job response nobody is waiting for (stale create after reset)', () => {
+    const reset = run([
+      { type: 'create_requested' },
+      { type: 'reset' },
+      { type: 'job_received', job: job('queued') },
+    ]);
+    expect(reset).toEqual(initialTtsJobState);
+    expect(shouldPoll(reset)).toBe(false);
+  });
+
+  it('resumes tracking an in-flight job on reset, but not a terminal one', () => {
+    const resumed = run([{ type: 'reset', job: job('running') }]);
+    expect(resumed).toMatchObject({ phase: 'tracking', pollAttempt: 0 });
+    expect(shouldPoll(resumed)).toBe(true);
+    expect(trackingStateFor(job('succeeded'))).toEqual(initialTtsJobState);
+    expect(trackingStateFor(null)).toEqual(initialTtsJobState);
+  });
+
+  it('reports a job in flight from create request until a terminal status', () => {
+    expect(isTtsJobInFlight(initialTtsJobState)).toBe(false);
+    let state = run([{ type: 'create_requested' }]);
+    expect(isTtsJobInFlight(state)).toBe(true);
+    state = run([{ type: 'job_received', job: job('queued') }], state);
+    expect(isTtsJobInFlight(state)).toBe(true);
+    state = run([{ type: 'cancel_requested' }], state);
+    expect(isTtsJobInFlight(state)).toBe(true);
+    // Polling gave up: the job may still be running server-side.
+    let lost = run([
+      { type: 'create_requested' },
+      { type: 'job_received', job: job('running') },
+    ]);
+    for (let index = 0; index < MAX_POLL_FAILURES; index += 1)
+      lost = run([{ type: 'poll_failed', error: 'offline' }], lost);
+    expect(isTtsJobInFlight(lost)).toBe(true);
+    for (const status of ['succeeded', 'failed', 'cancelled'] as const)
+      expect(
+        isTtsJobInFlight(
+          run([
+            { type: 'create_requested' },
+            { type: 'job_received', job: job(status) },
+          ]),
+        ),
+      ).toBe(false);
+    expect(
+      isTtsJobInFlight(
+        run([
+          { type: 'create_requested' },
+          { type: 'request_failed', error: 'denied' },
+        ]),
+      ),
+    ).toBe(false);
+  });
+
   it('stops polling after repeated poll failures until resumed', () => {
     let state = run([
       { type: 'create_requested' },
@@ -196,5 +253,25 @@ describe('TTS generation RBAC/visibility guard', () => {
     expect(
       ttsGenerationGuard({ ...editor, localeEnabled: false }).reason,
     ).toContain('đang tắt');
+  });
+});
+
+describe('in-flight TTS job registry (survives editor remount)', () => {
+  it('keeps a queued/running job per narration and forgets it once terminal', () => {
+    const forNarration = (status: TtsJobStatus) => ({
+      ...job(status),
+      narrationId: 'n-remember',
+    });
+    expect(inFlightTtsJob('n-remember')).toBeNull();
+    rememberTtsJob(forNarration('queued'));
+    expect(inFlightTtsJob('n-remember')?.status).toBe('queued');
+    rememberTtsJob(forNarration('running'));
+    expect(inFlightTtsJob('n-remember')?.status).toBe('running');
+    expect(inFlightTtsJob('another-narration')).toBeNull();
+    expect(inFlightTtsJob(undefined)).toBeNull();
+    rememberTtsJob(forNarration('cancelled'));
+    expect(inFlightTtsJob('n-remember')).toBeNull();
+    rememberTtsJob(null);
+    expect(inFlightTtsJob('n-remember')).toBeNull();
   });
 });

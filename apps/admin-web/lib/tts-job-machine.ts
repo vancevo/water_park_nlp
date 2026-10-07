@@ -22,7 +22,8 @@ export type TtsJobEvent =
   | { type: 'request_failed'; error: string }
   | { type: 'poll_failed'; error: string }
   | { type: 'resume_polling' }
-  | { type: 'reset' };
+  /** Back to idle, or resume tracking a job still in flight for this narration. */
+  | { type: 'reset'; job?: TtsGenerationJob | null };
 
 export const MAX_POLL_FAILURES = 3;
 
@@ -44,11 +45,13 @@ export function ttsJobReducer(
       return { ...initialTtsJobState, phase: 'creating', job: state.job };
     case 'job_received': {
       const current = state.job;
-      // Ignore stale responses: other jobs, or anything after a terminal state.
+      // Ignore stale responses: nothing requested, other jobs, or anything
+      // after a terminal state. Only a pending create may introduce a job.
       if (
-        current &&
         state.phase !== 'creating' &&
-        (current.id !== event.job.id || isTerminalTtsStatus(current.status))
+        (!current ||
+          current.id !== event.job.id ||
+          isTerminalTtsStatus(current.status))
       )
         return state;
       const terminal = isTerminalTtsStatus(event.job.status);
@@ -85,8 +88,17 @@ export function ttsJobReducer(
     case 'resume_polling':
       return { ...state, pollFailures: 0, error: '' };
     case 'reset':
-      return initialTtsJobState;
+      return trackingStateFor(event.job);
   }
+}
+
+/** Initial state for a narration: idle, or tracking a job that is still in flight. */
+export function trackingStateFor(
+  job: TtsGenerationJob | null | undefined,
+): TtsJobUiState {
+  return job && !isTerminalTtsStatus(job.status)
+    ? { ...initialTtsJobState, phase: 'tracking', job }
+    : initialTtsJobState;
 }
 
 function isActive(state: TtsJobUiState) {
@@ -105,6 +117,40 @@ export function shouldPoll(state: TtsJobUiState): boolean {
 export function nextPollDelayMs(attempt: number): number {
   return Math.min(5_000, Math.round(800 * 1.5 ** Math.max(0, attempt)));
 }
+
+/**
+ * A create/cancel request is pending or the job is not terminal yet. While this
+ * holds, the draft must not be saved or submitted: the generated audio would
+ * attach to a revision whose transcript or workflow state has moved on.
+ */
+export function isTtsJobInFlight(state: TtsJobUiState): boolean {
+  return (
+    state.phase === 'creating' ||
+    state.phase === 'cancelling' ||
+    isActive(state)
+  );
+}
+
+/**
+ * Jobs still in flight, per narration, for this page session. Contract v1 has
+ * no "latest job for a narration" endpoint, so without this a locale-tab switch
+ * (which remounts the editor) would forget a running job, stop polling and let
+ * the draft be submitted while generation is still writing to it.
+ */
+const inFlightJobs = new Map<string, TtsGenerationJob>();
+
+export function rememberTtsJob(job: TtsGenerationJob | null | undefined) {
+  if (!job) return;
+  if (isTerminalTtsStatus(job.status)) inFlightJobs.delete(job.narrationId);
+  else inFlightJobs.set(job.narrationId, job);
+}
+
+export function inFlightTtsJob(narrationId: string | undefined) {
+  return narrationId ? (inFlightJobs.get(narrationId) ?? null) : null;
+}
+
+export const TTS_IN_FLIGHT_REASON =
+  'Đang tạo audio AI cho bản nháp này. Chờ hoàn tất hoặc huỷ trước khi lưu hay gửi duyệt.';
 
 export function canCancelJob(state: TtsJobUiState): boolean {
   return state.phase === 'tracking' && isActive(state);

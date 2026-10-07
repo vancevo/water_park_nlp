@@ -7,31 +7,55 @@ import {
   type TtsGenerationPort,
 } from '@/lib/tts-generation';
 import {
-  initialTtsJobState,
+  inFlightTtsJob,
+  isTtsJobInFlight,
+  rememberTtsJob,
   nextPollDelayMs,
   shouldPoll,
+  trackingStateFor,
   ttsJobReducer,
 } from '@/lib/tts-job-machine';
 
 /**
  * Drives one narration's TTS job through the port: create → poll until a
  * terminal status → cancel/retry. Polling stops on unmount and never runs
- * against a terminal job. Calls `onSucceeded` once per succeeded job so the
- * caller can reload the draft that now carries the generated audio.
+ * against a terminal job; responses that arrive after the narration changed or
+ * the component unmounted are dropped. Calls `onSucceeded` once per succeeded
+ * job so the caller can reload the draft that now carries the generated audio.
  */
 export function useTtsJob(
   port: TtsGenerationPort | null,
   narrationId: string | undefined,
   onSucceeded: () => void,
 ) {
-  const [state, dispatch] = useReducer(ttsJobReducer, initialTtsJobState);
+  const [state, dispatch] = useReducer(ttsJobReducer, narrationId, (id) =>
+    trackingStateFor(inFlightTtsJob(id)),
+  );
   const notified = useRef(new Set<string>());
   const onSucceededRef = useRef(onSucceeded);
   useEffect(() => {
     onSucceededRef.current = onSucceeded;
   }, [onSucceeded]);
 
-  useEffect(() => dispatch({ type: 'reset' }), [narrationId]);
+  // Bumped whenever the narration changes or the hook unmounts; pending
+  // create/cancel responses from an older epoch are ignored.
+  const epoch = useRef(0);
+  const trackedNarration = useRef(narrationId);
+  useEffect(() => {
+    if (trackedNarration.current !== narrationId) {
+      trackedNarration.current = narrationId;
+      epoch.current += 1;
+      dispatch({ type: 'reset', job: inFlightTtsJob(narrationId) });
+    }
+  }, [narrationId]);
+  useEffect(() => {
+    const current = epoch;
+    return () => {
+      current.current += 1;
+    };
+  }, []);
+
+  useEffect(() => rememberTtsJob(state.job), [state.job]);
 
   const jobId = state.job?.id;
   const polling = port !== null && shouldPoll(state);
@@ -67,17 +91,18 @@ export function useTtsJob(
   const generate = useCallback(
     async (locale: NarrationLocaleCode) => {
       if (!port || !narrationId) return;
+      const started = epoch.current;
       dispatch({ type: 'create_requested' });
       try {
-        dispatch({
-          type: 'job_received',
-          job: await port.create(narrationId, { locale }),
-        });
+        const job = await port.create(narrationId, { locale });
+        if (epoch.current === started) dispatch({ type: 'job_received', job });
+        else rememberTtsJob(job); // still in flight server-side
       } catch (cause) {
-        dispatch({
-          type: 'request_failed',
-          error: ttsRequestErrorMessage(cause),
-        });
+        if (epoch.current === started)
+          dispatch({
+            type: 'request_failed',
+            error: ttsRequestErrorMessage(cause),
+          });
       }
     },
     [port, narrationId],
@@ -85,18 +110,28 @@ export function useTtsJob(
 
   const cancel = useCallback(async () => {
     if (!port || !jobId) return;
+    const started = epoch.current;
     dispatch({ type: 'cancel_requested' });
     try {
-      dispatch({ type: 'job_received', job: await port.cancel(jobId) });
+      const job = await port.cancel(jobId);
+      if (epoch.current === started) dispatch({ type: 'job_received', job });
+      else rememberTtsJob(job);
     } catch (cause) {
-      dispatch({
-        type: 'request_failed',
-        error: ttsRequestErrorMessage(cause),
-      });
+      if (epoch.current === started)
+        dispatch({
+          type: 'request_failed',
+          error: ttsRequestErrorMessage(cause),
+        });
     }
   }, [port, jobId]);
 
   const resume = useCallback(() => dispatch({ type: 'resume_polling' }), []);
 
-  return { state, generate, cancel, resume };
+  return {
+    state,
+    inFlight: isTtsJobInFlight(state),
+    generate,
+    cancel,
+    resume,
+  };
 }

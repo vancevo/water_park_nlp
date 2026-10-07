@@ -8,7 +8,7 @@ import type {
   UserRole,
 } from '@damsen/shared-types';
 import { useEffect, useId, useState } from 'react';
-import { useTtsJob } from '@/hooks/use-tts-job';
+import type { useTtsJob } from '@/hooks/use-tts-job';
 import {
   isTerminalTtsStatus,
   type TtsGenerationPort,
@@ -31,23 +31,25 @@ const STEPS: { status: TtsJobStatus; label: string }[] = [
  * AI narration audio for one saved draft revision. Output is always a draft
  * attachment: this panel never submits, approves or publishes, and it labels
  * everything it shows as AI-generated with provider/model/version provenance.
+ * The job state (`useTtsJob`) is owned by the editor so it can block save and
+ * submit while a job is in flight.
  */
 export function TtsGenerationPanel({
   port,
+  tts,
   narration,
   isNewRevision,
   localeOption,
   roles,
   hasUnsavedChanges,
-  onSucceeded,
 }: {
   port: TtsGenerationPort;
+  tts: ReturnType<typeof useTtsJob>;
   narration?: AdminNarration;
   isNewRevision: boolean;
   localeOption: NarrationLocaleOption;
   roles: UserRole[];
   hasUnsavedChanges: boolean;
-  onSucceeded: () => void;
 }) {
   const headingId = useId();
   const guard = ttsGenerationGuard({
@@ -57,12 +59,7 @@ export function TtsGenerationPanel({
     hasUnsavedChanges,
     localeEnabled: true,
   });
-  const narrationId = isNewRevision ? undefined : narration?.id;
-  const { state, generate, cancel, resume } = useTtsJob(
-    port,
-    narrationId,
-    onSucceeded,
-  );
+  const { state, generate, cancel, resume } = tts;
   const job = state.job;
   const previewUrl = usePreviewUrl(port, job);
   if (!guard.visible) return null;
