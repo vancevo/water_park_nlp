@@ -774,6 +774,71 @@ button {
   border: 0;
 }
 
+.narration-locale {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.narration-locale select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 650;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+}
+
+.narration-locale select:disabled {
+  opacity: 0.65;
+}
+
+.narration .fallback-notice,
+.arrival-dialog .fallback-notice {
+  padding: 8px 10px;
+  color: #6a4a07;
+  font-size: 13px;
+  font-weight: 650;
+  background: #fbefcf;
+  border-left: 4px solid var(--gold);
+  border-radius: 8px;
+}
+
+.narration .narration-note {
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.narration .secondary-action {
+  width: 100%;
+  border-radius: 11px;
+  cursor: pointer;
+}
+
+.inline-action {
+  padding: 0;
+  color: var(--green);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+audio:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
 @media (max-width: 820px) {
   .topbar {
     height: 66px;
