@@ -13,7 +13,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from validate import evaluate_gate, export_benchmark, update_checksums, validate  # noqa: E402
+from validate import evaluate_gate, export_benchmark, main, update_checksums, validate  # noqa: E402
 
 
 class DatasetCopy:
@@ -190,6 +190,15 @@ class ValidatorTest(unittest.TestCase):
         self.assertTrue(only_fr and all(s["locale"] == "fr" for s in only_fr))
         backend = json.loads((HERE.parents[1] / "config" / "tts-benchmark-sentences.json").read_text(encoding="utf-8"))
         self.assertTrue(set(backend["sentences"][0]) <= {"id", "locale", "category", "text"})
+
+    def test_export_refuses_unknown_locale(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "bench.json"
+            self.assertEqual(main(["--export-benchmark", str(out), "--locale", "de"]), 1)
+            self.assertFalse(out.exists())
+            self.assertEqual(main(["--export-benchmark", str(out), "--locale", "vi"]), 0)
+            exported = json.loads(out.read_text(encoding="utf-8"))["sentences"]
+            self.assertTrue(exported and all(s["locale"] == "vi" for s in exported))
 
 
 if __name__ == "__main__":

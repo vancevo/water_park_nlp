@@ -352,6 +352,10 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     if args.export_benchmark:
         document = export_benchmark(args.root, args.locale)
+        if not document["sentences"]:
+            # An empty benchmark would "pass" every gate; refuse it instead.
+            print(f"ERROR: no corpus sentences for locale {args.locale!r}", file=sys.stderr)
+            return 1
         args.export_benchmark.write_text(json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(f"Exported {len(document['sentences'])} sentences to {args.export_benchmark}")
     counts = {}
