@@ -1,12 +1,12 @@
+import type { NarrationLocaleCode } from '@damsen/api-client';
 import { useQuery } from '@tanstack/react-query';
 
 import type { NarrationClient } from './narrationModel';
-import type { SupportedLocale } from './model';
 
 export function usePoiNarration(
   client: NarrationClient,
   poiId: string | null,
-  locale: SupportedLocale,
+  locale: NarrationLocaleCode,
   enabled: boolean,
 ) {
   return useQuery({

@@ -1,9 +1,10 @@
-import type { PoiNarration, SupportedLocale } from '@damsen/api-client';
+import type { NarrationLocaleCode, PoiNarration } from '@damsen/api-client';
 
 export interface NarrationClient {
   getNarration(input: {
     poiId: string;
-    locale: SupportedLocale;
+    /** Any BCP 47 narration locale from the catalog; not limited to the UI locale. */
+    locale: NarrationLocaleCode;
     signal?: AbortSignal;
   }): Promise<PoiNarration>;
 }
