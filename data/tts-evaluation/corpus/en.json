@@ -1,0 +1,230 @@
+{
+  "schema": "tts-evaluation-corpus/v1",
+  "locale": "en",
+  "note": "Synthetic, original English sentences for TTS evaluation only. Content is fictional: times, prices, distances and dates are illustrative and do not describe the real park.",
+  "sentences": [
+    {
+      "id": "en-poi-001",
+      "locale": "en",
+      "category": "poi-name",
+      "text": "Welcome to the Rainbow Garden, home to dozens of colourful flower beds.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "en-poi-002",
+      "locale": "en",
+      "category": "poi-name",
+      "text": "The Water Discovery Station is just past the stone path on your left.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "en-poi-003",
+      "locale": "en",
+      "category": "poi-name",
+      "text": "The next show on the Wind Stage starts in a few minutes.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "en-poi-004",
+      "locale": "en",
+      "category": "poi-name",
+      "text": "Meet your group at Cloud Square before heading home.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "en-place-001",
+      "locale": "en",
+      "category": "place-name",
+      "text": "Dam Sen Cultural Park is in District 11 of Ho Chi Minh City.",
+      "split": "eval",
+      "sourceId": "public-place-names",
+      "synthetic": true,
+      "lexiconRefs": [
+        "en-dam-sen"
+      ]
+    },
+    {
+      "id": "en-place-002",
+      "locale": "en",
+      "category": "place-name",
+      "text": "Many visitors still call the city centre Saigon.",
+      "split": "eval",
+      "sourceId": "public-place-names",
+      "synthetic": true,
+      "lexiconRefs": [
+        "en-saigon"
+      ]
+    },
+    {
+      "id": "en-number-001",
+      "locale": "en",
+      "category": "number-date",
+      "text": "The garden is open from 8:30 a.m. to 5 p.m. every day.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "The garden is open from eight thirty a m to five p m every day.",
+      "lexiconRefs": [
+        "en-abbr-am-pm"
+      ]
+    },
+    {
+      "id": "en-number-002",
+      "locale": "en",
+      "category": "number-date",
+      "text": "This sample event takes place on 2 September 2026.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "This sample event takes place on the second of September twenty twenty-six."
+    },
+    {
+      "id": "en-number-003",
+      "locale": "en",
+      "category": "number-date",
+      "text": "An illustrative child ticket costs 45,000 VND.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "An illustrative child ticket costs forty-five thousand Vietnamese dong.",
+      "lexiconRefs": [
+        "en-abbr-vnd"
+      ]
+    },
+    {
+      "id": "en-number-004",
+      "locale": "en",
+      "category": "number-date",
+      "text": "The exit is about 1.5 km away, roughly a 20-minute walk.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "The exit is about one point five kilometres away, roughly a twenty-minute walk.",
+      "lexiconRefs": [
+        "en-abbr-km"
+      ]
+    },
+    {
+      "id": "en-abbr-001",
+      "locale": "en",
+      "category": "abbreviation",
+      "text": "Restrooms marked WC are about 50 m ahead.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Restrooms marked W C are about fifty metres ahead.",
+      "lexiconRefs": [
+        "en-abbr-wc"
+      ]
+    },
+    {
+      "id": "en-abbr-002",
+      "locale": "en",
+      "category": "abbreviation",
+      "text": "Bring water, sunscreen, a hat, etc., especially at noon.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Bring water, sunscreen, a hat, et cetera, especially at noon."
+    },
+    {
+      "id": "en-abbr-003",
+      "locale": "en",
+      "category": "abbreviation",
+      "text": "Scan the QR code at the gate to open the digital map.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Scan the Q R code at the gate to open the digital map.",
+      "lexiconRefs": [
+        "en-abbr-qr"
+      ]
+    },
+    {
+      "id": "en-codeswitch-001",
+      "locale": "en",
+      "category": "code-switch",
+      "text": "Look for the sign that reads Vườn Cầu Vồng, which means Rainbow Garden.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": [
+        "vi-vuon-cau-vong"
+      ]
+    },
+    {
+      "id": "en-codeswitch-002",
+      "locale": "en",
+      "category": "code-switch",
+      "text": "Staff may greet you with xin chào, the Vietnamese hello.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": [
+        "en-cs-xin-chao"
+      ]
+    },
+    {
+      "id": "en-punct-001",
+      "locale": "en",
+      "category": "punctuation",
+      "text": "Ready? Hold the handrail tightly — the ride is about to start!",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "en-punct-002",
+      "locale": "en",
+      "category": "punctuation",
+      "text": "Note: please do not run on the wooden bridge; walk slowly (especially when it is wet).",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "en-long-001",
+      "locale": "en",
+      "category": "long",
+      "text": "From Cloud Square, follow the covered walkway for about two hundred steps, cross a small bridge, and turn right at the round flower bed to reach the Rainbow Garden, where shaded benches let the whole family rest.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "en-long-002",
+      "locale": "en",
+      "category": "long",
+      "text": "The Water Discovery Station explains the water cycle with a simple model: water evaporates into clouds, clouds bring rain, and rain flows back into the lake to start again.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "en-safety-001",
+      "locale": "en",
+      "category": "safety",
+      "text": "Children under one metre twenty must ride with an accompanying adult.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "en-safety-002",
+      "locale": "en",
+      "category": "safety",
+      "text": "If you get lost, go to the nearest information desk and tell a staff member in a green shirt.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    }
+  ]
+}

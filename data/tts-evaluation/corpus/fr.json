@@ -1,0 +1,205 @@
+{
+  "schema": "tts-evaluation-corpus/v1",
+  "locale": "fr",
+  "note": "Phrases françaises originales et synthétiques, réservées à l'évaluation TTS. Contenu fictif : horaires, prix, distances et dates sont illustratifs. Locale expérimentale (troisième langue).",
+  "sentences": [
+    {
+      "id": "fr-poi-001",
+      "locale": "fr",
+      "category": "poi-name",
+      "text": "Bienvenue au Jardin Arc-en-ciel, où fleurissent de nombreux massifs colorés.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "fr-poi-002",
+      "locale": "fr",
+      "category": "poi-name",
+      "text": "La Station Découverte de l'Eau se trouve juste après le chemin de pierre, à gauche.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "fr-poi-003",
+      "locale": "fr",
+      "category": "poi-name",
+      "text": "Le prochain spectacle sur la Scène du Vent commence dans quelques minutes.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "fr-place-001",
+      "locale": "fr",
+      "category": "place-name",
+      "text": "Le parc culturel Đầm Sen se trouve dans le 11e arrondissement de Hô Chi Minh-Ville.",
+      "split": "eval",
+      "sourceId": "public-place-names",
+      "synthetic": true,
+      "expectedNormalized": "Le parc culturel Đầm Sen se trouve dans le onzième arrondissement de Hô Chi Minh-Ville.",
+      "lexiconRefs": [
+        "fr-dam-sen",
+        "fr-ho-chi-minh-ville"
+      ]
+    },
+    {
+      "id": "fr-place-002",
+      "locale": "fr",
+      "category": "place-name",
+      "text": "Beaucoup de visiteurs appellent encore le centre-ville Saïgon.",
+      "split": "eval",
+      "sourceId": "public-place-names",
+      "synthetic": true,
+      "lexiconRefs": [
+        "fr-saigon"
+      ]
+    },
+    {
+      "id": "fr-number-001",
+      "locale": "fr",
+      "category": "number-date",
+      "text": "Le jardin est ouvert de 8 h 30 à 17 h tous les jours.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Le jardin est ouvert de huit heures trente à dix-sept heures tous les jours."
+    },
+    {
+      "id": "fr-number-002",
+      "locale": "fr",
+      "category": "number-date",
+      "text": "Cet événement fictif a lieu le 2 septembre 2026.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Cet événement fictif a lieu le deux septembre deux mille vingt-six."
+    },
+    {
+      "id": "fr-number-003",
+      "locale": "fr",
+      "category": "number-date",
+      "text": "Un billet enfant d'exemple coûte 45 000 VND.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Un billet enfant d'exemple coûte quarante-cinq mille dongs vietnamiens.",
+      "lexiconRefs": [
+        "fr-abbr-vnd"
+      ]
+    },
+    {
+      "id": "fr-abbr-001",
+      "locale": "fr",
+      "category": "abbreviation",
+      "text": "Les toilettes signalées WC sont à environ 50 m.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Les toilettes signalées V C sont à environ cinquante mètres.",
+      "lexiconRefs": [
+        "fr-abbr-wc"
+      ]
+    },
+    {
+      "id": "fr-abbr-002",
+      "locale": "fr",
+      "category": "abbreviation",
+      "text": "Prévoyez de l'eau, un chapeau, de la crème solaire, etc.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Prévoyez de l'eau, un chapeau, de la crème solaire, et cetera."
+    },
+    {
+      "id": "fr-abbr-003",
+      "locale": "fr",
+      "category": "abbreviation",
+      "text": "M. Lâm, guide fictif, vous attend près de la sortie.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Monsieur Lâm, guide fictif, vous attend près de la sortie."
+    },
+    {
+      "id": "fr-codeswitch-001",
+      "locale": "fr",
+      "category": "code-switch",
+      "text": "Cherchez le panneau Vườn Cầu Vồng, qui signifie Jardin Arc-en-ciel.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": [
+        "vi-vuon-cau-vong"
+      ]
+    },
+    {
+      "id": "fr-codeswitch-002",
+      "locale": "fr",
+      "category": "code-switch",
+      "text": "Après le show, passez au stand de souvenirs près du check-in.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": [
+        "fr-cs-show",
+        "fr-cs-check-in"
+      ]
+    },
+    {
+      "id": "fr-punct-001",
+      "locale": "fr",
+      "category": "punctuation",
+      "text": "Prêts ? Tenez bien la rampe — l'attraction va démarrer !",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "fr-punct-002",
+      "locale": "fr",
+      "category": "punctuation",
+      "text": "Attention : ne courez pas sur le pont en bois ; marchez lentement (surtout s'il est mouillé).",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "fr-long-001",
+      "locale": "fr",
+      "category": "long",
+      "text": "Depuis la Place des Nuages, suivez l'allée couverte sur environ deux cents pas, traversez un petit pont, puis tournez à droite au massif rond pour rejoindre le Jardin Arc-en-ciel, où des bancs ombragés permettent à toute la famille de se reposer.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "fr-long-002",
+      "locale": "fr",
+      "category": "long",
+      "text": "La Station Découverte de l'Eau présente le cycle de l'eau avec un modèle simple : l'eau s'évapore en nuages, les nuages donnent la pluie, et la pluie retourne au lac pour recommencer.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "fr-safety-001",
+      "locale": "fr",
+      "category": "safety",
+      "text": "Les enfants de moins d'un mètre vingt doivent être accompagnés d'un adulte.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "fr-safety-002",
+      "locale": "fr",
+      "category": "safety",
+      "text": "Si vous êtes perdu, rendez-vous au point d'information le plus proche et adressez-vous à un employé en chemise verte.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    }
+  ]
+}

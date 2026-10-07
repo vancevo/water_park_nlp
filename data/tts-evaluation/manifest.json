@@ -1,0 +1,119 @@
+{
+  "schema": "tts-evaluation-manifest/v1",
+  "datasetId": "damsen-tts-eval",
+  "version": "1.0.0",
+  "purpose": "TTS evaluation and regression benchmark for configurable narration locales (AI01 / T06).",
+  "trainingUse": "forbidden",
+  "trainEvalSeparation": "Every sentence is split=eval. This set must never be used to train or fine-tune a model; any future training data lives in a separate dataset with its own consent/license records and must not share sentences with this one.",
+  "sources": [
+    {
+      "id": "tu-original-2026",
+      "title": "Original synthetic sentences and annotations written for the Dam Sen Smart Guide project",
+      "origin": "Authored in this repository by the UI/evaluation workstream (Tú), October 2026",
+      "rightsHolder": "Dam Sen Smart Guide project",
+      "license": "LicenseRef-DamSen-Project-Original",
+      "licenseNote": "Project-owned original text; may be redistributed with this repository and used for evaluation. Not copied from any third-party publication. Owner to confirm a public license (e.g. CC0-1.0) before external release.",
+      "synthetic": true
+    },
+    {
+      "id": "fixture-poi-names",
+      "title": "Synthetic POI names from data/geojson/pois.geojson",
+      "origin": "data/geojson/pois.geojson (source=synthetic_fixture)",
+      "rightsHolder": "Dam Sen Smart Guide project",
+      "license": "LicenseRef-DamSen-Project-Original",
+      "licenseNote": "Fictional names created for test fixtures; they do not describe real attractions.",
+      "synthetic": true
+    },
+    {
+      "id": "public-place-names",
+      "title": "Names of public places and administrative areas",
+      "origin": "Common geographic names (Đầm Sen, Thành phố Hồ Chí Minh / Ho Chi Minh City, Sài Gòn, Quận 11)",
+      "rightsHolder": "Public domain (geographic names are facts)",
+      "license": "LicenseRef-Factual-Place-Names",
+      "licenseNote": "Only the names are used; surrounding sentences are original. No description, photo or map data is copied. Real POI names/content remain blocked by B01 until rights are confirmed.",
+      "synthetic": false
+    }
+  ],
+  "files": [
+    {
+      "path": "corpus/vi.json",
+      "role": "corpus",
+      "license": "LicenseRef-DamSen-Project-Original",
+      "sourceIds": [
+        "tu-original-2026",
+        "fixture-poi-names",
+        "public-place-names"
+      ],
+      "sha256": "c0dcfbaeaffb0067d2c6bd8724388c3a4698ba05ff4055e58447b4b8e3bcf426"
+    },
+    {
+      "path": "corpus/en.json",
+      "role": "corpus",
+      "license": "LicenseRef-DamSen-Project-Original",
+      "sourceIds": [
+        "tu-original-2026",
+        "fixture-poi-names",
+        "public-place-names"
+      ],
+      "sha256": "31020591ee1ef70097e65c05467c4ae80d44c268f853dd6a0f5a6a1d819c09ba"
+    },
+    {
+      "path": "corpus/fr.json",
+      "role": "corpus",
+      "license": "LicenseRef-DamSen-Project-Original",
+      "sourceIds": [
+        "tu-original-2026",
+        "fixture-poi-names",
+        "public-place-names"
+      ],
+      "sha256": "2bf615bd11926f13338491a0eb1fb52df48d346ea968f4ec024697310992d3d8"
+    },
+    {
+      "path": "lexicon/pronunciation.json",
+      "role": "pronunciation-lexicon",
+      "license": "LicenseRef-DamSen-Project-Original",
+      "sourceIds": [
+        "tu-original-2026",
+        "fixture-poi-names",
+        "public-place-names"
+      ],
+      "sha256": "09f3efc702142fc69762cc7be5b77cfe240a60dca79fe0ff97fd60085f4d168a"
+    },
+    {
+      "path": "review/blind-review-form.json",
+      "role": "human-review-rubric",
+      "license": "LicenseRef-DamSen-Project-Original",
+      "sourceIds": [
+        "tu-original-2026"
+      ],
+      "sha256": "cadd62c99a662dc04f87c53e5deeb63ee0ad57d94c1a00f90bc92e3723bfad95"
+    },
+    {
+      "path": "thresholds.json",
+      "role": "release-gate",
+      "license": "LicenseRef-DamSen-Project-Original",
+      "sourceIds": [
+        "tu-original-2026"
+      ],
+      "sha256": "69bef92d0500db6bfe65e4d8b6573f6d83df28465820ecfd81f0364495d672df"
+    },
+    {
+      "path": "reports/report.schema.json",
+      "role": "report-schema",
+      "license": "LicenseRef-DamSen-Project-Original",
+      "sourceIds": [
+        "tu-original-2026"
+      ],
+      "sha256": "2361cadaf666d044a09efe9bf6ad33dde10f8a3ee90000ec9aab910b6d85b2b5"
+    },
+    {
+      "path": "reports/fixtures/example-report.json",
+      "role": "report-fixture (synthetic numbers)",
+      "license": "LicenseRef-DamSen-Project-Original",
+      "sourceIds": [
+        "tu-original-2026"
+      ],
+      "sha256": "48324156aa32d1f01d7607ea90300ec318b2ff2c9c2a241ae9792010883607e8"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "tts-evaluation-thresholds/v1",
+  "version": "1.0.0",
+  "decidedBeforeResults": true,
+  "note": "Release gate fixed before any benchmark result is inspected (roadmap section 5). Changing a threshold requires a new version and a written reason; never relax it after seeing results.",
+  "locales": {
+    "vi": { "tier": "release", "minNaturalnessMos": 3.5, "minIntelligibilityMos": 4.0 },
+    "en": { "tier": "release", "minNaturalnessMos": 3.5, "minIntelligibilityMos": 4.0 },
+    "fr": { "tier": "experimental", "minNaturalnessMos": 3.0, "minIntelligibilityMos": 3.5 }
+  },
+  "pronunciation": {
+    "maxCriticalPoiNameErrors": 0,
+    "minRaterAgreement": 2,
+    "note": "A POI or place name counts as correct only when at least minRaterAgreement raters mark it correct."
+  },
+  "automated": {
+    "decodableRate": 1.0,
+    "maxClippedSampleRatio": 0.001,
+    "maxLeadingOrTrailingSilenceSeconds": 0.5,
+    "maxInternalSilenceRatio": 0.35,
+    "asrCharacterErrorRateIsSecondarySignal": true
+  },
+  "operational": {
+    "maxP95GenerationMs": 5000,
+    "maxMeanRealTimeFactor": 1.0,
+    "maxFailedRatio": 0.0
+  },
+  "regression": {
+    "mustNotRegressPublishedLocales": ["vi", "en"]
+  }
+}
