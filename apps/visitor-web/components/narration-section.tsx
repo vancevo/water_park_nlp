@@ -177,7 +177,8 @@ export function NarrationSection({
           </button>
         </p>
       ) : null}
-      <div aria-live="polite" className="narration-body">
+      {/* Only short status text is live; the transcript itself is not re-announced. */}
+      <div className="narration-status" role="status" aria-live="polite">
         {status === 'loading' ? (
           <small className="muted">Đang tải thuyết minh…</small>
         ) : null}
@@ -186,20 +187,22 @@ export function NarrationSection({
             Địa điểm này chưa có bản thuyết minh được duyệt.
           </small>
         ) : null}
-        {status === 'error' ? (
-          <p className="narration-note" role="alert">
-            Không tải được thuyết minh.{' '}
-            <button type="button" className="inline-action" onClick={onRetry}>
-              Thử lại
-            </button>
-          </p>
-        ) : null}
         {fallback ? (
-          <p className="fallback-notice" role="status">
+          <p className="fallback-notice">
             Chưa có thuyết minh {fallback.requestedLabel}; đang hiển thị bản{' '}
             {fallback.resolvedLabel}.
           </p>
         ) : null}
+      </div>
+      {status === 'error' ? (
+        <p className="narration-note" role="alert">
+          Không tải được thuyết minh.{' '}
+          <button type="button" className="inline-action" onClick={onRetry}>
+            Thử lại
+          </button>
+        </p>
+      ) : null}
+      <div className="narration-body">
         {narration && status === 'ready' ? (
           <>
             <strong>

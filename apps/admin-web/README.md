@@ -17,7 +17,9 @@ The adapter reflects the current backend:
 - Create/update map the form to `AdminPoiInput`. Closed weekdays are omitted because the API has no `isClosed` field.
 - Submit uses the POI id. Approve/reject use `pendingVersionId`; rejection requires a reason.
 - Status is read-only in the form and changes only through workflow endpoints.
-- POI detail lists Vietnamese/English narration revisions and exposes role-aware draft/review actions. Audio selection validates MIME and the 50 MiB limit, hashes SHA-256 in the browser, uploads through the presigned PUT, and stores rights metadata with the narration. The selected local file can be previewed before submission; private object keys are not rendered.
+- POI detail lists narration revisions per locale from the narration-locale catalog (`NarrationLocaleCatalogPort`, keyboard-accessible tabs) and exposes role-aware draft/review actions. Audio selection validates MIME and the 50 MiB limit, hashes SHA-256 in the browser, uploads through the presigned PUT, and stores rights metadata with the narration. The selected local file can be previewed before submission; private object keys are not rendered.
 - `NEXT_PUBLIC_POI_DATA_MODE=demo` selects the lazy fixture adapter for an explicit demo only.
+- `NEXT_PUBLIC_NARRATION_DATA_MODE=demo` uses a VI/EN/FR fixture catalog instead of `GET /v1/narration-locales`.
+- `NEXT_PUBLIC_TTS_GENERATION_MODE=off|demo|api` (default `off`) shows the AI audio generation panel (`TtsGenerationPort`): simulated job lifecycle in `demo`, contract v1 endpoints in `api`. Generated audio is labelled AI-generated with provider/model/version and only attaches to a draft. See `docs/runbooks/frontend-narration-locales-tts.md`.
 
 Remaining contract limitation: fetching one admin POI costs a full list request until the backend provides `GET /v1/admin/pois/:id`.

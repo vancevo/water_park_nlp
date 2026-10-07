@@ -47,3 +47,12 @@ hoàn tất kiểm tra quyền/provider.
 
 Session user chỉ nằm trong `sessionStorage`. Refresh-token cookie/rotation và
 offline service worker chưa thuộc bản web MVP hiện tại.
+
+## Ngôn ngữ thuyết minh
+
+Ngôn ngữ thuyết minh độc lập với ngôn ngữ giao diện VI/EN: danh sách lấy từ
+`GET /v1/narration-locales`, lựa chọn được nhớ trong `localStorage`
+(`damsen.visitor.narrationLocale.v1`), có thông báo khi API trả bản fallback,
+audio đã xuất bản được ưu tiên hơn Web Speech và Web Speech dùng `speechTag`.
+`NEXT_PUBLIC_NARRATION_DATA_MODE=demo` dùng fixture VI/EN/FR (VI có âm báo demo,
+FR rơi về EN). Xem `docs/runbooks/frontend-narration-locales-tts.md`.

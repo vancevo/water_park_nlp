@@ -124,27 +124,27 @@ API, worker hoặc model chạy thật.
 
 ### Checklist Tú
 
-- [ ] **T01 — Mock ports và fixtures**
+- [x] **T01 — Mock ports và fixtures**
   - Tạo app-local `NarrationLocaleCatalogPort` và `TtsGenerationPort`.
   - Fixture có VI, EN, FR; job mô phỏng queued → running → succeeded/failed.
   - Không thêm type vào shared packages.
-- [ ] **T02 — Admin locale-aware UI**
+- [x] **T02 — Admin locale-aware UI**
   - Thực hiện T25C bằng mock catalog: selector động, history, upload theo locale,
     loading/error/empty/disabled states.
-- [ ] **T03 — Visitor narration selector**
+- [x] **T03 — Visitor narration selector**
   - Thực hiện T25D: locale narration độc lập với UI, local preference,
     fallback indicator, audio và Web Speech `speechTag`.
-- [ ] **T04 — Admin AI generation UX**
+- [x] **T04 — Admin AI generation UX**
   - Phần UI của AI04: nút tạo audio, trạng thái, polling giả lập, cancel/retry,
     preview, provenance và cảnh báo “AI-generated”.
   - RBAC backend do Công làm; Tú test visibility/action guards ở UI.
-- [ ] **T05 — Mobile compatibility**
+- [x] **T05 — Mobile compatibility**
   - Thực hiện T25E ở client: narration locale là string BCP 47, không còn giả
     định transport chỉ có `vi|en`; không mở rộng mobile UI ngoài ADR 0006.
-- [ ] **T06 — Evaluation corpus và pronunciation assets**
+- [x] **T06 — Evaluation corpus và pronunciation assets**
   - Thực hiện AI01 độc lập: corpus VI/EN/FR, license manifest, tên POI, số/ngày,
     viết tắt, code-switch, pronunciation dictionary và report fixtures.
-- [ ] **T07 — Frontend quality gate**
+- [x] **T07 — Frontend quality gate**
   - Accessibility, keyboard/screen reader, responsive layout, browser tests,
     failure states và UI runbook.
 
