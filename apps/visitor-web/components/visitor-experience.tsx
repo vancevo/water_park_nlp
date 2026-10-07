@@ -247,10 +247,17 @@ export function VisitorExperience() {
     setIsWalking(false);
   }, []);
 
-  /** Stops both recorded audio and browser TTS. */
+  /**
+   * Stops browser TTS and every narration audio: the programmatic player used
+   * by replay/arrival and the inline `<audio controls>` in the POI card, so two
+   * narrations never play over each other.
+   */
   const stopPlayback = useCallback(() => {
     window.speechSynthesis?.cancel();
     narrationAudioRef.current?.pause();
+    document
+      .querySelectorAll<HTMLAudioElement>('audio')
+      .forEach((audio) => audio.pause());
   }, []);
 
   const openPoi = useCallback(

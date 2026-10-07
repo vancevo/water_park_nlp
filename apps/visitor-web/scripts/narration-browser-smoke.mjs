@@ -73,6 +73,16 @@ try {
       await page.locator('.fallback-notice').innerText(),
       /Français/,
     );
+    // Demo fixture: VI carries recorded audio, so it wins over browser TTS.
+    await select.selectOption('vi');
+    await page.locator('.narration-body audio').waitFor();
+    assert.equal(
+      await page.locator('.narration-body .secondary-action').count(),
+      0,
+      'no browser-TTS button when recorded audio exists',
+    );
+    await select.selectOption('fr');
+    await page.locator('.fallback-notice').waitFor();
   }
 
   // Preference survives reload; keyboard can change the selection.

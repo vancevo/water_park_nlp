@@ -214,6 +214,8 @@ export function NarrationSection({
                 controls
                 preload="none"
                 src={narration.audio.playbackUrl}
+                // Recorded audio wins: silence any browser TTS still speaking.
+                onPlay={() => window.speechSynthesis?.cancel()}
                 aria-label={`Audio thuyết minh ${localeLabel(catalog, narration.resolvedLocale)}`}
               />
             ) : speechSupported ? (
