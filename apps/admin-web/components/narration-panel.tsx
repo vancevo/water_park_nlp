@@ -3,9 +3,18 @@
 import type {
   AdminNarration,
   NarrationAudioMetadataInput,
-  SupportedLocale,
+  NarrationLocaleCatalog,
+  NarrationLocaleCode,
+  NarrationLocaleOption,
 } from '@damsen/shared-types';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from 'react';
 import {
   AUTH_SESSION_EVENT,
   readAuthSession,
@@ -17,14 +26,53 @@ import {
   newestNarration,
 } from '@/lib/narration-admin-client';
 import {
+  disabledStoredLocales,
+  getNarrationLocalePort,
+  localeLabel,
+} from '@/lib/narration-locales';
+import {
   audioMetadata,
   sha256Hex,
   validateAudioFile,
 } from '@/lib/narration-media';
 import { StatusBadge } from './status-badge';
 
+type CatalogState =
+  | { status: 'loading' }
+  | { status: 'error'; message: string }
+  | { status: 'ready'; catalog: NarrationLocaleCatalog };
+
+function useNarrationLocaleCatalog() {
+  const [state, setState] = useState<CatalogState>({ status: 'loading' });
+  const load = useCallback(async () => {
+    setState({ status: 'loading' });
+    try {
+      setState({
+        status: 'ready',
+        catalog: await getNarrationLocalePort().getCatalog(),
+      });
+    } catch (cause) {
+      setState({
+        status: 'error',
+        message:
+          cause instanceof Error
+            ? cause.message
+            : 'Không thể tải danh sách ngôn ngữ thuyết minh.',
+      });
+    }
+  }, []);
+  useEffect(() => {
+    void load();
+  }, [load]);
+  return { state, reload: load };
+}
+
 export function NarrationPanel({ poiId }: { poiId: string }) {
-  const [locale, setLocale] = useState<SupportedLocale>('vi');
+  const { state: catalogState, reload: reloadCatalog } =
+    useNarrationLocaleCatalog();
+  const catalog = catalogState.status === 'ready' ? catalogState.catalog : null;
+  const [requestedLocale, setRequestedLocale] =
+    useState<NarrationLocaleCode | null>(null);
   const [items, setItems] = useState<AdminNarration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -57,7 +105,13 @@ export function NarrationPanel({ poiId }: { poiId: string }) {
     void load();
   }, [load]);
 
-  const selected = newestNarration(items, locale);
+  // A locale disabled in config disappears after reload; fall back to default.
+  const locale =
+    catalog && catalog.locales.some((option) => option.code === requestedLocale)
+      ? requestedLocale
+      : (catalog?.defaultLocale ?? null);
+  const localeOption = catalog?.locales.find((item) => item.code === locale);
+  const selected = locale ? newestNarration(items, locale) : undefined;
   const revisions = useMemo(
     () =>
       items
@@ -65,77 +119,216 @@ export function NarrationPanel({ poiId }: { poiId: string }) {
         .sort((a, b) => b.revision - a.revision),
     [items, locale],
   );
+  const hiddenLocales = catalog ? disabledStoredLocales(catalog, items) : [];
 
   return (
-    <div className="panel card narration-panel">
+    <section
+      className="panel card narration-panel"
+      aria-labelledby="narration-panel-title"
+    >
       <div className="section-heading">
         <div>
-          <h2>Thuyết minh và audio</h2>
-          <p>Bản nháp, duyệt nội dung và tệp nghe theo từng ngôn ngữ.</p>
+          <h2 id="narration-panel-title">Thuyết minh và audio</h2>
+          <p>
+            Bản nháp, duyệt nội dung và tệp nghe theo từng ngôn ngữ được bật
+            trong cấu hình.
+          </p>
         </div>
         <span className="tag">≤ 50 MiB</span>
       </div>
-      <div className="tabs">
-        {(['vi', 'en'] as const).map((item) => (
-          <button
-            key={item}
-            className={locale === item ? 'selected' : ''}
-            onClick={() => {
-              setLocale(item);
-              setGeneration(0);
-            }}
-          >
-            {item === 'vi' ? '🇻🇳 Tiếng Việt' : '🇬🇧 English'}
+      {catalogState.status === 'loading' && (
+        <div className="empty-inline" role="status">
+          Đang tải danh sách ngôn ngữ thuyết minh…
+        </div>
+      )}
+      {catalogState.status === 'error' && (
+        <div className="alert error" role="alert">
+          <span>Không tải được danh sách ngôn ngữ: {catalogState.message}</span>
+          <button className="link-button" onClick={() => void reloadCatalog()}>
+            Thử lại
           </button>
-        ))}
-      </div>
+        </div>
+      )}
+      {catalog && catalog.locales.length === 0 && (
+        <div className="empty-inline" role="status">
+          Chưa có ngôn ngữ thuyết minh nào được bật trong cấu hình.
+        </div>
+      )}
+      {catalog && catalog.locales.length > 0 && locale && (
+        <LocaleTabs
+          catalog={catalog}
+          selected={locale}
+          items={items}
+          disabled={!session}
+          onSelect={(code) => {
+            setRequestedLocale(code);
+            setGeneration(0);
+          }}
+        />
+      )}
+      {hiddenLocales.length > 0 && (
+        <p className="helper">
+          Có bản thuyết minh ở ngôn ngữ đang tắt (
+          {hiddenLocales.map((code) => code.toUpperCase()).join(', ')}). Nội
+          dung vẫn được giữ nhưng không hiển thị cho khách cho đến khi bật lại.
+        </p>
+      )}
       {!session && (
         <div className="alert error">
           Đăng nhập phiên quản trị để xem và cập nhật thuyết minh.
         </div>
       )}
-      {loading && <div className="empty-inline">Đang tải thuyết minh…</div>}
-      {error && (
-        <div className="alert error">
-          {error}{' '}
-          <button className="link-button" onClick={() => void load()}>
-            Thử lại
-          </button>
-        </div>
-      )}
-      {!loading && !error && session && (
-        <NarrationEditor
-          key={`${locale}:${selected?.id ?? 'new'}:${generation}`}
-          poiId={poiId}
-          locale={locale}
-          current={selected}
-          permissions={permissions}
-          onChanged={async () => {
-            setGeneration(0);
-            await load();
-          }}
-          startNew={generation > 0}
-          onStartNew={() => setGeneration((value) => value + 1)}
-        />
-      )}
-      {revisions.length > 0 && (
-        <div className="narration-history">
-          <h3>Lịch sử phiên bản</h3>
-          {revisions.map((item) => (
-            <div className="narration-revision" key={item.id}>
-              <span>Phiên bản {item.revision}</span>
-              <StatusBadge status={item.status} />
-              <small>{new Date(item.updatedAt).toLocaleString('vi-VN')}</small>
-              <small>{item.audio ? 'Có audio' : 'Chỉ văn bản'}</small>
-              {item.rejectionReason && (
-                <small className="field-error">
-                  Lý do: {item.rejectionReason}
+      <div
+        id="narration-locale-panel"
+        role={locale ? 'tabpanel' : undefined}
+        aria-labelledby={locale ? `narration-tab-${locale}` : undefined}
+        className="narration-locale-panel"
+      >
+        {loading && session && (
+          <div className="empty-inline" role="status">
+            Đang tải thuyết minh…
+          </div>
+        )}
+        {error && (
+          <div className="alert error" role="alert">
+            <span>{error}</span>
+            <button className="link-button" onClick={() => void load()}>
+              Thử lại
+            </button>
+          </div>
+        )}
+        {!loading && !error && session && locale && localeOption && (
+          <NarrationEditor
+            key={`${locale}:${selected?.id ?? 'new'}:${generation}`}
+            poiId={poiId}
+            locale={locale}
+            localeOption={localeOption}
+            fallbackLabel={
+              localeOption.fallbackLocale
+                ? localeLabel(catalog, localeOption.fallbackLocale)
+                : ''
+            }
+            current={selected}
+            permissions={permissions}
+            onChanged={async () => {
+              setGeneration(0);
+              await load();
+            }}
+            startNew={generation > 0}
+            onStartNew={() => setGeneration((value) => value + 1)}
+          />
+        )}
+        {revisions.length > 0 && localeOption && (
+          <div className="narration-history">
+            <h3>Lịch sử phiên bản · {localeOption.nativeLabel}</h3>
+            {revisions.map((item) => (
+              <div className="narration-revision" key={item.id}>
+                <span>Phiên bản {item.revision}</span>
+                <StatusBadge status={item.status} />
+                <small>
+                  {new Date(item.updatedAt).toLocaleString('vi-VN')}
                 </small>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+                <small>{item.audio ? 'Có audio' : 'Chỉ văn bản'}</small>
+                {item.rejectionReason && (
+                  <small className="field-error">
+                    Lý do: {item.rejectionReason}
+                  </small>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        {!loading &&
+          !error &&
+          session &&
+          localeOption &&
+          revisions.length === 0 && (
+            <p className="helper">
+              Chưa có phiên bản {localeOption.nativeLabel} nào cho điểm này.
+            </p>
+          )}
+      </div>
+    </section>
+  );
+}
+
+const STATUS_HINTS: Record<AdminNarration['status'], string> = {
+  draft: 'Nháp',
+  pending_review: 'Chờ duyệt',
+  published: 'Đã xuất bản',
+  rejected: 'Bị từ chối',
+  superseded: 'Đã thay thế',
+};
+
+/** WAI-ARIA tabs with roving tabindex: Arrow/Home/End move focus and selection. */
+function LocaleTabs({
+  catalog,
+  selected,
+  items,
+  disabled,
+  onSelect,
+}: {
+  catalog: NarrationLocaleCatalog;
+  selected: NarrationLocaleCode;
+  items: AdminNarration[];
+  disabled: boolean;
+  onSelect(code: NarrationLocaleCode): void;
+}) {
+  const refs = useRef(new Map<string, HTMLButtonElement>());
+  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    const codes = catalog.locales.map((option) => option.code);
+    const index = codes.indexOf(selected);
+    const next =
+      event.key === 'ArrowRight'
+        ? codes[(index + 1) % codes.length]
+        : event.key === 'ArrowLeft'
+          ? codes[(index - 1 + codes.length) % codes.length]
+          : event.key === 'Home'
+            ? codes[0]
+            : event.key === 'End'
+              ? codes[codes.length - 1]
+              : undefined;
+    if (!next || disabled) return;
+    event.preventDefault();
+    onSelect(next);
+    refs.current.get(next)?.focus();
+  }
+  return (
+    <div
+      className="tabs locale-tabs"
+      role="tablist"
+      aria-label="Ngôn ngữ thuyết minh"
+      onKeyDown={onKeyDown}
+    >
+      {catalog.locales.map((option: NarrationLocaleOption) => {
+        const newest = newestNarration(items, option.code);
+        const isSelected = option.code === selected;
+        return (
+          <button
+            key={option.code}
+            id={`narration-tab-${option.code}`}
+            ref={(node) => {
+              if (node) refs.current.set(option.code, node);
+              else refs.current.delete(option.code);
+            }}
+            type="button"
+            role="tab"
+            lang={option.code}
+            aria-selected={isSelected}
+            aria-controls="narration-locale-panel"
+            tabIndex={isSelected ? 0 : -1}
+            disabled={disabled}
+            className={isSelected ? 'selected' : ''}
+            onClick={() => onSelect(option.code)}
+          >
+            <span>{option.nativeLabel}</span>{' '}
+            <small className="locale-code">{option.code.toUpperCase()}</small>
+            <small className="locale-state">
+              {newest ? STATUS_HINTS[newest.status] : 'Chưa có'}
+            </small>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -143,6 +336,8 @@ export function NarrationPanel({ poiId }: { poiId: string }) {
 function NarrationEditor({
   poiId,
   locale,
+  localeOption,
+  fallbackLabel,
   current,
   permissions,
   onChanged,
@@ -150,7 +345,9 @@ function NarrationEditor({
   onStartNew,
 }: {
   poiId: string;
-  locale: SupportedLocale;
+  locale: NarrationLocaleCode;
+  localeOption: NarrationLocaleOption;
+  fallbackLabel: string;
   current?: AdminNarration;
   permissions: ReturnType<typeof narrationPermissions>;
   onChanged: () => Promise<void>;
@@ -285,8 +482,15 @@ function NarrationEditor({
       <div className="section-heading">
         <div>
           <h3>
-            {isNew ? 'Bản thuyết minh mới' : `Phiên bản ${current.revision}`}
+            {isNew ? 'Bản thuyết minh mới' : `Phiên bản ${current.revision}`} ·{' '}
+            {localeOption.nativeLabel}
           </h3>
+          {fallbackLabel && (
+            <p className="helper">
+              Ngôn ngữ dự phòng cho khách: {fallbackLabel} (dùng khi
+              {localeOption.nativeLabel} chưa có bản xuất bản).
+            </p>
+          )}
           <p>
             {editable
               ? 'Bạn có thể lưu nháp và nghe thử audio trước khi gửi duyệt.'
@@ -299,6 +503,7 @@ function NarrationEditor({
         Nội dung thuyết minh
         <textarea
           rows={8}
+          lang={locale}
           minLength={20}
           maxLength={20_000}
           disabled={!editable || busy}
@@ -368,7 +573,11 @@ function NarrationEditor({
         <p className="helper">Phiên bản hiện tại đã đính kèm audio.</p>
       )}
       {message && (
-        <div className={message.includes('Không') ? 'alert error' : 'alert'}>
+        <div
+          className={message.includes('Không') ? 'alert error' : 'alert'}
+          role="status"
+          aria-live="polite"
+        >
           {message}
         </div>
       )}

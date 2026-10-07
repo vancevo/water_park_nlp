@@ -693,6 +693,34 @@ td small {
   font-size: 12px;
   box-shadow: 0 8px 25px #0003;
 }
+.locale-tabs {
+  flex-wrap: wrap;
+}
+.locale-tabs button {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+.locale-tabs button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.locale-code {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+.locale-state {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+}
+button:focus-visible,
+a:focus-visible,
+[role='tab']:focus-visible {
+  outline: 3px solid #f3b840;
+  outline-offset: 2px;
+}
 @media (max-width: 900px) {
   .shell {
     grid-template-columns: 1fr;
@@ -710,8 +738,10 @@ td small {
   .content > section {
     padding: 0 16px;
   }
-  .form-grid {
-    grid-template-columns: 1fr;
+  .form-grid,
+  .form-main,
+  .form-side {
+    grid-template-columns: minmax(0, 1fr);
   }
   .form-side {
     position: static;
@@ -735,6 +765,9 @@ td small {
     grid-template-columns: 1fr;
   }
   .hours-row {
-    grid-template-columns: 80px 100px 1fr 10px 1fr;
+    grid-template-columns: 72px auto minmax(0, 1fr) 10px minmax(0, 1fr);
+  }
+  .hours-row input {
+    min-width: 0;
   }
 }

@@ -34,7 +34,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <header>
           <div>
             <b>Trang quản trị nội dung</b>
-            <span>Đầm Sen • VI / EN</span>
+            <span>Đầm Sen • Nội dung VI / EN · Thuyết minh theo cấu hình</span>
           </div>
           <div className="avatar">ED</div>
         </header>
