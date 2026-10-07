@@ -36,6 +36,11 @@ contract v1 trong `docs/plans/CONG_TU_WORK_SPLIT.md`; vận hành:
 | `failed` | "Tạo audio thất bại — <mô tả theo errorCode>" | Thử lại |
 | `cancelled` | "Đã huỷ tạo audio" | Thử lại |
 
+- Trong lúc job đang chạy (từ khi bấm tạo đến khi `succeeded`/`failed`/
+  `cancelled`, kể cả khi polling tạm dừng vì lỗi mạng) nút "Lưu thuyết minh"
+  và "Gửi duyệt" bị khoá kèm lý do: audio AI không được gắn vào transcript
+  hoặc trạng thái workflow khác với lúc tạo. Đổi tab ngôn ngữ rồi quay lại
+  vẫn tiếp tục theo dõi job trong cùng phiên trang.
 - Polling tự động (0,8 s → tối đa 5 s), dừng ở trạng thái kết thúc; sau 3 lỗi
   mạng liên tiếp thì dừng và cho "Kiểm tra lại".
 - Chỉ hiển thị mã lỗi ổn định (`TTS_TIMEOUT`, `TTS_AUDIO_INVALID`,
@@ -65,5 +70,11 @@ Theo ADR 0006 không thêm màn hình mới; chỉ đảm bảo transport nhận
   (`AdminNarration.audio` không có `playbackUrl`); demo dùng âm báo cục bộ.
 - Narration chưa mang provenance AI (`generatedBy {provider, model,
   modelVersion, jobId}`) nên lịch sử phiên bản chưa thể gắn nhãn AI sau reload.
-- Chưa có endpoint liệt kê job gần nhất của một narration để tiếp tục theo dõi
-  sau khi tải lại trang hoặc đổi tab.
+- Chưa có endpoint liệt kê job gần nhất của một narration. UI nhớ job đang
+  chạy trong phiên trang (đổi tab vẫn theo dõi), nhưng sau khi tải lại trang
+  hoặc ở trình duyệt khác thì không biết job đang chạy; backend cần từ chối
+  submit khi narration còn job `queued`/`running` (RBAC/khóa phía server là
+  nguồn quyết định).
+- Mã lỗi 409 của create/cancel job (ví dụ narration không còn là draft, job đã
+  kết thúc) chưa được tài liệu hoá trong OpenAPI; UI hiện chỉ hiển thị thông
+  báo chung theo HTTP status.

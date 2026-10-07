@@ -58,7 +58,8 @@ ADMIN_EMAIL=... ADMIN_PASSWORD=... PLAYWRIGHT_CORE_PATH=... CHROMIUM_PATH=... \
 
 Smoke kiểm tra: locale từ catalog, bàn phím (Arrow/Home/End trên tab admin,
 Home trên select visitor), `aria-live` trạng thái job, nhãn AI-generated và
-provenance, cancel/retry, lựa chọn được ghi nhớ sau reload, đổi ngôn ngữ giao
+provenance, khoá lưu/gửi duyệt khi job đang chạy và tiếp tục theo dõi sau khi
+đổi tab, cancel/retry, audio thu sẵn được ưu tiên hơn Web Speech (demo), lựa chọn được ghi nhớ sau reload, đổi ngôn ngữ giao
 diện không đổi ngôn ngữ thuyết minh, localStorage bị chặn vẫn chạy, không cuộn
 ngang ở 390 px.
 
@@ -83,6 +84,7 @@ ngang ở 390 px.
 | Admin: "Có bản thuyết minh ở ngôn ngữ đang tắt" | Locale bị tắt trong config | Đúng thiết kế: dữ liệu giữ nguyên, không hiện cho khách |
 | Admin: không thấy khu Audio AI | `NEXT_PUBLIC_TTS_GENERATION_MODE` = off, hoặc role không phải EDITOR/REVIEWER/ADMIN | Bật flag khi rebuild; RBAC backend vẫn quyết định |
 | Admin: nút tạo audio bị khoá | Chưa lưu, transcript đang sửa, bản không ở draft/rejected, hoặc tài khoản chỉ có REVIEWER | Làm theo lý do hiển thị |
+| Admin: "Lưu thuyết minh"/"Gửi duyệt" bị khoá, ghi chú "Đang tạo audio AI…" | Job TTS đang `queued`/`running` hoặc yêu cầu tạo/huỷ chưa trả về | Chờ job kết thúc hoặc bấm "Huỷ tạo audio" |
 | Admin: "Mất kết nối…" + "Kiểm tra lại" | 3 lần polling lỗi liên tiếp | Kiểm tra API rồi bấm "Kiểm tra lại" |
 | Admin: 404 khi tạo job ở chế độ `api` | Endpoint AI04 backend chưa triển khai | Dùng `demo` cho tới I01 |
 | Visitor: ghi chú dùng Tiếng Việt/English | Catalog lỗi, đang dùng catalog dự phòng | "Thử lại"; transcript vẫn dùng được |
