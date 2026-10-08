@@ -88,6 +88,46 @@ export type {
 export { parseWav, WavParseError } from './tts/piper/wav.js';
 export type { WavInfo } from './tts/piper/wav.js';
 
+// AI05 — provider benchmark and selection.
+export {
+  CliTtsProvider,
+  CliTtsSynthesisError,
+  CliTtsTimeoutError,
+  spawnCliRunner,
+} from './tts/providers/cli-tts-provider.js';
+export type {
+  CliProviderSpec,
+  CliRunner,
+  CliRunInput,
+  HardwareClass,
+} from './tts/providers/cli-tts-provider.js';
+export {
+  parseBenchmarkProvidersManifest,
+  loadBenchmarkProvidersManifest,
+  buildBenchmarkProviders,
+  toCliProviderSpec,
+  BenchmarkProvidersManifestError,
+} from './tts/providers/benchmark-providers-manifest.js';
+export type {
+  BenchmarkProviderEntry,
+  BenchmarkProvidersManifest,
+} from './tts/providers/benchmark-providers-manifest.js';
+export { runProviderComparison } from './tts/providers/provider-benchmark.js';
+export type {
+  BenchmarkThresholds,
+  ProviderCandidate,
+  ProviderBenchmarkEntry,
+  ProviderComparisonReport,
+  ProviderComparisonOptions,
+  BlindLabel,
+  LocaleRecommendation,
+} from './tts/providers/provider-benchmark.js';
+export {
+  validateProviderComparisonReport,
+  assertValidProviderComparisonReport,
+  ProviderBenchmarkReportError,
+} from './tts/providers/provider-benchmark-report.js';
+
 export function startWorker(): void {
   // Queue/CLI composition belongs here once a production embedding provider and
   // database client are selected. The domain service itself remains injectable.

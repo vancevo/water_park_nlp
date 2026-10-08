@@ -1,0 +1,68 @@
+{
+  "schema": "tts-benchmark-providers/v1",
+  "note": "AI05 candidate providers for the comparison benchmark. Copy to config/tts-benchmark-providers.json and, per each engine's MODEL CARD, pin modelVersion (never 'main'/'latest'), set the real license + source checksum, and adjust command/argsTemplate/modelPath to the installed binary. Placeholders: {out} output WAV path, {model} modelPath, {text} transcript (omit when textViaStdin), {voice} voiceId, {speaker}. See docs/runbooks/backend-tts-benchmark.md.",
+  "entries": [
+    {
+      "provider": "piper",
+      "model": "vi_VN-vais1000-medium",
+      "modelVersion": "piper-voices-2023.11.14-2",
+      "voiceId": "vi_VN-vais1000-medium",
+      "locale": "vi",
+      "license": "UNSET — copy from the Piper voice model card",
+      "sourceUrl": "https://huggingface.co/rhasspy/piper-voices",
+      "checksum": "0000000000000000000000000000000000000000000000000000000000000000",
+      "enabled": true,
+      "hardwareClass": "cpu",
+      "command": "piper",
+      "argsTemplate": ["--model", "{model}", "--output_file", "{out}"],
+      "textViaStdin": true,
+      "modelPath": "config/piper-voices/vi_VN-vais1000-medium.onnx"
+    },
+    {
+      "provider": "zerotts",
+      "model": "zerotts-vi",
+      "modelVersion": "UNSET — pin a ZeroTTS release tag/commit",
+      "voiceId": "zerotts-vi-default",
+      "locale": "vi",
+      "license": "UNSET — copy from the ZeroTTS model card",
+      "sourceUrl": "https://github.com/zeroweight-ai/ZeroTTS",
+      "checksum": "0000000000000000000000000000000000000000000000000000000000000000",
+      "enabled": true,
+      "hardwareClass": "cpu",
+      "command": "zerotts",
+      "argsTemplate": [
+        "--model",
+        "{model}",
+        "--text",
+        "{text}",
+        "--out",
+        "{out}"
+      ],
+      "textViaStdin": false,
+      "modelPath": "config/zerotts/vi"
+    },
+    {
+      "provider": "moss-tts",
+      "model": "moss-tts-vi",
+      "modelVersion": "UNSET — pin a MOSS-TTS release tag/commit",
+      "voiceId": "moss-tts-vi-default",
+      "locale": "vi",
+      "license": "UNSET — copy from the MOSS-TTS model card",
+      "sourceUrl": "https://github.com/OpenMOSS/MOSS-TTS",
+      "checksum": "0000000000000000000000000000000000000000000000000000000000000000",
+      "enabled": true,
+      "hardwareClass": "gpu",
+      "command": "moss-tts",
+      "argsTemplate": [
+        "--model",
+        "{model}",
+        "--text",
+        "{text}",
+        "--output",
+        "{out}"
+      ],
+      "textViaStdin": false,
+      "modelPath": "config/moss-tts/vi"
+    }
+  ]
+}
