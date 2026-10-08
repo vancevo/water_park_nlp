@@ -1,0 +1,44 @@
+# Prometheus alerting rules for the AI/TTS pipeline (AI08).
+# Metric names are emitted by apps/worker/src/ops (MetricsRegistry / TtsMetrics).
+# Tune thresholds per environment; these are conservative starting points.
+groups:
+  - name: tts-pipeline
+    rules:
+      - alert: TtsDeadLetterSpike
+        expr: increase(tts_job_dead_letters_total[15m]) > 5
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "TTS jobs are dead-lettering"
+          description: "More than 5 TTS jobs dead-lettered in 15m (by provider/error_code). Check the provider and the runbook."
+
+      - alert: TtsQueueBacklog
+        expr: max_over_time(tts_queue_depth[10m]) > 200
+        for: 10m
+        labels:
+          severity: page
+        annotations:
+          summary: "TTS queue backlog"
+          description: "Queue depth stayed above 200 for 10m. Check worker throughput and quotas."
+
+      - alert: TtsGenerationSlow
+        expr: histogram_quantile(0.95, sum(rate(tts_generation_duration_ms_bucket[10m])) by (le, provider)) > 15000
+        for: 10m
+        labels:
+          severity: ticket
+        annotations:
+          summary: "TTS p95 generation time high"
+          description: "p95 generation time over 15s for 10m. Compare against the AI05 benchmark thresholds."
+
+      - alert: TtsJobFailureRatio
+        expr: |
+          sum(rate(tts_jobs_total{status="failed"}[15m]))
+            / clamp_min(sum(rate(tts_jobs_total{status=~"succeeded|failed"}[15m])), 1)
+            > 0.1
+        for: 10m
+        labels:
+          severity: page
+        annotations:
+          summary: "TTS failure ratio high"
+          description: "More than 10% of finished TTS jobs failed over 15m. Consider the kill switch (TTS_GENERATION_ENABLED=false) and model rollback."

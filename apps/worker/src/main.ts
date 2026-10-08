@@ -128,6 +128,31 @@ export {
   ProviderBenchmarkReportError,
 } from './tts/providers/provider-benchmark-report.js';
 
+// AI08 — operational hardening (metrics, quota, retention, kill-switches).
+export { MetricsRegistry, DEFAULT_LATENCY_BUCKETS_MS } from './ops/metrics.js';
+export type { Labels, MetricsSnapshot } from './ops/metrics.js';
+export { TtsMetrics } from './ops/tts-metrics.js';
+export type { TtsJobLabels } from './ops/tts-metrics.js';
+export {
+  QuotaGuard,
+  DEFAULT_QUOTA_CONFIG,
+  loadQuotaConfig,
+} from './ops/quota.js';
+export type { QuotaConfig, QuotaDecision } from './ops/quota.js';
+export {
+  isExpired,
+  selectExpiredJobs,
+  loadRetentionPolicy,
+  DEFAULT_RETENTION_POLICY,
+} from './ops/retention.js';
+export type { RetentionPolicy, RetainableJob } from './ops/retention.js';
+export {
+  loadAiFeatureFlags,
+  assertTtsGenerationEnabled,
+  AiFeatureDisabledError,
+} from './ops/ai-feature-flags.js';
+export type { AiFeatureFlags } from './ops/ai-feature-flags.js';
+
 export function startWorker(): void {
   // Queue/CLI composition belongs here once a production embedding provider and
   // database client are selected. The domain service itself remains injectable.
