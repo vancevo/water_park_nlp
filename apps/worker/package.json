@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsx watch src/main.ts",
     "benchmark": "tsx src/tts/piper/run-benchmark.ts",
+    "benchmark:providers": "tsx src/tts/providers/run-provider-benchmark.ts",
     "start": "node dist/main.js",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"

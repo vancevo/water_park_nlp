@@ -1,0 +1,8 @@
+{
+  "schema": "tts-benchmark-thresholds/v1",
+  "note": "Operational pass thresholds for the AI05 provider comparison, FIXED BEFORE running any engine (see docs/adr/0011). Natural-ness and pronunciation are judged separately by blind human review; these are the automated gates only.",
+  "maxP95GenerationMs": 15000,
+  "maxMeanRealTimeFactor": 2.0,
+  "maxFailureRate": 0.0,
+  "minLocales": 2
+}

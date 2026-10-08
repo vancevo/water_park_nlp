@@ -22,6 +22,7 @@
     "data:research:validate": "python3 data/research-damsen/validate.py",
     "smoke:media": "node scripts/smoke-media.mjs",
     "tts:setup-voices": "node scripts/setup-piper-voices.mjs",
+    "tts:benchmark-providers": "npm run benchmark:providers --workspace @damsen/worker",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
