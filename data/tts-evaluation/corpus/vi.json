@@ -1,0 +1,248 @@
+{
+  "schema": "tts-evaluation-corpus/v1",
+  "locale": "vi",
+  "note": "Synthetic, original Vietnamese sentences for TTS evaluation only. Content is fictional: times, prices, distances and dates are illustrative and do not describe the real park.",
+  "sentences": [
+    {
+      "id": "vi-poi-001",
+      "locale": "vi",
+      "category": "poi-name",
+      "text": "Chào mừng bạn đến Vườn Cầu Vồng, nơi có nhiều luống hoa nhiều màu.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": ["vi-vuon-cau-vong"]
+    },
+    {
+      "id": "vi-poi-002",
+      "locale": "vi",
+      "category": "poi-name",
+      "text": "Trạm Khám Phá Nước nằm ngay cạnh lối đi lát đá phía bên trái.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": ["vi-tram-kham-pha-nuoc"]
+    },
+    {
+      "id": "vi-poi-003",
+      "locale": "vi",
+      "category": "poi-name",
+      "text": "Buổi biểu diễn ở Sân Khấu Gió sẽ bắt đầu sau ít phút nữa.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": ["vi-san-khau-gio"]
+    },
+    {
+      "id": "vi-poi-004",
+      "locale": "vi",
+      "category": "poi-name",
+      "text": "Nếu trời mưa, bạn có thể ghé Nhà Khám Phá Xanh để nghỉ chân.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": ["vi-nha-kham-pha-xanh"]
+    },
+    {
+      "id": "vi-poi-005",
+      "locale": "vi",
+      "category": "poi-name",
+      "text": "Hẹn gặp cả nhóm tại Quảng Trường Mây trước giờ ra về.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": ["vi-quang-truong-may"]
+    },
+    {
+      "id": "vi-place-001",
+      "locale": "vi",
+      "category": "place-name",
+      "text": "Công viên Văn hóa Đầm Sen thuộc Quận 11, Thành phố Hồ Chí Minh.",
+      "split": "eval",
+      "sourceId": "public-place-names",
+      "synthetic": true,
+      "expectedNormalized": "Công viên Văn hóa Đầm Sen thuộc Quận Mười Một, Thành phố Hồ Chí Minh.",
+      "lexiconRefs": ["vi-dam-sen"]
+    },
+    {
+      "id": "vi-place-002",
+      "locale": "vi",
+      "category": "place-name",
+      "text": "Từ trung tâm Sài Gòn, bạn có thể đi xe buýt đến cổng công viên.",
+      "split": "eval",
+      "sourceId": "public-place-names",
+      "synthetic": true
+    },
+    {
+      "id": "vi-number-001",
+      "locale": "vi",
+      "category": "number-date",
+      "text": "Khu vườn mở cửa từ 8 giờ 30 đến 17 giờ mỗi ngày.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Khu vườn mở cửa từ tám giờ ba mươi đến mười bảy giờ mỗi ngày."
+    },
+    {
+      "id": "vi-number-002",
+      "locale": "vi",
+      "category": "number-date",
+      "text": "Chương trình mẫu diễn ra vào ngày 02/09/2026.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Chương trình mẫu diễn ra vào ngày hai tháng chín năm hai nghìn không trăm hai mươi sáu."
+    },
+    {
+      "id": "vi-number-003",
+      "locale": "vi",
+      "category": "number-date",
+      "text": "Vé minh hoạ cho trẻ em có giá 45.000 đồng.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Vé minh hoạ cho trẻ em có giá bốn mươi lăm nghìn đồng."
+    },
+    {
+      "id": "vi-number-004",
+      "locale": "vi",
+      "category": "number-date",
+      "text": "Quãng đường còn lại khoảng 1,5 km, tức chừng 20 phút đi bộ.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Quãng đường còn lại khoảng một phẩy năm ki-lô-mét, tức chừng hai mươi phút đi bộ.",
+      "lexiconRefs": ["vi-abbr-km"]
+    },
+    {
+      "id": "vi-abbr-001",
+      "locale": "vi",
+      "category": "abbreviation",
+      "text": "Khu vui chơi nằm ở TP.HCM và rất gần trạm xe buýt.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Khu vui chơi nằm ở Thành phố Hồ Chí Minh và rất gần trạm xe buýt.",
+      "lexiconRefs": ["vi-abbr-tphcm"]
+    },
+    {
+      "id": "vi-abbr-002",
+      "locale": "vi",
+      "category": "abbreviation",
+      "text": "Nhà vệ sinh có biển WC màu xanh, cách đây chừng 50 m.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Nhà vệ sinh có biển vê kép xê màu xanh, cách đây chừng năm mươi mét.",
+      "lexiconRefs": ["vi-abbr-wc", "vi-abbr-m"]
+    },
+    {
+      "id": "vi-abbr-003",
+      "locale": "vi",
+      "category": "abbreviation",
+      "text": "Vui lòng đọc kỹ hướng dẫn an toàn trước khi lên tàu, v.v.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Vui lòng đọc kỹ hướng dẫn an toàn trước khi lên tàu, vân vân.",
+      "lexiconRefs": ["vi-abbr-vv"]
+    },
+    {
+      "id": "vi-abbr-004",
+      "locale": "vi",
+      "category": "abbreviation",
+      "text": "Quầy hỗ trợ ở Q.11 nhận đổi tiền VNĐ và thẻ ngân hàng.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "expectedNormalized": "Quầy hỗ trợ ở Quận Mười Một nhận đổi tiền Việt Nam đồng và thẻ ngân hàng.",
+      "lexiconRefs": ["vi-abbr-q", "vi-abbr-vnd"]
+    },
+    {
+      "id": "vi-codeswitch-001",
+      "locale": "vi",
+      "category": "code-switch",
+      "text": "Khu Water World mẫu có đường trượt nước dành cho cả gia đình.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": ["vi-cs-water-world"]
+    },
+    {
+      "id": "vi-codeswitch-002",
+      "locale": "vi",
+      "category": "code-switch",
+      "text": "Bạn có thể check-in tại cổng bằng mã QR trên điện thoại.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": ["vi-cs-check-in", "vi-abbr-qr"]
+    },
+    {
+      "id": "vi-codeswitch-003",
+      "locale": "vi",
+      "category": "code-switch",
+      "text": "Sau buổi show, mời bạn ghé quầy souvenir gần lối ra.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": ["vi-cs-show", "vi-cs-souvenir"]
+    },
+    {
+      "id": "vi-punct-001",
+      "locale": "vi",
+      "category": "punctuation",
+      "text": "Bạn đã sẵn sàng chưa? Hãy nắm chặt tay vịn — tàu sắp chạy!",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "vi-punct-002",
+      "locale": "vi",
+      "category": "punctuation",
+      "text": "Lưu ý: không chạy nhảy trên cầu gỗ; hãy đi chậm (nhất là khi trời ướt).",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "vi-long-001",
+      "locale": "vi",
+      "category": "long",
+      "text": "Từ Quảng Trường Mây, bạn đi theo lối có mái che khoảng hai trăm bước, qua một cây cầu nhỏ, rồi rẽ phải ở bồn hoa tròn để đến Vườn Cầu Vồng, nơi có ghế đá và bóng mát cho cả gia đình nghỉ ngơi.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": ["vi-quang-truong-may", "vi-vuon-cau-vong"]
+    },
+    {
+      "id": "vi-long-002",
+      "locale": "vi",
+      "category": "long",
+      "text": "Trạm Khám Phá Nước giới thiệu vòng tuần hoàn của nước bằng mô hình đơn giản: nước bốc hơi thành mây, mây tạo mưa, và mưa chảy về hồ để bắt đầu một vòng mới.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true,
+      "lexiconRefs": ["vi-tram-kham-pha-nuoc"]
+    },
+    {
+      "id": "vi-safety-001",
+      "locale": "vi",
+      "category": "safety",
+      "text": "Trẻ em dưới một mét hai cần có người lớn đi kèm khi tham gia trò chơi này.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    },
+    {
+      "id": "vi-safety-002",
+      "locale": "vi",
+      "category": "safety",
+      "text": "Nếu bị lạc, hãy đến quầy thông tin gần nhất và báo cho nhân viên mặc áo xanh.",
+      "split": "eval",
+      "sourceId": "tu-original-2026",
+      "synthetic": true
+    }
+  ]
+}

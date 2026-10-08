@@ -4,6 +4,7 @@ import type {
   AuthResponse,
   GeoPoint,
   PoiDetail,
+  NarrationLocaleCatalog,
   PoiNarration,
   PoiSummary,
   RouteResponse,
@@ -26,10 +27,16 @@ import {
   type RouteProgress,
 } from '@/lib/route-simulation';
 import {
+  pickSpeechVoice,
+  localeLabel,
+  speechTagFor,
+} from '@/lib/narration-locales';
+import {
   clearVisitorSession,
   readVisitorSession,
   saveVisitorSession,
 } from '@/lib/session';
+import { NarrationSection, useVisitorNarration } from './narration-section';
 
 const FALLBACK_CENTER: [number, number] = [106.63853, 10.76433];
 const MAP_TILE_URL = process.env.NEXT_PUBLIC_MAP_TILE_URL;
@@ -195,12 +202,12 @@ export function VisitorExperience() {
   const simulationMarkerRef = useRef<Marker | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const narrationSpeakerRef = useRef<() => void>(() => {});
+  const narrationAudioRef = useRef<HTMLAudioElement | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [locale, setLocale] = useState<SupportedLocale>('vi');
   const [pois, setPois] = useState<PoiSummary[]>([]);
   const [selected, setSelected] = useState<PoiSummary | null>(null);
   const [detail, setDetail] = useState<PoiDetail | null>(null);
-  const [narration, setNarration] = useState<PoiNarration | null>(null);
   const [route, setRoute] = useState<RouteResponse | null>(null);
   const [position, setPosition] = useState<GeoPoint | null>(null);
   const [simulationPosition, setSimulationPosition] = useState<GeoPoint | null>(
@@ -217,6 +224,16 @@ export function VisitorExperience() {
   const [message, setMessage] = useState('');
   const [session, setSession] = useState<AuthResponse | null>(null);
   const [authMode, setAuthMode] = useState<AuthMode | null>(null);
+  const {
+    catalog: narrationCatalog,
+    catalogStatus: narrationCatalogStatus,
+    narrationLocale,
+    setNarrationLocale,
+    narration,
+    status: narrationStatus,
+    retry: retryNarration,
+    retryCatalog: retryNarrationCatalog,
+  } = useVisitorNarration(selected?.id ?? null, locale);
   const effectivePosition = simulationPosition ?? position;
   const simulationProgress: RouteProgress | null = route
     ? routeProgressAt(route.geometry.coordinates, simulationDistanceMeters)
@@ -230,14 +247,27 @@ export function VisitorExperience() {
     setIsWalking(false);
   }, []);
 
+  /**
+   * Stops browser TTS and every narration audio: the programmatic player used
+   * by replay/arrival and the inline `<audio controls>` in the POI card, so two
+   * narrations never play over each other.
+   */
+  const stopPlayback = useCallback(() => {
+    window.speechSynthesis?.cancel();
+    narrationAudioRef.current?.pause();
+    document
+      .querySelectorAll<HTMLAudioElement>('audio')
+      .forEach((audio) => audio.pause());
+  }, []);
+
   const openPoi = useCallback(
     (poi: PoiSummary) => {
       cancelSimulationAnimation();
-      window.speechSynthesis?.cancel();
+      stopPlayback();
       setSelected(poi);
       setDetailCardOpen(true);
     },
-    [cancelSimulationAnimation],
+    [cancelSimulationAnimation, stopPlayback],
   );
 
   useEffect(() => setSession(readVisitorSession()), []);
@@ -247,10 +277,13 @@ export function VisitorExperience() {
       'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window,
     );
     return () => {
-      window.speechSynthesis?.cancel();
+      stopPlayback();
       cancelSimulationAnimation();
     };
-  }, [cancelSimulationAnimation]);
+  }, [cancelSimulationAnimation, stopPlayback]);
+
+  // Changing narration language or POI must not keep playing the old audio.
+  useEffect(() => stopPlayback(), [narrationLocale, selected, stopPlayback]);
 
   const loadPois = useCallback(async () => {
     setLoading(true);
@@ -449,19 +482,17 @@ export function VisitorExperience() {
   useEffect(() => {
     if (!selected) {
       setDetail(null);
-      setNarration(null);
       setRoute(null);
       setSimulationDistanceMeters(0);
       setArrivalOpen(false);
       return;
     }
     setDetail(null);
-    setNarration(null);
     setRoute(null);
     setSimulationDistanceMeters(0);
     setArrivalOpen(false);
     cancelSimulationAnimation();
-    window.speechSynthesis?.cancel();
+    stopPlayback();
     mapRef.current?.flyTo({
       center: [selected.location.longitude, selected.location.latitude],
       zoom: 17.2,
@@ -470,11 +501,7 @@ export function VisitorExperience() {
       .getPoi(selected.id, locale)
       .then(setDetail)
       .catch(() => {});
-    void visitorApi
-      .getPoiNarration(selected.id, locale)
-      .then(setNarration)
-      .catch(() => setNarration(null));
-  }, [cancelSimulationAnimation, locale, selected]);
+  }, [cancelSimulationAnimation, locale, selected, stopPlayback]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -572,7 +599,26 @@ export function VisitorExperience() {
     }
   }
 
+  /**
+   * Audio first: recorded/published audio wins over browser TTS. Web Speech
+   * uses the catalog speechTag and never reads a transcript with a voice of
+   * another language; the transcript stays visible either way.
+   */
   const speakNarration = useCallback(() => {
+    stopPlayback();
+    if (narration?.audio) {
+      const audio = narrationAudioRef.current ?? new Audio();
+      narrationAudioRef.current = audio;
+      if (audio.src !== narration.audio.playbackUrl)
+        audio.src = narration.audio.playbackUrl;
+      audio.currentTime = 0;
+      void audio
+        .play()
+        .catch(() =>
+          setMessage('Trình duyệt chặn tự phát audio. Hãy bấm nút phát.'),
+        );
+      return;
+    }
     if (!speechSupported) {
       setMessage('Trình duyệt này không hỗ trợ Web Speech TTS.');
       return;
@@ -585,13 +631,31 @@ export function VisitorExperience() {
       setMessage('Chưa có nội dung thuyết minh để phát.');
       return;
     }
-    window.speechSynthesis.cancel();
+    // Without narration the text is POI content in the UI locale.
+    const textLocale = narration?.resolvedLocale ?? locale;
+    const speechTag = speechTagFor(narrationCatalog, textLocale);
+    const voices = window.speechSynthesis.getVoices();
+    const voice = pickSpeechVoice(voices, speechTag);
+    if (voices.length > 0 && !voice) {
+      setMessage(
+        `Thiết bị chưa có giọng đọc ${localeLabel(narrationCatalog, textLocale)}. Bạn vẫn có thể đọc nội dung thuyết minh.`,
+      );
+      return;
+    }
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang =
-      (narration?.resolvedLocale ?? locale) === 'vi' ? 'vi-VN' : 'en-US';
+    utterance.lang = speechTag;
+    if (voice) utterance.voice = voice;
     utterance.rate = 0.95;
     window.speechSynthesis.speak(utterance);
-  }, [detail, locale, narration, selected, speechSupported]);
+  }, [
+    detail,
+    locale,
+    narration,
+    narrationCatalog,
+    selected,
+    speechSupported,
+    stopPlayback,
+  ]);
 
   useEffect(() => {
     narrationSpeakerRef.current = speakNarration;
@@ -599,7 +663,7 @@ export function VisitorExperience() {
 
   function startAutomaticWalk(nextRoute: RouteResponse) {
     cancelSimulationAnimation();
-    window.speechSynthesis?.cancel();
+    stopPlayback();
     const coordinates = nextRoute.geometry.coordinates;
     const start = routeProgressAt(coordinates, 0);
     if (!start) {
@@ -649,7 +713,7 @@ export function VisitorExperience() {
 
   function clearSimulation() {
     cancelSimulationAnimation();
-    window.speechSynthesis?.cancel();
+    stopPlayback();
     simulationMarkerRef.current?.remove();
     simulationMarkerRef.current = null;
     setSimulationPosition(null);
@@ -769,7 +833,20 @@ export function VisitorExperience() {
           {selected && detailCardOpen ? (
             <PoiDetailCard
               detail={detail}
-              narration={narration}
+              narrationSection={
+                <NarrationSection
+                  catalog={narrationCatalog}
+                  catalogStatus={narrationCatalogStatus}
+                  narrationLocale={narrationLocale}
+                  narration={narration}
+                  status={narrationStatus}
+                  speechSupported={speechSupported}
+                  onLocaleChange={setNarrationLocale}
+                  onRetry={retryNarration}
+                  onRetryCatalog={retryNarrationCatalog}
+                  onSpeak={speakNarration}
+                />
+              }
               route={route}
               selected={selected}
               hasSimulation={Boolean(simulationPosition)}
@@ -796,14 +873,15 @@ export function VisitorExperience() {
       {arrivalOpen && selected ? (
         <ArrivalDialog
           narration={narration}
+          catalog={narrationCatalog}
           poiName={detail?.name ?? selected.name}
-          speechSupported={speechSupported}
+          canPlay={speechSupported || Boolean(narration?.audio)}
           onClose={() => {
-            window.speechSynthesis?.cancel();
+            stopPlayback();
             setArrivalOpen(false);
           }}
           onReplay={speakNarration}
-          onStop={() => window.speechSynthesis?.cancel()}
+          onStop={stopPlayback}
         />
       ) : null}
     </main>
@@ -833,15 +911,25 @@ function Header({
         </span>
       </a>
       <div className="top-actions">
-        <div className="locale-switch" aria-label="Ngôn ngữ">
+        <div
+          className="locale-switch"
+          role="group"
+          aria-label="Ngôn ngữ giao diện"
+        >
           <button
+            type="button"
             className={locale === 'vi' ? 'active' : ''}
+            aria-pressed={locale === 'vi'}
+            aria-label="Giao diện tiếng Việt"
             onClick={() => onLocaleChange('vi')}
           >
             VI
           </button>
           <button
+            type="button"
             className={locale === 'en' ? 'active' : ''}
+            aria-pressed={locale === 'en'}
+            aria-label="Interface in English"
             onClick={() => onLocaleChange('en')}
           >
             EN
@@ -863,7 +951,7 @@ function Header({
 
 function PoiDetailCard({
   detail,
-  narration,
+  narrationSection,
   route,
   selected,
   hasSimulation,
@@ -871,7 +959,7 @@ function PoiDetailCard({
   onNavigate,
 }: {
   detail: PoiDetail | null;
-  narration: PoiNarration | null;
+  narrationSection: React.ReactNode;
   route: RouteResponse | null;
   selected: PoiSummary;
   hasSimulation: boolean;
@@ -886,19 +974,7 @@ function PoiDetailCard({
       <p className="eyebrow">{categoryLabel(selected.category)}</p>
       <h2>{detail?.name ?? selected.name}</h2>
       <p>{detail?.longDescription ?? selected.shortDescription}</p>
-      {narration ? (
-        <div className="narration">
-          <strong>Thuyết minh {narration.resolvedLocale.toUpperCase()}</strong>
-          <p>{narration.transcript}</p>
-          {narration.audio ? (
-            <audio controls src={narration.audio.playbackUrl} />
-          ) : null}
-        </div>
-      ) : (
-        <small className="muted">
-          Địa điểm này chưa có bản thuyết minh được duyệt.
-        </small>
-      )}
+      {narrationSection}
       {route ? (
         <div className="route-summary">
           <strong>{formatDistance(route.distanceMeters)}</strong>
@@ -1021,15 +1097,17 @@ function SimulationControls({
 
 function ArrivalDialog({
   narration,
+  catalog,
   poiName,
-  speechSupported,
+  canPlay,
   onClose,
   onReplay,
   onStop,
 }: {
   narration: PoiNarration | null;
+  catalog: NarrationLocaleCatalog;
   poiName: string;
-  speechSupported: boolean;
+  canPlay: boolean;
   onClose(): void;
   onReplay(): void;
   onStop(): void;
@@ -1051,11 +1129,17 @@ function ArrivalDialog({
         </div>
         <p className="eyebrow">Bạn đã đến nơi</p>
         <h2 id="arrival-title">{poiName}</h2>
-        <p>
+        {narration?.fallbackUsed ? (
+          <p className="fallback-notice" role="status">
+            Đang dùng bản {localeLabel(catalog, narration.resolvedLocale)} vì
+            chưa có bản {localeLabel(catalog, narration.requestedLocale)}.
+          </p>
+        ) : null}
+        <p lang={narration?.resolvedLocale}>
           {narration?.transcript ??
             'Địa điểm này chưa có bản thuyết minh được duyệt.'}
         </p>
-        {speechSupported ? (
+        {canPlay ? (
           <div className="arrival-actions">
             <button className="primary-action" onClick={onReplay}>
               ▶ Phát lại thuyết minh
@@ -1066,7 +1150,7 @@ function ArrivalDialog({
           </div>
         ) : (
           <small className="muted">
-            Trình duyệt hiện tại không hỗ trợ Web Speech TTS.
+            Chưa có audio thu sẵn và trình duyệt không hỗ trợ Web Speech TTS.
           </small>
         )}
       </section>

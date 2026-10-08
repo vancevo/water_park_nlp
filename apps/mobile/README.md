@@ -48,6 +48,12 @@ Opening a POI detail fetches its exact-locale published narration through
 the Expo SDK 57-compatible `expo-audio` module and never autoplays. Closing the POI or changing
 POI/locale unloads the player.
 
+The narration transport treats the locale as any BCP 47 `NarrationLocaleCode` (T25E):
+`narrationLocale.ts` canonicalises it (`Intl.getCanonicalLocales`, with a shape-check fallback for
+runtimes without it) and `httpNarrationClient` accepts any requested/resolved locale returned by
+the API's fallback chain. Per ADR 0006 the prototype adds no narration-language selector: it still
+requests the UI locale, so `vi | en` remains only in UI/POI-content code, never in the transport.
+
 The MVP streams the reviewed asset. Its signed playback URL only lives in the active React Query
 observer (`gcTime: 0`) and is never written to storage or an offline cache. Expired URLs stop
 playback and require a fresh API response. A later offline cache may retain verified audio bytes

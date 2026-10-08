@@ -1,0 +1,59 @@
+{
+  "schema": "tts-blind-review-form/v1",
+  "version": "1.0.0",
+  "instructions": [
+    "Samples are shown in random order with anonymous ids; provider, model and voice are hidden until all ratings are submitted.",
+    "Listen with headphones at a comfortable volume. Replay is allowed; do not compare file sizes or metadata.",
+    "Rate each sample on its own. Read the reference text only after the first listen.",
+    "Raters must be fluent in the sample locale; at least three raters per locale.",
+    "Do not record your own voice, upload samples elsewhere, or share them outside the review."
+  ],
+  "blinding": {
+    "hideFields": ["provider", "model", "modelVersion", "voiceId"],
+    "shuffle": true,
+    "minRatersPerLocale": 3
+  },
+  "criteria": [
+    {
+      "id": "naturalness",
+      "question": "How natural does the voice sound?",
+      "scale": { "min": 1, "max": 5, "labels": { "1": "Robotic", "3": "Acceptable", "5": "Fully natural" } }
+    },
+    {
+      "id": "intelligibility",
+      "question": "How easy is it to understand every word?",
+      "scale": { "min": 1, "max": 5, "labels": { "1": "Mostly unclear", "3": "Some effort", "5": "Effortless" } }
+    },
+    {
+      "id": "pronunciation",
+      "question": "Are names, numbers and abbreviations pronounced correctly?",
+      "scale": { "min": 1, "max": 5, "labels": { "1": "Several errors", "3": "One minor error", "5": "All correct" } }
+    },
+    {
+      "id": "pace",
+      "question": "Is the speaking rate suitable for a park guide?",
+      "scale": { "min": 1, "max": 5, "labels": { "1": "Far too fast or slow", "3": "Slightly off", "5": "Just right" } }
+    },
+    {
+      "id": "suitability",
+      "question": "Would you publish this for visitors after review?",
+      "scale": { "min": 1, "max": 5, "labels": { "1": "No", "3": "With fixes", "5": "Yes" } }
+    }
+  ],
+  "checks": [
+    {
+      "id": "critical_name_error",
+      "question": "Is any POI or place name mispronounced so that a visitor could not find it?",
+      "type": "boolean"
+    },
+    {
+      "id": "content_error",
+      "question": "Does the audio skip, repeat or add words compared with the reference text?",
+      "type": "boolean"
+    }
+  ],
+  "ratingRecord": {
+    "fields": ["sampleId", "raterId", "criteria", "checks", "comment"],
+    "raterIdPolicy": "Pseudonymous id only (e.g. R01). Never store names, e-mails or voice recordings of raters."
+  }
+}

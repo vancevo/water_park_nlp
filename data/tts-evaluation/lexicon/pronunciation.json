@@ -1,0 +1,468 @@
+{
+  "schema": "tts-pronunciation-lexicon/v1",
+  "version": "1.0.0",
+  "note": "Pronunciation and expansion hints for TTS text normalisation. IPA is approximate (Southern Vietnamese for VI) and every entry awaits native-speaker review before release use.",
+  "entries": [
+    {
+      "id": "vi-vuon-cau-vong",
+      "locale": "vi",
+      "term": "Vườn Cầu Vồng",
+      "category": "poi-name",
+      "spokenForm": "vườn cầu vồng",
+      "ipa": "vɨəŋ˨˩ kəw˨˩ vəwŋ˨˩",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi",
+        "en",
+        "fr"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "fixture-poi-names",
+      "notes": "Synthetic fixture POI. Southern (Saigon) pronunciation; keep Vietnamese tones when embedded in EN/FR."
+    },
+    {
+      "id": "vi-tram-kham-pha-nuoc",
+      "locale": "vi",
+      "term": "Trạm Khám Phá Nước",
+      "category": "poi-name",
+      "spokenForm": "trạm khám phá nước",
+      "ipa": "ʈam˨˩ˀ xam˧˥ fa˧˥ nɨək˧˥",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "fixture-poi-names"
+    },
+    {
+      "id": "vi-san-khau-gio",
+      "locale": "vi",
+      "term": "Sân Khấu Gió",
+      "category": "poi-name",
+      "spokenForm": "sân khấu gió",
+      "ipa": "ʂən˧ xəw˧˥ jɔ˧˥",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "fixture-poi-names",
+      "notes": "Southern 'gi' realised as [j]."
+    },
+    {
+      "id": "vi-nha-kham-pha-xanh",
+      "locale": "vi",
+      "term": "Nhà Khám Phá Xanh",
+      "category": "poi-name",
+      "spokenForm": "nhà khám phá xanh",
+      "ipa": "ɲa˨˩ xam˧˥ fa˧˥ san˧",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "fixture-poi-names",
+      "notes": "Southern final '-anh' realised as [an]."
+    },
+    {
+      "id": "vi-quang-truong-may",
+      "locale": "vi",
+      "term": "Quảng Trường Mây",
+      "category": "poi-name",
+      "spokenForm": "quảng trường mây",
+      "ipa": "waŋ˧˩˧ ʈɨəŋ˨˩ məj˧",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "fixture-poi-names",
+      "notes": "Southern initial 'qu' realised as [w]."
+    },
+    {
+      "id": "vi-dam-sen",
+      "locale": "vi",
+      "term": "Đầm Sen",
+      "category": "place-name",
+      "spokenForm": "đầm sen",
+      "ipa": "ɗəm˨˩ sɛn˧",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "public-place-names"
+    },
+    {
+      "id": "vi-abbr-tphcm",
+      "locale": "vi",
+      "term": "TP.HCM",
+      "category": "abbreviation",
+      "spokenForm": "Thành phố Hồ Chí Minh",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "public-place-names"
+    },
+    {
+      "id": "vi-abbr-q",
+      "locale": "vi",
+      "term": "Q.",
+      "category": "abbreviation",
+      "spokenForm": "Quận",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026",
+      "notes": "Followed by a number: 'Q.11' → 'Quận Mười Một'."
+    },
+    {
+      "id": "vi-abbr-km",
+      "locale": "vi",
+      "term": "km",
+      "category": "abbreviation",
+      "spokenForm": "ki-lô-mét",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "vi-abbr-m",
+      "locale": "vi",
+      "term": "m",
+      "category": "abbreviation",
+      "spokenForm": "mét",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026",
+      "notes": "Only after a number; never expand the letter 'm' elsewhere."
+    },
+    {
+      "id": "vi-abbr-wc",
+      "locale": "vi",
+      "term": "WC",
+      "category": "abbreviation",
+      "spokenForm": "vê kép xê",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "vi-abbr-vv",
+      "locale": "vi",
+      "term": "v.v.",
+      "category": "abbreviation",
+      "spokenForm": "vân vân",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "vi-abbr-vnd",
+      "locale": "vi",
+      "term": "VNĐ",
+      "category": "abbreviation",
+      "spokenForm": "Việt Nam đồng",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "vi-abbr-qr",
+      "locale": "vi",
+      "term": "QR",
+      "category": "abbreviation",
+      "spokenForm": "quy-a",
+      "termLanguage": "en",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026",
+      "notes": "Common Vietnamese reading of the English letters; reviewers may accept 'kiu-a'."
+    },
+    {
+      "id": "vi-cs-water-world",
+      "locale": "vi",
+      "term": "Water World",
+      "category": "code-switch",
+      "spokenForm": "Water World",
+      "ipa": "ˈwɔːtə wɜːld",
+      "termLanguage": "en",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026",
+      "notes": "Keep English pronunciation inside Vietnamese sentences; do not read letter by letter."
+    },
+    {
+      "id": "vi-cs-check-in",
+      "locale": "vi",
+      "term": "check-in",
+      "category": "code-switch",
+      "spokenForm": "check-in",
+      "ipa": "ˈtʃɛk ɪn",
+      "termLanguage": "en",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "vi-cs-show",
+      "locale": "vi",
+      "term": "show",
+      "category": "code-switch",
+      "spokenForm": "show",
+      "ipa": "ʃoʊ",
+      "termLanguage": "en",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "vi-cs-souvenir",
+      "locale": "vi",
+      "term": "souvenir",
+      "category": "code-switch",
+      "spokenForm": "souvenir",
+      "ipa": "ˌsuːvəˈnɪə",
+      "termLanguage": "en",
+      "appliesToLocales": [
+        "vi"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "en-dam-sen",
+      "locale": "en",
+      "term": "Dam Sen",
+      "category": "place-name",
+      "spokenForm": "Dam Sen",
+      "ipa": "dɑm sɛn",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "en"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "public-place-names",
+      "notes": "Approximation of Vietnamese Đầm Sen for English voices; avoid 'damn'."
+    },
+    {
+      "id": "en-saigon",
+      "locale": "en",
+      "term": "Saigon",
+      "category": "place-name",
+      "spokenForm": "Saigon",
+      "ipa": "saɪˈɡɒn",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "en"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "public-place-names"
+    },
+    {
+      "id": "en-abbr-am-pm",
+      "locale": "en",
+      "term": "a.m./p.m.",
+      "category": "abbreviation",
+      "spokenForm": "a m / p m",
+      "termLanguage": "en",
+      "appliesToLocales": [
+        "en"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "en-abbr-vnd",
+      "locale": "en",
+      "term": "VND",
+      "category": "abbreviation",
+      "spokenForm": "Vietnamese dong",
+      "termLanguage": "en",
+      "appliesToLocales": [
+        "en"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "en-abbr-km",
+      "locale": "en",
+      "term": "km",
+      "category": "abbreviation",
+      "spokenForm": "kilometres",
+      "termLanguage": "en",
+      "appliesToLocales": [
+        "en"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "en-abbr-wc",
+      "locale": "en",
+      "term": "WC",
+      "category": "abbreviation",
+      "spokenForm": "W C",
+      "termLanguage": "en",
+      "appliesToLocales": [
+        "en"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "en-abbr-qr",
+      "locale": "en",
+      "term": "QR",
+      "category": "abbreviation",
+      "spokenForm": "Q R",
+      "termLanguage": "en",
+      "appliesToLocales": [
+        "en"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "en-cs-xin-chao",
+      "locale": "en",
+      "term": "xin chào",
+      "category": "code-switch",
+      "spokenForm": "xin chào",
+      "ipa": "sin˧ tɕaːw˨˩",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "en"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026",
+      "notes": "Vietnamese greeting inside English; keep Vietnamese tones."
+    },
+    {
+      "id": "fr-dam-sen",
+      "locale": "fr",
+      "term": "Đầm Sen",
+      "category": "place-name",
+      "spokenForm": "Đầm Sen",
+      "ipa": "dam sɛn",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "fr"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "public-place-names"
+    },
+    {
+      "id": "fr-ho-chi-minh-ville",
+      "locale": "fr",
+      "term": "Hô Chi Minh-Ville",
+      "category": "place-name",
+      "spokenForm": "Hô Chi Minh-Ville",
+      "ipa": "o ʃi minʁ vil",
+      "termLanguage": "fr",
+      "appliesToLocales": [
+        "fr"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "public-place-names",
+      "notes": "French exonym; 'Minh' approximated as [min]."
+    },
+    {
+      "id": "fr-saigon",
+      "locale": "fr",
+      "term": "Saïgon",
+      "category": "place-name",
+      "spokenForm": "Saïgon",
+      "ipa": "sa.iɡɔ̃",
+      "termLanguage": "vi",
+      "appliesToLocales": [
+        "fr"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "public-place-names"
+    },
+    {
+      "id": "fr-abbr-vnd",
+      "locale": "fr",
+      "term": "VND",
+      "category": "abbreviation",
+      "spokenForm": "dongs vietnamiens",
+      "termLanguage": "fr",
+      "appliesToLocales": [
+        "fr"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "fr-abbr-wc",
+      "locale": "fr",
+      "term": "WC",
+      "category": "abbreviation",
+      "spokenForm": "V C",
+      "termLanguage": "fr",
+      "appliesToLocales": [
+        "fr"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026",
+      "notes": "Usually read 'vé-cé' in French."
+    },
+    {
+      "id": "fr-cs-show",
+      "locale": "fr",
+      "term": "show",
+      "category": "code-switch",
+      "spokenForm": "show",
+      "ipa": "ʃo",
+      "termLanguage": "en",
+      "appliesToLocales": [
+        "fr"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    },
+    {
+      "id": "fr-cs-check-in",
+      "locale": "fr",
+      "term": "check-in",
+      "category": "code-switch",
+      "spokenForm": "check-in",
+      "ipa": "tʃɛk in",
+      "termLanguage": "en",
+      "appliesToLocales": [
+        "fr"
+      ],
+      "reviewStatus": "needs_native_review",
+      "sourceId": "tu-original-2026"
+    }
+  ]
+}

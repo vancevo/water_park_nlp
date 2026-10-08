@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tts-evaluation-report/v1",
+  "title": "TTS evaluation report",
+  "description": "Superset of the worker BenchmarkReport (apps/worker/src/tts/piper/tts-benchmark.ts) plus corpus, automated-check and gate fields. Contains ids, metrics and stable error codes only; never transcript text or audio.",
+  "type": "object",
+  "required": ["schema", "corpus", "reports"],
+  "properties": {
+    "schema": { "const": "tts-evaluation-report/v1" },
+    "fixture": { "type": "boolean", "description": "true for synthetic example/test reports" },
+    "note": { "type": "string" },
+    "corpus": {
+      "type": "object",
+      "required": ["datasetId", "version"],
+      "properties": {
+        "datasetId": { "type": "string" },
+        "version": { "type": "string" },
+        "thresholdsVersion": { "type": "string" }
+      }
+    },
+    "reports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "provider",
+          "model",
+          "modelVersion",
+          "voiceId",
+          "locale",
+          "count",
+          "ok",
+          "failed",
+          "p50GenerationMs",
+          "p95GenerationMs",
+          "meanRealTimeFactor",
+          "totalSizeBytes",
+          "samples",
+          "generatedAt"
+        ],
+        "properties": {
+          "provider": { "type": "string", "minLength": 1 },
+          "model": { "type": "string", "minLength": 1 },
+          "modelVersion": { "type": "string", "minLength": 1, "not": { "enum": ["main", "latest"] } },
+          "voiceId": { "type": "string" },
+          "locale": { "type": "string", "minLength": 2 },
+          "count": { "type": "integer", "minimum": 0 },
+          "ok": { "type": "integer", "minimum": 0 },
+          "failed": { "type": "integer", "minimum": 0 },
+          "p50GenerationMs": { "type": ["number", "null"], "minimum": 0 },
+          "p95GenerationMs": { "type": ["number", "null"], "minimum": 0 },
+          "meanRealTimeFactor": { "type": ["number", "null"], "minimum": 0 },
+          "totalSizeBytes": { "type": "integer", "minimum": 0 },
+          "generatedAt": { "type": "string", "format": "date-time" },
+          "samples": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "category", "ok"],
+              "properties": {
+                "id": { "type": "string" },
+                "category": { "type": ["string", "null"] },
+                "ok": { "type": "boolean" },
+                "errorCode": { "type": "string", "pattern": "^TTS_[A-Z_]+$" },
+                "generationMs": { "type": "number", "minimum": 0 },
+                "durationSeconds": { "type": "number", "minimum": 0 },
+                "realTimeFactor": { "type": "number", "minimum": 0 },
+                "sizeBytes": { "type": "integer", "minimum": 0 },
+                "automatedChecks": {
+                  "type": "object",
+                  "properties": {
+                    "decodable": { "type": "boolean" },
+                    "clippedSampleRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+                    "leadingSilenceSeconds": { "type": "number", "minimum": 0 },
+                    "trailingSilenceSeconds": { "type": "number", "minimum": 0 },
+                    "internalSilenceRatio": { "type": "number", "minimum": 0, "maximum": 1 }
+                  }
+                }
+              },
+              "not": { "anyOf": [{ "required": ["text"] }, { "required": ["transcript"] }] }
+            }
+          },
+          "humanRatings": {
+            "type": "object",
+            "properties": {
+              "raters": { "type": "integer", "minimum": 0 },
+              "naturalnessMos": { "type": "number", "minimum": 1, "maximum": 5 },
+              "intelligibilityMos": { "type": "number", "minimum": 1, "maximum": 5 },
+              "criticalPoiNameErrors": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "gate": {
+            "type": "object",
+            "required": ["passed", "failures"],
+            "properties": {
+              "passed": { "type": "boolean" },
+              "failures": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    }
+  }
+}

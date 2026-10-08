@@ -1,0 +1,748 @@
+{
+  "schema": "tts-evaluation-report/v1",
+  "fixture": true,
+  "note": "SYNTHETIC FIXTURE for schema/validator tests and UI mock-ups. Every number is invented; this is not a benchmark result.",
+  "corpus": {
+    "datasetId": "damsen-tts-eval",
+    "version": "1.0.0",
+    "thresholdsVersion": "1.0.0"
+  },
+  "reports": [
+    {
+      "provider": "piper",
+      "model": "fixture-vi-voice",
+      "modelVersion": "fixture-0.0.1",
+      "voiceId": "fixture-vi-voice",
+      "locale": "vi",
+      "count": 24,
+      "ok": 24,
+      "failed": 0,
+      "p50GenerationMs": 1007,
+      "p95GenerationMs": 1414,
+      "meanRealTimeFactor": 0.298,
+      "totalSizeBytes": 2714880,
+      "samples": [
+        {
+          "id": "vi-poi-001",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 600,
+          "durationSeconds": 3.48,
+          "realTimeFactor": 0.172,
+          "sizeBytes": 111360,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-poi-002",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 637,
+          "durationSeconds": 3.33,
+          "realTimeFactor": 0.191,
+          "sizeBytes": 106560,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-poi-003",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 674,
+          "durationSeconds": 3.21,
+          "realTimeFactor": 0.21,
+          "sizeBytes": 102720,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-poi-004",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 711,
+          "durationSeconds": 3.3,
+          "realTimeFactor": 0.215,
+          "sizeBytes": 105600,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-poi-005",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 748,
+          "durationSeconds": 3.09,
+          "realTimeFactor": 0.242,
+          "sizeBytes": 98880,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-place-001",
+          "category": "place-name",
+          "ok": true,
+          "generationMs": 785,
+          "durationSeconds": 3.39,
+          "realTimeFactor": 0.232,
+          "sizeBytes": 108480,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-place-002",
+          "category": "place-name",
+          "ok": true,
+          "generationMs": 822,
+          "durationSeconds": 3.39,
+          "realTimeFactor": 0.242,
+          "sizeBytes": 108480,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-number-001",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 859,
+          "durationSeconds": 2.94,
+          "realTimeFactor": 0.292,
+          "sizeBytes": 94080,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-number-002",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 896,
+          "durationSeconds": 2.85,
+          "realTimeFactor": 0.314,
+          "sizeBytes": 91200,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-number-003",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 933,
+          "durationSeconds": 2.76,
+          "realTimeFactor": 0.338,
+          "sizeBytes": 88320,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-number-004",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 970,
+          "durationSeconds": 3.27,
+          "realTimeFactor": 0.297,
+          "sizeBytes": 104640,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-abbr-001",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 1007,
+          "durationSeconds": 3.0,
+          "realTimeFactor": 0.336,
+          "sizeBytes": 96000,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-abbr-002",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 1044,
+          "durationSeconds": 3.09,
+          "realTimeFactor": 0.338,
+          "sizeBytes": 98880,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-abbr-003",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 1081,
+          "durationSeconds": 3.21,
+          "realTimeFactor": 0.337,
+          "sizeBytes": 102720,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-abbr-004",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 1118,
+          "durationSeconds": 3.12,
+          "realTimeFactor": 0.358,
+          "sizeBytes": 99840,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-codeswitch-001",
+          "category": "code-switch",
+          "ok": true,
+          "generationMs": 1155,
+          "durationSeconds": 3.33,
+          "realTimeFactor": 0.347,
+          "sizeBytes": 106560,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-codeswitch-002",
+          "category": "code-switch",
+          "ok": true,
+          "generationMs": 1192,
+          "durationSeconds": 3.18,
+          "realTimeFactor": 0.375,
+          "sizeBytes": 101760,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-codeswitch-003",
+          "category": "code-switch",
+          "ok": true,
+          "generationMs": 1229,
+          "durationSeconds": 3.06,
+          "realTimeFactor": 0.402,
+          "sizeBytes": 97920,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-punct-001",
+          "category": "punctuation",
+          "ok": true,
+          "generationMs": 1266,
+          "durationSeconds": 3.24,
+          "realTimeFactor": 0.391,
+          "sizeBytes": 103680,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-punct-002",
+          "category": "punctuation",
+          "ok": true,
+          "generationMs": 1303,
+          "durationSeconds": 3.63,
+          "realTimeFactor": 0.359,
+          "sizeBytes": 116160,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-long-001",
+          "category": "long",
+          "ok": true,
+          "generationMs": 1340,
+          "durationSeconds": 7.26,
+          "realTimeFactor": 0.185,
+          "sizeBytes": 232320,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-long-002",
+          "category": "long",
+          "ok": true,
+          "generationMs": 1377,
+          "durationSeconds": 6.18,
+          "realTimeFactor": 0.223,
+          "sizeBytes": 197760,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-safety-001",
+          "category": "safety",
+          "ok": true,
+          "generationMs": 1414,
+          "durationSeconds": 3.72,
+          "realTimeFactor": 0.38,
+          "sizeBytes": 119040,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "vi-safety-002",
+          "category": "safety",
+          "ok": true,
+          "generationMs": 1451,
+          "durationSeconds": 3.81,
+          "realTimeFactor": 0.381,
+          "sizeBytes": 121920,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        }
+      ],
+      "generatedAt": "2026-10-07T00:00:00.000Z",
+      "humanRatings": {
+        "raters": 3,
+        "naturalnessMos": 3.8,
+        "intelligibilityMos": 4.3,
+        "criticalPoiNameErrors": 0
+      },
+      "gate": {
+        "passed": true,
+        "failures": []
+      }
+    },
+    {
+      "provider": "piper",
+      "model": "fixture-fr-voice",
+      "modelVersion": "fixture-0.0.1",
+      "voiceId": "fixture-fr-voice",
+      "locale": "fr",
+      "count": 19,
+      "ok": 18,
+      "failed": 1,
+      "p50GenerationMs": 896,
+      "p95GenerationMs": 1266,
+      "meanRealTimeFactor": 0.256,
+      "totalSizeBytes": 2140800,
+      "samples": [
+        {
+          "id": "fr-poi-001",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 600,
+          "durationSeconds": 3.78,
+          "realTimeFactor": 0.159,
+          "sizeBytes": 120960,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-poi-002",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 637,
+          "durationSeconds": 3.99,
+          "realTimeFactor": 0.16,
+          "sizeBytes": 127680,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-poi-003",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 674,
+          "durationSeconds": 3.72,
+          "realTimeFactor": 0.181,
+          "sizeBytes": 119040,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-place-001",
+          "category": "place-name",
+          "ok": true,
+          "generationMs": 711,
+          "durationSeconds": 3.99,
+          "realTimeFactor": 0.178,
+          "sizeBytes": 127680,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-place-002",
+          "category": "place-name",
+          "ok": true,
+          "generationMs": 748,
+          "durationSeconds": 3.36,
+          "realTimeFactor": 0.223,
+          "sizeBytes": 107520,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-number-001",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 785,
+          "durationSeconds": 3.09,
+          "realTimeFactor": 0.254,
+          "sizeBytes": 98880,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-number-002",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 822,
+          "durationSeconds": 2.94,
+          "realTimeFactor": 0.28,
+          "sizeBytes": 94080,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-number-003",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 859,
+          "durationSeconds": 2.82,
+          "realTimeFactor": 0.305,
+          "sizeBytes": 90240,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-abbr-001",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 896,
+          "durationSeconds": 2.91,
+          "realTimeFactor": 0.308,
+          "sizeBytes": 93120,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-abbr-002",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 933,
+          "durationSeconds": 3.18,
+          "realTimeFactor": 0.293,
+          "sizeBytes": 101760,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-abbr-003",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 970,
+          "durationSeconds": 3.06,
+          "realTimeFactor": 0.317,
+          "sizeBytes": 97920,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-codeswitch-001",
+          "category": "code-switch",
+          "ok": true,
+          "generationMs": 1007,
+          "durationSeconds": 3.51,
+          "realTimeFactor": 0.287,
+          "sizeBytes": 112320,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-codeswitch-002",
+          "category": "code-switch",
+          "ok": true,
+          "generationMs": 1044,
+          "durationSeconds": 3.33,
+          "realTimeFactor": 0.314,
+          "sizeBytes": 106560,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-punct-001",
+          "category": "punctuation",
+          "ok": true,
+          "generationMs": 1081,
+          "durationSeconds": 3.18,
+          "realTimeFactor": 0.34,
+          "sizeBytes": 101760,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-punct-002",
+          "category": "punctuation",
+          "ok": true,
+          "generationMs": 1118,
+          "durationSeconds": 4.29,
+          "realTimeFactor": 0.261,
+          "sizeBytes": 137280,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-long-001",
+          "category": "long",
+          "ok": false,
+          "errorCode": "TTS_TIMEOUT"
+        },
+        {
+          "id": "fr-long-002",
+          "category": "long",
+          "ok": true,
+          "generationMs": 1192,
+          "durationSeconds": 6.99,
+          "realTimeFactor": 0.171,
+          "sizeBytes": 223680,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-safety-001",
+          "category": "safety",
+          "ok": true,
+          "generationMs": 1229,
+          "durationSeconds": 3.75,
+          "realTimeFactor": 0.328,
+          "sizeBytes": 120000,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        },
+        {
+          "id": "fr-safety-002",
+          "category": "safety",
+          "ok": true,
+          "generationMs": 1266,
+          "durationSeconds": 5.01,
+          "realTimeFactor": 0.253,
+          "sizeBytes": 160320,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.12,
+            "trailingSilenceSeconds": 0.2,
+            "internalSilenceRatio": 0.14
+          }
+        }
+      ],
+      "generatedAt": "2026-10-07T00:00:00.000Z",
+      "humanRatings": {
+        "raters": 3,
+        "naturalnessMos": 2.9,
+        "intelligibilityMos": 3.6,
+        "criticalPoiNameErrors": 1
+      },
+      "gate": {
+        "passed": false,
+        "failures": [
+          "failed-ratio",
+          "naturalness",
+          "poi-name-pronunciation"
+        ]
+      }
+    }
+  ]
+}
