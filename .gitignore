@@ -10,3 +10,8 @@ coverage/
 # Piper voice binaries (large) and generated benchmark report
 config/piper-voices/
 config/tts-benchmark-report.json
+
+# AI05 provider benchmark: local engine weights (large) and generated report
+config/zerotts/
+config/moss-tts/
+config/tts-provider-benchmark-report.json

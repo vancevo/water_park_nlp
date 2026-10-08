@@ -20,6 +20,17 @@ import { NarrationService } from './narration.service.js';
 import { PostgresNarrationRepository } from './postgres-narration.repository.js';
 import { createMediaStorage, MEDIA_STORAGE } from './media-storage.js';
 import { MediaService } from './media.service.js';
+import { AdminTtsJobController } from './admin-tts-job.controller.js';
+import { AdminTtsJobService } from './tts-job.service.js';
+import { InMemoryTtsJobRepository } from './in-memory-tts-job.repository.js';
+import { PostgresTtsJobRepository } from './postgres-tts-job.repository.js';
+import {
+  loadTtsJobDefaults,
+  TTS_JOB_CLOCK,
+  TTS_JOB_DEFAULTS,
+  TTS_JOB_REPOSITORY,
+  type TtsJobRepository,
+} from './tts-job.models.js';
 
 function sqlClient(): SqlClient | null {
   const connectionString = process.env.DATABASE_URL;
@@ -38,17 +49,29 @@ function createRepository(): NarrationRepository {
     : new InMemoryNarrationRepository();
 }
 
+function createTtsJobRepository(): TtsJobRepository {
+  const client = sqlClient();
+  return client
+    ? new PostgresTtsJobRepository(client)
+    : new InMemoryTtsJobRepository();
+}
+
 @Module({
   imports: [AuthModule, PoiModule],
   controllers: [
     NarrationController,
     NarrationLocalesController,
     AdminNarrationController,
+    AdminTtsJobController,
   ],
   providers: [
     NarrationService,
     NarrationLocalesService,
     MediaService,
+    AdminTtsJobService,
+    { provide: TTS_JOB_CLOCK, useValue: () => new Date() },
+    { provide: TTS_JOB_DEFAULTS, useFactory: () => loadTtsJobDefaults() },
+    { provide: TTS_JOB_REPOSITORY, useFactory: createTtsJobRepository },
     {
       provide: NARRATION_LOCALE_CONFIG,
       useFactory: () => loadNarrationLocaleConfig(),

@@ -7,8 +7,8 @@
 - Current wave: `W5/W6 — Search, analytics and release hardening`
 - Integration status: `SEARCH_ANALYTICS_POSTGIS_PASS`
 - Active blockers: B01 blocks public map/content release; B03 blocks local real-object-storage smoke only
-- Last updated: 2026-10-01
-- Updated by: Công (C04 backend)
+- Last updated: 2026-10-08
+- Updated by: Công (AI08 backend)
 
 ## Task board
 
@@ -29,7 +29,7 @@
 | T24–T25 Media/narration | IN_PROGRESS | API/mobile/admin agents | T21–T23 | Workflow, signer, admin preview and mobile player pass; B03 real storage smoke + offline audio cache remain |
 | T25A/T25B Configurable narration locales (backend, C02) | IN_PROGRESS | Công backend | T24–T25, C01 | Config loader + `GET /v1/narration-locales` + fallback + write validation + migration 009 + ADR 0007 on `codex/cong-c02-locale-backend`; T25C–E (Tú) + integration I01 pending |
 | T01–T07 Narration locale UI, AI TTS UX, mobile BCP 47, TTS eval corpus (T25C–E, AI01, AI04 UI) | DONE (mock/fixture level) | Tú | contract v1 | Reviewed on `tu/t01_t07` (not merged): mock ports + fixtures, admin tabs/AI generation (save/submit locked while a job runs), visitor selector, mobile transport, `data/tts-evaluation`; runbook `docs/runbooks/frontend-narration-locales-tts.md`. Full T25C–E/AI04 acceptance (real catalog with FR, real jobs/audio) closes only at I01–I04, which wait for backend AI04 endpoints + B03 |
-| AI00–AI08 AI/TTS/search hardening | IN_PROGRESS | Công backend / Tú UX+eval | T41–T42 | AI02 worker foundation (C03) + AI03 Piper baseline code (C04 — native binary, CPU benchmark run locally, ADR 0009) done on branch; AI04 admin API + AI05/AI07 next; AI06 requires explicit GO; I01–I04 are final gates |
+| AI00–AI08 AI/TTS/search hardening | IN_PROGRESS | Công backend / Tú UX+eval | T41–T42 | AI02 (C03) + AI03 (C04) + AI04 admin TTS API merged; AI05 provider benchmark (ADR 0011) merged; AI07/T43 hybrid search (ADR 0012) merged; AI08/C07 ops hardening (metrics/quota/retention/kill-switch + alerts + runbook, ADR 0013) done on `codex/cong-ai08-backend-hardening` — live scrape endpoint + storage-restore (B03) deferred; AI06 requires explicit GO; remaining for Công = integration gates I02/I04 |
 | T30 Mobile map | DONE | mobile agent | T21 contract | Typecheck + 10 shared mobile tests pass |
 | T31 GPS session | DONE | mobile agent | T30 | Permission/signal state machine + explicit follow mode |
 | T32 Walkway graph | DONE | geo agent | W1 | 7-node/8-edge fixture, topology validator and migration 004 |
@@ -43,7 +43,7 @@
 | T40 Lexical/spatial search | DONE | search agent | W2, W4 | API + migration 007 + real DB smoke; HTTP eval Recall@10 0.60 |
 | T41 Search evaluation | DONE | search evaluation agent | T40 | 50-query VI/EN dataset reconciled with authoritative fixtures |
 | T42 Embedding pipeline | IN_PROGRESS | worker agent | T41 | Versioned/hash-idempotent pipeline + pgvector schema; production provider benchmark remains |
-| T43 Hybrid ranking | TODO | unassigned | T40–T42 | — |
+| T43 Hybrid ranking | IN_PROGRESS | Công backend | T40–T42 | RRF re-ranking + `SEARCH_HYBRID_ENABLED` flag + lexical fallback + `semantic` reason on `codex/cong-ai07-hybrid-search` (ADR 0012); prod embedding endpoint + 50-query eval at I03 |
 | T50 Offline/cache | TODO | unassigned | W3, W4 | — |
 | T51 Event batching | DONE | analytics agent | W1 | Migration 008 + consent/idempotency/privacy tests + real DB retry smoke |
 | T52 Observability/security | TODO | unassigned | W1–W5 | — |

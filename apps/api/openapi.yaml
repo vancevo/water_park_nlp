@@ -997,7 +997,15 @@ components:
         isOpen: { type: boolean }
     SearchReason:
       type: string
-      enum: [exact_name, accent_insensitive_name, text_match, nearby, open_now]
+      enum:
+        [
+          exact_name,
+          accent_insensitive_name,
+          text_match,
+          nearby,
+          open_now,
+          semantic,
+        ]
     SearchResult:
       allOf:
         - { $ref: '#/components/schemas/PoiSummary' }
