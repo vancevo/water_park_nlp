@@ -73,7 +73,8 @@ export type SearchReason =
   | 'accent_insensitive_name'
   | 'text_match'
   | 'nearby'
-  | 'open_now';
+  | 'open_now'
+  | 'semantic';
 
 export interface SearchQuery {
   q: string;

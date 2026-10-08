@@ -74,7 +74,7 @@ Không ghi chi tiết implementation dài tại đây. Link tới README, OpenAP
 | SEARCH-LEXICAL | ready | `GET /v1/search`, `DamSenApiClient.search()` | `apps/api/src/search/`, `infra/migrations/007_*` | 8 tests + real DB + 50-query HTTP eval | T40 | Accent/typo strong; semantic/location slices intentionally weak before T43 |
 | SEARCH-EVAL | ready | 50-query judgments + metrics | `data/search-evaluation/` | validator + 3 regression tests | T41 | Recall@10/MRR/nDCG@10 + zero-result accuracy |
 | SEARCH-EMBED | in_progress | `EmbeddingService` + repository/provider ports | `apps/worker/src/embedding/`, `infra/migrations/005_*` | 5 unit tests + real schema migration | T42 | Hash-idempotent 1024d versioned storage; production model/provider benchmark remains |
-| SEARCH-HYBRID | planned | Hybrid ranking | API search module | benchmark | T43 | Lexical + vector + spatial + open-now |
+| SEARCH-HYBRID | in_progress | RRF hybrid re-ranking behind a feature flag + lexical fallback | `apps/api/src/search/hybrid-ranking.ts`, `search-flags.ts`, `query-embedder.ts`, `{in-memory,postgres}-vector.source.ts`, `search.service.ts`, ADR 0012 | 25 unit tests (fusion/flags/embedder/hybrid+fallback) | T43 (AI07) | `SEARCH_HYBRID_ENABLED` off by default; strict re-rank of lexical pool (set/total unchanged); fail-closed to lexical; `semantic` reason added; prod embedding endpoint + 50-query eval at I03 |
 
 ## Offline, analytics and operations
 

@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Optional,
+} from '@nestjs/common';
 import type {
   SearchReason,
   SearchResponse,
@@ -11,15 +16,21 @@ import type { PoiRecord } from '../poi/poi.models.js';
 import type { SearchQueryDto } from './search.dto.js';
 import {
   SEARCH_CLOCK,
+  SEARCH_HYBRID,
   SEARCH_REPOSITORY,
+  type HybridSearchDeps,
   type SearchCandidate,
   type SearchRepository,
+  type SearchRepositoryQuery,
 } from './search.models.js';
 import { normalizeSearchText } from './search-text.js';
+import { fuseRankings } from './hybrid-ranking.js';
 
 const VIETNAM_UTC_OFFSET_MS = 7 * 60 * 60 * 1000;
 
-function vietnamTime(date: Date): { dayOfWeek: number; minutes: number } {
+type ClockParts = { dayOfWeek: number; minutes: number };
+
+function vietnamTime(date: Date): ClockParts {
   const local = new Date(date.getTime() + VIETNAM_UTC_OFFSET_MS);
   return {
     dayOfWeek: local.getUTCDay(),
@@ -27,10 +38,7 @@ function vietnamTime(date: Date): { dayOfWeek: number; minutes: number } {
   };
 }
 
-function recordIsOpen(
-  record: PoiRecord,
-  at: ReturnType<typeof vietnamTime>,
-): boolean {
+function recordIsOpen(record: PoiRecord, at: ClockParts): boolean {
   return record.operatingHours.some((hours) => {
     if (hours.dayOfWeek !== at.dayOfWeek) return false;
     const [openHour = 0, openMinute = 0] = hours.opensAt.split(':').map(Number);
@@ -49,12 +57,100 @@ export class SearchService {
   constructor(
     @Inject(SEARCH_REPOSITORY) private readonly repository: SearchRepository,
     @Inject(SEARCH_CLOCK) private readonly now: () => Date,
+    @Optional()
+    @Inject(SEARCH_HYBRID)
+    private readonly hybrid: HybridSearchDeps | null = null,
   ) {}
 
   async search(query: SearchQueryDto): Promise<SearchResponse> {
     this.validateQuery(query);
     const at = vietnamTime(this.now());
-    const candidates = await this.repository.search({
+
+    if (this.hybrid?.flags.hybridEnabled) {
+      const fused = await this.tryHybrid(query, at, this.hybrid);
+      if (fused) return fused;
+    }
+    return this.lexical(query, at);
+  }
+
+  /** Lexical baseline: the repository paginates and scores. */
+  private async lexical(
+    query: SearchQueryDto,
+    at: ClockParts,
+  ): Promise<SearchResponse> {
+    const candidates = await this.repository.search(
+      this.repositoryQuery(query, at, {
+        limit: query.limit,
+        offset: query.offset,
+      }),
+    );
+    const total = candidates[0]?.total ?? 0;
+    const items = candidates.map((candidate) =>
+      this.result(candidate, query, at, new Set()),
+    );
+    return this.paginate(items, total, query);
+  }
+
+  /**
+   * Hybrid: re-rank the top lexical pool by fusing lexical order with the
+   * semantic (vector) order, then paginate. Fails closed — any missing vector,
+   * empty pool, deep page or error returns null so the caller uses lexical.
+   * The candidate SET is unchanged (re-ranking only), so total/pagination stay
+   * consistent with the lexical baseline.
+   */
+  private async tryHybrid(
+    query: SearchQueryDto,
+    at: ClockParts,
+    hybrid: HybridSearchDeps,
+  ): Promise<SearchResponse | null> {
+    const poolSize = hybrid.flags.poolSize;
+    // Deep pages fall back to lexical ordering beyond the re-ranked pool.
+    if (query.offset >= poolSize) return null;
+    try {
+      const vector = await hybrid.embedder.embed(query.q.trim(), query.locale);
+      if (!vector || vector.length === 0) return null;
+
+      const pool = await this.repository.search(
+        this.repositoryQuery(query, at, { limit: poolSize, offset: 0 }),
+      );
+      if (pool.length === 0) return null;
+      const total = pool[0]?.total ?? pool.length;
+      const poolIds = pool.map((candidate) => candidate.record.id);
+
+      const vectorHits = await hybrid.vectorSource.search({
+        vector,
+        locale: query.locale,
+        limit: poolSize,
+        poiIds: poolIds,
+      });
+      const vectorRanked = new Set(vectorHits.map((hit) => hit.poiId));
+
+      const fused = fuseRankings(
+        poolIds,
+        vectorHits.map((hit) => hit.poiId),
+        hybrid.flags.weights,
+      );
+      const byId = new Map(pool.map((c) => [c.record.id, c]));
+      const ordered = fused
+        .map((entry) => byId.get(entry.id))
+        .filter((c): c is SearchCandidate => c !== undefined);
+
+      const page = ordered.slice(query.offset, query.offset + query.limit);
+      const items = page.map((candidate) =>
+        this.result(candidate, query, at, vectorRanked),
+      );
+      return this.paginate(items, total, query);
+    } catch {
+      return null; // Fail closed to lexical search.
+    }
+  }
+
+  private repositoryQuery(
+    query: SearchQueryDto,
+    at: ClockParts,
+    page: { limit: number; offset: number },
+  ): SearchRepositoryQuery {
+    return {
       query: query.q.trim(),
       locale: query.locale,
       category: query.category,
@@ -62,13 +158,16 @@ export class SearchService {
       longitude: query.lng,
       radiusMeters: query.radius,
       openAt: query.openNow ? at : undefined,
-      limit: query.limit,
-      offset: query.offset,
-    });
-    const total = candidates[0]?.total ?? 0;
-    const items = candidates.map((candidate) =>
-      this.result(candidate, query.locale, query.lat, query.lng, at),
-    );
+      limit: page.limit,
+      offset: page.offset,
+    };
+  }
+
+  private paginate(
+    items: SearchResult[],
+    total: number,
+    query: SearchQueryDto,
+  ): SearchResponse {
     const nextOffset = query.offset + items.length;
     return {
       items,
@@ -95,11 +194,11 @@ export class SearchService {
 
   private result(
     candidate: SearchCandidate,
-    requestedLocale: SupportedLocale,
-    latitude: number | undefined,
-    longitude: number | undefined,
-    at: ReturnType<typeof vietnamTime>,
+    query: SearchQueryDto,
+    at: ClockParts,
+    vectorRanked: ReadonlySet<string>,
   ): SearchResult {
+    const requestedLocale: SupportedLocale = query.locale;
     const translation =
       candidate.record.translations[requestedLocale] ??
       candidate.record.translations.vi;
@@ -109,10 +208,10 @@ export class SearchService {
     const isOpen = recordIsOpen(candidate.record, at);
     const distance =
       candidate.distanceMeters ??
-      (latitude !== undefined && longitude !== undefined
+      (query.lat !== undefined && query.lng !== undefined
         ? distanceMeters(
-            latitude,
-            longitude,
+            query.lat,
+            query.lng,
             candidate.record.latitude,
             candidate.record.longitude,
           )
@@ -125,6 +224,7 @@ export class SearchService {
           : 'text_match',
       ...(distance !== undefined ? (['nearby'] as const) : []),
       ...(isOpen ? (['open_now'] as const) : []),
+      ...(vectorRanked.has(candidate.record.id) ? (['semantic'] as const) : []),
     ];
     return {
       id: candidate.record.id,
