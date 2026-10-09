@@ -5,7 +5,6 @@ import {
   HttpCode,
   Inject,
   Param,
-  ParseUUIDPipe,
   Post,
   Request,
   UseGuards,
@@ -24,6 +23,7 @@ import {
 } from '../auth/rbac.js';
 import { CreateTtsJobDto } from './tts-job.dto.js';
 import { AdminTtsJobService } from './tts-job.service.js';
+import { ParseUuidShapePipe } from '../common/uuid-shape.pipe.js';
 
 const bodyPipe = <T>(expectedType: new () => T) =>
   new ValidationPipe({
@@ -34,11 +34,11 @@ const bodyPipe = <T>(expectedType: new () => T) =>
   });
 
 /**
- * Any RFC 4122 UUID. Narration ids are not always v4: migration 006 seeds
- * narrations with md5-derived ids (I02-9). Job ids are v4 but the same pipe
- * keeps the three routes consistent.
+ * Shape-only UUID (I04): migration 006 seeds narrations with md5-derived ids
+ * whose version/variant bits are arbitrary (I02-9). Job ids are v4 but the
+ * same pipe keeps the routes consistent.
  */
-const uuidPipe = () => new ParseUUIDPipe();
+const uuidPipe = () => new ParseUuidShapePipe();
 
 /**
  * Admin TTS job endpoints (contract v1 + additive v1.1 — see

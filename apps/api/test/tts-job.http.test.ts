@@ -303,6 +303,56 @@ describe('admin TTS job HTTP API', () => {
     ).toBe(seededId);
   }, 30_000);
 
+  it('accepts md5-seeded narration ids with non-RFC 4122 variant bits on every narration/TTS route (I04)', async () => {
+    // Variant nibble `4`/`a`… arbitrary: real ids seeded by migration 006.
+    const repo = app.get<NarrationRepository>(NARRATION_REPOSITORY);
+    for (const seededId of [
+      '7a690593-2654-1ea1-4f71-0a1b2c3d4e5f',
+      '36f81b11-bca4-ac9d-0c2e-9f8e7d6c5b4a',
+    ]) {
+      const at = new Date();
+      await repo.save({
+        id: seededId,
+        poiId: '00000000-0000-4000-8000-000000000105',
+        locale: 'en',
+        revision: 50,
+        transcript: 'Seeded draft whose md5 id has arbitrary variant bits.',
+        status: 'draft',
+        audio: null,
+        createdAt: at,
+        updatedAt: at,
+      });
+      for (const [path, method] of [
+        [`/v1/admin/narrations/${seededId}/tts-jobs/latest`, 'GET'],
+        [`/v1/admin/narrations/${seededId}/audio/playback`, 'GET'],
+      ] as const) {
+        const res = await request(baseUrl, path, {
+          method,
+          token: editorToken,
+        });
+        expect(res.status, path).not.toBe(400);
+      }
+      const patch = await request(baseUrl, `/v1/admin/narrations/${seededId}`, {
+        method: 'PATCH',
+        token: editorToken,
+        body: { transcript: 'Edited seeded draft with an md5 id.' },
+      });
+      expect(patch.status).toBe(200);
+      const remove = await request(
+        baseUrl,
+        `/v1/admin/narrations/${seededId}`,
+        { method: 'DELETE', token: editorToken },
+      );
+      expect(remove.status).toBe(204);
+    }
+    const malformed = await request(
+      baseUrl,
+      '/v1/admin/narrations/not-a-uuid/tts-jobs/latest',
+      { token: editorToken },
+    );
+    expect(malformed.status).toBe(400);
+  }, 30_000);
+
   it('admin audio playback: 404 without audio, 503 when storage is off (I02-11)', async () => {
     const id = await freshDraft('00000000-0000-4000-8000-000000000105');
     const missing = await request(
