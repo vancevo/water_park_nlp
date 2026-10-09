@@ -21,6 +21,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { visitorApi } from '@/lib/api';
 import { categoryLabel, formatDistance, formatDuration } from '@/lib/format';
 import {
+  readUiLocalePreference,
+  saveUiLocalePreference,
+  uiText,
+  type UiText,
+} from '@/lib/ui-text';
+import {
   routeLengthMeters,
   routeProgressAt,
   simulationDistanceAtTime,
@@ -204,7 +210,12 @@ export function VisitorExperience() {
   const narrationSpeakerRef = useRef<() => void>(() => {});
   const narrationAudioRef = useRef<HTMLAudioElement | null>(null);
   const [mapReady, setMapReady] = useState(false);
-  const [locale, setLocale] = useState<SupportedLocale>('vi');
+  const [locale, setLocaleState] = useState<SupportedLocale>('vi');
+  const t = uiText(locale);
+  const changeLocale = useCallback((next: SupportedLocale) => {
+    setLocaleState(next);
+    saveUiLocalePreference(next);
+  }, []);
   const [pois, setPois] = useState<PoiSummary[]>([]);
   const [selected, setSelected] = useState<PoiSummary | null>(null);
   const [detail, setDetail] = useState<PoiDetail | null>(null);
@@ -305,9 +316,7 @@ export function VisitorExperience() {
         : await visitorApi.listPois({ locale, ...locationQuery });
       setPois(response.items);
     } catch (error) {
-      setMessage(
-        error instanceof Error ? error.message : 'Không tải được địa điểm.',
-      );
+      setMessage(error instanceof Error ? error.message : t.loadPlacesFailed);
     } finally {
       setLoading(false);
     }
@@ -380,6 +389,22 @@ export function VisitorExperience() {
     };
   }, []);
 
+  // Remembered interface language (read after mount so SSR markup stays 'vi').
+  useEffect(() => {
+    const saved = readUiLocalePreference();
+    if (saved) setLocaleState(saved);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.title = t.documentTitle;
+    const marker = simulationMarkerRef.current?.getElement();
+    if (marker) {
+      marker.title = t.simulatedWalker;
+      marker.setAttribute('aria-label', t.simulatedWalker);
+    }
+  }, [locale, t]);
+
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady || !isPickingSimulation) return;
@@ -395,7 +420,7 @@ export function VisitorExperience() {
       setRoute(null);
       setArrivalOpen(false);
       setIsPickingSimulation(false);
-      setMessage('Đã đặt người mô phỏng. Chọn một POI rồi tạo tuyến đường.');
+      setMessage(t.simulationPlaced);
     };
     map.once('click', placeHuman);
     return () => {
@@ -448,8 +473,8 @@ export function VisitorExperience() {
       }
       const element = document.createElement('div');
       element.className = 'simulated-human';
-      element.title = 'Người mô phỏng';
-      element.setAttribute('aria-label', 'Người mô phỏng');
+      element.title = t.simulatedWalker;
+      element.setAttribute('aria-label', t.simulatedWalker);
       const avatar = document.createElement('img');
       avatar.className = 'chibi-sprite-strip';
       avatar.src = '/chibi-walker-spritesheet.png';
@@ -542,8 +567,7 @@ export function VisitorExperience() {
   }, [mapReady, route, simulationPosition]);
 
   async function locate(): Promise<GeoPoint> {
-    if (!navigator.geolocation)
-      throw new Error('Trình duyệt không hỗ trợ GPS.');
+    if (!navigator.geolocation) throw new Error(t.gpsUnsupported);
     const coordinates = await new Promise<GeolocationCoordinates>(
       (resolve, reject) =>
         navigator.geolocation.getCurrentPosition(
@@ -588,14 +612,10 @@ export function VisitorExperience() {
       if (simulationPosition) {
         startAutomaticWalk(result);
       } else {
-        setMessage('Đã tạo tuyến. Hãy đi theo đường màu vàng trên bản đồ.');
+        setMessage(t.routeCreated);
       }
     } catch (error) {
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : 'Không thể tạo tuyến đường lúc này.',
-      );
+      setMessage(error instanceof Error ? error.message : t.routeFailed);
     }
   }
 
@@ -612,15 +632,11 @@ export function VisitorExperience() {
       if (audio.src !== narration.audio.playbackUrl)
         audio.src = narration.audio.playbackUrl;
       audio.currentTime = 0;
-      void audio
-        .play()
-        .catch(() =>
-          setMessage('Trình duyệt chặn tự phát audio. Hãy bấm nút phát.'),
-        );
+      void audio.play().catch(() => setMessage(t.autoplayBlocked));
       return;
     }
     if (!speechSupported) {
-      setMessage('Trình duyệt này không hỗ trợ Web Speech TTS.');
+      setMessage(t.speechUnsupported);
       return;
     }
     const text =
@@ -628,7 +644,7 @@ export function VisitorExperience() {
       detail?.longDescription ??
       selected?.shortDescription;
     if (!text) {
-      setMessage('Chưa có nội dung thuyết minh để phát.');
+      setMessage(t.noNarrationToPlay);
       return;
     }
     // Without narration the text is POI content in the UI locale.
@@ -637,9 +653,7 @@ export function VisitorExperience() {
     const voices = window.speechSynthesis.getVoices();
     const voice = pickSpeechVoice(voices, speechTag);
     if (voices.length > 0 && !voice) {
-      setMessage(
-        `Thiết bị chưa có giọng đọc ${localeLabel(narrationCatalog, textLocale)}. Bạn vẫn có thể đọc nội dung thuyết minh.`,
-      );
+      setMessage(t.noVoice(localeLabel(narrationCatalog, textLocale)));
       return;
     }
     const utterance = new SpeechSynthesisUtterance(text);
@@ -655,6 +669,7 @@ export function VisitorExperience() {
     selected,
     speechSupported,
     stopPlayback,
+    t,
   ]);
 
   useEffect(() => {
@@ -667,7 +682,7 @@ export function VisitorExperience() {
     const coordinates = nextRoute.geometry.coordinates;
     const start = routeProgressAt(coordinates, 0);
     if (!start) {
-      setMessage('Tuyến đường không có dữ liệu hình học hợp lệ.');
+      setMessage(t.routeNoGeometry);
       return;
     }
 
@@ -727,9 +742,10 @@ export function VisitorExperience() {
   return (
     <main className="visitor-shell">
       <Header
+        t={t}
         locale={locale}
         session={session}
-        onLocaleChange={setLocale}
+        onLocaleChange={changeLocale}
         onLogin={() => setAuthMode('login')}
         onLogout={() => {
           clearVisitorSession();
@@ -739,38 +755,33 @@ export function VisitorExperience() {
       <section className="workspace" id="top">
         <aside className="discovery-panel">
           <div className="intro">
-            <p className="eyebrow">Khám phá theo cách của bạn</p>
+            <p className="eyebrow">{t.eyebrow}</p>
             <h1>
-              Mỗi bước chân,
+              {t.heroLine1}
               <br />
-              một câu chuyện.
+              {t.heroLine2}
             </h1>
-            <p>
-              Chọn điểm đến, nghe thuyết minh và nhận tuyến đi bộ từ vị trí hiện
-              tại.
-            </p>
+            <p>{t.heroBody}</p>
           </div>
           <label className="search-box">
             <span>⌕</span>
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Tìm trò chơi, khu tham quan…"
-              aria-label="Tìm địa điểm"
+              placeholder={t.searchPlaceholder}
+              aria-label={t.searchLabel}
             />
           </label>
           <div className="list-heading">
-            <strong>{query ? 'Kết quả tìm kiếm' : 'Điểm khám phá'}</strong>
-            <span>{pois.length} địa điểm</span>
+            <strong>{query ? t.searchResults : t.placesHeading}</strong>
+            <span>{t.placeCount(pois.length)}</span>
           </div>
           <div className="poi-list">
             {loading ? (
-              <div className="empty-state">Đang tải địa điểm…</div>
+              <div className="empty-state">{t.loadingPlaces}</div>
             ) : null}
             {!loading && pois.length === 0 ? (
-              <div className="empty-state">
-                Không tìm thấy địa điểm phù hợp.
-              </div>
+              <div className="empty-state">{t.noPlaces}</div>
             ) : null}
             {pois.map((poi, index) => (
               <button
@@ -784,8 +795,8 @@ export function VisitorExperience() {
                 <span className="poi-copy">
                   <strong>{poi.name}</strong>
                   <small>
-                    {categoryLabel(poi.category)} ·{' '}
-                    {formatDistance(poi.distanceMeters)}
+                    {categoryLabel(poi.category, locale)} ·{' '}
+                    {formatDistance(poi.distanceMeters, locale)}
                   </small>
                 </span>
                 <span className="poi-arrow">→</span>
@@ -796,10 +807,12 @@ export function VisitorExperience() {
 
         <section
           className={`map-panel${isPickingSimulation ? ' is-picking-human' : ''}`}
-          aria-label="Bản đồ điểm khám phá"
+          aria-label={t.mapLabel}
         >
           <div className="map-canvas" ref={mapContainerRef} />
           <SimulationControls
+            t={t}
+            locale={locale}
             isPicking={isPickingSimulation}
             position={simulationPosition}
             progress={simulationProgress}
@@ -810,9 +823,7 @@ export function VisitorExperience() {
             onPick={() => {
               cancelSimulationAnimation();
               setIsPickingSimulation(true);
-              setMessage(
-                'Click vào một lối đi trên bản đồ để đặt người mô phỏng.',
-              );
+              setMessage(t.simulationPickHint);
             }}
             onReplay={() => {
               if (route) startAutomaticWalk(route);
@@ -824,17 +835,18 @@ export function VisitorExperience() {
               void locate().catch((error: Error) => setMessage(error.message))
             }
           >
-            ◎ Vị trí của tôi
+            {t.locateMe}
           </button>
-          <div className="research-badge">
-            POI + lối đi tham khảo từ OSM · Cần kiểm tra thực địa
-          </div>
+          <div className="research-badge">{t.researchBadge}</div>
           {message ? <div className="toast">{message}</div> : null}
           {selected && detailCardOpen ? (
             <PoiDetailCard
+              t={t}
+              locale={locale}
               detail={detail}
               narrationSection={
                 <NarrationSection
+                  t={t}
                   catalog={narrationCatalog}
                   catalogStatus={narrationCatalogStatus}
                   narrationLocale={narrationLocale}
@@ -859,6 +871,7 @@ export function VisitorExperience() {
 
       {authMode ? (
         <AuthDialog
+          t={t}
           mode={authMode}
           locale={locale}
           onClose={() => setAuthMode(null)}
@@ -872,6 +885,7 @@ export function VisitorExperience() {
       ) : null}
       {arrivalOpen && selected ? (
         <ArrivalDialog
+          t={t}
           narration={narration}
           catalog={narrationCatalog}
           poiName={detail?.name ?? selected.name}
@@ -889,12 +903,14 @@ export function VisitorExperience() {
 }
 
 function Header({
+  t,
   locale,
   session,
   onLocaleChange,
   onLogin,
   onLogout,
 }: {
+  t: UiText;
   locale: SupportedLocale;
   session: AuthResponse | null;
   onLocaleChange(locale: SupportedLocale): void;
@@ -914,7 +930,7 @@ function Header({
         <div
           className="locale-switch"
           role="group"
-          aria-label="Ngôn ngữ giao diện"
+          aria-label={t.localeGroupLabel}
         >
           <button
             type="button"
@@ -937,11 +953,11 @@ function Header({
         </div>
         {session ? (
           <button className="account-button" onClick={onLogout}>
-            {session.user.email.split('@')[0]} · Đăng xuất
+            {session.user.email.split('@')[0]} · {t.logout}
           </button>
         ) : (
           <button className="account-button" onClick={onLogin}>
-            Đăng nhập
+            {t.login}
           </button>
         )}
       </div>
@@ -950,6 +966,8 @@ function Header({
 }
 
 function PoiDetailCard({
+  t,
+  locale,
   detail,
   narrationSection,
   route,
@@ -958,6 +976,8 @@ function PoiDetailCard({
   onClose,
   onNavigate,
 }: {
+  t: UiText;
+  locale: SupportedLocale;
   detail: PoiDetail | null;
   narrationSection: React.ReactNode;
   route: RouteResponse | null;
@@ -968,17 +988,17 @@ function PoiDetailCard({
 }) {
   return (
     <article className="poi-detail">
-      <button className="close-button" onClick={onClose} aria-label="Đóng">
+      <button className="close-button" onClick={onClose} aria-label={t.close}>
         ×
       </button>
-      <p className="eyebrow">{categoryLabel(selected.category)}</p>
+      <p className="eyebrow">{categoryLabel(selected.category, locale)}</p>
       <h2>{detail?.name ?? selected.name}</h2>
       <p>{detail?.longDescription ?? selected.shortDescription}</p>
       {narrationSection}
       {route ? (
         <div className="route-summary">
-          <strong>{formatDistance(route.distanceMeters)}</strong>
-          <span>Khoảng {formatDuration(route.etaSeconds)}</span>
+          <strong>{formatDistance(route.distanceMeters, locale)}</strong>
+          <span>{t.routeAbout(formatDuration(route.etaSeconds, locale))}</span>
           <ol>
             {route.steps.map((step) => (
               <li key={step.sequence}>{step.instruction}</li>
@@ -988,16 +1008,18 @@ function PoiDetailCard({
       ) : null}
       <button className="primary-action" onClick={onNavigate}>
         {route
-          ? 'Cập nhật tuyến đường'
+          ? t.updateRoute
           : hasSimulation
-            ? 'Dẫn đường từ người mô phỏng'
-            : 'Dẫn đường từ vị trí của tôi'}
+            ? t.routeFromWalker
+            : t.routeFromMe}
       </button>
     </article>
   );
 }
 
 function SimulationControls({
+  t,
+  locale,
   isPicking,
   isWalking,
   position,
@@ -1008,6 +1030,8 @@ function SimulationControls({
   onPick,
   onReplay,
 }: {
+  t: UiText;
+  locale: SupportedLocale;
   isPicking: boolean;
   isWalking: boolean;
   position: GeoPoint | null;
@@ -1026,13 +1050,13 @@ function SimulationControls({
   return (
     <section
       className={`simulation-controls${isCollapsed ? ' is-collapsed' : ''}`}
-      aria-label="Mô phỏng người đi bộ"
+      aria-label={t.simulationLabel}
     >
       <button
         className="simulation-toggle"
         type="button"
         aria-expanded={!isCollapsed}
-        aria-label={isCollapsed ? 'Mở bảng mô phỏng' : 'Thu gọn bảng mô phỏng'}
+        aria-label={isCollapsed ? t.openSimulation : t.collapseSimulation}
         onClick={() => setIsCollapsed((value) => !value)}
       >
         {isCollapsed ? '⌄' : '⌃'}
@@ -1042,15 +1066,17 @@ function SimulationControls({
           ✦
         </span>
         <span>
-          <strong>Người mô phỏng</strong>
+          <strong>{t.simulatedWalker}</strong>
           <small>
             {isWalking
-              ? `Đang đi · ${progressPercent}%`
+              ? t.walking(progressPercent)
               : position
                 ? route
-                  ? `Còn ${formatDistance(progress?.remainingMeters)}`
-                  : 'Đã đặt trên bản đồ'
-                : 'Chưa có vị trí'}
+                  ? t.remaining(
+                      formatDistance(progress?.remainingMeters, locale),
+                    )
+                  : t.placedOnMap
+                : t.noPosition}
           </small>
         </span>
       </div>
@@ -1058,16 +1084,12 @@ function SimulationControls({
         className={`simulation-pick${isPicking ? ' active' : ''}`}
         onClick={onPick}
       >
-        {isPicking
-          ? 'Click lên bản đồ…'
-          : position
-            ? 'Đặt lại vị trí'
-            : 'Đặt người trên bản đồ'}
+        {isPicking ? t.clickMap : position ? t.repositionWalker : t.placeWalker}
       </button>
       {position ? (
         <>
           {route ? (
-            <div className="simulation-progress" aria-label="Tiến độ di chuyển">
+            <div className="simulation-progress" aria-label={t.progressLabel}>
               <span style={{ width: `${progressPercent}%` }} />
             </div>
           ) : null}
@@ -1077,17 +1099,17 @@ function SimulationControls({
             onClick={onReplay}
           >
             {isWalking
-              ? `Đang đi · ${progressPercent}%`
+              ? t.walking(progressPercent)
               : route
                 ? progress?.complete
-                  ? 'Đi lại tuyến trong 5 giây'
-                  : 'Bắt đầu đi trong 5 giây'
+                  ? t.walkAgain
+                  : t.startWalking
                 : selected
-                  ? 'Tạo tuyến trong thẻ POI'
-                  : 'Chọn một POI'}
+                  ? t.createRouteInCard
+                  : t.choosePoi}
           </button>
           <button className="simulation-clear" onClick={onClear}>
-            Xóa mô phỏng
+            {t.clearSimulation}
           </button>
         </>
       ) : null}
@@ -1096,6 +1118,7 @@ function SimulationControls({
 }
 
 function ArrivalDialog({
+  t,
   narration,
   catalog,
   poiName,
@@ -1104,6 +1127,7 @@ function ArrivalDialog({
   onReplay,
   onStop,
 }: {
+  t: UiText;
   narration: PoiNarration | null;
   catalog: NarrationLocaleCatalog;
   poiName: string;
@@ -1121,37 +1145,36 @@ function ArrivalDialog({
         aria-labelledby="arrival-title"
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <button className="close-button" onClick={onClose} aria-label="Đóng">
+        <button className="close-button" onClick={onClose} aria-label={t.close}>
           ×
         </button>
         <div className="arrival-icon" aria-hidden="true">
           ✓
         </div>
-        <p className="eyebrow">Bạn đã đến nơi</p>
+        <p className="eyebrow">{t.arrived}</p>
         <h2 id="arrival-title">{poiName}</h2>
         {narration?.fallbackUsed ? (
           <p className="fallback-notice" role="status">
-            Đang dùng bản {localeLabel(catalog, narration.resolvedLocale)} vì
-            chưa có bản {localeLabel(catalog, narration.requestedLocale)}.
+            {t.usingFallback(
+              localeLabel(catalog, narration.resolvedLocale),
+              localeLabel(catalog, narration.requestedLocale),
+            )}
           </p>
         ) : null}
         <p lang={narration?.resolvedLocale}>
-          {narration?.transcript ??
-            'Địa điểm này chưa có bản thuyết minh được duyệt.'}
+          {narration?.transcript ?? t.noApprovedNarration}
         </p>
         {canPlay ? (
           <div className="arrival-actions">
             <button className="primary-action" onClick={onReplay}>
-              ▶ Phát lại thuyết minh
+              {t.replayNarration}
             </button>
             <button className="secondary-action" onClick={onStop}>
-              Dừng đọc
+              {t.stopReading}
             </button>
           </div>
         ) : (
-          <small className="muted">
-            Chưa có audio thu sẵn và trình duyệt không hỗ trợ Web Speech TTS.
-          </small>
+          <small className="muted">{t.noAudioNoSpeech}</small>
         )}
       </section>
     </div>
@@ -1159,12 +1182,14 @@ function ArrivalDialog({
 }
 
 function AuthDialog({
+  t,
   mode,
   locale,
   onAuthenticated,
   onClose,
   onModeChange,
 }: {
+  t: UiText;
   mode: AuthMode;
   locale: SupportedLocale;
   onAuthenticated(session: AuthResponse): void;
@@ -1191,9 +1216,7 @@ function AuthDialog({
             });
       onAuthenticated(response);
     } catch (reason) {
-      setError(
-        reason instanceof Error ? reason.message : 'Không thể xác thực.',
-      );
+      setError(reason instanceof Error ? reason.message : t.authFailed);
     } finally {
       setLoading(false);
     }
@@ -1210,15 +1233,15 @@ function AuthDialog({
           type="button"
           className="close-button"
           onClick={onClose}
-          aria-label="Đóng"
+          aria-label={t.close}
         >
           ×
         </button>
-        <p className="eyebrow">Tài khoản khách tham quan</p>
-        <h2>{mode === 'login' ? 'Chào mừng trở lại' : 'Tạo tài khoản'}</h2>
-        <p>Bạn vẫn có thể khám phá với tư cách khách mà không cần đăng nhập.</p>
+        <p className="eyebrow">{t.accountEyebrow}</p>
+        <h2>{mode === 'login' ? t.welcomeBack : t.createAccount}</h2>
+        <p>{t.guestNote}</p>
         <label>
-          Email
+          {t.email}
           <input
             required
             type="email"
@@ -1227,7 +1250,7 @@ function AuthDialog({
           />
         </label>
         <label>
-          Mật khẩu
+          {t.password}
           <input
             required
             minLength={10}
@@ -1238,16 +1261,14 @@ function AuthDialog({
         </label>
         {error ? <div className="form-error">{error}</div> : null}
         <button className="primary-action" disabled={loading} type="submit">
-          {loading ? 'Đang xử lý…' : mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
+          {loading ? t.working : mode === 'login' ? t.login : t.signUp}
         </button>
         <button
           type="button"
           className="text-action"
           onClick={() => onModeChange(mode === 'login' ? 'register' : 'login')}
         >
-          {mode === 'login'
-            ? 'Chưa có tài khoản? Đăng ký'
-            : 'Đã có tài khoản? Đăng nhập'}
+          {mode === 'login' ? t.noAccount : t.haveAccount}
         </button>
       </form>
     </div>

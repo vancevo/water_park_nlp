@@ -93,6 +93,39 @@ try {
   await page.getByRole('button', { name: 'Giao diện tiếng Việt' }).click();
   assert.equal(await select.inputValue(), 'en');
 
+  // The whole interface (not only POI content) switches language, keeps the
+  // narration locale and survives a reload.
+  await page.getByRole('button', { name: 'Interface in English' }).click();
+  await page.getByLabel('Narration language').waitFor();
+  assert.equal(await page.locator('html').getAttribute('lang'), 'en');
+  assert.match(
+    await page.locator('.discovery-panel h1').innerText(),
+    /Every step/,
+  );
+  assert.match(await page.locator('.list-heading').innerText(), /place/);
+  assert.match(await page.locator('.account-button').innerText(), /Log in/);
+  assert.equal(
+    await page.locator('.narration-locale select').inputValue(),
+    'en',
+  );
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.locator('.poi-card').first().click();
+  assert.match(
+    await page.locator('.discovery-panel h1').innerText(),
+    /Every step/,
+  );
+  await page.getByRole('button', { name: 'Giao diện tiếng Việt' }).click();
+  await page.getByLabel('Ngôn ngữ thuyết minh').waitFor();
+  assert.equal(await page.locator('html').getAttribute('lang'), 'vi');
+  assert.match(
+    await page.locator('.discovery-panel h1').innerText(),
+    /Mỗi bước chân/,
+  );
+  assert.equal(
+    await page.locator('.narration-locale select').inputValue(),
+    'en',
+  );
+
   // Locale whose preference is checked after reload.
   let remembered = 'en';
   if (mode === 'demo') {

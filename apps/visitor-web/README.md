@@ -50,6 +50,11 @@ offline service worker chưa thuộc bản web MVP hiện tại.
 
 ## Ngôn ngữ thuyết minh
 
+Nút VI/EN đổi toàn bộ chữ trên giao diện (từ điển `lib/ui-text.ts`, thiếu khóa ở một
+ngôn ngữ là lỗi biên dịch), tên/mô tả địa điểm (qua API `locale`), `<html lang>` và
+tiêu đề trang; lựa chọn được nhớ trong localStorage. Nội dung từ API (bước chỉ đường,
+thông báo lỗi của server) không được dịch ở client.
+
 Ngôn ngữ thuyết minh độc lập với ngôn ngữ giao diện VI/EN: danh sách lấy từ
 `GET /v1/narration-locales`, lựa chọn được nhớ trong `localStorage`
 (`damsen.visitor.narrationLocale.v1`), có thông báo khi API trả bản fallback,

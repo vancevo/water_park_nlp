@@ -17,6 +17,7 @@ import {
   saveNarrationLocalePreference,
 } from '@/lib/narration-locales';
 import { getNarrationPorts } from '@/lib/narration-source';
+import type { UiText } from '@/lib/ui-text';
 
 export type CatalogStatus = 'loading' | 'ready' | 'error';
 export type NarrationStatus =
@@ -121,6 +122,7 @@ export function useVisitorNarration(
 }
 
 export function NarrationSection({
+  t,
   catalog,
   catalogStatus,
   narrationLocale,
@@ -132,6 +134,7 @@ export function NarrationSection({
   onRetryCatalog,
   onSpeak,
 }: {
+  t: UiText;
   catalog: NarrationLocaleCatalog;
   catalogStatus: CatalogStatus;
   narrationLocale: NarrationLocaleCode | null;
@@ -149,9 +152,9 @@ export function NarrationSection({
     ? aiAudioLabel(narration.resolvedLocale, narration.audio.generatedBy)
     : null;
   return (
-    <section className="narration" aria-label="Thuyết minh">
+    <section className="narration" aria-label={t.narrationLabel}>
       <div className="narration-locale">
-        <label htmlFor={selectId}>Ngôn ngữ thuyết minh</label>
+        <label htmlFor={selectId}>{t.narrationLanguage}</label>
         <select
           id={selectId}
           value={narrationLocale ?? ''}
@@ -160,7 +163,7 @@ export function NarrationSection({
           onChange={(event) => onLocaleChange(event.target.value)}
         >
           {catalogStatus === 'loading' && !narrationLocale ? (
-            <option value="">Đang tải ngôn ngữ…</option>
+            <option value="">{t.loadingLanguages}</option>
           ) : null}
           {catalog.locales.map((option) => (
             <option key={option.code} value={option.code} lang={option.code}>
@@ -171,38 +174,35 @@ export function NarrationSection({
       </div>
       {catalogStatus === 'error' ? (
         <p className="narration-note" role="status">
-          Không tải được danh sách ngôn ngữ; đang dùng Tiếng Việt/English.{' '}
+          {t.catalogError}{' '}
           <button
             type="button"
             className="inline-action"
             onClick={onRetryCatalog}
           >
-            Thử lại
+            {t.retry}
           </button>
         </p>
       ) : null}
       {/* Only short status text is live; the transcript itself is not re-announced. */}
       <div className="narration-status" role="status" aria-live="polite">
         {status === 'loading' ? (
-          <small className="muted">Đang tải thuyết minh…</small>
+          <small className="muted">{t.loadingNarration}</small>
         ) : null}
         {status === 'missing' ? (
-          <small className="muted">
-            Địa điểm này chưa có bản thuyết minh được duyệt.
-          </small>
+          <small className="muted">{t.noApprovedNarration}</small>
         ) : null}
         {fallback ? (
           <p className="fallback-notice">
-            Chưa có thuyết minh {fallback.requestedLabel}; đang hiển thị bản{' '}
-            {fallback.resolvedLabel}.
+            {t.noNarrationFor(fallback.requestedLabel, fallback.resolvedLabel)}
           </p>
         ) : null}
       </div>
       {status === 'error' ? (
         <p className="narration-note" role="alert">
-          Không tải được thuyết minh.{' '}
+          {t.narrationError}{' '}
           <button type="button" className="inline-action" onClick={onRetry}>
-            Thử lại
+            {t.retry}
           </button>
         </p>
       ) : null}
@@ -210,7 +210,7 @@ export function NarrationSection({
         {narration && status === 'ready' ? (
           <>
             <strong>
-              Thuyết minh · {localeLabel(catalog, narration.resolvedLocale)}
+              {t.narrationTitle(localeLabel(catalog, narration.resolvedLocale))}
             </strong>
             <p lang={narration.resolvedLocale}>{narration.transcript}</p>
             {narration.audio ? (
@@ -230,7 +230,7 @@ export function NarrationSection({
                   src={narration.audio.playbackUrl}
                   // Recorded audio wins: silence any browser TTS still speaking.
                   onPlay={() => window.speechSynthesis?.cancel()}
-                  aria-label={`Audio thuyết minh ${localeLabel(catalog, narration.resolvedLocale)}${aiLabel ? ` (${aiLabel.text})` : ''}`}
+                  aria-label={`${t.audioLabel(localeLabel(catalog, narration.resolvedLocale))}${aiLabel ? ` (${aiLabel.text})` : ''}`}
                 />
               </>
             ) : speechSupported ? (
@@ -239,13 +239,10 @@ export function NarrationSection({
                 className="secondary-action"
                 onClick={onSpeak}
               >
-                ▶ Đọc bằng giọng của trình duyệt
+                {t.speakWithBrowser}
               </button>
             ) : (
-              <small className="muted">
-                Chưa có audio thu sẵn và trình duyệt không hỗ trợ đọc tự động;
-                bạn vẫn có thể đọc nội dung ở trên.
-              </small>
+              <small className="muted">{t.noAudioNoAutoRead}</small>
             )}
           </>
         ) : null}
