@@ -138,8 +138,8 @@ try {
   await page.getByRole('button', { name: 'Giao diện tiếng Việt' }).click();
   await page.getByLabel('Ngôn ngữ thuyết minh').waitFor();
 
-  // Old / new / overlay map switch must not break the page.
-  for (const label of ['Mới', 'Chồng lớp', 'Cũ']) {
+  // Old / new map switch (small control by the zoom buttons) must not break the page.
+  for (const label of ['Cũ', 'Mới']) {
     await page.getByRole('button', { name: label, exact: true }).click();
     assert.equal(
       await page

@@ -63,3 +63,13 @@ audio đã xuất bản được ưu tiên hơn Web Speech và Web Speech dùng 
 thật ở I01: locale thêm bằng config như FR tự xuất hiện). `demo` dùng fixture
 VI/EN/FR (VI có âm báo demo, FR rơi về EN). Xem
 `docs/runbooks/frontend-narration-locales-tts.md`.
+
+## Bản đồ minh họa (Cũ / Mới)
+
+Nút nhỏ phía trên nút zoom của bản đồ chuyển giữa **Cũ** (nền OSM + đường đi bộ) và
+**Mới** (ảnh minh họa `public/maps/damsen-map.jpg`, mặc định). Đường OSM và tuyến dẫn
+đường luôn được vẽ trên ảnh. Các góc ảnh nằm trong `damsen-map.georef.json`, tính bằng
+`scripts/georeference-illustrated-map/fit_paths.py` (đường vẽ trong ảnh được khớp với
+đường OSM: sai số trung bình ~0,8 m, hướng bắc ở trên). Điều này chứng minh ảnh khớp
+với OSM, không chứng minh OSM đúng thực địa. Nếu ảnh không tải được, app dùng bản
+đồ cũ. Xem `docs/runbooks/frontend-illustrated-map-report.md`.

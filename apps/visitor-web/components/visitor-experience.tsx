@@ -18,11 +18,7 @@ import type {
 } from 'maplibre-gl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { visitorApi } from '@/lib/api';
-import {
-  addMapPictures,
-  pictureLayerId,
-  type AddedPicture,
-} from '@/lib/map-pictures';
+import { ILLUSTRATED_LAYER, addIllustratedMap } from '@/lib/map-pictures';
 import { categoryLabel, formatDistance, formatDuration } from '@/lib/format';
 import {
   readUiLocalePreference,
@@ -51,7 +47,7 @@ import {
 import { NarrationSection, useVisitorNarration } from './narration-section';
 
 const FALLBACK_CENTER: [number, number] = [106.63853, 10.76433];
-type MapKind = 'old' | 'new' | 'overlay';
+type MapKind = 'old' | 'new';
 const MAP_TILE_URL = process.env.NEXT_PUBLIC_MAP_TILE_URL;
 const MAP_TILE_ATTRIBUTION =
   process.env.NEXT_PUBLIC_MAP_TILE_ATTRIBUTION ??
@@ -218,10 +214,8 @@ export function VisitorExperience() {
   const narrationSpeakerRef = useRef<() => void>(() => {});
   const narrationAudioRef = useRef<HTMLAudioElement | null>(null);
   const [mapReady, setMapReady] = useState(false);
-  const [mapKind, setMapKind] = useState<MapKind>('old');
-  const [illustratedOpacity, setIllustratedOpacity] = useState(0.55);
-  const [pictures, setPictures] = useState<AddedPicture[]>([]);
-  const [pictureId, setPictureId] = useState('');
+  const [mapKind, setMapKind] = useState<MapKind>('new');
+  const [illustratedReady, setIllustratedReady] = useState(false);
   const [locale, setLocaleState] = useState<UiLocale>('vi');
   const t = uiText(locale);
   const changeLocale = useCallback((next: UiLocale) => {
@@ -378,14 +372,7 @@ export function VisitorExperience() {
           data: '/data/damsen-osm-walkways.geojson',
           attribution: '© OpenStreetMap contributors',
         });
-        void addMapPictures(map).then((added) => {
-          setPictures(added);
-          setPictureId((current) =>
-            added.some((picture) => picture.id === current)
-              ? current
-              : (added[0]?.id ?? ''),
-          );
-        });
+        void addIllustratedMap(map).then(setIllustratedReady);
         map.addLayer({
           id: 'damsen-osm-walkways-outline',
           type: 'line',
@@ -436,22 +423,22 @@ export function VisitorExperience() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [arrivalOpen, authMode, detailCardOpen, stopPlayback]);
 
-  // Old map = OSM base + walkways; new = the chosen picture; overlay = both.
+  // Old map = OSM base + walkways; new = the illustrated map under them.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady) return;
-    for (const { id } of pictures) {
-      const layer = pictureLayerId(id);
-      if (!map.getLayer(layer)) continue;
-      const shown = mapKind !== 'old' && id === pictureId;
-      map.setLayoutProperty(layer, 'visibility', shown ? 'visible' : 'none');
-      map.setPaintProperty(
-        layer,
-        'raster-opacity',
-        mapKind === 'new' ? 1 : illustratedOpacity,
-      );
-    }
-  }, [illustratedOpacity, mapKind, mapReady, pictureId, pictures]);
+    if (
+      !map ||
+      !mapReady ||
+      !illustratedReady ||
+      !map.getLayer(ILLUSTRATED_LAYER)
+    )
+      return;
+    map.setLayoutProperty(
+      ILLUSTRATED_LAYER,
+      'visibility',
+      mapKind === 'new' ? 'visible' : 'none',
+    );
+  }, [illustratedReady, mapKind, mapReady]);
 
   // Remembered interface language (read after mount so SSR markup stays 'vi').
   useEffect(() => {
@@ -905,63 +892,26 @@ export function VisitorExperience() {
             {t.locateMe}
           </button>
           <div className="research-badge">{t.researchBadge}</div>
-          <div className="map-kind" role="group" aria-label={t.mapKindLabel}>
-            {(
-              [
-                ['old', t.mapOld],
-                ['new', t.mapNew],
-                ['overlay', t.mapOverlay],
-              ] as const
-            ).map(([kind, label]) => (
-              <button
-                key={kind}
-                type="button"
-                className={mapKind === kind ? 'active' : ''}
-                aria-pressed={mapKind === kind}
-                onClick={() => setMapKind(kind)}
-              >
-                {label}
-              </button>
-            ))}
-            {mapKind === 'overlay' ? (
-              <label className="map-opacity">
-                <span>{t.mapOpacity}</span>
-                <input
-                  type="range"
-                  min={0.1}
-                  max={0.9}
-                  step={0.05}
-                  value={illustratedOpacity}
-                  onChange={(event) =>
-                    setIllustratedOpacity(Number(event.target.value))
-                  }
-                />
-              </label>
-            ) : null}
-            {mapKind !== 'old' && pictures.length > 1 ? (
-              <label className="map-picture">
-                <span>{t.mapPicture}</span>
-                <select
-                  value={pictureId}
-                  onChange={(event) => setPictureId(event.target.value)}
+          {illustratedReady ? (
+            <div className="map-kind" role="group" aria-label={t.mapKindLabel}>
+              {(
+                [
+                  ['old', t.mapOld],
+                  ['new', t.mapNew],
+                ] as const
+              ).map(([kind, label]) => (
+                <button
+                  key={kind}
+                  type="button"
+                  className={mapKind === kind ? 'active' : ''}
+                  aria-pressed={mapKind === kind}
+                  onClick={() => setMapKind(kind)}
                 >
-                  {pictures.map(({ id }) => (
-                    <option key={id} value={id}>
-                      {t.mapPictureNames[id] ?? id}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
-            {mapKind !== 'old' ? (
-              <small className="map-note">
-                {pictures.find((picture) => picture.id === pictureId)
-                  ?.confidence === 'fitted'
-                  ? t.mapFitted
-                  : t.mapExperimental}
-              </small>
-            ) : null}
-          </div>
+                  {label}
+                </button>
+              ))}
+            </div>
+          ) : null}
           {message ? <div className="toast">{message}</div> : null}
           {selected && detailCardOpen ? (
             <PoiDetailCard

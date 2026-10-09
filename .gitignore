@@ -19,5 +19,3 @@ config/tts-provider-benchmark-report.json
 __pycache__/
 *.pyc
 
-# Third-party artwork kept local only (rights not cleared, B01)
-apps/visitor-web/public/maps/local/

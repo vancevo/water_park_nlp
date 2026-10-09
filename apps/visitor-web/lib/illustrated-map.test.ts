@@ -1,50 +1,25 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { ILLUSTRATED_MAP_GEOREF, ILLUSTRATED_MAP_URL } from './map-pictures';
 
 const publicDir = join(__dirname, '../public');
-interface Georef {
+const georef = JSON.parse(
+  readFileSync(join(publicDir, ILLUSTRATED_MAP_GEOREF), 'utf8'),
+) as {
   status: string;
   image: string;
-  imageLocalOnly?: boolean;
   corners: [number, number][];
-}
-const read = (file: string) =>
-  JSON.parse(readFileSync(join(publicDir, 'maps', file), 'utf8')) as Georef;
-const manifest = JSON.parse(
-  readFileSync(join(publicDir, 'maps/index.json'), 'utf8'),
-) as {
-  pictures: {
-    id: string;
-    url: string;
-    georef: string;
-    optional?: boolean;
-    confidence?: string;
-  }[];
+  rotationDegrees: number;
+  meanDistanceMetres: number;
+  osmPathSamplesWithin3HalfPixels: number;
 };
 
-describe('map picture manifest', () => {
-  it('lists pictures whose georeference file exists', () => {
-    expect(manifest.pictures.length).toBeGreaterThan(0);
-    for (const picture of manifest.pictures) {
-      expect(
-        existsSync(join(publicDir, picture.georef.replace(/^\//, ''))),
-      ).toBe(true);
-    }
+describe('illustrated map georeference', () => {
+  it('ships the image it describes', () => {
+    expect(existsSync(join(publicDir, ILLUSTRATED_MAP_URL))).toBe(true);
+    expect(ILLUSTRATED_MAP_URL.endsWith(georef.image)).toBe(true);
   });
-
-  it('only third-party artwork may be missing from the repo (optional)', () => {
-    for (const picture of manifest.pictures) {
-      const present = existsSync(
-        join(publicDir, picture.url.replace(/^\//, '')),
-      );
-      if (!picture.optional) expect(present, picture.id).toBe(true);
-    }
-  });
-});
-
-describe.each(manifest.pictures)('georeference of $id', (picture) => {
-  const georef = read(picture.georef.split('/').pop()!);
 
   it('has four corners around the park, in lon/lat order', () => {
     expect(georef.corners).toHaveLength(4);
@@ -71,67 +46,10 @@ describe.each(manifest.pictures)('georeference of $id', (picture) => {
     expect(new Set(signs).size).toBe(1);
   });
 
-  it('never claims to be verified on site', () => {
-    expect(['provisional', 'fitted-to-osm-paths']).toContain(georef.status);
-  });
-});
-
-describe('quality numbers are recorded', () => {
-  it('illustrated 3: painted paths match the OSM footpaths within a few metres', () => {
-    const g = read('damsen-illustrated-3.georef.json') as Georef & {
-      meanDistanceMetres: number;
-      osmPathSamplesWithin3HalfPixels: number;
-      rotationDegrees: number;
-      startingGuessWithin3HalfPixels: number;
-    };
-    expect(g.meanDistanceMetres).toBeLessThan(5);
-    expect(g.osmPathSamplesWithin3HalfPixels).toBeGreaterThan(0.8);
-    expect(g.osmPathSamplesWithin3HalfPixels).toBeGreaterThan(
-      g.startingGuessWithin3HalfPixels,
-    );
-    expect(Math.abs(g.rotationDegrees)).toBeLessThan(2); // drawn north-up
-    expect(manifest.pictures[1]?.id).toBe('illustrated3');
-    expect(manifest.pictures[1]?.confidence).toBe('fitted');
-  });
-
-  it('illustrated 4 (default): paths within about a metre, same layout as 3', () => {
-    const g = read('damsen-illustrated-4.georef.json') as Georef & {
-      meanDistanceMetres: number;
-      osmPathSamplesWithin3HalfPixels: number;
-      rotationDegrees: number;
-    };
-    expect(g.meanDistanceMetres).toBeLessThan(1.5);
-    expect(g.osmPathSamplesWithin3HalfPixels).toBeGreaterThan(0.9);
-    expect(Math.abs(g.rotationDegrees)).toBeLessThan(2);
-    expect(manifest.pictures[0]?.id).toBe('illustrated4'); // default picture
-    expect(manifest.pictures[0]?.confidence).toBe('fitted');
-    // Same layout as picture 3: the two fits agree to within a few metres.
-    const three = read('damsen-illustrated-3.georef.json');
-    const kx = Math.cos((10.764 * Math.PI) / 180) * 111320;
-    g.corners.forEach(([lon, lat], i) => {
-      const [lon3, lat3] = three.corners[i]!;
-      const metres = Math.hypot((lon - lon3) * kx, (lat - lat3) * 110574);
-      expect(metres).toBeLessThan(8);
-    });
-  });
-
-  it('illustrated: beats a north-up guess but leaves footpaths on water', () => {
-    const g = read('damsen-illustrated.georef.json') as Georef & {
-      lakeOverlapIoU: number;
-      osmFootpathSamplesOnPaintedWater: number;
-      northUpBaseline: { lakeOverlapIoU: number };
-    };
-    expect(g.lakeOverlapIoU).toBeGreaterThan(g.northUpBaseline.lakeOverlapIoU);
-    expect(g.osmFootpathSamplesOnPaintedWater).toBeGreaterThan(0);
-  });
-
-  it('official: affine beats similarity-only on the main lake', () => {
-    const g = read('damsen-official.georef.json') as Georef & {
-      mainLakeIoU: number;
-      similarityOnlyBaseline: { mainLakeIoU: number };
-      imageLocalOnly: boolean;
-    };
-    expect(g.mainLakeIoU).toBeGreaterThan(g.similarityOnlyBaseline.mainLakeIoU);
-    expect(g.imageLocalOnly).toBe(true);
+  it('is fitted to the OSM footpaths within about a metre, north-up', () => {
+    expect(georef.status).toBe('fitted-to-osm-paths'); // never "verified on site"
+    expect(georef.meanDistanceMetres).toBeLessThan(1.5);
+    expect(georef.osmPathSamplesWithin3HalfPixels).toBeGreaterThan(0.9);
+    expect(Math.abs(georef.rotationDegrees)).toBeLessThan(2);
   });
 });

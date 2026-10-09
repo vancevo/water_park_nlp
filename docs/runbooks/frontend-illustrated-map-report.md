@@ -1,148 +1,44 @@
-# Bản đồ minh họa "Đầm Sen Khô" so với bản đồ cũ (OSM)
+# Bản đồ minh họa "Đầm Sen" — kết quả khớp với đường OSM
 
-Câu hỏi: bản đồ minh họa (đẹp) có thể làm bản đồ thật mà vẫn chỉ đường đúng như
-bản đồ cũ (đường OSM) không? Kết quả đo ngày 2026-10-09. Trạng thái: **thử nghiệm,
-chưa dùng để dẫn đường**.
+Trạng thái: **đã chốt** dùng một ảnh (`apps/visitor-web/public/maps/damsen-map.jpg`) làm
+bản đồ **Mới**; bản đồ **Cũ** (OSM) vẫn có để so sánh. Nút chuyển nằm phía trên nút zoom.
 
-## Cách xem
+## Cách khớp
 
-Visitor web → góc dưới bên trái bản đồ: **Cũ | Mới | Chồng lớp**. Đường OSM
-(màu kem, viền xanh) và tuyến dẫn đường luôn được vẽ *trên* ảnh, nên chỗ nào
-lệch đều nhìn thấy. Chế độ "Chồng lớp" có thanh độ mờ.
+Ảnh vẽ sẵn mạng đường đi bộ dạng nét be. `fit_paths.py` trích mạng đường đó, rồi tìm
+phép affine (xoay, tỉ lệ, nghiêng, dịch) đặt đường OSM (`damsen-osm-walkways.geojson`)
+lên đúng các nét vẽ, bằng cách giảm khoảng cách trung bình từ mỗi điểm OSM tới nét vẽ
+gần nhất. Chạy lại:
 
-## Đã đo gì
-
-Sự thật để so sánh là dữ liệu OSM: hồ (relation 5445124, có đảo) và 360 điểm
-đường đi bộ. Tìm phép biến đổi đồng dạng (xoay + tỉ lệ + dịch) đặt hồ OSM
-trùng hồ trong ảnh nhất (`apps/visitor-web/scripts/georeference-illustrated-map/fit.py`,
-chạy lại được):
-
-| Chỉ số | Giá trị |
-|---|---|
-| Xoay cần thiết | ~256° (ảnh bị xoay ~100° so với hướng bắc) |
-| Trùng khớp hồ (IoU) khi để hướng bắc ở trên, chỉ co giãn/dịch | 0,10 (vô dụng) |
-| Trùng khớp hồ (IoU) với phép xoay tốt nhất | 0,53 (vừa phải) |
-| Đường OSM rơi xuống mặt nước vẽ trong ảnh | ~11% (đúng ra ≈ 0–2%, trừ cầu tàu) |
-
-## Kết luận
-
-1. **Cấu trúc đúng, hướng thì lệch.** Sau khi xoay, đường trục từ cổng chính tới
-   đảo, các đường quanh hồ và các lối chính của OSM khớp với đường vẽ trong ảnh.
-   Nghĩa là ảnh vẽ đúng "sơ đồ" của công viên. Nhưng mũi tên "N" trong ảnh không
-   phải hướng bắc thật: theo phép khớp, "Cổng Lạc Long Quân" nằm về phía **đông**,
-   đường Hòa Bình về phía bắc. *Cần bạn xác nhận bằng hiểu biết thực tế.*
-2. **Không khớp tuyệt đối.** Ảnh là tranh minh họa (không đúng tỉ lệ, nhiều
-   chỗ bị bóp/kéo): một phép biến đổi cứng cho sai số khoảng vài chục mét ở
-   nhiều nơi, một số đoạn đường OSM cắt qua hồ vẽ. Dẫn đường trên ảnh như vậy sẽ
-   **vẽ tuyến lệch khỏi đường trong ảnh**.
-3. **Phần ngoài ảnh.** Ảnh chỉ có khu "Khô". Khu công viên nước phía tây nam và
-   một phần phía bắc của dữ liệu OSM không có trong ảnh.
-
-## Để dùng làm bản đồ thật cần thêm gì
-
-- **Căn chỉnh bằng điểm điều khiển** (≥ 8–10 cặp điểm: cổng, góc hồ, ngã ba, cầu
-  tàu) và biến đổi phi tuyến từng vùng để sai số < ~5 m. Cần người biết công
-  viên xác nhận từng cặp điểm.
-- Hoặc **vẽ lại đồ thị đường đi trực tiếp lên ảnh** (tọa độ ảnh) và dẫn đường
-  trong hệ ảnh; tuyến sẽ luôn nằm đúng trên đường vẽ nhưng không dùng GPS thật
-  trừ khi có phép chuyển ảnh ↔ GPS.
-- Xác nhận **quyền sử dụng ảnh** (nguồn, tác giả) trước khi công khai (B01).
-
-Không đổi dữ liệu dẫn đường, API hay OpenAPI; ảnh chỉ là lớp hiển thị tùy chọn.
-
-## Bản đồ chính thức "CVVH Đầm Sen" (khớp bằng 2 hồ, affine)
-
-Ảnh sơ đồ chính thức của công viên là tác phẩm của bên thứ ba (quyền sử dụng
-chưa được xác nhận — B01), nên **ảnh không nằm trong git**: đặt tại
-`apps/visitor-web/public/maps/local/damsen-official.png` (đã gitignore). Chỉ có
-số liệu căn chỉnh được commit (`public/maps/damsen-official.georef.json`). Trong
-app, khi có file này thì ô "Ảnh" cho chọn "Chính thức (nội bộ)".
-
-Khớp bằng hồ chính (có đảo) và hồ Khu B của OSM, phép biến đổi affine
-(`fit_official.py`, chạy lại được):
-
-| Chỉ số | Chỉ xoay + co giãn đều | Affine |
-|---|---|---|
-| Trùng khớp hồ chính (IoU) | 0,48 | **0,83** |
-| Trùng khớp hồ Khu B (IoU) | 0,32 | 0,35 (nhận dạng hồ bằng màu, kém ổn định) |
-| Đường OSM rơi xuống nước vẽ | — | 4,7% (chủ yếu cầu Cửu Khúc và đường ven hồ) |
-| Tỉ lệ | — | ~0,66–0,68 m/pixel |
-
-- Hướng giống ảnh minh họa: **phần "trên" của bản đồ là hướng tây** (Kênh Tân Hóa
-  nằm phía tây công viên trong OSM). Hai bản đồ và OSM nhất quán.
-- Bằng mắt: đường ven hồ, trục từ Cổng số 1 lên đảo Sân khấu Ngôi Sao và các lối
-  ở Khu B khớp với đường vẽ; vùng khu trò chơi phía đông ít đường OSM hơn.
-- **Chưa chứng minh được độ chính xác tuyệt đối.** Thử đối chiếu 3 cổng: cổng
-  nhà hàng Thủy Tạ khớp trong ~60–80 m, nhưng Cổng số 1 và 1A lệch ~190 m so với
-  nút `barrier=gate` gần nhất — OSM không đặt tên các cổng nên có thể là cổng khác,
-  hoặc phép khớp chưa đủ chính xác ở đó. Cần điểm đối chiếu thực địa (GPS tại cổng,
-  cầu, ngã ba) để chốt; không dùng để dẫn đường trước khi làm việc này.
-
-## Minh họa 2 (ảnh "Đầm Sen Khô" thứ hai) — khớp được nhưng độ tin cậy thấp
-
-Ảnh vẽ cả viền công viên (có thùy tây bắc, thùy tây nam) trên nền xanh nhạt, nên
-khớp bằng **viền công viên + hồ** so với ranh giới OSM (way 32735046) và hồ
-(`fit_silhouette.py`, chạy lại được). Đã thử 3 cách:
-
-| Cách | Kết quả |
-|---|---|
-| Viền + hồ, affine (cách chọn) | xoay ~300°; trùng viền 0,58; trùng hồ **0,31**; 0,9% đường OSM rơi xuống nước; 72% đường OSM nằm trong viền ảnh |
-| Chỉ ưu tiên hồ | trùng hồ 0,33 nhưng trùng viền chỉ 0,50 |
-| Qua bản đồ chính thức bằng 7 điểm chung (cổng, đảo, đài phun, cầu, ao) | sai số trung bình ~120 m, vẽ OSM co nhỏ một nửa → bỏ |
-
-Kết luận: ảnh này **không phải bản vẽ tỉ lệ thật** — hồ là một hình tam giác lớn
-cộng một hồ phía tây tách riêng, vị trí các cổng so với hồ khác bản chính thức, thùy
-tây nam là khu vườn không có ao như trong OSM. Nó nhìn đẹp nhưng không có phép
-biến đổi đơn giản nào khớp tốt (hồ chỉ trùng ~31%, kém ảnh minh họa 1 là 53% và
-bản chính thức là 83%). Trong app nó được gắn nhãn "Minh họa 2 (độ tin cậy thấp)".
-
-Khuyến nghị: dùng ảnh này chỉ để xem. Nếu muốn dùng thật thì cần vẽ lại cho đúng
-bố cục (hoặc nắn từng vùng bằng nhiều điểm đối chiếu thực địa — ảnh sẽ bị biến
-dạng nhiều); bản chính thức vẫn là bản khớp tốt nhất cho tới nay.
-
-## Minh họa 3 — khớp đúng với đường OSM (ảnh nên dùng)
-
-Ảnh thứ ba vẽ sẵn mạng đường đi bộ dạng nét kem. Khớp bằng chính các nét đường đó
-(`fit_paths.py`, chạy lại được): trích mạng đường kem từ ảnh, rồi tìm phép affine đặt
-đường OSM lên đúng các nét này.
-
-| Chỉ số | Giá trị |
-|---|---|
-| Sai số trung bình đường OSM ↔ đường vẽ | **~2,7 m** |
-| Điểm đường OSM nằm trong ≤ 3 pixel (nửa độ phân giải) so với đường vẽ | **88%** (điểm xuất phát chỉ 75%) |
-| Góc xoay | −0,07° — ảnh vẽ **hướng bắc ở trên**, đúng với OSM |
-| Tỉ lệ | ~0,77 m/pixel, gần như đều (0,78 × 0,76) |
-
-Kiểm tra độc lập (không dùng để khớp): chồng hồ chính và ao tây nam của OSM lên ảnh —
-nhìn bằng mắt viền hồ OSM bám đúng hồ vẽ (chiều dài bắc–nam, ao tây nam gần như
-trùng khít). Con số máy chỉ ra 43% hồ OSM phủ "nước vẽ" (IoU 0,36) vì bộ lọc màu không
-tính vùng sen/bèo và bọt đài phun là nước; hòn đảo OSM lệch khoảng vài chục mét so
-với đảo vẽ.
-
-Kết luận: đường dẫn (OSM) và đường trong ảnh trùng nhau, nên tuyến và chấm vị trí sẽ
-nằm đúng trên đường vẽ. Đây là ảnh đầu tiên đủ tốt để làm lớp hiển thị chính; trong
-app nó là ảnh mặc định của mục **Mới**. Giới hạn: ảnh khớp với *đường OSM* (chưa
-kiểm tra thực địa), không chứng minh OSM đúng với thực tế; phần ngoài mạng đường
-(nhà, cây, hồ) là minh họa.
-
-## Minh họa 4 — cùng bố cục với ảnh 3, khớp sát hơn (ảnh mặc định)
-
-Ảnh thứ tư có cùng bố cục với ảnh 3 nhưng nét đường màu be (không viền xanh). Khớp bằng
-`fit_paths.py --path-color 248,216,184` (bắt đầu từ ước lượng khung bao, **không** lấy
-phép biến đổi của ảnh 3):
+```bash
+python3 apps/visitor-web/scripts/georeference-illustrated-map/fit_paths.py \
+  --image apps/visitor-web/public/maps/damsen-map.jpg \
+  --out apps/visitor-web/public/maps/damsen-map.georef.json \
+  --path-color 248,216,184 --tolerance 32
+```
 
 | Chỉ số | Giá trị |
 |---|---|
 | Sai số trung bình đường OSM ↔ đường vẽ | **~0,8 m** |
-| Điểm đường OSM trong ≤ 3 pixel (nửa độ phân giải) | **94%** (điểm xuất phát 83%) |
-| Góc xoay / tỉ lệ | −0,4° (hướng bắc ở trên) / ~0,77 m/pixel |
-| So với ảnh 3 | bốn góc ảnh chênh nhau chỉ 3–5 m: cùng bố cục, độ chính xác tương đương |
+| Điểm đường OSM trong ≤ 3 pixel (nửa độ phân giải) | **94%** (xuất phát từ ước lượng khung bao: 83%) |
+| Góc xoay | −0,4° — ảnh vẽ **hướng bắc ở trên** |
+| Tỉ lệ | ~0,77 m/pixel, gần như đều (0,78 × 0,76) |
 
-Khi khởi tạo từ phép biến đổi của ảnh 3 (`--init-from`) kết quả trùng với cách trên
-(bốn góc cách nhau ≤ 1,5 m), nên không phải kết quả của cách chọn điểm xuất phát.
-Màu đường được xác định từ chính ảnh. Kiểm tra độc lập bằng hồ cho kết quả như ảnh 3
-(bộ lọc màu hồ chỉ bắt được ~38% vì sen/bèo không tính là nước).
+Khởi tạo từ phép biến đổi của một ảnh cùng bố cục khác (`--init-from`) cho kết quả trùng
+(các góc cách nhau ≤ 1,5 m), nên kết quả không phụ thuộc điểm xuất phát.
 
-Ảnh 4 là ảnh mặc định của mục **Mới**; ảnh 3 vẫn có trong ô chọn. Cả hai chỉ chứng
-minh khớp với *đường OSM*, chưa phải với thực địa.
+## Giới hạn (đọc trước khi tin)
 
+- **Chỉ chứng minh ảnh khớp với đường OSM**, không chứng minh OSM đúng ngoài đời — dữ liệu
+  OSM chưa được khảo sát thực địa (B01). Cần vài điểm đo GPS tại cổng và ngã ba lớn.
+- Kiểm tra độc lập bằng hồ chỉ cho ~38% (bộ lọc màu không tính sen/bèo/bọt phun là
+  nước); bằng mắt viền hồ và ao tây nam của OSM bám đúng hồ vẽ, hòn đảo OSM lệch vài chục
+  mét. Phần ngoài mạng đường (nhà, cây, hồ) là minh họa.
+- **Quyền sử dụng ảnh chưa được xác nhận** (B01).
+
+## Các ảnh đã thử và bỏ
+
+Trong quá trình chọn đã thử 4 ảnh khác, kể cả bản đồ chính thức của công viên (khớp được
+nhưng là tài liệu của bên thứ ba nên chưa dùng) và hai ảnh minh họa không đúng tỉ lệ (hồ
+trùng 0,31–0,53 so với OSM). Không còn nằm trong repo. Điều đáng nhớ: các ảnh đó đều bị
+xoay ~100° so với hướng bắc; chỉ ảnh chốt vẽ hướng bắc ở trên.

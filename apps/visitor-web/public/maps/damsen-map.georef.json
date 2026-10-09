@@ -1,7 +1,7 @@
 {
   "status": "fitted-to-osm-paths",
   "method": "affine fit of the OSM footpaths onto the cream paths painted in the picture (path colour given: 248,216,184, tolerance 32; started from a bounding-box guess, not from another picture)",
-  "image": "damsen-illustrated-4.jpg",
+  "image": "damsen-map.jpg",
   "imageSizePx": [1157, 1360],
   "rotationDegrees": -0.38,
   "metresPerPixel": [0.777, 0.761],
