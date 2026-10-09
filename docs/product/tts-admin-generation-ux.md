@@ -32,7 +32,7 @@ contract v1 trong `docs/plans/CONG_TU_WORK_SPLIT.md`; vận hành:
 | (chưa có) | Nút "Tạo audio AI" (khoá + lý do nếu chưa đủ điều kiện) | Tạo |
 | `queued` | "Đang chờ xử lý", bước 1/3 | Huỷ |
 | `running` | "Đang tạo audio", bước 2/3 | Huỷ |
-| `succeeded` | "Đã tạo xong — audio được gắn vào bản nháp", nghe thử + provenance | Tạo lại |
+| `succeeded` | "Đã tạo xong audio AI (chỉ cho bản nháp, chưa xuất bản)", provenance; nghe thử nếu có URL, nếu không thì nói rõ bản nháp đã/chưa có audio (I01) | Tạo lại (cần transcript mới — cùng transcript + model version trả lại job cũ) |
 | `failed` | "Tạo audio thất bại — <mô tả theo errorCode>" | Thử lại |
 | `cancelled` | "Đã huỷ tạo audio" | Thử lại |
 
@@ -44,8 +44,12 @@ contract v1 trong `docs/plans/CONG_TU_WORK_SPLIT.md`; vận hành:
 - Polling tự động (0,8 s → tối đa 5 s), dừng ở trạng thái kết thúc; sau 3 lỗi
   mạng liên tiếp thì dừng và cho "Kiểm tra lại".
 - Chỉ hiển thị mã lỗi ổn định (`TTS_TIMEOUT`, `TTS_AUDIO_INVALID`,
-  `TTS_PROVIDER_ERROR`, …) dưới dạng câu tiếng Việt; không hiện stack hay nội
-  dung nội bộ.
+  `TTS_PROVIDER_ERROR`, `AI_FEATURE_DISABLED`, …) dưới dạng câu tiếng Việt;
+  lỗi khi tạo job theo `code` của API (`NARRATION_LOCALE_DISABLED`,
+  `TTS_JOB_LOCALE_MISMATCH`, `TTS_JOB_TRANSCRIPT_EMPTY`, quota
+  `rate_limited`/`concurrency_limited`, HTTP 429/503); không hiện stack hay
+  message nội bộ của server.
+- Job `queued` quá 2 phút: ghi chú "máy chủ có thể chưa chạy worker", cho huỷ.
 - Quyền hiển thị (UI; backend RBAC là nguồn quyết định): VISITOR không thấy;
   REVIEWER thấy khu vực nhưng không tạo; EDITOR/ADMIN tạo cho bản draft/rejected.
 
@@ -65,6 +69,10 @@ contract v1 trong `docs/plans/CONG_TU_WORK_SPLIT.md`; vận hành:
 Theo ADR 0006 không thêm màn hình mới; chỉ đảm bảo transport nhận mọi mã BCP 47.
 
 ## Khoảng trống contract (đề xuất cho Công, không tự sửa)
+
+Kiểm chứng với backend thật ở I01: cả bốn mục dưới đây **vẫn mở** (xem
+`docs/runbooks/frontend-i01-integration-report.md` §4 cho danh sách I02 kèm
+file:line). UI giữ cách xử lý suy giảm an toàn.
 
 - Job/narration chưa có URL audio để admin nghe lại bản nháp do AI tạo
   (`AdminNarration.audio` không có `playbackUrl`); demo dùng âm báo cục bộ.

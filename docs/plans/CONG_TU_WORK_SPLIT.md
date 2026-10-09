@@ -184,10 +184,10 @@ thời gian rảnh trước checkpoint này.
 
 ### I01 — Adapter swap — Owner: Tú
 
-- [ ] Thay mock locale port bằng generated API client của Công.
-- [ ] Thay mock TTS job port bằng endpoints thật.
-- [ ] Không đổi UI state machine nếu contract v1 được giữ đúng.
-- [ ] Giữ fixtures cho unit/component tests; chỉ E2E dùng backend thật.
+- [x] Thay mock locale port bằng generated API client của Công.
+- [x] Thay mock TTS job port bằng endpoints thật.
+- [x] Không đổi UI state machine nếu contract v1 được giữ đúng.
+- [x] Giữ fixtures cho unit/component tests; chỉ E2E dùng backend thật.
 
 ### I02 — Contract/integration fixes — Owner: Công
 

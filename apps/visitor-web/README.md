@@ -54,5 +54,7 @@ Ngôn ngữ thuyết minh độc lập với ngôn ngữ giao diện VI/EN: danh
 `GET /v1/narration-locales`, lựa chọn được nhớ trong `localStorage`
 (`damsen.visitor.narrationLocale.v1`), có thông báo khi API trả bản fallback,
 audio đã xuất bản được ưu tiên hơn Web Speech và Web Speech dùng `speechTag`.
-`NEXT_PUBLIC_NARRATION_DATA_MODE=demo` dùng fixture VI/EN/FR (VI có âm báo demo,
-FR rơi về EN). Xem `docs/runbooks/frontend-narration-locales-tts.md`.
+`NEXT_PUBLIC_NARRATION_DATA_MODE=api|demo` (mặc định `api`, đã kiểm với backend
+thật ở I01: locale thêm bằng config như FR tự xuất hiện). `demo` dùng fixture
+VI/EN/FR (VI có âm báo demo, FR rơi về EN). Xem
+`docs/runbooks/frontend-narration-locales-tts.md`.
