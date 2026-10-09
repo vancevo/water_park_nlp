@@ -64,14 +64,19 @@ export function useTtsJob(
   useEffect(() => {
     if (!port?.latest || !narrationId) return;
     const started = epoch.current;
+    // The job this page session was already tracking (locale-tab remount).
+    const trackedId = inFlightTtsJob(narrationId)?.id;
     let cancelled = false;
     port
       .latest(narrationId)
       .then((job) => {
         if (cancelled || epoch.current !== started || !job) return;
-        // A job that already finished before this mount was not produced by
-        // this page; do not reload the draft for it.
-        if (job.status === 'succeeded') notified.current.add(job.id);
+        // A job that finished before a page reload is already reflected in the
+        // freshly loaded draft; do not reload it again. A job this page was
+        // tracking (remount) that finished meanwhile still must reload the
+        // draft, or its attached audio would not show.
+        if (job.status === 'succeeded' && job.id !== trackedId)
+          notified.current.add(job.id);
         dispatch({ type: 'job_restored', job });
       })
       .catch(() => {});

@@ -103,7 +103,11 @@ export function ttsJobReducer(
       const current = state.job;
       if (
         current &&
-        (current.id !== event.job.id || isTerminalTtsStatus(current.status))
+        (current.id !== event.job.id ||
+          isTerminalTtsStatus(current.status) ||
+          // A poll may already have seen a newer status of this job than the
+          // latest-job response, which was requested at mount.
+          Date.parse(event.job.updatedAt) < Date.parse(current.updatedAt))
       )
         return state;
       return {

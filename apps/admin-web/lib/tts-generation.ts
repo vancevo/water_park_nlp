@@ -230,16 +230,20 @@ export function createHttpTtsGenerationPort(
 export type TtsGenerationMode = 'off' | 'demo' | 'api';
 
 /**
- * Independent build-time feature flag. Default `api` since I03 (real worker,
- * draft attach, AI08 kill switch/quota verified end to end; see
- * docs/runbooks/frontend-i03-acceptance-report.md). `off` hides the panel and is
- * the rollback; an unrecognised value also stays `off` (fail safe).
+ * Independent build-time feature flag; fails closed. Only an explicit `api`
+ * (or `demo`/`test`) shows the panel: a missing, empty or unrecognised value
+ * stays `off`. The real endpoints were verified end to end at I03 (real worker,
+ * draft attach, AI08 kill switch/quota; see
+ * docs/runbooks/frontend-i03-acceptance-report.md), but turning generation on
+ * for a release is the I04 gate's call: there is no production voice yet and
+ * the backend kill switch defaults to enabled, so a default `api` build would
+ * offer editors a button whose jobs can only fail.
  */
 export function ttsGenerationMode(
   value = process.env.NEXT_PUBLIC_TTS_GENERATION_MODE,
 ): TtsGenerationMode {
   if (value === 'demo' || value === 'test') return 'demo';
-  if (value === undefined || value === '' || value === 'api') return 'api';
+  if (value === 'api') return 'api';
   return 'off';
 }
 

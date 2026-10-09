@@ -11,9 +11,9 @@ backend: `backend-i02-integration-fixes.md`.
 |---|---|---|---|
 | 1 | Config thêm FR → admin/visitor tự xuất hiện | **PASS** | §3.1 — tabs `Tiếng Việt · English · Français (Chưa có)`, select `vi, en, fr`; bỏ FR khỏi config → tabs/select chỉ còn `vi, en`, admin báo "ngôn ngữ đang tắt (FR)" |
 | 2 | Transcript → generate → running → draft audio → review → publish | **PASS** (provider giả, S3 emulator) | §3.2 — VI và FR: `queued → running → succeeded` bởi **worker thật**, reload → bản nháp có audio AI + provenance, nghe được qua playback URL (sha256 khớp), gửi duyệt → duyệt → `published` |
-| 3 | Visitor chọn locale, nghe đúng audio hoặc thấy fallback | **PASS** | §3.3 — `fr`/`vi` phát đúng byte audio đã xuất bản (sha256 khớp, `currentTime` tăng); POI không có FR → "Chưa có thuyết minh Français; đang hiển thị bản English." |
+| 3 | Visitor chọn locale, nghe đúng audio hoặc thấy fallback | **PASS** (audio từ provider giả, phục vụ qua S3 emulator) | §3.3 — `fr`/`vi` phát đúng byte audio đã xuất bản (sha256 khớp, `currentTime` tăng); POI không có FR → "Chưa có thuyết minh Français; đang hiển thị bản English." |
 | 4 | Chạy corpus T06 qua provider được chọn và xuất benchmark cuối | **PARTIAL** | §3.4 — toàn bộ 64 câu qua benchmark worker + báo cáo `tts-evaluation-report/v1` hợp lệ, **nhưng provider là âm sine giả** (Piper bị chặn 403) và chưa có blind review → chỉ là kiểm tra pipeline, chưa có provider được chọn. Không tick |
-| 5 | Hybrid search flag on/off đều hoạt động | **PASS** (embedder giả) | §3.5 — off, on (không embedder), on (embedder sập), on (embedder giả + pgvector): đều trả kết quả, thứ hạng không đổi, chỉ chế độ có embedder gắn lý do `semantic` (33/33 kết quả) |
+| 5 | Hybrid search flag on/off đều hoạt động | **PASS** (chỉ về chức năng; embedder giả) | §3.5 — off, on (không embedder), on (embedder sập), on (embedder giả + pgvector): đều trả kết quả, không lỗi, chỉ chế độ có embedder gắn lý do `semantic` (33/33 kết quả). **Không** chứng minh chất lượng: số liệu giống hệt ở cả bốn chế độ (Recall@10 0,600) và search sống thấp hơn nhiều so với baseline đã commit (Recall@10 0,600 vs 0,911; zero-result 0,46 vs 0,10) — chuyển Công/I04 (§5) |
 
 I01 chuyển **DONE**: E2E thật giờ chạy qua tiến trình worker thật
 (`node apps/worker/dist/worker.js`), không còn harness claim ngoài repo.
@@ -63,7 +63,8 @@ Job log (từ response trình duyệt) và chi tiết từng bước:
 `scratchpad/i03/e2e-evidence.json`. Không có `pageerror`.
 
 Browser smoke admin `SMOKE_MODE=api SMOKE_FAIL_MARKER='[fail]'` (PASS, bản
-build mặc định mới — không đặt `NEXT_PUBLIC_TTS_GENERATION_MODE`):
+build `NEXT_PUBLIC_TTS_GENERATION_MODE=api`; lần chạy gốc dùng bản build mặc
+định khi mặc định còn là `api`, chạy lại sau review — xem §4):
 
 ```text
 GET(latest) 200 - none
@@ -159,14 +160,23 @@ quả với 5 POI. Quan sát cho Công ở §5 (chênh lệch so với baseline)
 - Guard: bản `rejected` phải lưu lại (về `draft`) trước khi tạo audio — khớp
   backend v1.1.
 - Fixture demo: `artifact` trên job `succeeded` + `latest()`.
-- **Mặc định `NEXT_PUBLIC_TTS_GENERATION_MODE` = `api`** (trước: `off`). Ba
-  lý do giữ `off` ở I01 đã được I02 xử lý và kiểm lại ở đây: worker thật tiêu
-  thụ hàng đợi, kill switch/quota hoạt động ở API (UI hiện câu tiếng Việt),
-  audio được gắn vào bản nháp và chỉ reviewer xuất bản. Backend vẫn là nguồn
-  quyết định: tắt nhanh bằng `TTS_GENERATION_ENABLED=false` (503, không rebuild);
-  ẩn hẳn panel bằng rebuild với `off`. Lưu ý vận hành: môi trường chưa có
-  voice thật (Piper) phải đặt kill switch `false`, nếu không job sẽ fail với
-  `TTS_MODEL_UNAVAILABLE`/`TTS_PROVIDER_ERROR` (hiển thị rõ, không xuất bản gì).
+- **Mặc định `NEXT_PUBLIC_TTS_GENERATION_MODE` giữ `off`, fail closed**
+  (thiếu/rỗng/giá trị lạ → `off`; chỉ `api`/`demo` tường minh mới hiện panel).
+  Bản đầu của I03 đổi mặc định sang `api`; review đã hoàn lại vì:
+  1. Chưa có voice production (Piper 403) và chưa có storage thật (B03). Kill
+     switch backend `TTS_GENERATION_ENABLED` mặc định **bật**, API không có
+     manifest vẫn nhận job với voice fallback mà không worker nào phục vụ →
+     job fail `TTS_MODEL_UNAVAILABLE` (hoặc kẹt `queued` nếu chưa chạy worker).
+     Một bản build mặc định `api` sẽ cho editor một nút chỉ có thể thất bại.
+  2. Tắt kill switch thì an toàn (503 → câu tiếng Việt, kiểm ở §3.2) nhưng
+     panel vẫn hiện với nút luôn lỗi — không phải trạng thái phát hành tốt.
+  3. Cờ build-time: thiếu cấu hình nên được xử lý như giá trị lạ (fail closed),
+     không phải bật tính năng.
+  4. Quyết định bật cho production thuộc release gate I04 (Công), khi có voice
+     thật + B03; I02 vẫn ở REVIEW.
+  Staging/acceptance build với `NEXT_PUBLIC_TTS_GENERATION_MODE=api` (đã kiểm
+  E2E ở đây). Khi bật: giữ `TTS_GENERATION_ENABLED=false` ở mọi môi trường chưa
+  có voice thật; rollback = rebuild với `off` hoặc tắt kill switch backend.
 
 ## 5. Vấn đề cho Công (I04 follow-up)
 
@@ -175,6 +185,7 @@ quả với 5 POI. Quan sát cho Công ở §5 (chênh lệch so với baseline)
 | Thông tin/gap | `PoiNarration` công khai không có cờ/provenance AI → visitor không thể ghi chú "AI-generated" (chỉ có chuỗi tự do trong `rightsSource`) | `apps/api/src/narration/narration.service.ts:46-91` (`published`); `packages/shared-types/src/index.ts:295-303` |
 | Trung bình | Search sống (Postgres lexical) chênh lớn so với baseline đã commit: Recall@10 0,600 vs 0,911; zero-result 0,46 vs 0,10. 9/10 truy vấn `semantic_intent` và 9/9 `category_location` trả 0 kết quả. Vì hybrid chỉ re-rank tập lexical (ADR 0012), bật hybrid **không thể** cứu các truy vấn này; gate "không hồi quy so với baseline" của runbook cần so với baseline của API thật | `apps/api/src/search/search.service.ts:101-146`; `data/search-evaluation/baseline_report.json`; `docs/runbooks/backend-hybrid-search.md` §Preconditions 3 |
 | Thông tin | Locale bị tắt (`?locale=fr` khi FR off) trả bản mặc định với `fallbackUsed: true` thay vì 400 — chấp nhận được, chỉ cần ghi trong runbook | `apps/api/src/narration/narration.service.ts:46-64` (`published`) |
+| Cao | `ParseUUIDPipe()` mặc định từ chối một số id narration seed dạng md5 (bit variant không theo RFC 4122, ví dụ `7a690593-2654-1ea1-4f71-…`, `36f81b11-bca4-ac9d-…`) → 400 `Validation failed (uuid is expected)` trên `GET …/tts-jobs/latest` và `GET …/audio/playback` (đã thử trực tiếp trên API I03), và (theo code, chưa thử) cùng pipe ở PATCH/submit/approve/reject/delete. I02-9 chỉ bỏ ràng buộc version, chưa bỏ ràng buộc variant. E2E I03 không lộ ra vì chỉ dùng revision mới (UUID v4); log job của lần chạy E2E có `GET(latest) 400`. UI chỉ nuốt lỗi latest và hiện câu tiếng Việt cho playback | `apps/api/src/narration/admin-narration.controller.ts` (`new ParseUUIDPipe()` cho `:id`), `apps/api/src/narration/admin-tts-job.controller.ts:41` |
 | Vẫn mở | B03 (MinIO/S3 thật) và voice thật (Piper 403) — I03 chạy trên moto + provider giả | `backend-i02-integration-fixes.md` §3 |
 
 ## 6. Tái hiện
@@ -185,7 +196,7 @@ PGPASSWORD=… psql -h 127.0.0.1 -p 64321 -U damsen -d damsen -c 'CREATE DATABAS
 psql … -d damsen_i03 -f infra/docker/init-postgres.sql
 DATABASE_URL=…/damsen_i03 npm run db:migrate
 moto_server -H 127.0.0.1 -p 3290 &          # dev-only S3 emulator
-npm run build
+NEXT_PUBLIC_TTS_GENERATION_MODE=api npm run build   # mặc định off ẩn panel
 # API (:3000) + worker: env như backend-i02-integration-fixes.md §4, thêm
 #   NARRATION_LOCALES_CONFIG_PATH=<file tạm có fr> S3_ENDPOINT=http://127.0.0.1:3290
 #   TTS_VOICES_MANIFEST_PATH=<manifest vi/en/fr> TTS_WORKER_ENGINE=cli
