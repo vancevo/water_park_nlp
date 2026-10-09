@@ -60,3 +60,76 @@ export function lexicalScore(
       fuzzyName,
   };
 }
+
+// Function words and meta words ("category", "POI") that match nearly every
+// record. Compared after normalizeSearchText (lower case, no diacritics).
+const STOPWORDS = new Set([
+  // Vietnamese
+  'cho',
+  'cua',
+  'va',
+  'la',
+  'o',
+  'noi',
+  'cac',
+  'nhung',
+  'mot',
+  'de',
+  'den',
+  'toi',
+  'muon',
+  'xem',
+  'ca',
+  'voi',
+  'tai',
+  'tu',
+  'nay',
+  'do',
+  'nao',
+  'gi',
+  // English
+  'a',
+  'an',
+  'the',
+  'for',
+  'of',
+  'to',
+  'in',
+  'on',
+  'at',
+  'and',
+  'or',
+  'is',
+  'are',
+  'how',
+  'what',
+  'where',
+  'i',
+  'want',
+  'see',
+  'place',
+  // Meta words about the catalogue itself
+  'category',
+  'categories',
+  'poi',
+  'pois',
+]);
+
+/**
+ * Significant query terms for OR-style matching. A record matches when it
+ * contains at least `minMatch` of them (half, rounded up), so a natural
+ * sentence still finds the right POI while a query that only shares one common
+ * word with the catalogue ("nhà hàng pizza" vs "Nhà Khám Phá") returns nothing.
+ * When every word is a stopword the plain tokens are used instead.
+ */
+export function searchTerms(query: string): {
+  terms: string[];
+  minMatch: number;
+} {
+  const tokens = [...new Set(normalizeSearchText(query).split(' '))].filter(
+    Boolean,
+  );
+  const significant = tokens.filter((token) => !STOPWORDS.has(token));
+  const terms = significant.length > 0 ? significant : tokens;
+  return { terms, minMatch: Math.max(1, Math.ceil(terms.length / 2)) };
+}

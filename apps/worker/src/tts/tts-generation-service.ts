@@ -141,8 +141,8 @@ export class TtsGenerationService {
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
       record.attempts = attempt;
       try {
-        const result = await withTimeout(
-          this.provider.synthesize(synthesisRequest),
+        const result = await runWithTimeout(
+          (signal) => this.provider.synthesize({ ...synthesisRequest, signal }),
           timeoutMs,
         );
         validateSynthesizedAudio(result, this.audioLimits);
@@ -283,6 +283,32 @@ export async function withTimeout<T>(
   });
   try {
     return await Promise.race([promise, timeout]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+/**
+ * Like {@link withTimeout}, but hands the call an AbortSignal that fires when the
+ * timeout does, so the provider can kill its process instead of leaving it
+ * running outside the quota.
+ */
+export async function runWithTimeout<T>(
+  run: (signal: AbortSignal) => Promise<T>,
+  ms: number,
+): Promise<T> {
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new TtsTimeoutError());
+    }, ms);
+  });
+  const attempt = run(controller.signal);
+  attempt.catch(() => undefined); // a late failure after the timeout is already handled
+  try {
+    return await Promise.race([attempt, timeout]);
   } finally {
     if (timer) clearTimeout(timer);
   }

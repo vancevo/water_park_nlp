@@ -30,6 +30,11 @@ export interface TtsSynthesisRequest {
   config: Record<string, string | number | boolean>;
   /** Deterministic seed when the provider supports it. */
   seed: number | null;
+  /**
+   * Aborted when the per-attempt timeout fires. A provider must stop its engine
+   * process then, so a timed-out attempt cannot keep running beside the retry.
+   */
+  signal?: AbortSignal;
 }
 
 /** Lossless intermediate produced by a provider (WAV before release encoding). */

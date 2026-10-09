@@ -44,7 +44,7 @@
 | T35-SIM2 Auto chibi simulation | DONE | web agent | T35-SIM | Five-second elapsed-time playback, detail closes on guidance, 6-frame indie spritesheet; 6 visitor tests + build pass |
 | T35-SIM3 Compact controls | DONE | web agent | T35-SIM2 | Compact-by-default simulation pill with accessible expand/collapse; visitor checks pass |
 | T35-SIM4 Preserve map zoom | DONE | web agent | T35-SIM3 | Simulation preserves current zoom; real-GPS routes retain fitBounds; visitor checks pass |
-| T40 Lexical/spatial search | DONE | search agent | W2, W4 | API + migration 007 + real DB smoke; HTTP eval Recall@10 0.60 |
+| T40 Lexical/spatial search | DONE | search agent | W2, W4 | API + migration 007 + real DB smoke; HTTP eval Recall@10 0.60 → 0.90 after L3 (OR + min-match + category in document; `backend-hybrid-search.md`); ADR 0012 gate (≥0.911) still 0.011 short |
 | T41 Search evaluation | DONE | search evaluation agent | T40 | 50-query VI/EN dataset reconciled with authoritative fixtures |
 | T42 Embedding pipeline | IN_PROGRESS | worker agent | T41 | Versioned/hash-idempotent pipeline + pgvector schema; production provider benchmark remains |
 | T43 Hybrid ranking | IN_PROGRESS | Công backend | T40–T42 | RRF re-ranking + `SEARCH_HYBRID_ENABLED` flag + lexical fallback + `semantic` reason on `codex/cong-ai07-hybrid-search` (ADR 0012); prod embedding endpoint + 50-query eval at I03 |
