@@ -24,8 +24,9 @@ export interface TtsGenerationPort {
   cancel(jobId: string): Promise<TtsGenerationJob>;
   /**
    * Optional local preview of a succeeded job. Contract v1 has no audio URL on
-   * the job; the API adapter therefore omits it and the reviewer listens to the
-   * draft narration after it reloads (see contract gap in the runbook).
+   * the job and (verified at I01) the backend does not attach the generated
+   * audio to the draft yet, so the API adapter omits it; the panel then states
+   * honestly whether the reloaded draft carries audio (see the I01 report).
    */
   previewAudio?(job: TtsGenerationJob): Promise<Blob | null>;
 }
@@ -216,20 +217,47 @@ export function getTtsGenerationPort(): TtsGenerationPort | null {
   return port;
 }
 
+/**
+ * Stable request-level error codes returned by the real AI04 endpoints (and the
+ * AI08 controls once they are wired at the API boundary). Messages are
+ * user-facing Vietnamese; the server message is never shown because it can
+ * contain internal detail (validation paths, locale strings).
+ */
+const REQUEST_ERROR_LABELS: Record<string, string> = {
+  NARRATION_LOCALE_DISABLED:
+    'Ngôn ngữ này đang tắt trong cấu hình nên không thể tạo audio AI.',
+  TTS_JOB_LOCALE_MISMATCH:
+    'Ngôn ngữ yêu cầu không khớp ngôn ngữ của bản thuyết minh. Tải lại trang rồi thử lại.',
+  TTS_JOB_TRANSCRIPT_EMPTY: 'Bản thuyết minh chưa có nội dung để tạo audio.',
+  AI_FEATURE_DISABLED:
+    'Tính năng tạo audio AI đang tạm tắt (kill switch). Thử lại sau hoặc liên hệ quản trị.',
+  rate_limited: 'Đã vượt hạn mức tạo audio. Thử lại sau ít phút.',
+  concurrency_limited:
+    'Đang có quá nhiều job tạo audio chạy cùng lúc. Thử lại sau ít phút.',
+};
+
 /** Maps transport failures to user-facing Vietnamese text without leaking internals. */
 export function ttsRequestErrorMessage(cause: unknown): string {
   if (cause instanceof ApiClientError) {
+    const known = REQUEST_ERROR_LABELS[cause.body?.code ?? ''];
+    if (known) return known;
+    if (cause.status === 400)
+      return 'Yêu cầu tạo audio không hợp lệ. Tải lại trang rồi thử lại.';
     if (cause.status === 401)
       return 'Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.';
     if (cause.status === 403) return 'Tài khoản không có quyền tạo audio AI.';
     if (cause.status === 404)
-      return 'Không tìm thấy bản thuyết minh hoặc job tạo audio.';
+      return 'Không tìm thấy bản thuyết minh hoặc job tạo audio (job cũ có thể đã bị dọn theo chính sách lưu trữ).';
     if (cause.status === 409)
       return 'Trạng thái bản thuyết minh không cho phép thao tác này.';
-    if (cause.status === 429) return 'Đã vượt hạn mức tạo audio. Thử lại sau.';
+    if (cause.status === 429) return REQUEST_ERROR_LABELS.rate_limited!;
+    if (cause.status === 503)
+      return 'Dịch vụ tạo audio AI đang tạm ngừng. Thử lại sau.';
     return `Máy chủ không xử lý được yêu cầu (HTTP ${cause.status}).`;
   }
-  return cause instanceof Error
+  // Network failures surface as TypeError ("Failed to fetch"); app-level
+  // errors (e.g. missing session) already carry Vietnamese text.
+  return cause instanceof Error && !(cause instanceof TypeError)
     ? cause.message
     : 'Không thể kết nối dịch vụ tạo audio.';
 }

@@ -17,6 +17,7 @@ import {
   TTS_STATUS_LABELS,
   canCancelJob,
   canRetryJob,
+  isQueuedStalled,
   ttsErrorLabel,
   ttsGenerationGuard,
 } from '@/lib/tts-job-machine';
@@ -24,7 +25,7 @@ import {
 const STEPS: { status: TtsJobStatus; label: string }[] = [
   { status: 'queued', label: 'Xếp hàng' },
   { status: 'running', label: 'Đang tạo' },
-  { status: 'succeeded', label: 'Gắn vào bản nháp' },
+  { status: 'succeeded', label: 'Hoàn tất' },
 ];
 
 /**
@@ -62,6 +63,7 @@ export function TtsGenerationPanel({
   const { state, generate, cancel, resume } = tts;
   const job = state.job;
   const previewUrl = usePreviewUrl(port, job);
+  const stalled = useQueuedStall(job);
   if (!guard.visible) return null;
 
   const active = Boolean(job && !isTerminalTtsStatus(job.status));
@@ -175,6 +177,12 @@ export function TtsGenerationPanel({
           ))}
         </ol>
       )}
+      {stalled && (
+        <p className="helper">
+          Job đã chờ hơn 2 phút mà chưa được xử lý. Máy chủ có thể chưa chạy
+          worker tạo audio; bạn có thể huỷ và thử lại sau.
+        </p>
+      )}
       {state.error && (
         <div className="alert error" role="alert">
           <span>{state.error}</span>
@@ -212,15 +220,16 @@ export function TtsGenerationPanel({
       {job?.status === 'succeeded' && (
         <div className="audio-preview ai-preview">
           <b>
-            <span className="ai-badge">AI-generated</span> Nghe thử trước khi
-            gửi duyệt
+            <span className="ai-badge">AI-generated</span>{' '}
+            {previewUrl ? 'Nghe thử trước khi gửi duyệt' : 'Kết quả tạo audio'}
           </b>
           {previewUrl ? (
             <audio controls src={previewUrl} lang={localeOption.code} />
           ) : (
             <small>
-              Audio đã được gắn vào bản nháp hiện tại. Danh sách phiên bản đã
-              tải lại; reviewer nghe bản này trước khi xuất bản.
+              {narration?.audio
+                ? 'Máy chủ chưa cung cấp đường dẫn nghe thử audio AI. Bản nháp đang có audio đính kèm; kiểm tra lại đó có phải audio AI không trước khi gửi duyệt.'
+                : 'Máy chủ chưa cung cấp đường dẫn nghe thử và chưa gắn audio AI vào bản nháp này. Bản nháp vẫn chỉ có văn bản; chưa thể gửi duyệt kèm audio AI.'}
             </small>
           )}
           <small>
@@ -230,6 +239,18 @@ export function TtsGenerationPanel({
       )}
     </section>
   );
+}
+
+/** True once a tracked job has sat in `queued` too long; re-checked every 15 s. */
+function useQueuedStall(job: TtsGenerationJob | null) {
+  const [now, setNow] = useState(() => Date.now());
+  const queued = job?.status === 'queued';
+  useEffect(() => {
+    if (!queued) return;
+    const timer = window.setInterval(() => setNow(Date.now()), 15_000);
+    return () => window.clearInterval(timer);
+  }, [queued]);
+  return isQueuedStalled(job, now);
 }
 
 /** Object URL for a local preview blob, revoked when the job changes or unmounts. */

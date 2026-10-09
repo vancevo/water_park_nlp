@@ -11,6 +11,8 @@ import {
   rememberTtsJob,
   shouldPoll,
   ttsErrorLabel,
+  isQueuedStalled,
+  QUEUED_STALL_MS,
   ttsGenerationGuard,
   trackingStateFor,
   ttsJobReducer,
@@ -101,6 +103,27 @@ describe('TTS job UI state machine', () => {
     );
     expect(next.job?.id).toBe('j2');
     expect(next.phase).toBe('tracking');
+  });
+
+  it('tracks a retry that re-enqueues the same job id (real AI04 backend)', () => {
+    const cancelled = run([
+      { type: 'create_requested' },
+      { type: 'job_received', job: job('queued') },
+      { type: 'cancel_requested' },
+      { type: 'job_received', job: job('cancelled') },
+    ]);
+    expect(canRetryJob(cancelled)).toBe(true);
+    const retried = run(
+      [
+        { type: 'create_requested' },
+        { type: 'job_received', job: job('queued') },
+        { type: 'job_received', job: job('running') },
+        { type: 'job_received', job: job('succeeded') },
+      ],
+      cancelled,
+    );
+    expect(retried.job?.status).toBe('succeeded');
+    expect(retried.phase).toBe('idle');
   });
 
   it('blocks duplicate create while a job is active and surfaces create errors', () => {
@@ -199,6 +222,21 @@ describe('TTS job UI state machine', () => {
     expect(ttsErrorLabel('TTS_TIMEOUT')).toBe('Quá thời gian tạo audio.');
     expect(ttsErrorLabel('SOMETHING_ELSE')).toBe('Lỗi không xác định.');
     expect(ttsErrorLabel()).toBe('Không rõ nguyên nhân.');
+    expect(ttsErrorLabel('AI_FEATURE_DISABLED')).toContain('kill switch');
+  });
+
+  it('flags a job stuck in queued (no worker consuming the queue)', () => {
+    const at = Date.parse('2026-10-09T00:00:00.000Z');
+    const job = {
+      status: 'queued' as const,
+      updatedAt: new Date(at).toISOString(),
+    };
+    expect(isQueuedStalled(job, at + QUEUED_STALL_MS - 1)).toBe(false);
+    expect(isQueuedStalled(job, at + QUEUED_STALL_MS)).toBe(true);
+    expect(
+      isQueuedStalled({ ...job, status: 'running' }, at + QUEUED_STALL_MS * 5),
+    ).toBe(false);
+    expect(isQueuedStalled(null, at)).toBe(false);
   });
 });
 

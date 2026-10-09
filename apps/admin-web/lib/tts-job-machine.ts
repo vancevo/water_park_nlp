@@ -166,7 +166,7 @@ export function canRetryJob(state: TtsJobUiState): boolean {
 export const TTS_STATUS_LABELS: Record<TtsJobStatus, string> = {
   queued: 'Đang chờ xử lý',
   running: 'Đang tạo audio',
-  succeeded: 'Đã tạo xong — audio được gắn vào bản nháp',
+  succeeded: 'Đã tạo xong audio AI (chỉ cho bản nháp, chưa xuất bản)',
   failed: 'Tạo audio thất bại',
   cancelled: 'Đã huỷ tạo audio',
 };
@@ -177,7 +177,20 @@ const ERROR_LABELS: Record<string, string> = {
   TTS_PROVIDER_ERROR: 'Dịch vụ TTS gặp lỗi.',
   TTS_LOCALE_UNSUPPORTED: 'Chưa có giọng đọc cho ngôn ngữ này.',
   TTS_TRANSCRIPT_STALE: 'Nội dung đã thay đổi sau khi tạo; hãy tạo lại.',
+  AI_FEATURE_DISABLED: 'Tính năng tạo audio AI đang tạm tắt (kill switch).',
 };
+
+/** A queued job older than this suggests no worker is consuming the queue. */
+export const QUEUED_STALL_MS = 120_000;
+
+export function isQueuedStalled(
+  job: Pick<TtsGenerationJob, 'status' | 'updatedAt'> | null | undefined,
+  nowMs: number,
+): boolean {
+  if (job?.status !== 'queued') return false;
+  const since = Date.parse(job.updatedAt);
+  return Number.isFinite(since) && nowMs - since >= QUEUED_STALL_MS;
+}
 
 /** Only stable error codes are shown; unknown codes stay generic. */
 export function ttsErrorLabel(errorCode?: string): string {

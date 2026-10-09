@@ -147,6 +147,42 @@ describe('HTTP TTS generation port', () => {
     expect(ttsRequestErrorMessage('boom')).toBe(
       'Không thể kết nối dịch vụ tạo audio.',
     );
+    expect(ttsRequestErrorMessage(new TypeError('Failed to fetch'))).toBe(
+      'Không thể kết nối dịch vụ tạo audio.',
+    );
+  });
+
+  it('maps the real AI04/AI08 error codes before falling back to status', () => {
+    const coded = (status: number, code: string) =>
+      new ApiClientError(status, {
+        code,
+        message: 'Requested locale "en" does not match …',
+        details: null,
+        requestId: 'r',
+      });
+    expect(
+      ttsRequestErrorMessage(coded(400, 'NARRATION_LOCALE_DISABLED')),
+    ).toContain('đang tắt');
+    expect(
+      ttsRequestErrorMessage(coded(400, 'TTS_JOB_LOCALE_MISMATCH')),
+    ).toContain('không khớp');
+    expect(
+      ttsRequestErrorMessage(coded(400, 'TTS_JOB_TRANSCRIPT_EMPTY')),
+    ).toContain('chưa có nội dung');
+    expect(ttsRequestErrorMessage(coded(503, 'AI_FEATURE_DISABLED'))).toContain(
+      'tạm tắt',
+    );
+    expect(ttsRequestErrorMessage(coded(429, 'concurrency_limited'))).toContain(
+      'cùng lúc',
+    );
+    expect(ttsRequestErrorMessage(coded(429, 'HTTP_429'))).toContain('hạn mức');
+    // Generic validation: the server message (internal detail) is never shown.
+    const validation = ttsRequestErrorMessage(coded(400, 'BAD_REQUEST'));
+    expect(validation).toContain('không hợp lệ');
+    expect(validation).not.toContain('Requested locale');
+    expect(ttsRequestErrorMessage(coded(404, 'NOT_FOUND'))).toContain(
+      'Không tìm thấy',
+    );
   });
 });
 
