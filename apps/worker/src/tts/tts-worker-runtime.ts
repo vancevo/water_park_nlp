@@ -171,9 +171,23 @@ export function startTtsWorker(
     Pool: new (options: {
       connectionString: string;
       max?: number;
-    }) => SqlTransactionalPool & { end(): Promise<void> };
+    }) => SqlTransactionalPool & {
+      end(): Promise<void>;
+      on(
+        event: 'error',
+        listener: (error: Error & { code?: string }) => void,
+      ): void;
+    };
   };
   const pool = new pg.Pool({ connectionString: config.databaseUrl, max: 8 });
+  // An idle client closed by the server (DB restart/failover) is emitted on
+  // the pool; unhandled, it kills the worker (I04 drill). The pool drops the
+  // client and the next query reconnects.
+  pool.on('error', (error) =>
+    log(
+      `tts worker: postgres idle client error ${error.code ?? error.name}; client discarded`,
+    ),
+  );
   const registry = new MetricsRegistry();
   const metrics = new TtsMetrics(registry);
   const queue = new PostgresTtsJobQueue(pool, {

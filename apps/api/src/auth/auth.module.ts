@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { createRequire } from 'node:module';
 
 import { AuthController } from './auth.controller.js';
 import { AUTH_CLOCK, AUTH_REPOSITORY, PASSWORD_HASHER } from './auth.models.js';
@@ -11,15 +10,14 @@ import { TokenService } from './token.service.js';
 import { PostgresAuthRepository } from './postgres-auth.repository.js';
 import type { AuthRepository } from './auth.models.js';
 import type { SqlClient } from '../poi/postgres-poi.repository.js';
+import { createPgPool } from '../common/pg-pool.js';
 
 function createAuthRepository(): AuthRepository {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) return new InMemoryAuthRepository();
-  const require = createRequire(import.meta.url);
-  const pg = require('pg') as {
-    Pool: new (options: { connectionString: string }) => SqlClient;
-  };
-  return new PostgresAuthRepository(new pg.Pool({ connectionString }));
+  return new PostgresAuthRepository(
+    createPgPool<SqlClient>(connectionString, 'auth'),
+  );
 }
 
 @Module({

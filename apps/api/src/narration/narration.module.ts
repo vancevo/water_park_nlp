@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { createRequire } from 'node:module';
 import { loadNarrationLocaleConfig } from '@damsen/config';
 
 import { AuthModule } from '../auth/auth.module.js';
@@ -37,15 +36,12 @@ import {
   TTS_JOB_REPOSITORY,
   type TtsJobRepository,
 } from './tts-job.models.js';
+import { createPgPool } from '../common/pg-pool.js';
 
 function sqlClient(): SqlClient | null {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) return null;
-  const require = createRequire(import.meta.url);
-  const pg = require('pg') as {
-    Pool: new (options: { connectionString: string }) => SqlClient;
-  };
-  return new pg.Pool({ connectionString });
+  return createPgPool<SqlClient>(connectionString, 'narration');
 }
 
 function createRepository(): NarrationRepository {
