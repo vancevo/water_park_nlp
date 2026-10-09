@@ -32,7 +32,7 @@ contract v1 trong `docs/plans/CONG_TU_WORK_SPLIT.md`; vận hành:
 | (chưa có) | Nút "Tạo audio AI" (khoá + lý do nếu chưa đủ điều kiện) | Tạo |
 | `queued` | "Đang chờ xử lý", bước 1/3 | Huỷ |
 | `running` | "Đang tạo audio", bước 2/3 | Huỷ |
-| `succeeded` | "Đã tạo xong — audio được gắn vào bản nháp", nghe thử + provenance | Tạo lại |
+| `succeeded` | "Đã tạo xong audio AI cho bản nháp (chưa xuất bản)", provenance (nhà cung cấp/model/phiên bản/giọng/giấy phép); chỉ nói "đã gắn vào bản nháp" khi bản nháp thật sự mang audio của job này, nếu audio đã bị thay thì nói rõ; nghe qua mục "Audio AI của phiên bản này" (playback URL, I03) | Tạo lại (cần transcript mới — cùng transcript + model version trả lại job cũ) |
 | `failed` | "Tạo audio thất bại — <mô tả theo errorCode>" | Thử lại |
 | `cancelled` | "Đã huỷ tạo audio" | Thử lại |
 
@@ -40,14 +40,23 @@ contract v1 trong `docs/plans/CONG_TU_WORK_SPLIT.md`; vận hành:
   `cancelled`, kể cả khi polling tạm dừng vì lỗi mạng) nút "Lưu thuyết minh"
   và "Gửi duyệt" bị khoá kèm lý do: audio AI không được gắn vào transcript
   hoặc trạng thái workflow khác với lúc tạo. Đổi tab ngôn ngữ rồi quay lại
-  vẫn tiếp tục theo dõi job trong cùng phiên trang.
+  vẫn tiếp tục theo dõi job trong cùng phiên trang; tải lại trang thì tiếp tục
+  theo job mới nhất từ server (`…/tts-jobs/latest`, I03).
 - Polling tự động (0,8 s → tối đa 5 s), dừng ở trạng thái kết thúc; sau 3 lỗi
   mạng liên tiếp thì dừng và cho "Kiểm tra lại".
 - Chỉ hiển thị mã lỗi ổn định (`TTS_TIMEOUT`, `TTS_AUDIO_INVALID`,
-  `TTS_PROVIDER_ERROR`, …) dưới dạng câu tiếng Việt; không hiện stack hay nội
-  dung nội bộ.
+  `TTS_PROVIDER_ERROR`, `AI_FEATURE_DISABLED`, …) dưới dạng câu tiếng Việt;
+  lỗi khi tạo job theo `code` của API (`NARRATION_LOCALE_DISABLED`,
+  `TTS_JOB_LOCALE_MISMATCH`, `TTS_JOB_TRANSCRIPT_EMPTY`, quota
+  `rate_limited`/`concurrency_limited`, HTTP 429/503); không hiện stack hay
+  message nội bộ của server.
+- Job `queued` quá 2 phút: ghi chú "máy chủ có thể chưa chạy worker", cho huỷ.
 - Quyền hiển thị (UI; backend RBAC là nguồn quyết định): VISITOR không thấy;
-  REVIEWER thấy khu vực nhưng không tạo; EDITOR/ADMIN tạo cho bản draft/rejected.
+  REVIEWER thấy khu vực nhưng không tạo; EDITOR/ADMIN tạo cho bản `draft`
+  (bản `rejected` phải lưu lại để về nháp trước — backend v1.1 chỉ nhận draft).
+- Phát hành: khu vực chỉ hiện khi build với `NEXT_PUBLIC_TTS_GENERATION_MODE=api`
+  (hoặc `demo`); mặc định `off`, fail closed. Bật cho production là quyết định
+  của I04 khi có voice thật + storage thật (lý do: báo cáo I03 §4).
 
 ## Visitor — chọn ngôn ngữ thuyết minh (T03)
 
@@ -66,15 +75,19 @@ Theo ADR 0006 không thêm màn hình mới; chỉ đảm bảo transport nhận
 
 ## Khoảng trống contract (đề xuất cho Công, không tự sửa)
 
-- Job/narration chưa có URL audio để admin nghe lại bản nháp do AI tạo
-  (`AdminNarration.audio` không có `playbackUrl`); demo dùng âm báo cục bộ.
-- Narration chưa mang provenance AI (`generatedBy {provider, model,
-  modelVersion, jobId}`) nên lịch sử phiên bản chưa thể gắn nhãn AI sau reload.
-- Chưa có endpoint liệt kê job gần nhất của một narration. UI nhớ job đang
-  chạy trong phiên trang (đổi tab vẫn theo dõi), nhưng sau khi tải lại trang
-  hoặc ở trình duyệt khác thì không biết job đang chạy; backend cần từ chối
-  submit khi narration còn job `queued`/`running` (RBAC/khóa phía server là
-  nguồn quyết định).
-- Mã lỗi 409 của create/cancel job (ví dụ narration không còn là draft, job đã
-  kết thúc) chưa được tài liệu hoá trong OpenAPI; UI hiện chỉ hiển thị thông
-  báo chung theo HTTP status.
+Ba khoảng trống phía admin của I01 đã đóng bằng contract v1.1 (ADR 0014) và UI
+dùng chúng từ I03 (`docs/runbooks/frontend-i03-acceptance-report.md`):
+
+- Đã đóng: nghe lại audio AI của bản nháp qua
+  `GET /v1/admin/narrations/{id}/audio/playback` (URL ký 10 phút).
+- Đã đóng: provenance `AdminNarration.audioGeneratedBy` — nhãn AI-generated
+  và nhà cung cấp/model/phiên bản/giọng/giấy phép hiện cả sau reload và trong
+  lịch sử phiên bản.
+- Đã đóng: `GET …/tts-jobs/latest` để tiếp tục theo dõi job sau khi tải lại
+  trang; server chặn submit/PATCH khi còn job (`409 TTS_JOB_IN_PROGRESS`) và
+  các mã lỗi đã có trong OpenAPI, UI map sang tiếng Việt.
+
+Còn mở:
+
+- Narration công khai (`PoiNarration`) chưa có cờ AI, nên visitor chưa thể
+  ghi chú "audio do AI tạo" khi phát bản đã xuất bản (I03 §5, đề xuất I04).

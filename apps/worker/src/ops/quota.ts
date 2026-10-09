@@ -53,6 +53,23 @@ export class QuotaGuard {
     return { allowed: true };
   }
 
+  /**
+   * The decision {@link tryAcquire} would return right now, without consuming
+   * anything. Lets a single dispatcher check capacity before it claims work.
+   */
+  peek(key: string, now: number = Date.now()): QuotaDecision {
+    const window = this.windows.get(key);
+    const count =
+      !window || now - window.start >= this.config.windowMs ? 0 : window.count;
+    if (count >= this.config.maxPerWindow) {
+      return { allowed: false, reason: 'rate_limited' };
+    }
+    if ((this.concurrent.get(key) ?? 0) >= this.config.maxConcurrent) {
+      return { allowed: false, reason: 'concurrency_limited' };
+    }
+    return { allowed: true };
+  }
+
   release(key: string): void {
     const inFlight = this.concurrent.get(key) ?? 0;
     if (inFlight <= 1) this.concurrent.delete(key);

@@ -1,7 +1,10 @@
+import { ApiClientError } from '@damsen/api-client';
 import type { AdminNarration } from '@damsen/shared-types';
 import { describe, expect, it, vi } from 'vitest';
 import {
   NarrationAdminAdapter,
+  narrationErrorMessage,
+  narrationPlaybackErrorMessage,
   narrationPermissions,
   newestNarration,
 } from './narration-admin-client';
@@ -37,6 +40,10 @@ function fakeApi() {
     submitAdminNarration: vi.fn(async () => narration()),
     approveAdminNarration: vi.fn(async () => narration()),
     rejectAdminNarration: vi.fn(async () => narration()),
+    getAdminNarrationAudioPlayback: vi.fn(async () => ({
+      playbackUrl: 'https://storage.example/signed',
+      playbackExpiresAt: '2026-01-01T00:10:00.000Z',
+    })),
   };
 }
 
@@ -59,6 +66,31 @@ describe('NarrationAdminAdapter', () => {
       { reason: 'Chưa đúng nội dung' },
       'access-token',
     );
+  });
+
+  it('calls the default global fetch with the global receiver (browser "Illegal invocation")', async () => {
+    const original = globalThis.fetch;
+    const strictFetch = vi.fn(function (this: unknown) {
+      if (this !== globalThis) throw new TypeError('Illegal invocation');
+      return Promise.resolve(new Response(null, { status: 200 }));
+    });
+    globalThis.fetch = strictFetch as unknown as typeof fetch;
+    try {
+      const adapter = new NarrationAdminAdapter(fakeApi(), () => 'token');
+      await adapter.uploadAudio(
+        {
+          poiId: 'p1',
+          locale: 'vi',
+          mimeType: 'audio/mpeg',
+          sizeBytes: 5,
+          sha256: 'a'.repeat(64),
+        },
+        new Blob(['audio']),
+      );
+      expect(strictFetch).toHaveBeenCalledOnce();
+    } finally {
+      globalThis.fetch = original;
+    }
   });
 
   it('uploads exact browser-safe signed headers and lets fetch derive content-length', async () => {
@@ -125,5 +157,64 @@ describe('narration UI state', () => {
       canEdit: false,
       canReview: false,
     });
+  });
+});
+
+describe('narration v1.1 playback and error copy', () => {
+  it('fetches the signed admin playback URL with the session token', async () => {
+    const api = fakeApi();
+    const adapter = new NarrationAdminAdapter(api, () => 'access-token');
+    expect(await adapter.playback('n1')).toEqual({
+      playbackUrl: 'https://storage.example/signed',
+      playbackExpiresAt: '2026-01-01T00:10:00.000Z',
+    });
+    expect(api.getAdminNarrationAudioPlayback).toHaveBeenCalledWith(
+      'n1',
+      'access-token',
+    );
+  });
+
+  it('maps AI-related workflow codes and never shows their server text', () => {
+    const coded = (status: number, code: string) =>
+      new ApiClientError(status, {
+        code,
+        message: 'A TTS job for this narration is still queued or running',
+        details: null,
+        requestId: 'r',
+      });
+    const busy = narrationErrorMessage(
+      coded(409, 'TTS_JOB_IN_PROGRESS'),
+      'fallback',
+    );
+    expect(busy).toContain('đang tạo audio AI');
+    expect(busy).not.toContain('queued');
+    expect(
+      narrationErrorMessage(coded(409, 'NARRATION_NOT_DRAFT'), 'fallback'),
+    ).toContain('không còn ở trạng thái nháp');
+    expect(
+      narrationErrorMessage(coded(404, 'NARRATION_AUDIO_NOT_FOUND'), 'x'),
+    ).toContain('Không tìm thấy audio');
+    expect(narrationErrorMessage(new Error('Lỗi khác'), 'fallback')).toBe(
+      'Lỗi khác',
+    );
+    expect(narrationErrorMessage('boom', 'fallback')).toBe('fallback');
+  });
+
+  it('never shows server text for playback failures', () => {
+    const coded = (status: number, code: string, message = 'server text') =>
+      new ApiClientError(status, {
+        code,
+        message,
+        details: null,
+        requestId: 'r',
+      });
+    expect(
+      narrationPlaybackErrorMessage(
+        coded(400, 'BAD_REQUEST', 'Validation failed (uuid is expected)'),
+      ),
+    ).toBe('Không lấy được đường dẫn nghe thử audio. (HTTP 400)');
+    expect(
+      narrationPlaybackErrorMessage(coded(404, 'NARRATION_AUDIO_NOT_FOUND')),
+    ).toContain('Không tìm thấy audio');
   });
 });

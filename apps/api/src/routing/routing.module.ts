@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { createRequire } from 'node:module';
 
 import type { SqlClient } from '../poi/postgres-poi.repository.js';
 import { InMemoryRoutingRepository } from './in-memory-routing.repository.js';
@@ -10,15 +9,14 @@ import {
   type RoutingRepository,
 } from './routing.models.js';
 import { RoutingService } from './routing.service.js';
+import { createPgPool } from '../common/pg-pool.js';
 
 function createRepository(): RoutingRepository {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) return new InMemoryRoutingRepository();
-  const require = createRequire(import.meta.url);
-  const pg = require('pg') as {
-    Pool: new (options: { connectionString: string }) => SqlClient;
-  };
-  return new PostgresRoutingRepository(new pg.Pool({ connectionString }));
+  return new PostgresRoutingRepository(
+    createPgPool<SqlClient>(connectionString, 'routing'),
+  );
 }
 
 @Module({

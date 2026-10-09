@@ -114,6 +114,24 @@
         "tu-original-2026"
       ],
       "sha256": "48324156aa32d1f01d7607ea90300ec318b2ff2c9c2a241ae9792010883607e8"
+    },
+    {
+      "path": "reports/fixtures/i03-pipeline-check-report.json",
+      "role": "report (I03 pipeline check: full corpus through the worker benchmark with a fake tone provider; not a quality result)",
+      "license": "LicenseRef-DamSen-Project-Original",
+      "sourceIds": [
+        "tu-original-2026"
+      ],
+      "sha256": "ce100434d7cbd0c1200f0cb6d7c2627d1ede1d5cb71f4e0bc470f9cbb06cf2e9"
+    },
+    {
+      "path": "reports/fixtures/i03-real-piper-report.json",
+      "role": "report (I03: full corpus through real Piper voices vi/en/fr on CPU; operational + automated checks only, no human ratings)",
+      "license": "LicenseRef-DamSen-Project-Original",
+      "sourceIds": [
+        "tu-original-2026"
+      ],
+      "sha256": "8ba8717b275bad954055b6125d94e52dc5b4ed58575565bfa67ff156876e1c27"
     }
   ]
 }

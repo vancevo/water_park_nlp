@@ -75,26 +75,26 @@ Công có thể bắt đầu ngay, không cần UI của Tú.
 
 ### Checklist Công
 
-- [ ] **C01 — Governance và backend contract**
+- [ ] **C01 — Governance và backend contract** (contract v1→v1.2 xong; còn thiếu ADR AI00 về voice consent/commercial-use — I04 §1)
   - Hoàn thành AI00 ADR: AI-generated label, license, voice consent, review gate.
   - Hiện thực contract v1 trong OpenAPI, shared types và API client.
-- [ ] **C02 — Locale config và database**
+- [x] **C02 — Locale config và database** (I01/I03 PASS trên API thật; I04 §1)
   - Thực hiện phần backend của T25A/T25B.
   - Config parser, `GET /v1/narration-locales`, migration locale động, fallback,
     validation và media object-key safety.
-- [ ] **C03 — TTS worker foundation**
+- [x] **C03 — TTS worker foundation** (I02 consumer + DB int tests; drills I04 §3)
   - Thực hiện AI02: `TtsProvider`, job persistence, idempotency,
     retry/dead-letter, artifact/model registry và audio validation.
-- [ ] **C04 — Piper baseline**
+- [x] **C04 — Piper baseline** (2026-10-09: giọng Piper thật vi/en/fr trong `config/tts-voices.json`, E2E sinh audio → draft PASS với MinIO — PR #14; còn lại: encode mp3/m4a, nhãn ghi công CC-BY cho visitor)
   - Thực hiện AI03 bằng corpus fixture nhỏ riêng của backend.
   - Pin model/voice/license/checksum; sinh audio và gắn vào draft narration.
-- [ ] **C05 — Provider benchmark và training decision**
+- [ ] **C05 — Provider benchmark và training decision** (harness xong; corpus 64 câu đã chạy qua Piper THẬT 64/64 ok — PR #14; còn lại: chạy ZeroTTS/MOSS, blind review của người, quyết định chọn provider)
   - Thực hiện AI05 với fixture trước; chạy lại bộ corpus đầy đủ của Tú khi tích hợp.
   - AI06 chỉ mở sau quyết định GO; không train từ đầu.
-- [ ] **C06 — Semantic search production**
+- [ ] **C06 — Semantic search production** (flag/fallback chạy; lexical Recall@10 0,60 → 0,90 ở PR #16, vẫn thấp hơn ngưỡng ADR 0012 0,911; chưa có embedding endpoint production)
   - Thực hiện AI07: embedding provider, vector retrieval, hybrid ranking,
     feature flag và lexical fallback.
-- [ ] **C07 — Backend/infra hardening**
+- [ ] **C07 — Backend/infra hardening** (drills + rollback xong I04 §3–4; F5–F7 sửa ở PR #15; chưa tick: metrics scrape endpoint, storage-restore drill và load test còn mở)
   - Phần Công của AI08: queue/model metrics, quota, dead-letter, retention,
     failure drills và rollback.
 
@@ -184,30 +184,41 @@ thời gian rảnh trước checkpoint này.
 
 ### I01 — Adapter swap — Owner: Tú
 
-- [ ] Thay mock locale port bằng generated API client của Công.
-- [ ] Thay mock TTS job port bằng endpoints thật.
-- [ ] Không đổi UI state machine nếu contract v1 được giữ đúng.
-- [ ] Giữ fixtures cho unit/component tests; chỉ E2E dùng backend thật.
+- [x] Thay mock locale port bằng generated API client của Công.
+- [x] Thay mock TTS job port bằng endpoints thật. (chế độ `api` chạy với AI04
+  thật; mặc định flag vẫn `off` tới khi I02 xong)
+- [x] Không đổi UI state machine nếu contract v1 được giữ đúng.
+- [x] Giữ fixtures cho unit/component tests; chỉ E2E dùng backend thật. (E2E
+  worker chạy qua harness claim ngoài repo + provider âm sine giả, vì worker
+  chưa có consumer — xem `docs/runbooks/frontend-i01-integration-report.md` §5)
 
 ### I02 — Contract/integration fixes — Owner: Công
 
-- [ ] Sửa backend nếu response không đúng contract v1.
-- [ ] Không yêu cầu Tú đổi UI để che lỗi contract backend.
-- [ ] Chạy migration + API + worker + object storage smoke.
+- [x] Sửa backend nếu response không đúng contract v1. (11/11 mục I01 — `docs/runbooks/backend-i02-integration-fixes.md`, ADR 0014)
+- [x] Không yêu cầu Tú đổi UI để che lỗi contract backend. (v1 giữ nguyên; v1.1 chỉ thêm field/endpoint tuỳ chọn)
+- [x] Chạy migration + API + worker + object storage smoke. (S3 emulator moto + provider CLI giả; MinIO/S3 thật vẫn là B03 → I04)
 
 ### I03 — End-to-end acceptance — Owner: Tú
 
-- [ ] Config thêm FR → admin/visitor tự xuất hiện.
-- [ ] Tạo transcript → generate → running → draft audio → review → publish.
-- [ ] Visitor chọn locale, nghe đúng audio hoặc thấy fallback rõ ràng.
+- [x] Config thêm FR → admin/visitor tự xuất hiện.
+- [x] Tạo transcript → generate → running → draft audio → review → publish.
+  (lần đầu: provider âm sine giả + moto; chạy lại 2026-10-09 với worker + Piper thật + MinIO thật cho vi/en/fr — PR #14)
+- [x] Visitor chọn locale, nghe đúng audio hoặc thấy fallback rõ ràng.
 - [ ] Chạy corpus T06 qua provider được chọn và xuất benchmark cuối.
-- [ ] Hybrid search feature flag on/off đều hoạt động.
+  (PARTIAL — chỉ còn phần của người: 64/64 câu đã qua Piper thật,
+  `data/tts-evaluation/reports/fixtures/i03-real-piper-report.json`; gate còn
+  `missing-human-ratings` cho tới khi ≥ 3 người bản ngữ/locale chấm mù gói
+  `tts-blind-review-pack/`; chưa chọn provider vì chưa chạy ZeroTTS/MOSS)
+- [x] Hybrid search feature flag on/off đều hoạt động. (embedder giả để kiểm
+  đường pgvector; lexical đã cải thiện ở PR #16, xem `backend-hybrid-search.md`)
+
+Báo cáo: `docs/runbooks/frontend-i03-acceptance-report.md`.
 
 ### I04 — Release gate — Owner: Công
 
-- [ ] Tổng hợp backend/frontend evidence.
-- [ ] Fault injection và rollback model/feature flag.
-- [ ] Chỉ đánh dấu DONE khi B03/object storage thật và root quality gate pass.
+- [x] Tổng hợp backend/frontend evidence. (`docs/runbooks/backend-i04-release-gate.md` §0–1)
+- [x] Fault injection và rollback model/feature flag. (§3–4: 20 drills, model/flag/migration 012)
+- [x] Chỉ đánh dấu DONE khi B03/object storage thật và root quality gate pass. (2026-10-09: CI `quality` + `fixture-contracts` xanh trên PR #14; smoke MinIO thật PASS trên image `bitnamilegacy/minio` ghim digest vì image chính thức đã bị gỡ — `backend-i04-release-gate.md` §9. Kết luận release vẫn NO-GO cho AI go-live và public; AWS S3/staging thuộc T60)
 
 ## 6. Lịch song song đề xuất
 

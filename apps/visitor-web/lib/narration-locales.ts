@@ -3,8 +3,8 @@ import type {
   NarrationLocaleCode,
   NarrationLocaleOption,
   PoiNarration,
-  SupportedLocale,
 } from '@damsen/shared-types';
+import type { UiLocale } from './ui-text';
 
 /**
  * App-local port for the public narration-locale catalog (contract v1,
@@ -134,7 +134,7 @@ export function speechTagFor(
 export function resolveInitialNarrationLocale(
   catalog: NarrationLocaleCatalog,
   stored: string | null,
-  uiLocale: SupportedLocale,
+  uiLocale: UiLocale,
 ): NarrationLocaleCode {
   const preferred = stored ? canonicalLocale(stored) : null;
   if (findLocale(catalog, preferred)) return preferred!;

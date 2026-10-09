@@ -5,6 +5,7 @@ import {
   createFixtureTtsGenerationPort,
   createHttpTtsGenerationPort,
   isTerminalTtsStatus,
+  retryAfterHint,
   ttsGenerationMode,
   ttsRequestErrorMessage,
 } from './tts-generation';
@@ -37,7 +38,34 @@ describe('fixture TTS generation port', () => {
     const done = await port.get(job.id);
     expect(done.status).toBe('succeeded');
     expect(done.updatedAt > done.createdAt).toBe(true);
+    // v1.1 shape: artifact only on succeeded, matching the demo tone WAV.
+    expect(job.artifact).toBeUndefined();
+    expect(done.artifact).toMatchObject({
+      voiceId: 'demo-tone-vi',
+      mimeType: 'audio/wav',
+      sizeBytes: createDemoToneWav().length,
+    });
     expect(await port.previewAudio?.(done)).toBeInstanceOf(Blob);
+  });
+
+  it('returns the latest job of a narration for resume (v1.1 latest)', async () => {
+    const time = clock();
+    const port = createFixtureTtsGenerationPort({
+      now: time.now,
+      queuedMs: 10,
+      runningMs: 10,
+    });
+    expect(await port.latest?.('n1')).toBeNull();
+    const first = await port.create('n1', { locale: 'vi' });
+    time.advance(50);
+    expect(await port.latest?.('n1')).toMatchObject({
+      id: first.id,
+      status: 'succeeded',
+    });
+    time.advance(1);
+    const second = await port.create('n1', { locale: 'vi' });
+    await port.create('n2', { locale: 'vi' });
+    expect((await port.latest?.('n1'))?.id).toBe(second.id);
   });
 
   it('fails the first French attempt with a stable code, then succeeds on retry', async () => {
@@ -115,11 +143,16 @@ describe('HTTP TTS generation port', () => {
         ...job,
         status: 'cancelled' as const,
       })),
+      getLatestTtsJob: vi.fn(async () => ({ job })),
     };
     const port = createHttpTtsGenerationPort(api, () => 'token');
     await port.create('n1', { locale: 'fr' });
     await port.get('j1');
     await port.cancel('j1');
+    expect(await port.latest?.('n1')).toEqual(job);
+    expect(api.getLatestTtsJob).toHaveBeenCalledWith('n1', 'token');
+    api.getLatestTtsJob.mockResolvedValueOnce({ job: null } as never);
+    expect(await port.latest?.('n1')).toBeNull();
     expect(api.createTtsJob).toHaveBeenCalledWith(
       'n1',
       { locale: 'fr' },
@@ -147,12 +180,91 @@ describe('HTTP TTS generation port', () => {
     expect(ttsRequestErrorMessage('boom')).toBe(
       'Không thể kết nối dịch vụ tạo audio.',
     );
+    expect(ttsRequestErrorMessage(new TypeError('Failed to fetch'))).toBe(
+      'Không thể kết nối dịch vụ tạo audio.',
+    );
+    expect(
+      ttsRequestErrorMessage(
+        new SyntaxError('Unexpected token \'<\', "<html>" is not valid JSON'),
+      ),
+    ).toBe('Không thể kết nối dịch vụ tạo audio.');
+  });
+
+  it('maps the real AI04/AI08 error codes before falling back to status', () => {
+    const coded = (status: number, code: string) =>
+      new ApiClientError(status, {
+        code,
+        message: 'Requested locale "en" does not match …',
+        details: null,
+        requestId: 'r',
+      });
+    expect(
+      ttsRequestErrorMessage(coded(400, 'NARRATION_LOCALE_DISABLED')),
+    ).toContain('đang tắt');
+    expect(
+      ttsRequestErrorMessage(coded(400, 'TTS_JOB_LOCALE_MISMATCH')),
+    ).toContain('không khớp');
+    expect(
+      ttsRequestErrorMessage(coded(400, 'TTS_JOB_TRANSCRIPT_EMPTY')),
+    ).toContain('chưa có nội dung');
+    expect(ttsRequestErrorMessage(coded(503, 'AI_FEATURE_DISABLED'))).toContain(
+      'tạm tắt',
+    );
+    expect(ttsRequestErrorMessage(coded(429, 'concurrency_limited'))).toContain(
+      'cùng lúc',
+    );
+    expect(ttsRequestErrorMessage(coded(429, 'HTTP_429'))).toContain('hạn mức');
+    expect(ttsRequestErrorMessage(coded(409, 'NARRATION_NOT_DRAFT'))).toContain(
+      'Chỉ tạo audio AI cho bản nháp',
+    );
+    expect(ttsRequestErrorMessage(coded(409, 'TTS_JOB_IN_PROGRESS'))).toContain(
+      'chưa xong',
+    );
+    expect(
+      ttsRequestErrorMessage(coded(400, 'TTS_VOICE_UNAVAILABLE')),
+    ).toContain('giọng đọc');
+    // Generic validation: the server message (internal detail) is never shown.
+    const validation = ttsRequestErrorMessage(coded(400, 'BAD_REQUEST'));
+    expect(validation).toContain('không hợp lệ');
+    expect(validation).not.toContain('Requested locale');
+    expect(ttsRequestErrorMessage(coded(404, 'NOT_FOUND'))).toContain(
+      'Không tìm thấy',
+    );
+  });
+
+  it('adds a retry hint from 429 details.retryAfterSeconds', () => {
+    const limited = (code: string, details: unknown) =>
+      new ApiClientError(429, {
+        code,
+        message: 'Too many TTS generation requests; retry later',
+        details,
+        requestId: 'r',
+      });
+    const rate = ttsRequestErrorMessage(
+      limited('rate_limited', { retryAfterSeconds: 42 }),
+    );
+    expect(rate).toBe('Đã vượt hạn mức tạo audio. Thử lại sau khoảng 42 giây.');
+    expect(
+      ttsRequestErrorMessage(
+        limited('concurrency_limited', { retryAfterSeconds: 300 }),
+      ),
+    ).toContain('cùng lúc. Thử lại sau khoảng 5 phút.');
+    expect(ttsRequestErrorMessage(limited('rate_limited', null))).toContain(
+      'Thử lại sau ít phút.',
+    );
+    expect(rate).not.toContain('retry later');
+    expect(retryAfterHint({ retryAfterSeconds: 'x' })).toBe(
+      'Thử lại sau ít phút.',
+    );
   });
 });
 
 describe('TTS generation flags and helpers', () => {
-  it('keeps generation off unless explicitly enabled', () => {
+  it('fails closed: only an explicit api/demo shows the panel', () => {
     expect(ttsGenerationMode(undefined)).toBe('off');
+    expect(ttsGenerationMode('')).toBe('off');
+    expect(ttsGenerationMode('API')).toBe('off');
+    expect(ttsGenerationMode('off')).toBe('off');
     expect(ttsGenerationMode('demo')).toBe('demo');
     expect(ttsGenerationMode('api')).toBe('api');
     expect(ttsGenerationMode('yes')).toBe('off');

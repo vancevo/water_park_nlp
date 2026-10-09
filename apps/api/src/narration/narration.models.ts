@@ -1,4 +1,5 @@
 import type {
+  NarrationAudioGeneratedBy,
   NarrationAudioMetadataInput,
   NarrationWorkflowStatus,
   NarrationLocaleCode,
@@ -12,6 +13,12 @@ export interface NarrationRecord {
   transcript: string;
   status: NarrationWorkflowStatus;
   audio: NarrationAudioMetadataInput | null;
+  /**
+   * AI provenance of the CURRENT audio (migration 012), written only by the
+   * TTS worker when it attaches generated audio to a draft. Cleared when an
+   * editor replaces the audio.
+   */
+  audioGeneratedBy?: NarrationAudioGeneratedBy | null;
   createdBy?: string;
   reviewedBy?: string;
   rejectionReason?: string;

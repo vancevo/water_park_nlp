@@ -7,6 +7,7 @@ import { UnavailableMediaStorage } from '../src/narration/media-storage.js';
 import type { NarrationRecord } from '../src/narration/narration.models.js';
 import { NarrationLocalesService } from '../src/narration/narration-locales.service.js';
 import { NarrationService } from '../src/narration/narration.service.js';
+import { InMemoryTtsJobRepository } from '../src/narration/in-memory-tts-job.repository.js';
 
 const POI_ID = '00000000-0000-4000-8000-000000000101';
 const NOW = new Date('2026-01-01T00:00:00.000Z');
@@ -50,6 +51,7 @@ function service(seed: NarrationRecord[]): NarrationService {
     () => NOW,
     new UnavailableMediaStorage(),
     new NarrationLocalesService(config),
+    new InMemoryTtsJobRepository(),
   );
 }
 

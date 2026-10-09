@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { createRequire } from 'node:module';
 import { loadNarrationLocaleConfig } from '@damsen/config';
 
 import { AuthModule } from '../auth/auth.module.js';
@@ -25,21 +24,24 @@ import { AdminTtsJobService } from './tts-job.service.js';
 import { InMemoryTtsJobRepository } from './in-memory-tts-job.repository.js';
 import { PostgresTtsJobRepository } from './postgres-tts-job.repository.js';
 import {
+  loadTtsJobControlsConfig,
+  TTS_JOB_CONTROLS,
+  TtsJobControls,
+} from './tts-job-controls.js';
+import {
   loadTtsJobDefaults,
+  usesFallbackTtsDefaults,
   TTS_JOB_CLOCK,
   TTS_JOB_DEFAULTS,
   TTS_JOB_REPOSITORY,
   type TtsJobRepository,
 } from './tts-job.models.js';
+import { createPgPool } from '../common/pg-pool.js';
 
 function sqlClient(): SqlClient | null {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) return null;
-  const require = createRequire(import.meta.url);
-  const pg = require('pg') as {
-    Pool: new (options: { connectionString: string }) => SqlClient;
-  };
-  return new pg.Pool({ connectionString });
+  return createPgPool<SqlClient>(connectionString, 'narration');
 }
 
 function createRepository(): NarrationRepository {
@@ -47,6 +49,15 @@ function createRepository(): NarrationRepository {
   return client
     ? new PostgresNarrationRepository(client)
     : new InMemoryNarrationRepository();
+}
+
+function createTtsJobDefaults() {
+  if (usesFallbackTtsDefaults() && process.env.NODE_ENV !== 'test') {
+    console.warn(
+      'TTS: no TTS_VOICES_MANIFEST_PATH or TTS_DEFAULT_MODEL_VERSION; jobs use fallback defaults that no worker voice serves (they will fail with TTS_MODEL_UNAVAILABLE).',
+    );
+  }
+  return loadTtsJobDefaults();
 }
 
 function createTtsJobRepository(): TtsJobRepository {
@@ -70,7 +81,11 @@ function createTtsJobRepository(): TtsJobRepository {
     MediaService,
     AdminTtsJobService,
     { provide: TTS_JOB_CLOCK, useValue: () => new Date() },
-    { provide: TTS_JOB_DEFAULTS, useFactory: () => loadTtsJobDefaults() },
+    { provide: TTS_JOB_DEFAULTS, useFactory: createTtsJobDefaults },
+    {
+      provide: TTS_JOB_CONTROLS,
+      useFactory: () => new TtsJobControls(loadTtsJobControlsConfig()),
+    },
     { provide: TTS_JOB_REPOSITORY, useFactory: createTtsJobRepository },
     {
       provide: NARRATION_LOCALE_CONFIG,

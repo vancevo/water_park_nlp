@@ -2,6 +2,18 @@
 
 Worker chứa các background job như embedding, TTS và media processing.
 
+## Chạy worker TTS (I02)
+
+`npm run start --workspace @damsen/worker` (dev: `npm run dev …`) chạy
+`src/worker.ts`: consumer đọc bảng `tts_generation_jobs` do API ghi, claim nguyên
+tử (`FOR UPDATE SKIP LOCKED`), tổng hợp bằng provider trong manifest
+(`TTS_WORKER_ENGINE=piper|cli`, `TTS_VOICES_MANIFEST_PATH` — cùng file với API),
+upload WAV lên object storage rồi gắn audio + provenance AI vào narration
+**draft** trong một transaction. Không bao giờ publish. Kill switch
+`TTS_GENERATION_ENABLED`, quota `TTS_QUOTA_*`. Chi tiết:
+`docs/runbooks/backend-tts-worker.md`, ADR 0014. Test DB thật (tuỳ chọn):
+`TTS_QUEUE_TEST_DATABASE_URL=<db rác đã migrate 001–012> npm test --workspace @damsen/worker`.
+
 ## Semantic embedding cho POI
 
 Embedding là vector số biểu diễn ý nghĩa tương đối của văn bản. Hai câu không

@@ -10,8 +10,11 @@ import {
 } from '@nestjs/common';
 import type {
   AdminNarration,
+  NarrationAudioGeneratedBy,
+  NarrationAudioPlayback,
   NarrationLocaleCode,
   PoiNarration,
+  PublicNarrationAudioProvenance,
 } from '@damsen/shared-types';
 
 import { POI_REPOSITORY, type PoiRepository } from '../poi/poi.models.js';
@@ -26,6 +29,22 @@ import {
   type NarrationRepository,
 } from './narration.models.js';
 import { NarrationLocalesService } from './narration-locales.service.js';
+import { TTS_JOB_REPOSITORY, type TtsJobRepository } from './tts-job.models.js';
+import { TtsJobInProgressException } from './tts-job-controls.js';
+
+/** Contract v1.2: visitors see the AI provenance without the internal job id. */
+function publicProvenance(
+  generatedBy: NarrationAudioGeneratedBy,
+): PublicNarrationAudioProvenance {
+  return {
+    provider: generatedBy.provider,
+    model: generatedBy.model,
+    modelVersion: generatedBy.modelVersion,
+    voiceId: generatedBy.voiceId,
+    license: generatedBy.license,
+    generatedAt: generatedBy.generatedAt,
+  };
+}
 
 @Injectable()
 export class NarrationService {
@@ -37,6 +56,7 @@ export class NarrationService {
     @Inject(MEDIA_STORAGE) private readonly mediaStorage: MediaStorage,
     @Inject(NarrationLocalesService)
     private readonly locales: NarrationLocalesService,
+    @Inject(TTS_JOB_REPOSITORY) private readonly ttsJobs: TtsJobRepository,
   ) {}
 
   async published(
@@ -81,6 +101,9 @@ export class NarrationService {
             usageRights: narration.audio.usageRights,
             playbackUrl: playback!.url,
             playbackExpiresAt: playback!.expiresAt.toISOString(),
+            ...(narration.audioGeneratedBy
+              ? { generatedBy: publicProvenance(narration.audioGeneratedBy) }
+              : {}),
           }
         : null,
     };
@@ -137,12 +160,23 @@ export class NarrationService {
         'Only draft or rejected narration can be edited',
       );
     }
+    // The worker may attach generated audio while a job runs; edits wait so
+    // neither side overwrites the other (I02-6, ADR 0014).
+    await this.assertNoActiveTtsJob(id);
     const audio = input.audio === undefined ? record.audio : input.audio;
     this.assertObjectKey(record.poiId, record.locale, audio ?? null);
+    const sameAudio =
+      audio !== null &&
+      audio !== undefined &&
+      record.audio !== null &&
+      audio.objectKey === record.audio.objectKey &&
+      audio.sha256 === record.audio.sha256;
     const updated: NarrationRecord = {
       ...record,
       transcript: input.transcript?.trim() ?? record.transcript,
       audio: audio ? { ...audio } : null,
+      // Provenance describes the current audio only; replaced audio drops it.
+      audioGeneratedBy: sameAudio ? (record.audioGeneratedBy ?? null) : null,
       status: 'draft',
       rejectionReason: undefined,
       updatedAt: this.now(),
@@ -169,6 +203,9 @@ export class NarrationService {
     if (record.transcript.trim().length < 20) {
       throw new BadRequestException('A reviewed transcript is required');
     }
+    // Server-side review gate (I02-6): never submit while a TTS job could
+    // still attach audio to this draft.
+    await this.assertNoActiveTtsJob(id);
     if (record.audio) await this.mediaStorage.verifyAudioObject(record.audio);
     record.status = 'pending_review';
     record.rejectionReason = undefined;
@@ -201,6 +238,31 @@ export class NarrationService {
     record.updatedAt = this.now();
     await this.narrations.save(record);
     return this.toAdmin(record);
+  }
+
+  /** Ten-minute signed GET so an admin can preview the current (draft) audio. */
+  async audioPlayback(id: string): Promise<NarrationAudioPlayback> {
+    const record = await this.required(id);
+    if (!record.audio) {
+      throw new NotFoundException({
+        code: 'NARRATION_AUDIO_NOT_FOUND',
+        message: 'Narration has no audio',
+        details: null,
+      });
+    }
+    const playback = await this.mediaStorage.signPlayback(
+      record.audio.objectKey,
+    );
+    return {
+      playbackUrl: playback.url,
+      playbackExpiresAt: playback.expiresAt.toISOString(),
+    };
+  }
+
+  private async assertNoActiveTtsJob(narrationId: string): Promise<void> {
+    if (await this.ttsJobs.hasActiveForNarration(narrationId)) {
+      throw new TtsJobInProgressException();
+    }
   }
 
   private async requireAdminPoi(id: string): Promise<void> {
@@ -239,6 +301,9 @@ export class NarrationService {
       audio: record.audio ? { ...record.audio } : null,
       ...(record.rejectionReason
         ? { rejectionReason: record.rejectionReason }
+        : {}),
+      ...(record.audio && record.audioGeneratedBy
+        ? { audioGeneratedBy: { ...record.audioGeneratedBy } }
         : {}),
       createdAt: record.createdAt.toISOString(),
       updatedAt: record.updatedAt.toISOString(),

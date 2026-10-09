@@ -19,6 +19,7 @@ interface NarrationRow {
   rights_owner: string | null;
   rights_source: string | null;
   usage_rights: string | null;
+  audio_generated_by: NarrationRecord['audioGeneratedBy'];
   created_by: string | null;
   reviewed_by: string | null;
   rejection_reason: string | null;
@@ -29,7 +30,7 @@ interface NarrationRow {
 const SELECT = `SELECT id, poi_id, locale, revision, transcript, workflow_status,
   audio_object_key, audio_mime_type, audio_size_bytes, audio_sha256,
   audio_duration_seconds, rights_owner, rights_source, usage_rights,
-  created_by, reviewed_by, rejection_reason, created_at, updated_at
+  audio_generated_by, created_by, reviewed_by, rejection_reason, created_at, updated_at
   FROM poi_narrations`;
 
 function toRecord(row: NarrationRow): NarrationRecord {
@@ -53,6 +54,7 @@ function toRecord(row: NarrationRow): NarrationRecord {
           usageRights: row.usage_rights!,
         }
       : null,
+    audioGeneratedBy: hasAudio ? (row.audio_generated_by ?? null) : null,
     createdBy: row.created_by ?? undefined,
     reviewedBy: row.reviewed_by ?? undefined,
     rejectionReason: row.rejection_reason ?? undefined,
@@ -109,8 +111,9 @@ export class PostgresNarrationRepository implements NarrationRepository {
         id, poi_id, locale, revision, transcript, workflow_status,
         audio_object_key, audio_mime_type, audio_size_bytes, audio_sha256,
         audio_duration_seconds, rights_owner, rights_source, usage_rights,
-        created_by, reviewed_by, rejection_reason, created_at, updated_at
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
+        created_by, reviewed_by, rejection_reason, created_at, updated_at,
+        audio_generated_by
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20::jsonb)
       ON CONFLICT (id) DO UPDATE SET transcript = EXCLUDED.transcript,
         workflow_status = EXCLUDED.workflow_status,
         audio_object_key = EXCLUDED.audio_object_key,
@@ -119,7 +122,9 @@ export class PostgresNarrationRepository implements NarrationRepository {
         audio_sha256 = EXCLUDED.audio_sha256,
         audio_duration_seconds = EXCLUDED.audio_duration_seconds,
         rights_owner = EXCLUDED.rights_owner, rights_source = EXCLUDED.rights_source,
-        usage_rights = EXCLUDED.usage_rights, reviewed_by = EXCLUDED.reviewed_by,
+        usage_rights = EXCLUDED.usage_rights,
+        audio_generated_by = EXCLUDED.audio_generated_by,
+        reviewed_by = EXCLUDED.reviewed_by,
         rejection_reason = EXCLUDED.rejection_reason, updated_at = EXCLUDED.updated_at`,
       [
         record.id,
@@ -141,6 +146,9 @@ export class PostgresNarrationRepository implements NarrationRepository {
         record.rejectionReason ?? null,
         record.createdAt,
         record.updatedAt,
+        record.audio && record.audioGeneratedBy
+          ? JSON.stringify(record.audioGeneratedBy)
+          : null,
       ],
     );
   }

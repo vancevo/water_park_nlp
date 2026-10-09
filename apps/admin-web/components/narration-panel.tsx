@@ -22,6 +22,7 @@ import {
 } from '@/lib/auth-session';
 import {
   narrationAdminClient,
+  narrationErrorMessage,
   narrationPermissions,
   newestNarration,
 } from '@/lib/narration-admin-client';
@@ -38,8 +39,11 @@ import {
 import { useTtsJob } from '@/hooks/use-tts-job';
 import { getTtsGenerationPort } from '@/lib/tts-generation';
 import { TTS_IN_FLIGHT_REASON } from '@/lib/tts-job-machine';
+import { NarrationAudioPreview } from './narration-audio-preview';
 import { StatusBadge } from './status-badge';
 import { TtsGenerationPanel } from './tts-generation-panel';
+
+const loadNarrationPlayback = (id: string) => narrationAdminClient.playback(id);
 
 type CatalogState =
   | { status: 'loading' }
@@ -237,7 +241,20 @@ export function NarrationPanel({ poiId }: { poiId: string }) {
                 <small>
                   {new Date(item.updatedAt).toLocaleString('vi-VN')}
                 </small>
-                <small>{item.audio ? 'Có audio' : 'Chỉ văn bản'}</small>
+                <small>
+                  {item.audioGeneratedBy ? (
+                    <>
+                      <span className="ai-badge">AI-generated</span> Audio AI ·{' '}
+                      {item.audioGeneratedBy.provider} ·{' '}
+                      {item.audioGeneratedBy.model}@
+                      {item.audioGeneratedBy.modelVersion}
+                    </>
+                  ) : item.audio ? (
+                    'Có audio'
+                  ) : (
+                    'Chỉ văn bản'
+                  )}
+                </small>
                 {item.rejectionReason && (
                   <small className="field-error">
                     Lý do: {item.rejectionReason}
@@ -465,7 +482,7 @@ function NarrationEditor({
       setMessage('Đã lưu bản thuyết minh.');
       await onChanged();
     } catch (cause) {
-      setMessage(cause instanceof Error ? cause.message : 'Không thể lưu.');
+      setMessage(narrationErrorMessage(cause, 'Không thể lưu.'));
     } finally {
       setBusy(false);
     }
@@ -490,9 +507,7 @@ function NarrationEditor({
       setMessage('Workflow đã được cập nhật.');
       await onChanged();
     } catch (cause) {
-      setMessage(
-        cause instanceof Error ? cause.message : 'Không thể cập nhật workflow.',
-      );
+      setMessage(narrationErrorMessage(cause, 'Không thể cập nhật workflow.'));
     } finally {
       setBusy(false);
     }
@@ -590,8 +605,11 @@ function NarrationEditor({
           )}
         </div>
       )}
-      {current?.audio && !file && (
-        <p className="helper">Phiên bản hiện tại đã đính kèm audio.</p>
+      {current?.audio && !file && !startNew && (
+        <NarrationAudioPreview
+          narration={current}
+          loadPlayback={loadNarrationPlayback}
+        />
       )}
       {message && (
         <div

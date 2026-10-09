@@ -5,16 +5,25 @@ import {
   HttpCode,
   Inject,
   Param,
-  ParseUUIDPipe,
   Post,
+  Request,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import type { TtsGenerationJob } from '@damsen/shared-types';
+import type {
+  LatestTtsJobResponse,
+  TtsGenerationJob,
+} from '@damsen/shared-types';
 
-import { AccessTokenGuard, Roles, RolesGuard } from '../auth/rbac.js';
+import {
+  AccessTokenGuard,
+  Roles,
+  RolesGuard,
+  type AuthenticatedRequest,
+} from '../auth/rbac.js';
 import { CreateTtsJobDto } from './tts-job.dto.js';
 import { AdminTtsJobService } from './tts-job.service.js';
+import { ParseUuidShapePipe } from '../common/uuid-shape.pipe.js';
 
 const bodyPipe = <T>(expectedType: new () => T) =>
   new ValidationPipe({
@@ -25,9 +34,16 @@ const bodyPipe = <T>(expectedType: new () => T) =>
   });
 
 /**
- * Admin TTS job endpoints (contract v1 — see apps/api/openapi.yaml). Visitors
- * are rejected by the role guards; jobs are enqueued as drafts only and never
- * auto-approve or publish a narration.
+ * Shape-only UUID (I04): migration 006 seeds narrations with md5-derived ids
+ * whose version/variant bits are arbitrary (I02-9). Job ids are v4 but the
+ * same pipe keeps the routes consistent.
+ */
+const uuidPipe = () => new ParseUuidShapePipe();
+
+/**
+ * Admin TTS job endpoints (contract v1 + additive v1.1 — see
+ * apps/api/openapi.yaml, ADR 0010/0014). Visitors are rejected by the role
+ * guards; jobs produce draft audio only and never approve or publish.
  */
 @Controller('v1/admin')
 @UseGuards(AccessTokenGuard, RolesGuard)
@@ -40,27 +56,31 @@ export class AdminTtsJobController {
   @Roles('EDITOR', 'ADMIN')
   @HttpCode(202)
   create(
-    @Param('narrationId', new ParseUUIDPipe({ version: '4' }))
-    narrationId: string,
+    @Param('narrationId', uuidPipe()) narrationId: string,
     @Body(bodyPipe(CreateTtsJobDto)) input: CreateTtsJobDto,
+    @Request() request: AuthenticatedRequest,
   ): Promise<TtsGenerationJob> {
-    return this.jobs.create(narrationId, input);
+    return this.jobs.create(narrationId, input, request.principal!.userId);
+  }
+
+  @Get('narrations/:narrationId/tts-jobs/latest')
+  @Roles('EDITOR', 'REVIEWER', 'ADMIN')
+  latest(
+    @Param('narrationId', uuidPipe()) narrationId: string,
+  ): Promise<LatestTtsJobResponse> {
+    return this.jobs.latest(narrationId);
   }
 
   @Get('tts-jobs/:jobId')
   @Roles('EDITOR', 'REVIEWER', 'ADMIN')
-  get(
-    @Param('jobId', new ParseUUIDPipe({ version: '4' })) jobId: string,
-  ): Promise<TtsGenerationJob> {
+  get(@Param('jobId', uuidPipe()) jobId: string): Promise<TtsGenerationJob> {
     return this.jobs.get(jobId);
   }
 
   @Post('tts-jobs/:jobId/cancel')
   @Roles('EDITOR', 'ADMIN')
   @HttpCode(200)
-  cancel(
-    @Param('jobId', new ParseUUIDPipe({ version: '4' })) jobId: string,
-  ): Promise<TtsGenerationJob> {
+  cancel(@Param('jobId', uuidPipe()) jobId: string): Promise<TtsGenerationJob> {
     return this.jobs.cancel(jobId);
   }
 }

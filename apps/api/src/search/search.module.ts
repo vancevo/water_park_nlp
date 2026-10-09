@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { createRequire } from 'node:module';
 
 import type { SqlClient } from '../poi/postgres-poi.repository.js';
 import { InMemorySearchRepository } from './in-memory-search.repository.js';
@@ -18,15 +17,12 @@ import { loadSearchFlags } from './search-flags.js';
 import { loadQueryEmbedder } from './query-embedder.js';
 import { InMemoryVectorCandidateSource } from './in-memory-vector.source.js';
 import { PostgresVectorCandidateSource } from './postgres-vector.source.js';
+import { createPgPool } from '../common/pg-pool.js';
 
 function sqlClient(): SqlClient | null {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) return null;
-  const require = createRequire(import.meta.url);
-  const pg = require('pg') as {
-    Pool: new (options: { connectionString: string }) => SqlClient;
-  };
-  return new pg.Pool({ connectionString });
+  return createPgPool<SqlClient>(connectionString, 'search');
 }
 
 function createRepository(): SearchRepository {

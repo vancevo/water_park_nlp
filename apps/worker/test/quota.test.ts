@@ -67,4 +67,21 @@ describe('QuotaGuard', () => {
     expect(cfg.maxPerWindow).toBe(120); // fallback
     expect(cfg.maxConcurrent).toBe(8);
   });
+
+  it('peek reports the next decision without consuming quota', () => {
+    const guard = new QuotaGuard({
+      windowMs: 1000,
+      maxPerWindow: 1,
+      maxConcurrent: 1,
+    });
+    expect(guard.peek('k', 0)).toEqual({ allowed: true });
+    expect(guard.peek('k', 0)).toEqual({ allowed: true });
+    expect(guard.tryAcquire('k', 0)).toEqual({ allowed: true });
+    expect(guard.peek('k', 0)).toEqual({
+      allowed: false,
+      reason: 'rate_limited',
+    });
+    guard.release('k');
+    expect(guard.peek('k', 1000)).toEqual({ allowed: true });
+  });
 });

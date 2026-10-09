@@ -30,6 +30,11 @@ export interface TtsSynthesisRequest {
   config: Record<string, string | number | boolean>;
   /** Deterministic seed when the provider supports it. */
   seed: number | null;
+  /**
+   * Aborted when the per-attempt timeout fires. A provider must stop its engine
+   * process then, so a timed-out attempt cannot keep running beside the retry.
+   */
+  signal?: AbortSignal;
 }
 
 /** Lossless intermediate produced by a provider (WAV before release encoding). */
@@ -87,6 +92,12 @@ export interface TtsArtifact {
   durationSeconds: number;
   sampleRateHz: number;
   mimeType: 'audio/wav';
+  /**
+   * Private object-storage key of the stored audio (I02). Set only by the queue
+   * consumer, which uploads the bytes and attaches them to the draft narration.
+   * Never returned by the public API.
+   */
+  objectKey?: string;
 }
 
 export interface TtsJobRecord {

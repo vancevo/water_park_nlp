@@ -40,6 +40,13 @@ export interface MediaStorage {
 
 export const MEDIA_STORAGE = Symbol('MEDIA_STORAGE');
 
+/** Headers the presigned upload URL signs; the client must send exactly these. */
+export const SIGNED_UPLOAD_HEADERS = [
+  'content-type',
+  'x-amz-checksum-sha256',
+  'x-amz-meta-sha256',
+] as const;
+
 export class MediaStorageUnavailableException extends ServiceUnavailableException {
   constructor() {
     super({
@@ -100,7 +107,15 @@ export class S3MediaStorage implements MediaStorage {
           ChecksumSHA256: checksumSha256Base64,
           Metadata: { sha256: input.sha256 },
         }),
-        { expiresIn },
+        {
+          expiresIn,
+          // The client sends these as headers (`requiredHeaders`), so they
+          // must be signed headers, not hoisted into the query string: real
+          // S3/MinIO reject unsigned `x-amz-*` headers (B03, I04). Signing
+          // them also binds the MIME type and checksum to the URL.
+          signableHeaders: new Set(SIGNED_UPLOAD_HEADERS),
+          unhoistableHeaders: new Set(SIGNED_UPLOAD_HEADERS),
+        },
       );
       return {
         url,
