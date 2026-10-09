@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { errorCodeOf } from '../src/tts/tts-generation-service.js';
 import { parseWav } from '../src/tts/piper/wav.js';
 
 function ascii(buf: Uint8Array, offset: number, text: string): void {
@@ -47,6 +48,14 @@ describe('parseWav', () => {
 
   it('rejects a non-WAV buffer and a missing fmt chunk', () => {
     expect(() => parseWav(new Uint8Array(8))).toThrow('RIFF/WAVE');
+    let caught: unknown;
+    try {
+      parseWav(new TextEncoder().encode('not a wav file at all'));
+    } catch (error) {
+      caught = error;
+    }
+    // A provider writing a non-WAV file is invalid audio, not a provider crash.
+    expect(errorCodeOf(caught)).toBe('TTS_AUDIO_INVALID');
     const noFmt = new Uint8Array(12);
     ascii(noFmt, 0, 'RIFF');
     ascii(noFmt, 8, 'WAVE');
