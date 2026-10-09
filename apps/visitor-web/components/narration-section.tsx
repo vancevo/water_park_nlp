@@ -4,7 +4,6 @@ import type {
   NarrationLocaleCatalog,
   NarrationLocaleCode,
   PoiNarration,
-  SupportedLocale,
 } from '@damsen/shared-types';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { aiAudioLabel } from '@/lib/ai-audio-label';
@@ -17,7 +16,7 @@ import {
   saveNarrationLocalePreference,
 } from '@/lib/narration-locales';
 import { getNarrationPorts } from '@/lib/narration-source';
-import type { UiText } from '@/lib/ui-text';
+import type { UiLocale, UiText } from '@/lib/ui-text';
 
 export type CatalogStatus = 'loading' | 'ready' | 'error';
 export type NarrationStatus =
@@ -32,10 +31,7 @@ export type NarrationStatus =
  * locale is independent of the UI locale: it comes from the catalog, is
  * remembered in localStorage and only falls back to the UI locale initially.
  */
-export function useVisitorNarration(
-  poiId: string | null,
-  uiLocale: SupportedLocale,
-) {
+export function useVisitorNarration(poiId: string | null, uiLocale: UiLocale) {
   const [catalogStatus, setCatalogStatus] = useState<CatalogStatus>('loading');
   const [catalog, setCatalog] = useState<NarrationLocaleCatalog>(
     OFFLINE_NARRATION_LOCALE_CATALOG,

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   UI_LOCALE_STORAGE_KEY,
+  contentLocale,
   readUiLocalePreference,
   saveUiLocalePreference,
   uiText,
@@ -8,22 +9,34 @@ import {
 import { categoryLabel, formatDistance, formatDuration } from './format';
 
 describe('visitor UI text', () => {
-  it('has the same keys in Vietnamese and English', () => {
+  it.each(['en', 'fr'] as const)('has the same keys in vi and %s', (locale) => {
     const vi = uiText('vi');
-    const en = uiText('en');
-    expect(Object.keys(en).sort()).toEqual(Object.keys(vi).sort());
-    expect(Object.keys(en.categories).sort()).toEqual(
+    const other = uiText(locale);
+    expect(Object.keys(other).sort()).toEqual(Object.keys(vi).sort());
+    expect(Object.keys(other.categories).sort()).toEqual(
       Object.keys(vi.categories).sort(),
     );
+  });
+
+  it('serves French interface text but English POI content', () => {
+    expect(uiText('fr').heroLine1).toBe('Chaque pas,');
+    expect(contentLocale('fr')).toBe('en');
+    expect(contentLocale('vi')).toBe('vi');
+    expect(contentLocale('en')).toBe('en');
+    expect(uiText('fr').placeCount(1)).toBe('1 lieu');
+    expect(uiText('fr').placeCount(2)).toBe('2 lieux');
+    expect(categoryLabel('garden', 'fr')).toBe('Jardin');
   });
 
   it('translates every plain string (English differs from Vietnamese)', () => {
     const vi = uiText('vi');
     const en = uiText('en');
+    const fr = uiText('fr');
     const brandLike = new Set(['email']);
     for (const [key, value] of Object.entries(vi)) {
       if (typeof value !== 'string' || brandLike.has(key)) continue;
       expect(en[key as keyof typeof en], key).not.toBe(value);
+      expect(fr[key as keyof typeof fr], key).not.toBe(value);
     }
   });
 
@@ -63,7 +76,9 @@ describe('UI locale preference', () => {
     expect(readUiLocalePreference(store)).toBeNull();
     saveUiLocalePreference('en', store);
     expect(readUiLocalePreference(store)).toBe('en');
-    store.setItem(UI_LOCALE_STORAGE_KEY, 'fr');
+    saveUiLocalePreference('fr', store);
+    expect(readUiLocalePreference(store)).toBe('fr');
+    store.setItem(UI_LOCALE_STORAGE_KEY, 'de');
     expect(readUiLocalePreference(store)).toBeNull();
   });
 

@@ -126,6 +126,18 @@ try {
     'en',
   );
 
+  // French interface: whole UI switches, POI content stays English.
+  await page.getByRole('button', { name: 'Interface en français' }).click();
+  await page.getByLabel('Langue du commentaire').waitFor();
+  assert.equal(await page.locator('html').getAttribute('lang'), 'fr');
+  assert.match(
+    await page.locator('.discovery-panel h1').innerText(),
+    /Chaque pas/,
+  );
+  assert.match(await page.locator('.account-button').innerText(), /connecter/);
+  await page.getByRole('button', { name: 'Giao diện tiếng Việt' }).click();
+  await page.getByLabel('Ngôn ngữ thuyết minh').waitFor();
+
   // Escape closes the POI card; reopen it for the rest of the run.
   await page.keyboard.press('Escape');
   await page.locator('.poi-detail').waitFor({ state: 'detached' });

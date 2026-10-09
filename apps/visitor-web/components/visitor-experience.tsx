@@ -8,7 +8,6 @@ import type {
   PoiNarration,
   PoiSummary,
   RouteResponse,
-  SupportedLocale,
 } from '@damsen/shared-types';
 import type {
   GeoJSONSource,
@@ -23,7 +22,9 @@ import { categoryLabel, formatDistance, formatDuration } from '@/lib/format';
 import {
   readUiLocalePreference,
   saveUiLocalePreference,
+  contentLocale,
   uiText,
+  type UiLocale,
   type UiText,
 } from '@/lib/ui-text';
 import {
@@ -211,9 +212,9 @@ export function VisitorExperience() {
   const narrationSpeakerRef = useRef<() => void>(() => {});
   const narrationAudioRef = useRef<HTMLAudioElement | null>(null);
   const [mapReady, setMapReady] = useState(false);
-  const [locale, setLocaleState] = useState<SupportedLocale>('vi');
+  const [locale, setLocaleState] = useState<UiLocale>('vi');
   const t = uiText(locale);
-  const changeLocale = useCallback((next: SupportedLocale) => {
+  const changeLocale = useCallback((next: UiLocale) => {
     setLocaleState(next);
     saveUiLocalePreference(next);
   }, []);
@@ -320,11 +321,14 @@ export function VisitorExperience() {
       const response = query.trim()
         ? await visitorApi.search({
             q: query.trim(),
-            locale,
+            locale: contentLocale(locale),
             limit: 30,
             ...locationQuery,
           })
-        : await visitorApi.listPois({ locale, ...locationQuery });
+        : await visitorApi.listPois({
+            locale: contentLocale(locale),
+            ...locationQuery,
+          });
       setPois(response.items);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : t.loadPlacesFailed);
@@ -548,7 +552,7 @@ export function VisitorExperience() {
       zoom: 17.2,
     });
     void visitorApi
-      .getPoi(selected.id, locale)
+      .getPoi(selected.id, contentLocale(locale))
       .then(setDetail)
       .catch(() => {});
   }, [cancelSimulationAnimation, locale, selected, stopPlayback]);
@@ -673,7 +677,7 @@ export function VisitorExperience() {
       return;
     }
     // Without narration the text is POI content in the UI locale.
-    const textLocale = narration?.resolvedLocale ?? locale;
+    const textLocale = narration?.resolvedLocale ?? contentLocale(locale);
     const speechTag = speechTagFor(narrationCatalog, textLocale);
     const voices = window.speechSynthesis.getVoices();
     const voice = pickSpeechVoice(voices, speechTag);
@@ -939,9 +943,9 @@ function Header({
   onLogout,
 }: {
   t: UiText;
-  locale: SupportedLocale;
+  locale: UiLocale;
   session: AuthResponse | null;
-  onLocaleChange(locale: SupportedLocale): void;
+  onLocaleChange(locale: UiLocale): void;
   onLogin(): void;
   onLogout(): void;
 }) {
@@ -978,6 +982,15 @@ function Header({
           >
             EN
           </button>
+          <button
+            type="button"
+            className={locale === 'fr' ? 'active' : ''}
+            aria-pressed={locale === 'fr'}
+            aria-label="Interface en français"
+            onClick={() => onLocaleChange('fr')}
+          >
+            FR
+          </button>
         </div>
         {session ? (
           <button className="account-button" onClick={onLogout}>
@@ -1005,7 +1018,7 @@ function PoiDetailCard({
   onNavigate,
 }: {
   t: UiText;
-  locale: SupportedLocale;
+  locale: UiLocale;
   detail: PoiDetail | null;
   narrationSection: React.ReactNode;
   route: RouteResponse | null;
@@ -1059,7 +1072,7 @@ function SimulationControls({
   onReplay,
 }: {
   t: UiText;
-  locale: SupportedLocale;
+  locale: UiLocale;
   isPicking: boolean;
   isWalking: boolean;
   position: GeoPoint | null;
@@ -1219,7 +1232,7 @@ function AuthDialog({
 }: {
   t: UiText;
   mode: AuthMode;
-  locale: SupportedLocale;
+  locale: UiLocale;
   onAuthenticated(session: AuthResponse): void;
   onClose(): void;
   onModeChange(mode: AuthMode): void;
@@ -1240,7 +1253,7 @@ function AuthDialog({
           : await visitorApi.register({
               email,
               password,
-              preferredLocale: locale,
+              preferredLocale: contentLocale(locale),
             });
       onAuthenticated(response);
     } catch (reason) {
