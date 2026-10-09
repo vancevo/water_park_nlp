@@ -9,6 +9,7 @@ import type {
   TtsSynthesisRequest,
   TtsSynthesisResult,
 } from '../types.js';
+import { killProcessTree } from '../process-kill.js';
 import { parseWav } from './wav.js';
 
 /**
@@ -40,6 +41,8 @@ export interface PiperRunInput {
   text: string;
   timeoutMs: number;
   extraArgs: readonly string[];
+  /** Aborted by the job runner's timeout: kill the engine process tree. */
+  signal?: AbortSignal;
 }
 
 /** Produces WAV bytes from a Piper run. Injected in tests. */
@@ -76,12 +79,15 @@ export const spawnPiperRunner: PiperRunner = async (input) => {
           outPath,
           ...input.extraArgs,
         ],
-        { stdio: ['pipe', 'ignore', 'pipe'] },
+        { stdio: ['pipe', 'ignore', 'pipe'], detached: true },
       );
-      const timer = setTimeout(() => {
-        child.kill('SIGKILL');
+      const stop = () => {
+        killProcessTree(child);
         reject(new PiperTimeoutError());
-      }, input.timeoutMs);
+      };
+      const timer = setTimeout(stop, input.timeoutMs);
+      if (input.signal?.aborted) stop();
+      else input.signal?.addEventListener('abort', stop, { once: true });
       let stderr = '';
       child.stderr?.on('data', (chunk: Buffer) => {
         if (stderr.length < 2000) stderr += chunk.toString('utf8');
@@ -92,6 +98,7 @@ export const spawnPiperRunner: PiperRunner = async (input) => {
       });
       child.on('close', (code) => {
         clearTimeout(timer);
+        input.signal?.removeEventListener('abort', stop);
         if (code === 0) resolve();
         else
           reject(new PiperSynthesisError(`exited with code ${code ?? 'null'}`));
@@ -142,6 +149,7 @@ export class PiperTtsProvider implements TtsProvider {
       text: request.transcript,
       timeoutMs: this.timeoutMs,
       extraArgs,
+      signal: request.signal,
     });
 
     const info = parseWav(audio);

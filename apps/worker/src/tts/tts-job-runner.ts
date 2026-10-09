@@ -10,7 +10,7 @@ import type { TtsAudioStore } from './tts-audio-store.js';
 import {
   buildTtsArtifact,
   errorCodeOf,
-  withTimeout,
+  runWithTimeout,
 } from './tts-generation-service.js';
 import { transcriptHash } from './tts-hash.js';
 import type {
@@ -145,14 +145,16 @@ export class TtsJobRunner {
       let attachment: DraftAudioAttachment;
       let done: TtsJobRecord;
       try {
-        const result = await withTimeout(
-          binding.provider.synthesize({
-            transcript: narration.transcript,
-            locale: narration.locale,
-            voiceId: binding.entry.voiceId,
-            config: {},
-            seed: null,
-          }),
+        const result = await runWithTimeout(
+          (signal) =>
+            binding.provider.synthesize({
+              transcript: narration.transcript,
+              locale: narration.locale,
+              voiceId: binding.entry.voiceId,
+              config: {},
+              seed: null,
+              signal,
+            }),
           this.config.timeoutMs,
         );
         validateSynthesizedAudio(result, this.audioLimits);

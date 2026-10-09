@@ -10,6 +10,7 @@ import type {
   TtsSynthesisResult,
 } from '../types.js';
 import { parseWav } from '../piper/wav.js';
+import { killProcessTree } from '../process-kill.js';
 
 /**
  * Generic external-CLI TTS adapter (AI05). A single provider-neutral adapter for
@@ -49,6 +50,8 @@ export interface CliRunInput {
   /** Temp path the command is told to write the WAV to. */
   outPath: string;
   timeoutMs: number;
+  /** Aborted by the job runner's timeout: kill the engine process tree. */
+  signal?: AbortSignal;
 }
 
 /** Produces WAV bytes from one CLI run. Injected in tests. */
@@ -83,11 +86,15 @@ export const spawnCliRunner: CliRunner = async (input) => {
   await new Promise<void>((resolveRun, reject) => {
     const child = spawn(input.command, [...input.args], {
       stdio: ['pipe', 'ignore', 'pipe'],
+      detached: true,
     });
-    const timer = setTimeout(() => {
-      child.kill('SIGKILL');
+    const stop = () => {
+      killProcessTree(child);
       reject(new CliTtsTimeoutError());
-    }, input.timeoutMs);
+    };
+    const timer = setTimeout(stop, input.timeoutMs);
+    if (input.signal?.aborted) stop();
+    else input.signal?.addEventListener('abort', stop, { once: true });
     let stderr = '';
     child.stderr?.on('data', (chunk: Buffer) => {
       if (stderr.length < 2000) stderr += chunk.toString('utf8');
@@ -98,6 +105,7 @@ export const spawnCliRunner: CliRunner = async (input) => {
     });
     child.on('close', (code) => {
       clearTimeout(timer);
+      input.signal?.removeEventListener('abort', stop);
       if (code === 0) resolveRun();
       else
         reject(
@@ -168,6 +176,7 @@ export class CliTtsProvider implements TtsProvider {
         stdin: this.spec.textViaStdin ? request.transcript : null,
         outPath,
         timeoutMs: this.timeoutMs,
+        signal: request.signal,
       });
       const info = parseWav(audio);
       return {

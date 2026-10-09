@@ -68,6 +68,25 @@ function positiveInt(
   return n;
 }
 
+/** Upload + verify + attach: three S3 calls, each capped at 60 s by the audio store. */
+const STORAGE_WORST_CASE_MS = 3 * 60_000;
+
+/**
+ * Longest a healthy claim can go without a heartbeat (the row is touched at the
+ * start of every attempt): one synthesis timeout, the storage calls, and the
+ * longest backoff before the next attempt. A stale window at or below this
+ * would let another worker re-claim a job that is still running.
+ */
+export function minimumStaleRunningMs(input: {
+  timeoutMs: number;
+  baseBackoffMs: number;
+  maxAttempts: number;
+}): number {
+  const longestBackoff =
+    input.baseBackoffMs * 2 ** Math.max(0, input.maxAttempts - 2);
+  return input.timeoutMs + STORAGE_WORST_CASE_MS + longestBackoff;
+}
+
 function required(env: NodeJS.ProcessEnv, name: string): string {
   const value = env[name]?.trim();
   if (!value) throw new TtsWorkerConfigError(`${name} is required`);
@@ -92,9 +111,18 @@ export function loadTtsWorkerConfig(
     'TTS_JOB_STALE_RUNNING_MS',
     30 * 60_000,
   );
-  if (staleRunningMs <= timeoutMs)
+  const baseBackoffMs = positiveInt(env, 'TTS_JOB_BACKOFF_MS', 500);
+  const maxAttempts = positiveInt(env, 'TTS_JOB_MAX_ATTEMPTS', 3);
+  const minStaleMs = minimumStaleRunningMs({
+    timeoutMs,
+    baseBackoffMs,
+    maxAttempts,
+  });
+  if (staleRunningMs <= minStaleMs)
     throw new TtsWorkerConfigError(
-      'TTS_JOB_STALE_RUNNING_MS must exceed TTS_JOB_TIMEOUT_MS',
+      `TTS_JOB_STALE_RUNNING_MS (${staleRunningMs}) must exceed one attempt's worst case ` +
+        `(${minStaleMs} ms = TTS_JOB_TIMEOUT_MS + storage calls + longest backoff); ` +
+        'otherwise a live job is re-claimed mid-run',
     );
   return {
     databaseUrl: required(env, 'DATABASE_URL'),
@@ -110,7 +138,7 @@ export function loadTtsWorkerConfig(
     },
     pollIntervalMs: positiveInt(env, 'TTS_WORKER_POLL_MS', 1000),
     timeoutMs,
-    baseBackoffMs: positiveInt(env, 'TTS_JOB_BACKOFF_MS', 500),
+    baseBackoffMs,
     staleRunningMs,
     rightsOwner:
       env.TTS_AUDIO_RIGHTS_OWNER?.trim() ||
