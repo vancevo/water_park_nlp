@@ -42,6 +42,7 @@ export type {
   CreateTtsJobRequest,
   NarrationAudioGeneratedBy,
   NarrationAudioPlayback,
+  PublicNarrationAudioProvenance,
   TtsJobArtifactSummary,
   LatestTtsJobResponse,
 } from '@damsen/shared-types';

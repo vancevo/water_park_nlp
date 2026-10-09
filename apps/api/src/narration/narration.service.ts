@@ -10,9 +10,11 @@ import {
 } from '@nestjs/common';
 import type {
   AdminNarration,
+  NarrationAudioGeneratedBy,
   NarrationAudioPlayback,
   NarrationLocaleCode,
   PoiNarration,
+  PublicNarrationAudioProvenance,
 } from '@damsen/shared-types';
 
 import { POI_REPOSITORY, type PoiRepository } from '../poi/poi.models.js';
@@ -29,6 +31,20 @@ import {
 import { NarrationLocalesService } from './narration-locales.service.js';
 import { TTS_JOB_REPOSITORY, type TtsJobRepository } from './tts-job.models.js';
 import { TtsJobInProgressException } from './tts-job-controls.js';
+
+/** Contract v1.2: visitors see the AI provenance without the internal job id. */
+function publicProvenance(
+  generatedBy: NarrationAudioGeneratedBy,
+): PublicNarrationAudioProvenance {
+  return {
+    provider: generatedBy.provider,
+    model: generatedBy.model,
+    modelVersion: generatedBy.modelVersion,
+    voiceId: generatedBy.voiceId,
+    license: generatedBy.license,
+    generatedAt: generatedBy.generatedAt,
+  };
+}
 
 @Injectable()
 export class NarrationService {
@@ -85,6 +101,9 @@ export class NarrationService {
             usageRights: narration.audio.usageRights,
             playbackUrl: playback!.url,
             playbackExpiresAt: playback!.expiresAt.toISOString(),
+            ...(narration.audioGeneratedBy
+              ? { generatedBy: publicProvenance(narration.audioGeneratedBy) }
+              : {}),
           }
         : null,
     };

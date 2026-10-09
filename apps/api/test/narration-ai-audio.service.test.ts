@@ -119,4 +119,39 @@ describe('NarrationService AI audio (I02-3, I02-11)', () => {
     expect(removed.audio).toBeNull();
     expect(removed.audioGeneratedBy).toBeUndefined();
   });
+
+  it('labels published AI audio for visitors without the internal job id (v1.2)', async () => {
+    const svc = service();
+    await svc.submit(ID);
+    await svc.approve(ID, 'reviewer-1');
+    const published = await svc.published(POI_ID, 'vi');
+    expect(published.audio?.generatedBy).toEqual({
+      provider: 'piper',
+      model: 'vi-voice',
+      modelVersion: 'v1',
+      voiceId: 'vi-voice',
+      license: 'MIT',
+      generatedAt: NOW.toISOString(),
+    });
+    expect(JSON.stringify(published)).not.toContain(
+      '00000000-0000-4000-8000-0000000007b1',
+    );
+  });
+
+  it('omits generatedBy for editor-uploaded published audio', async () => {
+    const svc = service();
+    await svc.update(ID, {
+      audio: {
+        ...aiDraft().audio!,
+        objectKey: `poi/${POI_ID}/vi/${'f'.repeat(64)}.wav`,
+        sha256: 'f'.repeat(64),
+        rightsOwner: 'Editor upload',
+      },
+    });
+    await svc.submit(ID);
+    await svc.approve(ID, 'reviewer-1');
+    const published = await svc.published(POI_ID, 'vi');
+    expect(published.audio).not.toBeNull();
+    expect(published.audio).not.toHaveProperty('generatedBy');
+  });
 });

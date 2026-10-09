@@ -87,4 +87,17 @@ describe('OpenAPI TTS contract (v1.1)', () => {
     expect(required).not.toContain('artifact');
     expect(required).not.toContain('errorCode');
   });
+
+  it('documents the optional public AI provenance without a job id (v1.2)', () => {
+    const audio = spec.slice(spec.indexOf('    PublicNarrationAudio:\n'));
+    const block = audio.slice(0, audio.indexOf('\n    PoiNarration:\n'));
+    const required = block.slice(0, block.indexOf('properties:'));
+    expect(required).not.toContain('generatedBy');
+    expect(block).toContain('generatedBy:');
+    const provenance = block.slice(
+      block.indexOf('    PublicNarrationAudioProvenance:'),
+    );
+    expect(provenance).toContain('modelVersion');
+    expect(provenance).not.toContain('jobId');
+  });
 });
