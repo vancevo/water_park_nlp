@@ -9,7 +9,7 @@
       "locale": "vi",
       "license": "CC-BY-4.0 (VAIS-1000 corpus; attribution required)",
       "sourceUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/vi/vi_VN/vais1000/medium/vi_VN-vais1000-medium.onnx",
-      "checksum": "",
+      "checksum": "ec7c89e2c85f4d1edc24b6120c18aaf1bda614f06b511567eb9c7c0de15e2dab",
       "modelPath": "config/piper-voices/vi_VN-vais1000-medium.onnx",
       "enabled": true
     },
@@ -21,7 +21,7 @@
       "locale": "en",
       "license": "Public domain (LJ Speech dataset)",
       "sourceUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/ljspeech/medium/en_US-ljspeech-medium.onnx",
-      "checksum": "",
+      "checksum": "6f52a751e2349abe7a76735eb09dc1875298c77ea2342ffd2fef79ff81b87f22",
       "modelPath": "config/piper-voices/en_US-ljspeech-medium.onnx",
       "enabled": true
     },
@@ -33,7 +33,7 @@
       "locale": "fr",
       "license": "CC-BY-4.0 (SIWIS corpus; attribution required)",
       "sourceUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/fr/fr_FR/siwis/medium/fr_FR-siwis-medium.onnx",
-      "checksum": "",
+      "checksum": "641d1ab097da2b81128c076810edb052b385decc8be3381814802a64a73baf99",
       "modelPath": "config/piper-voices/fr_FR-siwis-medium.onnx",
       "enabled": true
     }

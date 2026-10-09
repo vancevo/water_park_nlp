@@ -25,7 +25,10 @@ export class NarrationAdminAdapter {
   constructor(
     private readonly api: NarrationSdk,
     private readonly token: () => string,
-    private readonly fetchImplementation: typeof fetch = globalThis.fetch,
+    // Bound: a bare `window.fetch` called as a method throws "Illegal invocation".
+    private readonly fetchImplementation: typeof fetch = globalThis.fetch.bind(
+      globalThis,
+    ),
   ) {}
 
   list(poiId: string) {

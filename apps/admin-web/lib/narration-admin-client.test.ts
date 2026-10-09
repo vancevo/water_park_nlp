@@ -68,6 +68,31 @@ describe('NarrationAdminAdapter', () => {
     );
   });
 
+  it('calls the default global fetch with the global receiver (browser "Illegal invocation")', async () => {
+    const original = globalThis.fetch;
+    const strictFetch = vi.fn(function (this: unknown) {
+      if (this !== globalThis) throw new TypeError('Illegal invocation');
+      return Promise.resolve(new Response(null, { status: 200 }));
+    });
+    globalThis.fetch = strictFetch as unknown as typeof fetch;
+    try {
+      const adapter = new NarrationAdminAdapter(fakeApi(), () => 'token');
+      await adapter.uploadAudio(
+        {
+          poiId: 'p1',
+          locale: 'vi',
+          mimeType: 'audio/mpeg',
+          sizeBytes: 5,
+          sha256: 'a'.repeat(64),
+        },
+        new Blob(['audio']),
+      );
+      expect(strictFetch).toHaveBeenCalledOnce();
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
+
   it('uploads exact browser-safe signed headers and lets fetch derive content-length', async () => {
     const api = fakeApi();
     const put = vi.fn(async () => new Response(null, { status: 200 }));
