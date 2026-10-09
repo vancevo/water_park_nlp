@@ -195,6 +195,16 @@ describe('TTS job UI state machine', () => {
     expect(
       run([{ type: 'job_restored', job: job('running') }], cancelling),
     ).toBe(cancelling);
+    // An older snapshot of the same job never rolls back a newer poll result.
+    const runningLater = run([
+      {
+        type: 'job_restored',
+        job: { ...job('running'), updatedAt: '2026-10-07T00:00:05.000Z' },
+      },
+    ]);
+    expect(
+      run([{ type: 'job_restored', job: job('queued') }], runningLater),
+    ).toBe(runningLater);
     // Terminal locally stays terminal (same stale-response rule as polling).
     const done = run([{ type: 'job_restored', job: job('cancelled') }]);
     expect(run([{ type: 'job_restored', job: job('running') }], done)).toBe(

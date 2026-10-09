@@ -4,8 +4,8 @@ import type {
   AdminNarration,
   NarrationAudioPlayback,
 } from '@damsen/shared-types';
-import { useCallback, useEffect, useId, useState } from 'react';
-import { narrationErrorMessage } from '@/lib/narration-admin-client';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { narrationPlaybackErrorMessage } from '@/lib/narration-admin-client';
 
 type PlaybackState =
   | { status: 'loading' }
@@ -34,20 +34,30 @@ export function NarrationAudioPreview({
     key: '',
   });
 
+  // Only the newest request may update the state: a slow response for an
+  // older audio version (or an older retry) must not replace a newer one.
+  const request = useRef(0);
+  useEffect(() => {
+    const current = request;
+    return () => {
+      current.current += 1;
+    };
+  }, []);
+
   const load = useCallback(async () => {
     if (!key) return;
+    const id = ++request.current;
     setPlayback({ status: 'loading', key });
     try {
       const { playbackUrl } = await loadPlayback(narration.id);
-      setPlayback({ status: 'ready', url: playbackUrl, key });
+      if (id === request.current)
+        setPlayback({ status: 'ready', url: playbackUrl, key });
     } catch (cause) {
+      if (id !== request.current) return;
       setPlayback({
         status: 'error',
         key,
-        message: narrationErrorMessage(
-          cause,
-          'Không lấy được đường dẫn nghe thử audio.',
-        ),
+        message: narrationPlaybackErrorMessage(cause),
       });
     }
   }, [key, loadPlayback, narration.id]);

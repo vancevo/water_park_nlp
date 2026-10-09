@@ -260,9 +260,10 @@ describe('HTTP TTS generation port', () => {
 });
 
 describe('TTS generation flags and helpers', () => {
-  it('defaults to the real API since I03; off and unknown values hide it', () => {
-    expect(ttsGenerationMode(undefined)).toBe('api');
-    expect(ttsGenerationMode('')).toBe('api');
+  it('fails closed: only an explicit api/demo shows the panel', () => {
+    expect(ttsGenerationMode(undefined)).toBe('off');
+    expect(ttsGenerationMode('')).toBe('off');
+    expect(ttsGenerationMode('API')).toBe('off');
     expect(ttsGenerationMode('off')).toBe('off');
     expect(ttsGenerationMode('demo')).toBe('demo');
     expect(ttsGenerationMode('api')).toBe('api');

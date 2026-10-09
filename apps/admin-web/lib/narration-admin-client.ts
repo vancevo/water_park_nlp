@@ -103,6 +103,19 @@ export function narrationErrorMessage(cause: unknown, fallback: string) {
   return cause instanceof Error ? cause.message : fallback;
 }
 
+/**
+ * Playback-URL failures for the draft audio preview. Unlike save/workflow
+ * errors, server text is never shown here (it is English validation detail,
+ * e.g. a 400 for a narration id the API refuses).
+ */
+export function narrationPlaybackErrorMessage(cause: unknown) {
+  const fallback = 'Không lấy được đường dẫn nghe thử audio.';
+  if (!(cause instanceof ApiClientError))
+    return narrationErrorMessage(cause, fallback);
+  const known = NARRATION_ERROR_LABELS[cause.body?.code ?? ''];
+  return known ?? `${fallback} (HTTP ${cause.status})`;
+}
+
 export function narrationPermissions(roles: UserRole[]) {
   return {
     canEdit: roles.includes('EDITOR') || roles.includes('ADMIN'),

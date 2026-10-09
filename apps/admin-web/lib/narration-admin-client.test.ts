@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   NarrationAdminAdapter,
   narrationErrorMessage,
+  narrationPlaybackErrorMessage,
   narrationPermissions,
   newestNarration,
 } from './narration-admin-client';
@@ -172,5 +173,23 @@ describe('narration v1.1 playback and error copy', () => {
       'Lỗi khác',
     );
     expect(narrationErrorMessage('boom', 'fallback')).toBe('fallback');
+  });
+
+  it('never shows server text for playback failures', () => {
+    const coded = (status: number, code: string, message = 'server text') =>
+      new ApiClientError(status, {
+        code,
+        message,
+        details: null,
+        requestId: 'r',
+      });
+    expect(
+      narrationPlaybackErrorMessage(
+        coded(400, 'BAD_REQUEST', 'Validation failed (uuid is expected)'),
+      ),
+    ).toBe('Không lấy được đường dẫn nghe thử audio. (HTTP 400)');
+    expect(
+      narrationPlaybackErrorMessage(coded(404, 'NARRATION_AUDIO_NOT_FOUND')),
+    ).toContain('Không tìm thấy audio');
   });
 });
