@@ -32,7 +32,7 @@ contract v1 trong `docs/plans/CONG_TU_WORK_SPLIT.md`; vận hành:
 | (chưa có) | Nút "Tạo audio AI" (khoá + lý do nếu chưa đủ điều kiện) | Tạo |
 | `queued` | "Đang chờ xử lý", bước 1/3 | Huỷ |
 | `running` | "Đang tạo audio", bước 2/3 | Huỷ |
-| `succeeded` | "Đã tạo xong audio AI (chỉ cho bản nháp, chưa xuất bản)", provenance; nghe thử nếu có URL, nếu không thì nói rõ bản nháp đã/chưa có audio (I01) | Tạo lại (cần transcript mới — cùng transcript + model version trả lại job cũ) |
+| `succeeded` | "Đã tạo xong audio AI cho bản nháp (chưa xuất bản)", provenance (nhà cung cấp/model/phiên bản/giọng/giấy phép); chỉ nói "đã gắn vào bản nháp" khi bản nháp thật sự mang audio của job này, nếu audio đã bị thay thì nói rõ; nghe qua mục "Audio AI của phiên bản này" (playback URL, I03) | Tạo lại (cần transcript mới — cùng transcript + model version trả lại job cũ) |
 | `failed` | "Tạo audio thất bại — <mô tả theo errorCode>" | Thử lại |
 | `cancelled` | "Đã huỷ tạo audio" | Thử lại |
 
@@ -40,7 +40,8 @@ contract v1 trong `docs/plans/CONG_TU_WORK_SPLIT.md`; vận hành:
   `cancelled`, kể cả khi polling tạm dừng vì lỗi mạng) nút "Lưu thuyết minh"
   và "Gửi duyệt" bị khoá kèm lý do: audio AI không được gắn vào transcript
   hoặc trạng thái workflow khác với lúc tạo. Đổi tab ngôn ngữ rồi quay lại
-  vẫn tiếp tục theo dõi job trong cùng phiên trang.
+  vẫn tiếp tục theo dõi job trong cùng phiên trang; tải lại trang thì tiếp tục
+  theo job mới nhất từ server (`…/tts-jobs/latest`, I03).
 - Polling tự động (0,8 s → tối đa 5 s), dừng ở trạng thái kết thúc; sau 3 lỗi
   mạng liên tiếp thì dừng và cho "Kiểm tra lại".
 - Chỉ hiển thị mã lỗi ổn định (`TTS_TIMEOUT`, `TTS_AUDIO_INVALID`,
@@ -51,7 +52,11 @@ contract v1 trong `docs/plans/CONG_TU_WORK_SPLIT.md`; vận hành:
   message nội bộ của server.
 - Job `queued` quá 2 phút: ghi chú "máy chủ có thể chưa chạy worker", cho huỷ.
 - Quyền hiển thị (UI; backend RBAC là nguồn quyết định): VISITOR không thấy;
-  REVIEWER thấy khu vực nhưng không tạo; EDITOR/ADMIN tạo cho bản draft/rejected.
+  REVIEWER thấy khu vực nhưng không tạo; EDITOR/ADMIN tạo cho bản `draft`
+  (bản `rejected` phải lưu lại để về nháp trước — backend v1.1 chỉ nhận draft).
+- Phát hành: khu vực chỉ hiện khi build với `NEXT_PUBLIC_TTS_GENERATION_MODE=api`
+  (hoặc `demo`); mặc định `off`, fail closed. Bật cho production là quyết định
+  của I04 khi có voice thật + storage thật (lý do: báo cáo I03 §4).
 
 ## Visitor — chọn ngôn ngữ thuyết minh (T03)
 

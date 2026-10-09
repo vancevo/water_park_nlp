@@ -10,7 +10,7 @@ Phạm vi: `apps/admin-web`, `apps/visitor-web`, `apps/mobile` (transport) và
 |---|---|---|---|---|
 | `NEXT_PUBLIC_NARRATION_DATA_MODE` | admin | `api` \| `demo` | `api` | Catalog locale lấy từ `GET /v1/narration-locales` hoặc fixture VI/EN/FR |
 | `NEXT_PUBLIC_NARRATION_DATA_MODE` | visitor | `api` \| `demo` | `api` | Catalog **và** narration công khai lấy từ API hoặc fixture (VI có audio tone, EN chỉ transcript, FR thiếu → fallback EN) |
-| `NEXT_PUBLIC_TTS_GENERATION_MODE` | admin | `off` \| `demo` \| `api` | `api` (từ I03) | Ẩn hoặc bật khu "Audio AI"; `demo` mô phỏng job trên trình duyệt, `api` gọi endpoint thật (contract v1.1). Đổi mặc định sang `api` sau khi I03 chạy qua worker thật — lý do và điều kiện vận hành: `frontend-i03-acceptance-report.md` §4. Giá trị lạ → `off` |
+| `NEXT_PUBLIC_TTS_GENERATION_MODE` | admin | `off` \| `demo` \| `api` | `off` | Ẩn hoặc bật khu "Audio AI"; `demo` mô phỏng job trên trình duyệt, `api` gọi endpoint thật (contract v1.1, đã kiểm E2E ở I03). Thiếu/rỗng/giá trị lạ → `off` (fail closed). Bật `api` cho production là quyết định của I04 (cần voice thật + B03) — lý do: `frontend-i03-acceptance-report.md` §4 |
 
 `demo`/`test` chỉ dùng cho demo/dev. Không bật `demo` trên môi trường phát hành:
 job demo không tạo audio thật và audio nghe thử chỉ là âm báo tổng hợp (có nhãn).
@@ -104,7 +104,7 @@ ngang ở 390 px.
 
 ## 6. Rollback
 
-- Ẩn AI generation: rebuild admin với `NEXT_PUBLIC_TTS_GENERATION_MODE=off`.
+- Ẩn AI generation: rebuild admin với `NEXT_PUBLIC_TTS_GENERATION_MODE=off` (hoặc bỏ biến — mặc định `off`). Dừng tạo audio không cần rebuild: `TTS_GENERATION_ENABLED=false` ở API/worker.
 - Quay về catalog cố định: không cần — nếu API lỗi, visitor tự dùng VI/EN dự
   phòng; admin hiển thị lỗi và không cho chọn locale lạ.
 - Tắt một locale: sửa config backend (xem runbook backend); sau khi reload,
@@ -138,4 +138,6 @@ Kết quả từng checkbox, bằng chứng (lệnh, ảnh chụp, số liệu) 
 Công: [`frontend-i03-acceptance-report.md`](frontend-i03-acceptance-report.md).
 Tóm tắt: FR qua config, luồng tạo → duyệt → xuất bản và visitor PASS (worker
 thật, provider giả, S3 emulator); benchmark corpus chỉ là kiểm tra pipeline
-(PARTIAL); hybrid search on/off PASS.
+(PARTIAL); hybrid search on/off PASS về chức năng (số liệu không đổi giữa các
+chế độ, search sống thấp hơn baseline — chuyển I04). Flag TTS vẫn mặc định
+`off`; bản build staging/acceptance đặt `api` tường minh.
