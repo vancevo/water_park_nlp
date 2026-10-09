@@ -49,6 +49,8 @@ export interface UiText {
   mapOverlay: string;
   mapOpacity: string;
   mapExperimental: string;
+  mapPicture: string;
+  mapPictureNames: Record<string, string>;
   mapLabel: string;
   locateMe: string;
   researchBadge: string;
@@ -158,6 +160,8 @@ const vi: UiText = {
   mapOpacity: 'Độ mờ bản đồ mới',
   mapExperimental:
     'Bản đồ mới đang thử nghiệm: chưa căn chỉnh chính xác với đường đi thật. Đường màu kem là dữ liệu OSM.',
+  mapPicture: 'Ảnh',
+  mapPictureNames: { illustrated: 'Minh họa', official: 'Chính thức (nội bộ)' },
   mapLabel: 'Bản đồ điểm khám phá',
   locateMe: '◎ Vị trí của tôi',
   researchBadge: 'POI + lối đi tham khảo từ OSM · Cần kiểm tra thực địa',
@@ -278,6 +282,11 @@ const en: UiText = {
   mapOpacity: 'New map opacity',
   mapExperimental:
     'The new map is experimental: it is not precisely aligned with the real paths. The cream lines are OSM data.',
+  mapPicture: 'Picture',
+  mapPictureNames: {
+    illustrated: 'Illustrated',
+    official: 'Official (internal)',
+  },
   mapLabel: 'Map of places to explore',
   locateMe: '◎ My location',
   researchBadge: 'Reference POIs and OSM paths · Needs field verification',
@@ -397,6 +406,11 @@ const fr: UiText = {
   mapOpacity: 'Opacité de la nouvelle carte',
   mapExperimental:
     "La nouvelle carte est expérimentale : elle n'est pas alignée précisément avec les vrais sentiers. Les lignes crème sont des données OSM.",
+  mapPicture: 'Image',
+  mapPictureNames: {
+    illustrated: 'Illustrée',
+    official: 'Officielle (interne)',
+  },
   mapLabel: 'Carte des lieux à découvrir',
   locateMe: '◎ Ma position',
   researchBadge:

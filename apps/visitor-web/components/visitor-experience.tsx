@@ -18,6 +18,7 @@ import type {
 } from 'maplibre-gl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { visitorApi } from '@/lib/api';
+import { addMapPictures, pictureLayerId } from '@/lib/map-pictures';
 import { categoryLabel, formatDistance, formatDuration } from '@/lib/format';
 import {
   readUiLocalePreference,
@@ -47,44 +48,6 @@ import { NarrationSection, useVisitorNarration } from './narration-section';
 
 const FALLBACK_CENTER: [number, number] = [106.63853, 10.76433];
 type MapKind = 'old' | 'new' | 'overlay';
-const ILLUSTRATED_SOURCE = 'damsen-illustrated';
-const ILLUSTRATED_LAYER = 'damsen-illustrated-layer';
-
-/**
- * Adds the illustrated map as a hidden raster layer under the OSM walkways, so
- * real routes stay drawn on top and any misalignment is visible. Corners come
- * from `scripts/georeference-illustrated-map/fit.py` (provisional fit).
- */
-async function addIllustratedMap(map: MapLibreMap): Promise<void> {
-  try {
-    const georef = (await (
-      await fetch('/maps/damsen-illustrated.georef.json')
-    ).json()) as { corners: [number, number][] };
-    if (!map.getStyle()) return;
-    map.addSource(ILLUSTRATED_SOURCE, {
-      type: 'image',
-      url: '/maps/damsen-illustrated.jpg',
-      coordinates: georef.corners as [
-        [number, number],
-        [number, number],
-        [number, number],
-        [number, number],
-      ],
-    });
-    map.addLayer(
-      {
-        id: ILLUSTRATED_LAYER,
-        type: 'raster',
-        source: ILLUSTRATED_SOURCE,
-        layout: { visibility: 'none' },
-        paint: { 'raster-opacity': 1, 'raster-fade-duration': 0 },
-      },
-      'damsen-osm-walkways-outline',
-    );
-  } catch {
-    // The illustrated map is optional; the old map keeps working.
-  }
-}
 const MAP_TILE_URL = process.env.NEXT_PUBLIC_MAP_TILE_URL;
 const MAP_TILE_ATTRIBUTION =
   process.env.NEXT_PUBLIC_MAP_TILE_ATTRIBUTION ??
@@ -253,6 +216,8 @@ export function VisitorExperience() {
   const [mapReady, setMapReady] = useState(false);
   const [mapKind, setMapKind] = useState<MapKind>('old');
   const [illustratedOpacity, setIllustratedOpacity] = useState(0.55);
+  const [pictures, setPictures] = useState<string[]>([]);
+  const [pictureId, setPictureId] = useState('illustrated');
   const [locale, setLocaleState] = useState<UiLocale>('vi');
   const t = uiText(locale);
   const changeLocale = useCallback((next: UiLocale) => {
@@ -409,7 +374,12 @@ export function VisitorExperience() {
           data: '/data/damsen-osm-walkways.geojson',
           attribution: '© OpenStreetMap contributors',
         });
-        void addIllustratedMap(map);
+        void addMapPictures(map).then((ids) => {
+          setPictures(ids);
+          setPictureId((current) =>
+            ids.includes(current) ? current : (ids[0] ?? current),
+          );
+        });
         map.addLayer({
           id: 'damsen-osm-walkways-outline',
           type: 'line',
@@ -460,21 +430,22 @@ export function VisitorExperience() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [arrivalOpen, authMode, detailCardOpen, stopPlayback]);
 
-  // Old map = OSM base + walkways; new = the illustrated map; overlay = both.
+  // Old map = OSM base + walkways; new = the chosen picture; overlay = both.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapReady || !map.getLayer(ILLUSTRATED_LAYER)) return;
-    map.setLayoutProperty(
-      ILLUSTRATED_LAYER,
-      'visibility',
-      mapKind === 'old' ? 'none' : 'visible',
-    );
-    map.setPaintProperty(
-      ILLUSTRATED_LAYER,
-      'raster-opacity',
-      mapKind === 'new' ? 1 : illustratedOpacity,
-    );
-  }, [illustratedOpacity, mapKind, mapReady]);
+    if (!map || !mapReady) return;
+    for (const id of pictures) {
+      const layer = pictureLayerId(id);
+      if (!map.getLayer(layer)) continue;
+      const shown = mapKind !== 'old' && id === pictureId;
+      map.setLayoutProperty(layer, 'visibility', shown ? 'visible' : 'none');
+      map.setPaintProperty(
+        layer,
+        'raster-opacity',
+        mapKind === 'new' ? 1 : illustratedOpacity,
+      );
+    }
+  }, [illustratedOpacity, mapKind, mapReady, pictureId, pictures]);
 
   // Remembered interface language (read after mount so SSR markup stays 'vi').
   useEffect(() => {
@@ -959,6 +930,21 @@ export function VisitorExperience() {
                     setIllustratedOpacity(Number(event.target.value))
                   }
                 />
+              </label>
+            ) : null}
+            {mapKind !== 'old' && pictures.length > 1 ? (
+              <label className="map-picture">
+                <span>{t.mapPicture}</span>
+                <select
+                  value={pictureId}
+                  onChange={(event) => setPictureId(event.target.value)}
+                >
+                  {pictures.map((id) => (
+                    <option key={id} value={id}>
+                      {t.mapPictureNames[id] ?? id}
+                    </option>
+                  ))}
+                </select>
               </label>
             ) : null}
             {mapKind !== 'old' ? (

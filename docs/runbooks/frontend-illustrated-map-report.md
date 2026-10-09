@@ -49,3 +49,32 @@ chạy lại được):
 - Xác nhận **quyền sử dụng ảnh** (nguồn, tác giả) trước khi công khai (B01).
 
 Không đổi dữ liệu dẫn đường, API hay OpenAPI; ảnh chỉ là lớp hiển thị tùy chọn.
+
+## Bản đồ chính thức "CVVH Đầm Sen" (khớp bằng 2 hồ, affine)
+
+Ảnh sơ đồ chính thức của công viên là tác phẩm của bên thứ ba (quyền sử dụng
+chưa được xác nhận — B01), nên **ảnh không nằm trong git**: đặt tại
+`apps/visitor-web/public/maps/local/damsen-official.png` (đã gitignore). Chỉ có
+số liệu căn chỉnh được commit (`public/maps/damsen-official.georef.json`). Trong
+app, khi có file này thì ô "Ảnh" cho chọn "Chính thức (nội bộ)".
+
+Khớp bằng hồ chính (có đảo) và hồ Khu B của OSM, phép biến đổi affine
+(`fit_official.py`, chạy lại được):
+
+| Chỉ số | Chỉ xoay + co giãn đều | Affine |
+|---|---|---|
+| Trùng khớp hồ chính (IoU) | 0,48 | **0,83** |
+| Trùng khớp hồ Khu B (IoU) | 0,32 | 0,35 (nhận dạng hồ bằng màu, kém ổn định) |
+| Đường OSM rơi xuống nước vẽ | — | 4,7% (chủ yếu cầu Cửu Khúc và đường ven hồ) |
+| Tỉ lệ | — | ~0,66–0,68 m/pixel |
+
+- Hướng giống ảnh minh họa: **phần "trên" của bản đồ là hướng tây** (Kênh Tân Hóa
+  nằm phía tây công viên trong OSM). Hai bản đồ và OSM nhất quán.
+- Bằng mắt: đường ven hồ, trục từ Cổng số 1 lên đảo Sân khấu Ngôi Sao và các lối
+  ở Khu B khớp với đường vẽ; vùng khu trò chơi phía đông ít đường OSM hơn.
+- **Chưa chứng minh được độ chính xác tuyệt đối.** Thử đối chiếu 3 cổng: cổng
+  nhà hàng Thủy Tạ khớp trong ~60–80 m, nhưng Cổng số 1 và 1A lệch ~190 m so với
+  nút `barrier=gate` gần nhất — OSM không đặt tên các cổng nên có thể là cổng khác,
+  hoặc phép khớp chưa đủ chính xác ở đó. Cần điểm đối chiếu thực địa (GPS tại cổng,
+  cầu, ngã ba) để chốt; không dùng để dẫn đường trước khi làm việc này.
+

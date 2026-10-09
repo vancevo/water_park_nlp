@@ -1,0 +1,15 @@
+{
+  "pictures": [
+    {
+      "id": "illustrated",
+      "url": "/maps/damsen-illustrated.jpg",
+      "georef": "/maps/damsen-illustrated.georef.json"
+    },
+    {
+      "id": "official",
+      "url": "/maps/local/damsen-official.jpg",
+      "georef": "/maps/damsen-official.georef.json",
+      "optional": true
+    }
+  ]
+}

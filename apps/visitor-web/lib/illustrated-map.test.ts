@@ -3,21 +3,42 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const publicDir = join(__dirname, '../public');
-const georef = JSON.parse(
-  readFileSync(join(publicDir, 'maps/damsen-illustrated.georef.json'), 'utf8'),
-) as {
+interface Georef {
   status: string;
   image: string;
+  imageLocalOnly?: boolean;
   corners: [number, number][];
-  lakeOverlapIoU: number;
-  osmFootpathSamplesOnPaintedWater: number;
-  northUpBaseline: { lakeOverlapIoU: number };
+}
+const read = (file: string) =>
+  JSON.parse(readFileSync(join(publicDir, 'maps', file), 'utf8')) as Georef;
+const manifest = JSON.parse(
+  readFileSync(join(publicDir, 'maps/index.json'), 'utf8'),
+) as {
+  pictures: { id: string; url: string; georef: string; optional?: boolean }[];
 };
 
-describe('illustrated map georeference', () => {
-  it('ships the image it describes', () => {
-    expect(existsSync(join(publicDir, 'maps', georef.image))).toBe(true);
+describe('map picture manifest', () => {
+  it('lists pictures whose georeference file exists', () => {
+    expect(manifest.pictures.length).toBeGreaterThan(0);
+    for (const picture of manifest.pictures) {
+      expect(
+        existsSync(join(publicDir, picture.georef.replace(/^\//, ''))),
+      ).toBe(true);
+    }
   });
+
+  it('only third-party artwork may be missing from the repo (optional)', () => {
+    for (const picture of manifest.pictures) {
+      const present = existsSync(
+        join(publicDir, picture.url.replace(/^\//, '')),
+      );
+      if (!picture.optional) expect(present, picture.id).toBe(true);
+    }
+  });
+});
+
+describe.each(manifest.pictures)('georeference of $id', (picture) => {
+  const georef = read(picture.georef.split('/').pop()!);
 
   it('has four corners around the park, in lon/lat order', () => {
     expect(georef.corners).toHaveLength(4);
@@ -44,12 +65,29 @@ describe('illustrated map georeference', () => {
     expect(new Set(signs).size).toBe(1);
   });
 
-  it('stays honest: provisional, and better than a north-up guess', () => {
+  it('stays honest: provisional until verified on site', () => {
     expect(georef.status).toBe('provisional');
-    expect(georef.lakeOverlapIoU).toBeGreaterThan(
-      georef.northUpBaseline.lakeOverlapIoU,
-    );
-    // A rigid fit leaves footpaths on painted water; the report must say so.
-    expect(georef.osmFootpathSamplesOnPaintedWater).toBeGreaterThan(0);
+  });
+});
+
+describe('quality numbers are recorded', () => {
+  it('illustrated: beats a north-up guess but leaves footpaths on water', () => {
+    const g = read('damsen-illustrated.georef.json') as Georef & {
+      lakeOverlapIoU: number;
+      osmFootpathSamplesOnPaintedWater: number;
+      northUpBaseline: { lakeOverlapIoU: number };
+    };
+    expect(g.lakeOverlapIoU).toBeGreaterThan(g.northUpBaseline.lakeOverlapIoU);
+    expect(g.osmFootpathSamplesOnPaintedWater).toBeGreaterThan(0);
+  });
+
+  it('official: affine beats similarity-only on the main lake', () => {
+    const g = read('damsen-official.georef.json') as Georef & {
+      mainLakeIoU: number;
+      similarityOnlyBaseline: { mainLakeIoU: number };
+      imageLocalOnly: boolean;
+    };
+    expect(g.mainLakeIoU).toBeGreaterThan(g.similarityOnlyBaseline.mainLakeIoU);
+    expect(g.imageLocalOnly).toBe(true);
   });
 });

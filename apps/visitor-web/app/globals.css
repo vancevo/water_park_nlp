@@ -1090,3 +1090,22 @@ audio:focus-visible {
     left: 10px;
   }
 }
+
+.map-picture {
+  display: flex;
+  flex: 1 1 100%;
+  gap: 8px;
+  align-items: center;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.map-picture select {
+  flex: 1;
+  min-height: 32px;
+  font: inherit;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
