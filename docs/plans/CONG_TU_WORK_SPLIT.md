@@ -85,16 +85,16 @@ Công có thể bắt đầu ngay, không cần UI của Tú.
 - [x] **C03 — TTS worker foundation** (I02 consumer + DB int tests; drills I04 §3)
   - Thực hiện AI02: `TtsProvider`, job persistence, idempotency,
     retry/dead-letter, artifact/model registry và audio validation.
-- [ ] **C04 — Piper baseline** (code + test mock; chưa từng sinh audio thật — voice Piper 403)
+- [x] **C04 — Piper baseline** (2026-10-09: giọng Piper thật vi/en/fr trong `config/tts-voices.json`, E2E sinh audio → draft PASS với MinIO — PR #14; còn lại: encode mp3/m4a, nhãn ghi công CC-BY cho visitor)
   - Thực hiện AI03 bằng corpus fixture nhỏ riêng của backend.
   - Pin model/voice/license/checksum; sinh audio và gắn vào draft narration.
-- [ ] **C05 — Provider benchmark và training decision** (harness xong; corpus đầy đủ chỉ chạy provider giả, chưa blind review)
+- [ ] **C05 — Provider benchmark và training decision** (harness xong; corpus 64 câu đã chạy qua Piper THẬT 64/64 ok — PR #14; còn lại: chạy ZeroTTS/MOSS, blind review của người, quyết định chọn provider)
   - Thực hiện AI05 với fixture trước; chạy lại bộ corpus đầy đủ của Tú khi tích hợp.
   - AI06 chỉ mở sau quyết định GO; không train từ đầu.
-- [ ] **C06 — Semantic search production** (flag/fallback chạy; chưa có embedding endpoint production — I04 §6b)
+- [ ] **C06 — Semantic search production** (flag/fallback chạy; lexical Recall@10 0,60 → 0,90 ở PR #16, vẫn thấp hơn ngưỡng ADR 0012 0,911; chưa có embedding endpoint production)
   - Thực hiện AI07: embedding provider, vector retrieval, hybrid ranking,
     feature flag và lexical fallback.
-- [ ] **C07 — Backend/infra hardening** (drills + rollback xong I04 §3–4; chưa tick: metrics scrape endpoint và storage-restore drill còn mở)
+- [ ] **C07 — Backend/infra hardening** (drills + rollback xong I04 §3–4; F5–F7 sửa ở PR #15; chưa tick: metrics scrape endpoint, storage-restore drill và load test còn mở)
   - Phần Công của AI08: queue/model metrics, quota, dead-letter, retention,
     failure drills và rollback.
 
@@ -202,14 +202,15 @@ thời gian rảnh trước checkpoint này.
 
 - [x] Config thêm FR → admin/visitor tự xuất hiện.
 - [x] Tạo transcript → generate → running → draft audio → review → publish.
-  (worker thật; provider CLI âm sine giả + S3 emulator moto — Piper/B03 vẫn mở)
+  (lần đầu: provider âm sine giả + moto; chạy lại 2026-10-09 với worker + Piper thật + MinIO thật cho vi/en/fr — PR #14)
 - [x] Visitor chọn locale, nghe đúng audio hoặc thấy fallback rõ ràng.
 - [ ] Chạy corpus T06 qua provider được chọn và xuất benchmark cuối.
-  (PARTIAL: 64 câu qua benchmark worker với provider giả, báo cáo
-  `data/tts-evaluation/reports/fixtures/i03-pipeline-check-report.json` chỉ là
-  kiểm tra pipeline; cần provider thật + blind review)
+  (PARTIAL — chỉ còn phần của người: 64/64 câu đã qua Piper thật,
+  `data/tts-evaluation/reports/fixtures/i03-real-piper-report.json`; gate còn
+  `missing-human-ratings` cho tới khi ≥ 3 người bản ngữ/locale chấm mù gói
+  `tts-blind-review-pack/`; chưa chọn provider vì chưa chạy ZeroTTS/MOSS)
 - [x] Hybrid search feature flag on/off đều hoạt động. (embedder giả để kiểm
-  đường pgvector; xem báo cáo về chênh lệch baseline)
+  đường pgvector; lexical đã cải thiện ở PR #16, xem `backend-hybrid-search.md`)
 
 Báo cáo: `docs/runbooks/frontend-i03-acceptance-report.md`.
 
@@ -217,7 +218,7 @@ Báo cáo: `docs/runbooks/frontend-i03-acceptance-report.md`.
 
 - [x] Tổng hợp backend/frontend evidence. (`docs/runbooks/backend-i04-release-gate.md` §0–1)
 - [x] Fault injection và rollback model/feature flag. (§3–4: 20 drills, model/flag/migration 012)
-- [ ] Chỉ đánh dấu DONE khi B03/object storage thật và root quality gate pass. (CHƯA đạt: gate chỉ PASS local, CI chưa chạy; B03 mới MITIGATED bằng bản MinIO dev build tự compile — cần coordinator duyệt hoặc chạy lại trên image được duyệt, §2/§5)
+- [x] Chỉ đánh dấu DONE khi B03/object storage thật và root quality gate pass. (2026-10-09: CI `quality` + `fixture-contracts` xanh trên PR #14; smoke MinIO thật PASS trên image `bitnamilegacy/minio` ghim digest vì image chính thức đã bị gỡ — `backend-i04-release-gate.md` §9. Kết luận release vẫn NO-GO cho AI go-live và public; AWS S3/staging thuộc T60)
 
 ## 6. Lịch song song đề xuất
 
