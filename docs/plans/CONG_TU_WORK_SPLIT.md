@@ -200,11 +200,18 @@ thời gian rảnh trước checkpoint này.
 
 ### I03 — End-to-end acceptance — Owner: Tú
 
-- [ ] Config thêm FR → admin/visitor tự xuất hiện.
-- [ ] Tạo transcript → generate → running → draft audio → review → publish.
-- [ ] Visitor chọn locale, nghe đúng audio hoặc thấy fallback rõ ràng.
+- [x] Config thêm FR → admin/visitor tự xuất hiện.
+- [x] Tạo transcript → generate → running → draft audio → review → publish.
+  (worker thật; provider CLI âm sine giả + S3 emulator moto — Piper/B03 vẫn mở)
+- [x] Visitor chọn locale, nghe đúng audio hoặc thấy fallback rõ ràng.
 - [ ] Chạy corpus T06 qua provider được chọn và xuất benchmark cuối.
-- [ ] Hybrid search feature flag on/off đều hoạt động.
+  (PARTIAL: 64 câu qua benchmark worker với provider giả, báo cáo
+  `data/tts-evaluation/reports/fixtures/i03-pipeline-check-report.json` chỉ là
+  kiểm tra pipeline; cần provider thật + blind review)
+- [x] Hybrid search feature flag on/off đều hoạt động. (embedder giả để kiểm
+  đường pgvector; xem báo cáo về chênh lệch baseline)
+
+Báo cáo: `docs/runbooks/frontend-i03-acceptance-report.md`.
 
 ### I04 — Release gate — Owner: Công
 

@@ -60,3 +60,10 @@ Backend (Công) chạy `--export-benchmark` rồi đưa file vào benchmark runn
 worker thay cho fixture nhỏ `config/tts-benchmark-sentences.json`; báo cáo cuối
 thêm `corpus`, `automatedChecks`, `humanRatings` và `gate` theo
 `reports/report.schema.json`. Không thay đổi file trong `config/` từ luồng này.
+
+Kết quả I03: `reports/fixtures/i03-pipeline-check-report.json` — toàn bộ 64 câu
+qua benchmark worker với provider CLI **âm sine giả** (Piper bị chặn), kèm
+automated checks đo trên file WAV và gate theo `thresholds.json`. Đây là kiểm
+tra pipeline, **không phải** benchmark chất lượng; mọi gate fail với
+`missing-human-ratings` cho tới khi có provider thật + blind review. Chi tiết:
+`docs/runbooks/frontend-i03-acceptance-report.md` §3.4.

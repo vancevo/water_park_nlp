@@ -8,7 +8,7 @@
 - Integration status: `SEARCH_ANALYTICS_POSTGIS_PASS`
 - Active blockers: B01 blocks public map/content release; B03 (real MinIO/S3) gates I04 only — I02 smoke ran on an S3 emulator
 - Last updated: 2026-10-09
-- Updated by: Công (I02 backend, executed on Tú's request)
+- Updated by: Tú (I03 acceptance)
 
 ## Task board
 
@@ -29,9 +29,10 @@
 | T24–T25 Media/narration | IN_PROGRESS | API/mobile/admin agents | T21–T23 | Workflow, signer, admin preview and mobile player pass; B03 real storage smoke + offline audio cache remain |
 | T25A/T25B Configurable narration locales (backend, C02) | IN_PROGRESS | Công backend | T24–T25, C01 | Config loader + `GET /v1/narration-locales` + fallback + write validation + migration 009 + ADR 0007 on `codex/cong-c02-locale-backend`; T25C–E (Tú) + integration I01 pending |
 | T01–T07 Narration locale UI, AI TTS UX, mobile BCP 47, TTS eval corpus (T25C–E, AI01, AI04 UI) | DONE (mock/fixture level) | Tú | contract v1 | Merged (PR #9): mock ports + fixtures, admin tabs/AI generation (save/submit locked while a job runs), visitor selector, mobile transport, `data/tts-evaluation`; runbook `docs/runbooks/frontend-narration-locales-tts.md`. Full T25C–E/AI04 acceptance (real catalog with FR, real jobs/audio) closes only at I01–I04 |
-| I01 Adapter swap (narration locales + TTS jobs) | REVIEW | Tú | T01–T07, C01–C07 | `tu/i01-adapter-swap`: real catalog + AI04 endpoints verified in browser (`SMOKE_MODE=api`), error-code mapping, honest succeeded copy; TTS flag default stays `off`. E2E ran via a claim harness over real worker code + fake tone provider (no consumer/Piper voices here); audio not attached to draft — 11 I02 issues in `docs/runbooks/frontend-i01-integration-report.md` |
+| I01 Adapter swap (narration locales + TTS jobs) | DONE | Tú | T01–T07, C01–C07, I02 | Real catalog + AI endpoints in the browser; after I02 the real E2E runs through the real worker process (no claim harness) — I03 report §3.2; findings that drove I02: `docs/runbooks/frontend-i01-integration-report.md` |
 | AI00–AI08 AI/TTS/search hardening | IN_PROGRESS | Công backend / Tú UX+eval | T41–T42 | AI02–AI05, AI07, AI08 merged; I02 wires the AI08 kill switch/quota into API + worker (ADR 0014); live scrape endpoint + storage-restore (B03) deferred; AI06 requires explicit GO; remaining for Công = I04 |
 | I02 Contract/integration fixes | REVIEW | Công (executed on Tú's request) | I01 | `cong/i02-i04`: worker queue consumer (claim/cancel-safe/attach audio + AI provenance to draft), AI08 kill switch + quota in API/worker, draft-only create + submit/PATCH lock, OpenAPI errors, voice-manifest stamp, contract v1.1 additive (ADR 0014), migration 012; all 11 I01 issues fixed — `docs/runbooks/backend-i02-integration-fixes.md`. Live smoke: real API + worker + Postgres + S3 **emulator** (moto) + fake CLI tone provider (Piper voices blocked). Reviewed 2026-10-09: claim lease fencing, stale re-claim dead-letter, succeeded-idempotency vs replaced audio, S3 call timeout fixed; admin UI (unchanged) passes the api-mode browser smoke against the I02 API |
+| I03 End-to-end acceptance | PARTIAL | Tú | I01, I02 | `tu/i03-acceptance`: admin UI on contract v1.1 (playback + AI provenance, latest-job resume, new error codes; TTS flag default now `api`). Real stack (API :3000 + real worker + Postgres `damsen_i03` + moto S3 + fake tone provider): FR via config, transcript → generate → draft audio → review → publish, visitor locale audio/fallback, hybrid flag on/off **PASS**; T06 corpus benchmark only a pipeline check (fake provider, no blind review) → box 4 open. Report + issues for Công: `docs/runbooks/frontend-i03-acceptance-report.md` |
 | T30 Mobile map | DONE | mobile agent | T21 contract | Typecheck + 10 shared mobile tests pass |
 | T31 GPS session | DONE | mobile agent | T30 | Permission/signal state machine + explicit follow mode |
 | T32 Walkway graph | DONE | geo agent | W1 | 7-node/8-edge fixture, topology validator and migration 004 |

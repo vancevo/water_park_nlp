@@ -70,19 +70,19 @@ Theo ADR 0006 không thêm màn hình mới; chỉ đảm bảo transport nhận
 
 ## Khoảng trống contract (đề xuất cho Công, không tự sửa)
 
-Kiểm chứng với backend thật ở I01: cả bốn mục dưới đây **vẫn mở** (xem
-`docs/runbooks/frontend-i01-integration-report.md` §4 cho danh sách I02 kèm
-file:line). UI giữ cách xử lý suy giảm an toàn.
+Ba khoảng trống phía admin của I01 đã đóng bằng contract v1.1 (ADR 0014) và UI
+dùng chúng từ I03 (`docs/runbooks/frontend-i03-acceptance-report.md`):
 
-- Job/narration chưa có URL audio để admin nghe lại bản nháp do AI tạo
-  (`AdminNarration.audio` không có `playbackUrl`); demo dùng âm báo cục bộ.
-- Narration chưa mang provenance AI (`generatedBy {provider, model,
-  modelVersion, jobId}`) nên lịch sử phiên bản chưa thể gắn nhãn AI sau reload.
-- Chưa có endpoint liệt kê job gần nhất của một narration. UI nhớ job đang
-  chạy trong phiên trang (đổi tab vẫn theo dõi), nhưng sau khi tải lại trang
-  hoặc ở trình duyệt khác thì không biết job đang chạy; backend cần từ chối
-  submit khi narration còn job `queued`/`running` (RBAC/khóa phía server là
-  nguồn quyết định).
-- Mã lỗi 409 của create/cancel job (ví dụ narration không còn là draft, job đã
-  kết thúc) chưa được tài liệu hoá trong OpenAPI; UI hiện chỉ hiển thị thông
-  báo chung theo HTTP status.
+- Đã đóng: nghe lại audio AI của bản nháp qua
+  `GET /v1/admin/narrations/{id}/audio/playback` (URL ký 10 phút).
+- Đã đóng: provenance `AdminNarration.audioGeneratedBy` — nhãn AI-generated
+  và nhà cung cấp/model/phiên bản/giọng/giấy phép hiện cả sau reload và trong
+  lịch sử phiên bản.
+- Đã đóng: `GET …/tts-jobs/latest` để tiếp tục theo dõi job sau khi tải lại
+  trang; server chặn submit/PATCH khi còn job (`409 TTS_JOB_IN_PROGRESS`) và
+  các mã lỗi đã có trong OpenAPI, UI map sang tiếng Việt.
+
+Còn mở:
+
+- Narration công khai (`PoiNarration`) chưa có cờ AI, nên visitor chưa thể
+  ghi chú "audio do AI tạo" khi phát bản đã xuất bản (I03 §5, đề xuất I04).
