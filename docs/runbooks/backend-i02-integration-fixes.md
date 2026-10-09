@@ -86,7 +86,32 @@ node apps/worker/dist/worker.js &
 TTS_QUEUE_TEST_DATABASE_URL=…/damsen_i02 npx vitest run --root apps/worker test/postgres-tts-job-queue.int.test.ts
 ```
 
-## 5. Follow-ups for Tú's UI (optional, no UI change is required)
+## 5. Review fixes (2026-10-09)
+
+| Severity | Finding | Fix |
+|---|---|---|
+| High | A worker whose job was cancelled and immediately re-queued (same id), or re-claimed after the stale window, still passed the `status = 'running'` check and could write `failed`/`succeeded` into the new run | Per-claim `lease_token` (migration 012); every worker write and the commit transaction require it (`postgres-tts-job-queue.ts`, `in-memory-tts-job-queue.ts`, `tts-job-runner.ts`) |
+| Medium | A stale re-claim reset `attempts = 0`, so a job that crashes the worker every time looped forever (every 30 min) | Stale re-claim keeps spent attempts; exhausted → `failed`, dead-lettered, `TTS_WORKER_LOST` (OpenAPI errorCode list) |
+| Medium | Create returned an old `succeeded` job as-is even after the editor had replaced/removed that audio (e.g. transcript A → B → A), so "succeeded" claimed audio the draft no longer had | `succeeded` is idempotent only while `audioGeneratedBy.jobId` + sha256 still match; otherwise the same row is re-queued (`requeue` accepts `succeeded`) |
+| Low | S3 calls had no timeout: a hung upload held a concurrency slot without heart-beating | `S3TtsAudioStore` aborts each call after 60 s (`requestTimeoutMs`) → `TTS_STORAGE_ERROR`, retried |
+| Low (docs) | Orphan objects were said to be removed by the ADR 0004 lifecycle job, which does not exist; quota env vars are shared by API and worker | ADR 0014 / runner comment / `.env.example` corrected |
+
+Evidence: runner tests "superseded claim never writes", "stale re-claim …
+dead-letters"; DB tests (6, `damsen_i02_rev`) incl. stale/supersede fencing;
+service test "succeeded is idempotent only while the draft still carries its
+audio"; live: worker log `no longer owned by this claim … result discarded`
+after cancel → immediate re-queue, and remove-audio → create re-queues the
+succeeded row. Admin UI (unchanged, `NEXT_PUBLIC_TTS_GENERATION_MODE=api`)
+browser smoke PASS against the I02 API (`/api/*` routed to `:3100` by a
+Playwright route shim because the Next rewrite targets `:3000`).
+
+Known, not fixed: `PATCH`/`submit` lock and create's "one active job per
+narration" are check-then-act (no unique partial index); the worker's
+transactional draft/transcript re-check keeps data correct, a lost race only
+wastes a run. SIGTERM drains in-flight jobs without a bound — a platform kill
+leaves the job for the stale re-claim (30 min).
+
+## 6. Follow-ups for Tú's UI (optional, no UI change is required)
 
 - Use `artifact` on a succeeded job and `GET …/audio/playback` to let the editor
   listen to the AI draft; `audioGeneratedBy` for the AI-generated label.
