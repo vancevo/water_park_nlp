@@ -18,7 +18,11 @@ import type {
 } from 'maplibre-gl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { visitorApi } from '@/lib/api';
-import { addMapPictures, pictureLayerId } from '@/lib/map-pictures';
+import {
+  addMapPictures,
+  pictureLayerId,
+  type AddedPicture,
+} from '@/lib/map-pictures';
 import { categoryLabel, formatDistance, formatDuration } from '@/lib/format';
 import {
   readUiLocalePreference,
@@ -216,8 +220,8 @@ export function VisitorExperience() {
   const [mapReady, setMapReady] = useState(false);
   const [mapKind, setMapKind] = useState<MapKind>('old');
   const [illustratedOpacity, setIllustratedOpacity] = useState(0.55);
-  const [pictures, setPictures] = useState<string[]>([]);
-  const [pictureId, setPictureId] = useState('illustrated');
+  const [pictures, setPictures] = useState<AddedPicture[]>([]);
+  const [pictureId, setPictureId] = useState('');
   const [locale, setLocaleState] = useState<UiLocale>('vi');
   const t = uiText(locale);
   const changeLocale = useCallback((next: UiLocale) => {
@@ -374,10 +378,12 @@ export function VisitorExperience() {
           data: '/data/damsen-osm-walkways.geojson',
           attribution: '© OpenStreetMap contributors',
         });
-        void addMapPictures(map).then((ids) => {
-          setPictures(ids);
+        void addMapPictures(map).then((added) => {
+          setPictures(added);
           setPictureId((current) =>
-            ids.includes(current) ? current : (ids[0] ?? current),
+            added.some((picture) => picture.id === current)
+              ? current
+              : (added[0]?.id ?? ''),
           );
         });
         map.addLayer({
@@ -434,7 +440,7 @@ export function VisitorExperience() {
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
-    for (const id of pictures) {
+    for (const { id } of pictures) {
       const layer = pictureLayerId(id);
       if (!map.getLayer(layer)) continue;
       const shown = mapKind !== 'old' && id === pictureId;
@@ -939,7 +945,7 @@ export function VisitorExperience() {
                   value={pictureId}
                   onChange={(event) => setPictureId(event.target.value)}
                 >
-                  {pictures.map((id) => (
+                  {pictures.map(({ id }) => (
                     <option key={id} value={id}>
                       {t.mapPictureNames[id] ?? id}
                     </option>
@@ -948,7 +954,12 @@ export function VisitorExperience() {
               </label>
             ) : null}
             {mapKind !== 'old' ? (
-              <small className="map-note">{t.mapExperimental}</small>
+              <small className="map-note">
+                {pictures.find((picture) => picture.id === pictureId)
+                  ?.confidence === 'fitted'
+                  ? t.mapFitted
+                  : t.mapExperimental}
+              </small>
             ) : null}
           </div>
           {message ? <div className="toast">{message}</div> : null}

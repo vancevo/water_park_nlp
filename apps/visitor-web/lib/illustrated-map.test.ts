@@ -14,7 +14,13 @@ const read = (file: string) =>
 const manifest = JSON.parse(
   readFileSync(join(publicDir, 'maps/index.json'), 'utf8'),
 ) as {
-  pictures: { id: string; url: string; georef: string; optional?: boolean }[];
+  pictures: {
+    id: string;
+    url: string;
+    georef: string;
+    optional?: boolean;
+    confidence?: string;
+  }[];
 };
 
 describe('map picture manifest', () => {
@@ -65,12 +71,29 @@ describe.each(manifest.pictures)('georeference of $id', (picture) => {
     expect(new Set(signs).size).toBe(1);
   });
 
-  it('stays honest: provisional until verified on site', () => {
-    expect(georef.status).toBe('provisional');
+  it('never claims to be verified on site', () => {
+    expect(['provisional', 'fitted-to-osm-paths']).toContain(georef.status);
   });
 });
 
 describe('quality numbers are recorded', () => {
+  it('illustrated 3: painted paths match the OSM footpaths within a few metres', () => {
+    const g = read('damsen-illustrated-3.georef.json') as Georef & {
+      meanDistanceMetres: number;
+      osmPathSamplesWithin3HalfPixels: number;
+      rotationDegrees: number;
+      startingGuessWithin3HalfPixels: number;
+    };
+    expect(g.meanDistanceMetres).toBeLessThan(5);
+    expect(g.osmPathSamplesWithin3HalfPixels).toBeGreaterThan(0.8);
+    expect(g.osmPathSamplesWithin3HalfPixels).toBeGreaterThan(
+      g.startingGuessWithin3HalfPixels,
+    );
+    expect(Math.abs(g.rotationDegrees)).toBeLessThan(2); // drawn north-up
+    expect(manifest.pictures[0]?.id).toBe('illustrated3'); // default picture
+    expect(manifest.pictures[0]?.confidence).toBe('fitted');
+  });
+
   it('illustrated: beats a north-up guess but leaves footpaths on water', () => {
     const g = read('damsen-illustrated.georef.json') as Georef & {
       lakeOverlapIoU: number;

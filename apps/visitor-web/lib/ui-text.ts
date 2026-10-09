@@ -49,6 +49,7 @@ export interface UiText {
   mapOverlay: string;
   mapOpacity: string;
   mapExperimental: string;
+  mapFitted: string;
   mapPicture: string;
   mapPictureNames: Record<string, string>;
   mapLabel: string;
@@ -160,8 +161,11 @@ const vi: UiText = {
   mapOpacity: 'Độ mờ bản đồ mới',
   mapExperimental:
     'Bản đồ mới đang thử nghiệm: chưa căn chỉnh chính xác với đường đi thật. Đường màu kem là dữ liệu OSM.',
+  mapFitted:
+    'Bản đồ này đã được khớp với đường đi OSM (sai số trung bình khoảng 3 m). Chưa kiểm tra thực địa.',
   mapPicture: 'Ảnh',
   mapPictureNames: {
+    illustrated3: 'Minh họa 3 (khớp đường OSM)',
     illustrated: 'Minh họa 1',
     illustrated2: 'Minh họa 2 (độ tin cậy thấp)',
     official: 'Chính thức (nội bộ)',
@@ -286,9 +290,13 @@ const en: UiText = {
   mapOpacity: 'New map opacity',
   mapExperimental:
     'The new map is experimental: it is not precisely aligned with the real paths. The cream lines are OSM data.',
+  mapFitted:
+    'This map was matched to the OSM paths (average error about 3 m). Not yet verified on site.',
   mapPicture: 'Picture',
   mapPictureNames: {
-    illustrated: 'Illustrated',
+    illustrated3: 'Illustrated 3 (matched to OSM paths)',
+    illustrated: 'Illustrated 1',
+    illustrated2: 'Illustrated 2 (low confidence)',
     official: 'Official (internal)',
   },
   mapLabel: 'Map of places to explore',
@@ -410,9 +418,13 @@ const fr: UiText = {
   mapOpacity: 'Opacité de la nouvelle carte',
   mapExperimental:
     "La nouvelle carte est expérimentale : elle n'est pas alignée précisément avec les vrais sentiers. Les lignes crème sont des données OSM.",
+  mapFitted:
+    "Cette carte a été ajustée aux sentiers OSM (erreur moyenne d'environ 3 m). Pas encore vérifiée sur le terrain.",
   mapPicture: 'Image',
   mapPictureNames: {
-    illustrated: 'Illustrée',
+    illustrated3: 'Illustrée 3 (ajustée aux sentiers OSM)',
+    illustrated: 'Illustrée 1',
+    illustrated2: 'Illustrée 2 (faible confiance)',
     official: 'Officielle (interne)',
   },
   mapLabel: 'Carte des lieux à découvrir',

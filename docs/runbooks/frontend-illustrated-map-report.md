@@ -100,3 +100,28 @@ Khuyến nghị: dùng ảnh này chỉ để xem. Nếu muốn dùng thật th�
 bố cục (hoặc nắn từng vùng bằng nhiều điểm đối chiếu thực địa — ảnh sẽ bị biến
 dạng nhiều); bản chính thức vẫn là bản khớp tốt nhất cho tới nay.
 
+## Minh họa 3 — khớp đúng với đường OSM (ảnh nên dùng)
+
+Ảnh thứ ba vẽ sẵn mạng đường đi bộ dạng nét kem. Khớp bằng chính các nét đường đó
+(`fit_paths.py`, chạy lại được): trích mạng đường kem từ ảnh, rồi tìm phép affine đặt
+đường OSM lên đúng các nét này.
+
+| Chỉ số | Giá trị |
+|---|---|
+| Sai số trung bình đường OSM ↔ đường vẽ | **~2,7 m** |
+| Điểm đường OSM nằm trong ≤ 3 pixel (nửa độ phân giải) so với đường vẽ | **88%** (điểm xuất phát chỉ 75%) |
+| Góc xoay | −0,07° — ảnh vẽ **hướng bắc ở trên**, đúng với OSM |
+| Tỉ lệ | ~0,77 m/pixel, gần như đều (0,78 × 0,76) |
+
+Kiểm tra độc lập (không dùng để khớp): chồng hồ chính và ao tây nam của OSM lên ảnh —
+nhìn bằng mắt viền hồ OSM bám đúng hồ vẽ (chiều dài bắc–nam, ao tây nam gần như
+trùng khít). Con số máy chỉ ra 43% hồ OSM phủ "nước vẽ" (IoU 0,36) vì bộ lọc màu không
+tính vùng sen/bèo và bọt đài phun là nước; hòn đảo OSM lệch khoảng vài chục mét so
+với đảo vẽ.
+
+Kết luận: đường dẫn (OSM) và đường trong ảnh trùng nhau, nên tuyến và chấm vị trí sẽ
+nằm đúng trên đường vẽ. Đây là ảnh đầu tiên đủ tốt để làm lớp hiển thị chính; trong
+app nó là ảnh mặc định của mục **Mới**. Giới hạn: ảnh khớp với *đường OSM* (chưa
+kiểm tra thực địa), không chứng minh OSM đúng với thực tế; phần ngoài mạng đường
+(nhà, cây, hồ) là minh họa.
+

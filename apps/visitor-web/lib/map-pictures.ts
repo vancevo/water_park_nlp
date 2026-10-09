@@ -7,6 +7,13 @@ export interface MapPicture {
   georef: string;
   /** Third-party artwork kept out of git: only offered when the file exists. */
   optional?: boolean;
+  /** `fitted`: matched to the OSM footpaths with a measured error; else experimental. */
+  confidence?: 'fitted' | 'experimental';
+}
+
+export interface AddedPicture {
+  id: string;
+  confidence: 'fitted' | 'experimental';
 }
 
 export const PICTURE_LAYER_PREFIX = 'damsen-picture-';
@@ -35,11 +42,13 @@ async function available(picture: MapPicture): Promise<boolean> {
 /**
  * Adds every available picture as a hidden raster layer under the OSM walkways,
  * so real routes stay drawn on top and any misalignment is visible. Returns the
- * ids that were added. Failures only drop that picture; the old map keeps
+ * pictures that were added (first = default). Failures only drop that picture; the old map keeps
  * working. Corners come from `scripts/georeference-illustrated-map/`.
  */
-export async function addMapPictures(map: MapLibreMap): Promise<string[]> {
-  const added: string[] = [];
+export async function addMapPictures(
+  map: MapLibreMap,
+): Promise<AddedPicture[]> {
+  const added: AddedPicture[] = [];
   try {
     const manifest = (await (await fetch('/maps/index.json')).json()) as {
       pictures: MapPicture[];
@@ -66,7 +75,10 @@ export async function addMapPictures(map: MapLibreMap): Promise<string[]> {
           },
           BEFORE_LAYER,
         );
-        added.push(picture.id);
+        added.push({
+          id: picture.id,
+          confidence: picture.confidence ?? 'experimental',
+        });
       } catch {
         // Skip this picture only.
       }
