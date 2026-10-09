@@ -255,9 +255,13 @@ export function ttsRequestErrorMessage(cause: unknown): string {
       return 'Dịch vụ tạo audio AI đang tạm ngừng. Thử lại sau.';
     return `Máy chủ không xử lý được yêu cầu (HTTP ${cause.status}).`;
   }
-  // Network failures surface as TypeError ("Failed to fetch"); app-level
-  // errors (e.g. missing session) already carry Vietnamese text.
-  return cause instanceof Error && !(cause instanceof TypeError)
+  // Network failures surface as TypeError ("Failed to fetch") and a non-JSON
+  // error page (proxy/gateway HTML) as SyntaxError from the client's
+  // `response.json()`; neither message is user-facing. App-level errors (e.g.
+  // missing session) already carry Vietnamese text.
+  return cause instanceof Error &&
+    !(cause instanceof TypeError) &&
+    !(cause instanceof SyntaxError)
     ? cause.message
     : 'Không thể kết nối dịch vụ tạo audio.';
 }

@@ -157,6 +157,14 @@ export function TtsGenerationPanel({
         aria-atomic="true"
       >
         {statusText}
+        {/* Inside the live region so screen readers hear the hint too. */}
+        {stalled && ' '}
+        {stalled && (
+          <span className="helper tts-stall">
+            Job đã chờ hơn 2 phút mà chưa được xử lý. Máy chủ có thể chưa chạy
+            worker tạo audio; bạn có thể huỷ và thử lại sau.
+          </span>
+        )}
       </div>
       {job && job.status !== 'failed' && job.status !== 'cancelled' && (
         <ol className="tts-steps" aria-label="Tiến trình tạo audio">
@@ -176,12 +184,6 @@ export function TtsGenerationPanel({
             </li>
           ))}
         </ol>
-      )}
-      {stalled && (
-        <p className="helper">
-          Job đã chờ hơn 2 phút mà chưa được xử lý. Máy chủ có thể chưa chạy
-          worker tạo audio; bạn có thể huỷ và thử lại sau.
-        </p>
       )}
       {state.error && (
         <div className="alert error" role="alert">
@@ -241,16 +243,25 @@ export function TtsGenerationPanel({
   );
 }
 
-/** True once a tracked job has sat in `queued` too long; re-checked every 15 s. */
+/**
+ * True once a tracked job has sat in `queued` for QUEUED_STALL_MS as observed
+ * by this page (client clock only, so server/browser clock skew cannot trigger
+ * or suppress it). A re-enqueue (new `updatedAt`) restarts the window.
+ * Re-checked every 15 s.
+ */
 function useQueuedStall(job: TtsGenerationJob | null) {
-  const [now, setNow] = useState(() => Date.now());
-  const queued = job?.status === 'queued';
+  const key = job?.status === 'queued' ? `${job.id}|${job.updatedAt}` : '';
+  const [tick, setTick] = useState({ key: '', since: 0, now: 0 });
   useEffect(() => {
-    if (!queued) return;
-    const timer = window.setInterval(() => setNow(Date.now()), 15_000);
+    if (!key) return;
+    const since = Date.now();
+    const timer = window.setInterval(
+      () => setTick({ key, since, now: Date.now() }),
+      15_000,
+    );
     return () => window.clearInterval(timer);
-  }, [queued]);
-  return isQueuedStalled(job, now);
+  }, [key]);
+  return tick.key === key && isQueuedStalled(job, tick.now, tick.since);
 }
 
 /** Object URL for a local preview blob, revoked when the job changes or unmounts. */

@@ -21,7 +21,8 @@ import {
  * terminal status → cancel/retry. Polling stops on unmount and never runs
  * against a terminal job; responses that arrive after the narration changed or
  * the component unmounted are dropped. Calls `onSucceeded` once per succeeded
- * job so the caller can reload the draft that now carries the generated audio.
+ * job so the caller can reload the draft (which carries the generated audio
+ * once the backend attaches it — not yet at I01, see I02-3).
  */
 export function useTtsJob(
   port: TtsGenerationPort | null,

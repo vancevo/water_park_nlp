@@ -183,12 +183,18 @@ const ERROR_LABELS: Record<string, string> = {
 /** A queued job older than this suggests no worker is consuming the queue. */
 export const QUEUED_STALL_MS = 120_000;
 
+/**
+ * `queuedSinceMs` should come from the same clock as `nowMs` (the panel uses
+ * the time it first saw this queued state); `updatedAt` is only a fallback
+ * because the server and browser clocks may differ.
+ */
 export function isQueuedStalled(
   job: Pick<TtsGenerationJob, 'status' | 'updatedAt'> | null | undefined,
   nowMs: number,
+  queuedSinceMs?: number,
 ): boolean {
   if (job?.status !== 'queued') return false;
-  const since = Date.parse(job.updatedAt);
+  const since = queuedSinceMs ?? Date.parse(job.updatedAt);
   return Number.isFinite(since) && nowMs - since >= QUEUED_STALL_MS;
 }
 

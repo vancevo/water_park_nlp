@@ -746,6 +746,11 @@ td small {
   font-size: 13px;
   font-weight: 700;
 }
+.tts-stall {
+  display: block;
+  margin-top: 4px;
+  font-weight: 400;
+}
 .tts-steps {
   display: flex;
   flex-wrap: wrap;
