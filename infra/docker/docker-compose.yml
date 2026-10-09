@@ -35,18 +35,22 @@ services:
       retries: 10
 
   object-storage:
-    image: quay.io/minio/minio:RELEASE.2025-09-06T17-38-46Z
-    command: ["server", "/data", "--console-address", ":9001"]
+    # quay.io/minio/minio and minio/minio were withdrawn upstream (401/denied);
+    # this is the last Bitnami archive build of the MinIO server, pinned by digest.
+    # Server-wide CORS stands in for bucket CORS (MinIO does not implement it).
+    image: bitnamilegacy/minio@sha256:451fe6858cb770cc9d0e77ba811ce287420f781c7c1b806a386f6896471a349c
     environment:
       MINIO_ROOT_USER: damsen_local
       MINIO_ROOT_PASSWORD: damsen_local_password
+      MINIO_DEFAULT_BUCKETS: damsen-media
+      MINIO_API_CORS_ALLOW_ORIGIN: http://localhost:3001,http://localhost:3002
     ports:
       - "9000:9000"
       - "9001:9001"
     volumes:
-      - damsen_object_data:/data
+      - damsen_object_data:/bitnami/minio/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live"]
       interval: 5s
       timeout: 3s
       retries: 10

@@ -15,8 +15,10 @@ import {
 } from '@/lib/tts-generation';
 import {
   TTS_STATUS_LABELS,
+  aiAudioAttachment,
   canCancelJob,
   canRetryJob,
+  isQueuedStalled,
   ttsErrorLabel,
   ttsGenerationGuard,
 } from '@/lib/tts-job-machine';
@@ -24,7 +26,7 @@ import {
 const STEPS: { status: TtsJobStatus; label: string }[] = [
   { status: 'queued', label: 'Xếp hàng' },
   { status: 'running', label: 'Đang tạo' },
-  { status: 'succeeded', label: 'Gắn vào bản nháp' },
+  { status: 'succeeded', label: 'Hoàn tất' },
 ];
 
 /**
@@ -62,7 +64,9 @@ export function TtsGenerationPanel({
   const { state, generate, cancel, resume } = tts;
   const job = state.job;
   const previewUrl = usePreviewUrl(port, job);
+  const stalled = useQueuedStall(job);
   if (!guard.visible) return null;
+  const attachment = aiAudioAttachment(narration, job);
 
   const active = Boolean(job && !isTerminalTtsStatus(job.status));
   const busy = state.phase === 'creating' || state.phase === 'cancelling';
@@ -155,6 +159,14 @@ export function TtsGenerationPanel({
         aria-atomic="true"
       >
         {statusText}
+        {/* Inside the live region so screen readers hear the hint too. */}
+        {stalled && ' '}
+        {stalled && (
+          <span className="helper tts-stall">
+            Job đã chờ hơn 2 phút mà chưa được xử lý. Máy chủ có thể chưa chạy
+            worker tạo audio; bạn có thể huỷ và thử lại sau.
+          </span>
+        )}
       </div>
       {job && job.status !== 'failed' && job.status !== 'cancelled' && (
         <ol className="tts-steps" aria-label="Tiến trình tạo audio">
@@ -186,7 +198,10 @@ export function TtsGenerationPanel({
         </div>
       )}
       {job && (
-        <dl className="tts-provenance" aria-label="Nguồn gốc audio AI">
+        <dl
+          className="tts-provenance"
+          aria-label="Nguồn gốc của job tạo audio AI"
+        >
           <div>
             <dt>Nhà cung cấp</dt>
             <dd>{job.provider}</dd>
@@ -199,6 +214,25 @@ export function TtsGenerationPanel({
             <dt>Phiên bản model</dt>
             <dd>{job.modelVersion}</dd>
           </div>
+          {job.artifact && (
+            <>
+              <div>
+                <dt>Giọng</dt>
+                <dd>{job.artifact.voiceId}</dd>
+              </div>
+              <div>
+                <dt>Giấy phép</dt>
+                <dd>{job.artifact.license}</dd>
+              </div>
+              <div>
+                <dt>Audio</dt>
+                <dd>
+                  {job.artifact.durationSeconds.toFixed(1)} giây ·{' '}
+                  {job.artifact.sampleRateHz} Hz
+                </dd>
+              </div>
+            </>
+          )}
           <div>
             <dt>Cập nhật</dt>
             <dd>
@@ -210,18 +244,15 @@ export function TtsGenerationPanel({
         </dl>
       )}
       {job?.status === 'succeeded' && (
-        <div className="audio-preview ai-preview">
+        <div className="audio-preview ai-preview tts-result">
           <b>
-            <span className="ai-badge">AI-generated</span> Nghe thử trước khi
-            gửi duyệt
+            <span className="ai-badge">AI-generated</span>{' '}
+            {previewUrl ? 'Nghe thử trước khi gửi duyệt' : 'Kết quả tạo audio'}
           </b>
           {previewUrl ? (
             <audio controls src={previewUrl} lang={localeOption.code} />
           ) : (
-            <small>
-              Audio đã được gắn vào bản nháp hiện tại. Danh sách phiên bản đã
-              tải lại; reviewer nghe bản này trước khi xuất bản.
-            </small>
+            <small>{SUCCEEDED_NOTES[attachment]}</small>
           )}
           <small>
             {job.provider} · {job.model} · {job.modelVersion}
@@ -230,6 +261,38 @@ export function TtsGenerationPanel({
       )}
     </section>
   );
+}
+
+/** What the succeeded panel can truthfully say about the draft's audio (v1.1). */
+const SUCCEEDED_NOTES: Record<ReturnType<typeof aiAudioAttachment>, string> = {
+  attached:
+    'Audio AI đã được gắn vào bản nháp này (chưa xuất bản). Nghe thử ở mục “Audio AI của phiên bản này” phía trên trước khi gửi duyệt.',
+  replaced:
+    'Audio hiện tại của bản nháp không còn là audio của job này (đã được thay hoặc gỡ). Tạo lại nếu muốn dùng audio AI.',
+  pending:
+    'Đang chờ bản nháp cập nhật audio AI… Nếu tải lại trang mà vẫn chưa thấy, hãy tạo lại.',
+  none: '',
+};
+
+/**
+ * True once a tracked job has sat in `queued` for QUEUED_STALL_MS as observed
+ * by this page (client clock only, so server/browser clock skew cannot trigger
+ * or suppress it). A re-enqueue (new `updatedAt`) restarts the window.
+ * Re-checked every 15 s.
+ */
+function useQueuedStall(job: TtsGenerationJob | null) {
+  const key = job?.status === 'queued' ? `${job.id}|${job.updatedAt}` : '';
+  const [tick, setTick] = useState({ key: '', since: 0, now: 0 });
+  useEffect(() => {
+    if (!key) return;
+    const since = Date.now();
+    const timer = window.setInterval(
+      () => setTick({ key, since, now: Date.now() }),
+      15_000,
+    );
+    return () => window.clearInterval(timer);
+  }, [key]);
+  return tick.key === key && isQueuedStalled(job, tick.now, tick.since);
 }
 
 /** Object URL for a local preview blob, revoked when the job changes or unmounts. */

@@ -20,3 +20,15 @@ rotated on every successful refresh.
 
 Production must set a strong `JWT_SECRET`. The development fallback is not
 appropriate for a deployed environment.
+
+# AI TTS jobs (AI04 + I02)
+
+Admin endpoints `POST /v1/admin/narrations/:id/tts-jobs`, `GET
+/v1/admin/tts-jobs/:id`, `.../cancel`, and v1.1 `GET
+/v1/admin/narrations/:id/tts-jobs/latest`, `GET
+/v1/admin/narrations/:id/audio/playback`. The API only enqueues; the worker
+process (`apps/worker`, `npm run start`) synthesizes and attaches audio to the
+draft. Point `TTS_VOICES_MANIFEST_PATH` at the same voice manifest as the
+worker. Kill switch/quota: `TTS_GENERATION_ENABLED`, `TTS_QUOTA_*`,
+`TTS_QUEUE_MAX_ACTIVE`. Requires migration 012. See
+`docs/runbooks/backend-tts-jobs.md` and ADR 0014.

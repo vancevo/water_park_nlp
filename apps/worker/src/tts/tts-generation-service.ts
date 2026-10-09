@@ -141,26 +141,26 @@ export class TtsGenerationService {
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
       record.attempts = attempt;
       try {
-        const result = await this.withTimeout(
+        const result = await withTimeout(
           this.provider.synthesize(synthesisRequest),
           timeoutMs,
         );
         validateSynthesizedAudio(result, this.audioLimits);
-        record.artifact = this.buildArtifact(
-          entry,
-          result,
-          config,
-          tHash,
-          seed,
-        );
+        // I02-2: a cancel that landed while synthesizing wins over the result.
+        const cancelled = await this.cancelledMeanwhile(record.id);
+        if (cancelled) return cancelled;
+        record.artifact = buildTtsArtifact(entry, result, config, tHash, seed);
         record.status = 'succeeded';
         record.errorCode = null;
         record.updatedAt = this.clock();
         await this.repository.save(record);
         return record;
       } catch (error) {
+        // I02-10: the code of an attempt that will be retried is kept in memory
+        // only; a `running` job never exposes an errorCode.
         lastCode = errorCodeOf(error);
-        record.errorCode = lastCode;
+        const cancelled = await this.cancelledMeanwhile(record.id);
+        if (cancelled) return cancelled;
         record.updatedAt = this.clock();
         await this.repository.save(record);
         if (attempt < maxAttempts) {
@@ -169,12 +169,24 @@ export class TtsGenerationService {
       }
     }
 
+    const cancelled = await this.cancelledMeanwhile(record.id);
+    if (cancelled) return cancelled;
     record.status = 'failed';
     record.deadLettered = true;
     record.errorCode = lastCode;
     record.updatedAt = this.clock();
     await this.repository.save(record);
     return record;
+  }
+
+  /**
+   * Re-read the job; return it when it was cancelled out of band. Best-effort
+   * for this direct entrypoint — the queue consumer ({@link TtsJobRunner})
+   * relies on conditional SQL writes instead, which close the race fully.
+   */
+  private async cancelledMeanwhile(id: string): Promise<TtsJobRecord | null> {
+    const current = await this.repository.findById(id);
+    return current?.status === 'cancelled' ? current : null;
   }
 
   /** Cancel a non-terminal job. Terminal jobs are returned unchanged. */
@@ -233,46 +245,51 @@ export class TtsGenerationService {
       );
     }
   }
+}
 
-  private buildArtifact(
-    entry: TtsModelRegistryEntry,
-    result: TtsSynthesisResult,
-    config: Record<string, string | number | boolean>,
-    tHash: string,
-    seed: number | null,
-  ): TtsArtifact {
-    return {
-      provider: entry.provider,
-      model: entry.model,
-      modelVersion: entry.modelVersion,
-      voiceId: entry.voiceId,
-      license: entry.license,
-      configHash: configHash(config),
-      transcriptHash: tHash,
-      seed,
-      audioSha256: sha256Hex(result.audio),
-      sizeBytes: result.audio.length,
-      durationSeconds: result.durationSeconds,
-      sampleRateHz: result.sampleRateHz,
-      mimeType: 'audio/wav',
-    };
-  }
+/** Versioned, reproducible artifact manifest (no transcript, no audio bytes). */
+export function buildTtsArtifact(
+  entry: TtsModelRegistryEntry,
+  result: TtsSynthesisResult,
+  config: Record<string, string | number | boolean>,
+  tHash: string,
+  seed: number | null,
+): TtsArtifact {
+  return {
+    provider: entry.provider,
+    model: entry.model,
+    modelVersion: entry.modelVersion,
+    voiceId: entry.voiceId,
+    license: entry.license,
+    configHash: configHash(config),
+    transcriptHash: tHash,
+    seed,
+    audioSha256: sha256Hex(result.audio),
+    sizeBytes: result.audio.length,
+    durationSeconds: result.durationSeconds,
+    sampleRateHz: result.sampleRateHz,
+    mimeType: 'audio/wav',
+  };
+}
 
-  private async withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const timeout = new Promise<never>((_, reject) => {
-      timer = setTimeout(() => reject(new TtsTimeoutError()), ms);
-    });
-    try {
-      return await Promise.race([promise, timeout]);
-    } finally {
-      if (timer) clearTimeout(timer);
-    }
+/** Race a provider call against a per-attempt timeout ({@link TtsTimeoutError}). */
+export async function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new TtsTimeoutError()), ms);
+  });
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 }
 
 /** Map any failure to a stable code. Never returns transcript or provider text. */
-function errorCodeOf(error: unknown): string {
+export function errorCodeOf(error: unknown): string {
   if (error instanceof TtsTimeoutError) return 'TTS_TIMEOUT';
   if (error instanceof TtsAudioInvalidError) return 'TTS_AUDIO_INVALID';
   if (
@@ -287,14 +304,14 @@ function errorCodeOf(error: unknown): string {
   return 'TTS_PROVIDER_ERROR';
 }
 
-function positiveInteger(value: number, name: string): number {
+export function positiveInteger(value: number, name: string): number {
   if (!Number.isInteger(value) || value <= 0) {
     throw new Error(`${name} must be a positive integer`);
   }
   return value;
 }
 
-function nonNegativeInteger(value: number, name: string): number {
+export function nonNegativeInteger(value: number, name: string): number {
   if (!Number.isInteger(value) || value < 0) {
     throw new Error(`${name} must be a non-negative integer`);
   }

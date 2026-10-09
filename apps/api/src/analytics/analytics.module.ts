@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { createRequire } from 'node:module';
 
 import { AuthModule } from '../auth/auth.module.js';
 import type { SqlClient } from '../poi/postgres-poi.repository.js';
@@ -12,15 +11,14 @@ import {
 import { AnalyticsService } from './analytics.service.js';
 import { InMemoryAnalyticsRepository } from './in-memory-analytics.repository.js';
 import { PostgresAnalyticsRepository } from './postgres-analytics.repository.js';
+import { createPgPool } from '../common/pg-pool.js';
 
 function createRepository(): AnalyticsRepository {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) return new InMemoryAnalyticsRepository();
-  const require = createRequire(import.meta.url);
-  const pg = require('pg') as {
-    Pool: new (options: { connectionString: string }) => SqlClient;
-  };
-  return new PostgresAnalyticsRepository(new pg.Pool({ connectionString }));
+  return new PostgresAnalyticsRepository(
+    createPgPool<SqlClient>(connectionString, 'analytics'),
+  );
 }
 
 @Module({

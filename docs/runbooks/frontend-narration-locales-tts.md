@@ -10,7 +10,7 @@ Phạm vi: `apps/admin-web`, `apps/visitor-web`, `apps/mobile` (transport) và
 |---|---|---|---|---|
 | `NEXT_PUBLIC_NARRATION_DATA_MODE` | admin | `api` \| `demo` | `api` | Catalog locale lấy từ `GET /v1/narration-locales` hoặc fixture VI/EN/FR |
 | `NEXT_PUBLIC_NARRATION_DATA_MODE` | visitor | `api` \| `demo` | `api` | Catalog **và** narration công khai lấy từ API hoặc fixture (VI có audio tone, EN chỉ transcript, FR thiếu → fallback EN) |
-| `NEXT_PUBLIC_TTS_GENERATION_MODE` | admin | `off` \| `demo` \| `api` | `off` | Ẩn hoặc bật khu "Audio AI"; `demo` mô phỏng job trên trình duyệt, `api` gọi endpoint contract v1 |
+| `NEXT_PUBLIC_TTS_GENERATION_MODE` | admin | `off` \| `demo` \| `api` | `off` | Ẩn hoặc bật khu "Audio AI"; `demo` mô phỏng job trên trình duyệt, `api` gọi endpoint thật (contract v1.1, đã kiểm E2E ở I03). Thiếu/rỗng/giá trị lạ → `off` (fail closed). Bật `api` cho production là quyết định của I04 (cần voice thật + B03) — lý do: `frontend-i03-acceptance-report.md` §4 |
 
 `demo`/`test` chỉ dùng cho demo/dev. Không bật `demo` trên môi trường phát hành:
 job demo không tạo audio thật và audio nghe thử chỉ là âm báo tổng hợp (có nhãn).
@@ -47,16 +47,20 @@ python3 data/tts-evaluation/validate.py && python3 data/tts-evaluation/test_vali
 ```
 
 Browser smoke (không chạy trong `npm test`; cần app đang chạy, Chromium và
-`playwright-core` cài ngoài repo — không thêm dependency vào workspace):
+`playwright-core` cài ngoài repo — không thêm dependency vào workspace).
+`SMOKE_MODE=demo` (mặc định) cho bản build `demo`; `SMOKE_MODE=api` cho bản
+build `api` với backend thật (tabs/select phải khớp `GET /v1/narration-locales`;
+admin cần worker tiêu thụ hàng đợi TTS, `SMOKE_FAIL_MARKER` tuỳ chọn để thử
+nhánh lỗi):
 
 ```bash
-PLAYWRIGHT_CORE_PATH=/path/node_modules/playwright-core CHROMIUM_PATH=/path/chrome \
-  node apps/visitor-web/scripts/narration-browser-smoke.mjs http://localhost:3012
-ADMIN_EMAIL=... ADMIN_PASSWORD=... PLAYWRIGHT_CORE_PATH=... CHROMIUM_PATH=... \
+SMOKE_MODE=demo PLAYWRIGHT_CORE_PATH=/path/node_modules/playwright-core CHROMIUM_PATH=/path/chrome \
+  node apps/visitor-web/scripts/narration-browser-smoke.mjs http://localhost:3012 http://localhost:3000
+SMOKE_MODE=demo ADMIN_EMAIL=... ADMIN_PASSWORD=... PLAYWRIGHT_CORE_PATH=... CHROMIUM_PATH=... \
   node apps/admin-web/scripts/narration-browser-smoke.mjs http://localhost:3011 http://localhost:3000
 ```
 
-Smoke kiểm tra: locale từ catalog, bàn phím (Arrow/Home/End trên tab admin,
+Smoke kiểm tra (api, v1.1): audio AI gắn vào bản nháp có provenance, byte của playback URL khớp `audio.sha256`, reload trang tiếp tục theo dõi job qua `…/tts-jobs/latest`; visitor phát đúng byte audio đã xuất bản. Smoke api cần truy cập được object storage từ tiến trình Node. Ngoài ra: locale từ catalog, bàn phím (Arrow/Home/End trên tab admin,
 Home trên select visitor), `aria-live` trạng thái job, nhãn AI-generated và
 provenance, khoá lưu/gửi duyệt khi job đang chạy và tiếp tục theo dõi sau khi
 đổi tab, cancel/retry, audio thu sẵn được ưu tiên hơn Web Speech (demo), lựa chọn được ghi nhớ sau reload, đổi ngôn ngữ giao
@@ -83,17 +87,24 @@ ngang ở 390 px.
 | Admin: không có tab | Catalog rỗng | Kiểm tra config backend (luôn phải có vi/en) |
 | Admin: "Có bản thuyết minh ở ngôn ngữ đang tắt" | Locale bị tắt trong config | Đúng thiết kế: dữ liệu giữ nguyên, không hiện cho khách |
 | Admin: không thấy khu Audio AI | `NEXT_PUBLIC_TTS_GENERATION_MODE` = off, hoặc role không phải EDITOR/REVIEWER/ADMIN | Bật flag khi rebuild; RBAC backend vẫn quyết định |
-| Admin: nút tạo audio bị khoá | Chưa lưu, transcript đang sửa, bản không ở draft/rejected, hoặc tài khoản chỉ có REVIEWER | Làm theo lý do hiển thị |
+| Admin: nút tạo audio bị khoá | Chưa lưu, transcript đang sửa, bản không ở `draft` (bản `rejected` phải lưu lại để về nháp), hoặc tài khoản chỉ có REVIEWER | Làm theo lý do hiển thị |
 | Admin: "Lưu thuyết minh"/"Gửi duyệt" bị khoá, ghi chú "Đang tạo audio AI…" | Job TTS đang `queued`/`running` hoặc yêu cầu tạo/huỷ chưa trả về | Chờ job kết thúc hoặc bấm "Huỷ tạo audio" |
 | Admin: "Mất kết nối…" + "Kiểm tra lại" | 3 lần polling lỗi liên tiếp | Kiểm tra API rồi bấm "Kiểm tra lại" |
-| Admin: 404 khi tạo job ở chế độ `api` | Endpoint AI04 backend chưa triển khai | Dùng `demo` cho tới I01 |
+| Admin: job đứng ở "Đang chờ xử lý", sau 2 phút có ghi chú "máy chủ có thể chưa chạy worker" | Worker không chạy, hoặc worker đang tắt bởi kill switch/quota | Huỷ job; chạy/bật lại worker (`backend-i02-integration-fixes.md`) |
+| Admin: "Tính năng tạo audio AI đang tạm tắt (kill switch)" | API `TTS_GENERATION_ENABLED=false` (503) | Đúng thiết kế; bật lại phía backend |
+| Admin: "Đã vượt hạn mức… Thử lại sau khoảng N giây/phút"/"quá nhiều job…" | Quota AI08 (429 `rate_limited` / `concurrency_limited`, `retryAfterSeconds`) | Chờ đúng thời gian gợi ý rồi thử lại |
+| Admin: "Tạo audio thất bại — Giọng đọc AI … chưa sẵn sàng" / "Không lưu được tệp audio…" | Job `TTS_MODEL_UNAVAILABLE` (voice API ≠ worker) / `TTS_STORAGE_ERROR` (object storage) | Kiểm tra manifest voice dùng chung và S3 phía backend; "Thử lại" |
+| Admin: "Đã tạo xong" nhưng "Audio hiện tại của bản nháp không còn là audio của job này" | Editor đã tải audio khác/gỡ audio sau khi tạo | Đúng thiết kế; tạo lại nếu muốn dùng audio AI |
+| Admin: "Không phát được audio (đường dẫn nghe thử có thể đã hết hạn)" | Playback URL ký 10 phút đã hết hạn hoặc storage không truy cập được | Bấm "Lấy lại đường dẫn" |
+| Admin: "Không thể lưu hay gửi duyệt: máy chủ đang tạo audio AI…" | 409 `TTS_JOB_IN_PROGRESS` (job chạy từ tab/trình duyệt khác) | Chờ hoặc huỷ job; tải lại trang để thấy job (`…/tts-jobs/latest`) |
+| Admin: "Tạo lại audio AI" không tạo job mới | Cùng transcript + model version là idempotent ở backend | Sửa transcript, lưu, rồi tạo lại |
 | Visitor: ghi chú dùng Tiếng Việt/English | Catalog lỗi, đang dùng catalog dự phòng | "Thử lại"; transcript vẫn dùng được |
 | Visitor: "Thiết bị chưa có giọng đọc …" | OS/browser không có voice cho `speechTag` | Đúng thiết kế: không đọc bằng giọng sai ngôn ngữ; transcript vẫn hiện |
 | Visitor: "Trình duyệt chặn tự phát audio" | Autoplay policy | Người dùng bấm nút phát |
 
 ## 6. Rollback
 
-- Ẩn AI generation: rebuild admin với `NEXT_PUBLIC_TTS_GENERATION_MODE=off`.
+- Ẩn AI generation: rebuild admin với `NEXT_PUBLIC_TTS_GENERATION_MODE=off` (hoặc bỏ biến — mặc định `off`). Dừng tạo audio không cần rebuild: `TTS_GENERATION_ENABLED=false` ở API/worker.
 - Quay về catalog cố định: không cần — nếu API lỗi, visitor tự dùng VI/EN dự
   phòng; admin hiển thị lỗi và không cho chọn locale lạ.
 - Tắt một locale: sửa config backend (xem runbook backend); sau khi reload,
@@ -104,9 +115,37 @@ ngang ở 390 px.
 
 ## 7. Integration I01 (Tú)
 
+Kết quả, đối chiếu contract, bằng chứng E2E và danh sách I02 cho Công:
+[`frontend-i01-integration-report.md`](frontend-i01-integration-report.md).
+
 1. Rebuild admin với `NEXT_PUBLIC_NARRATION_DATA_MODE=api` và
-   `NEXT_PUBLIC_TTS_GENERATION_MODE=api`; visitor với `api`.
-2. Không đổi UI state machine nếu contract v1 giữ nguyên; unit test vẫn dùng
-   fixture.
-3. Chạy hai browser smoke với backend thật; I03 chạy `validate.py
-   --export-benchmark` cho benchmark của Công.
+   `NEXT_PUBLIC_TTS_GENERATION_MODE=api`; visitor với `api`. API cần
+   `TTS_DEFAULT_PROVIDER/MODEL/MODEL_VERSION` khớp voice của worker.
+2. UI state machine không đổi (contract v1 giữ nguyên); unit test vẫn dùng
+   fixture. Backend thật re-enqueue job `failed`/`cancelled` với **cùng id** —
+   reducer đã có test cho trường hợp này.
+3. Chạy hai browser smoke với `SMOKE_MODE=api` (mục 3) và giữ `SMOKE_MODE=demo`
+   xanh.
+4. Thêm locale không sửa `config/`: trỏ `NARRATION_LOCALES_CONFIG_PATH` (đường
+   dẫn tuyệt đối) tới file config tạm có `fr` (fallback `en`), khởi động lại
+   API, tải lại trang — tab admin và select visitor tự xuất hiện.
+5. I03 chạy `validate.py --export-benchmark` cho benchmark của Công và lặp lại
+   E2E sau khi I02 xong (worker thật, audio gắn vào bản nháp, Piper thật).
+
+## 8. Acceptance I03 (Tú)
+
+Kết quả từng checkbox, bằng chứng (lệnh, ảnh chụp, số liệu) và vấn đề cho
+Công: [`frontend-i03-acceptance-report.md`](frontend-i03-acceptance-report.md).
+Tóm tắt: FR qua config, luồng tạo → duyệt → xuất bản và visitor PASS (worker
+thật, provider giả, S3 emulator); benchmark corpus chỉ là kiểm tra pipeline
+(PARTIAL); hybrid search on/off PASS về chức năng (số liệu không đổi giữa các
+chế độ, search sống thấp hơn baseline — chuyển I04). Flag TTS vẫn mặc định
+`off`; bản build staging/acceptance đặt `api` tường minh.
+
+## 8. Nhãn AI cho visitor (L5)
+
+Khi `PoiNarration.audio.generatedBy` (contract v1.2) có mặt, visitor hiện nhãn
+"Giọng đọc do AI tạo" (vi) / "AI-generated voice" (en) / "Voix générée par IA"
+(fr) phía trên player, theo ngôn ngữ của audio; locale khác dùng English. Tooltip
+chỉ chứa provider/model/version (không có job id). Không có `generatedBy` →
+không hiện nhãn. Logic ở `apps/visitor-web/lib/ai-audio-label.ts`.

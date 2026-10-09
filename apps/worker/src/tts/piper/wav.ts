@@ -11,6 +11,8 @@ export interface WavInfo {
 }
 
 export class WavParseError extends Error {
+  /** A provider that exits 0 but writes no valid WAV produced invalid audio (I04). */
+  readonly code = 'TTS_AUDIO_INVALID';
   constructor(message: string) {
     super(`wav parse: ${message}`);
     this.name = 'WavParseError';

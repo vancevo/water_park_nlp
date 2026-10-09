@@ -50,9 +50,26 @@ offline service worker chưa thuộc bản web MVP hiện tại.
 
 ## Ngôn ngữ thuyết minh
 
+Nút VI/EN đổi toàn bộ chữ trên giao diện (từ điển `lib/ui-text.ts`, thiếu khóa ở một
+ngôn ngữ là lỗi biên dịch), tên/mô tả địa điểm (qua API `locale`), `<html lang>` và
+tiêu đề trang; lựa chọn được nhớ trong localStorage. Nội dung từ API (bước chỉ đường,
+thông báo lỗi của server) không được dịch ở client.
+
 Ngôn ngữ thuyết minh độc lập với ngôn ngữ giao diện VI/EN: danh sách lấy từ
 `GET /v1/narration-locales`, lựa chọn được nhớ trong `localStorage`
 (`damsen.visitor.narrationLocale.v1`), có thông báo khi API trả bản fallback,
 audio đã xuất bản được ưu tiên hơn Web Speech và Web Speech dùng `speechTag`.
-`NEXT_PUBLIC_NARRATION_DATA_MODE=demo` dùng fixture VI/EN/FR (VI có âm báo demo,
-FR rơi về EN). Xem `docs/runbooks/frontend-narration-locales-tts.md`.
+`NEXT_PUBLIC_NARRATION_DATA_MODE=api|demo` (mặc định `api`, đã kiểm với backend
+thật ở I01: locale thêm bằng config như FR tự xuất hiện). `demo` dùng fixture
+VI/EN/FR (VI có âm báo demo, FR rơi về EN). Xem
+`docs/runbooks/frontend-narration-locales-tts.md`.
+
+## Bản đồ minh họa (Cũ / Mới)
+
+Nút nhỏ phía trên nút zoom của bản đồ chuyển giữa **Cũ** (nền OSM + đường đi bộ) và
+**Mới** (ảnh minh họa `public/maps/damsen-map.jpg`, mặc định). Đường OSM và tuyến dẫn
+đường luôn được vẽ trên ảnh. Các góc ảnh nằm trong `damsen-map.georef.json`, tính bằng
+`scripts/georeference-illustrated-map/fit_paths.py` (đường vẽ trong ảnh được khớp với
+đường OSM: sai số trung bình ~0,8 m, hướng bắc ở trên). Điều này chứng minh ảnh khớp
+với OSM, không chứng minh OSM đúng thực địa. Nếu ảnh không tải được, app dùng bản
+đồ cũ. Xem `docs/runbooks/frontend-illustrated-map-report.md`.

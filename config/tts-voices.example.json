@@ -7,7 +7,7 @@
       "modelVersion": "piper-voices-v1.0.0",
       "voiceId": "vi_VN-vais1000-medium",
       "locale": "vi",
-      "license": "<fill from the voice MODEL_CARD before enabling>",
+      "license": "CC-BY-4.0 (VAIS-1000 corpus; attribution required)",
       "sourceUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/vi/vi_VN/vais1000/medium/vi_VN-vais1000-medium.onnx",
       "checksum": "",
       "modelPath": "config/piper-voices/vi_VN-vais1000-medium.onnx",
@@ -15,14 +15,26 @@
     },
     {
       "provider": "piper",
-      "model": "en_US-lessac-medium",
+      "model": "en_US-ljspeech-medium",
       "modelVersion": "piper-voices-v1.0.0",
-      "voiceId": "en_US-lessac-medium",
+      "voiceId": "en_US-ljspeech-medium",
       "locale": "en",
-      "license": "<fill from the voice MODEL_CARD before enabling>",
-      "sourceUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/medium/en_US-lessac-medium.onnx",
+      "license": "Public domain (LJ Speech dataset)",
+      "sourceUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/ljspeech/medium/en_US-ljspeech-medium.onnx",
       "checksum": "",
-      "modelPath": "config/piper-voices/en_US-lessac-medium.onnx",
+      "modelPath": "config/piper-voices/en_US-ljspeech-medium.onnx",
+      "enabled": true
+    },
+    {
+      "provider": "piper",
+      "model": "fr_FR-siwis-medium",
+      "modelVersion": "piper-voices-v1.0.0",
+      "voiceId": "fr_FR-siwis-medium",
+      "locale": "fr",
+      "license": "CC-BY-4.0 (SIWIS corpus; attribution required)",
+      "sourceUrl": "https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/fr/fr_FR/siwis/medium/fr_FR-siwis-medium.onnx",
+      "checksum": "",
+      "modelPath": "config/piper-voices/fr_FR-siwis-medium.onnx",
       "enabled": true
     }
   ]

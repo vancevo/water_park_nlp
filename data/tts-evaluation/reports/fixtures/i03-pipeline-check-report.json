@@ -1,0 +1,1105 @@
+{
+  "schema": "tts-evaluation-report/v1",
+  "fixture": true,
+  "note": "I03 PIPELINE CHECK, NOT A QUALITY BENCHMARK. Full T06 corpus run through the worker provider benchmark (CliTtsProvider) with a fake ffmpeg sine-tone command standing in for a voice, because Piper voice downloads are blocked (HTTP 403) in this environment. Timings and automated checks describe the tone, not speech; no human ratings, so every gate fails with missing-human-ratings by design. Re-run with a real provider + blind review before any provider decision (ADR 0011).",
+  "corpus": {
+    "datasetId": "damsen-tts-eval",
+    "version": "1.0.0",
+    "thresholdsVersion": "1.0.0"
+  },
+  "reports": [
+    {
+      "provider": "e2e-tone",
+      "model": "ffmpeg-sine",
+      "modelVersion": "e2e-tone-2026.10.0",
+      "voiceId": "tone-vi",
+      "locale": "vi",
+      "count": 24,
+      "ok": 24,
+      "failed": 0,
+      "p50GenerationMs": 81,
+      "p95GenerationMs": 94,
+      "meanRealTimeFactor": 0.04075,
+      "totalSizeBytes": 2118672,
+      "samples": [
+        {
+          "id": "vi-poi-001",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 94,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.047,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-poi-002",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 90,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.045,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-poi-003",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 79,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0395,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-poi-004",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 78,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.039,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-poi-005",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 77,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0385,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-place-001",
+          "category": "place-name",
+          "ok": true,
+          "generationMs": 81,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0405,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-place-002",
+          "category": "place-name",
+          "ok": true,
+          "generationMs": 74,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.037,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-number-001",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 84,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.042,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-number-002",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 77,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0385,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-number-003",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 81,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0405,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-number-004",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 80,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.04,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-abbr-001",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 82,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.041,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-abbr-002",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 86,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.043,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-abbr-003",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 73,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0365,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-abbr-004",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 96,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.048,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-codeswitch-001",
+          "category": "code-switch",
+          "ok": true,
+          "generationMs": 93,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0465,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-codeswitch-002",
+          "category": "code-switch",
+          "ok": true,
+          "generationMs": 78,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.039,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-codeswitch-003",
+          "category": "code-switch",
+          "ok": true,
+          "generationMs": 65,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0325,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-punct-001",
+          "category": "punctuation",
+          "ok": true,
+          "generationMs": 92,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.046,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-punct-002",
+          "category": "punctuation",
+          "ok": true,
+          "generationMs": 83,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0415,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-long-001",
+          "category": "long",
+          "ok": true,
+          "generationMs": 82,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.041,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-long-002",
+          "category": "long",
+          "ok": true,
+          "generationMs": 66,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.033,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-safety-001",
+          "category": "safety",
+          "ok": true,
+          "generationMs": 74,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.037,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "vi-safety-002",
+          "category": "safety",
+          "ok": true,
+          "generationMs": 91,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0455,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        }
+      ],
+      "generatedAt": "2026-10-09T08:44:58.635Z",
+      "gate": {
+        "passed": false,
+        "failures": [
+          "missing-human-ratings"
+        ]
+      }
+    },
+    {
+      "provider": "e2e-tone",
+      "model": "ffmpeg-sine",
+      "modelVersion": "e2e-tone-2026.10.0",
+      "voiceId": "tone-en",
+      "locale": "en",
+      "count": 21,
+      "ok": 21,
+      "failed": 0,
+      "p50GenerationMs": 98,
+      "p95GenerationMs": 128,
+      "meanRealTimeFactor": 0.04961904761904762,
+      "totalSizeBytes": 1853838,
+      "samples": [
+        {
+          "id": "en-poi-001",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 85,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0425,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-poi-002",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 84,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.042,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-poi-003",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 99,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0495,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-poi-004",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 90,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.045,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-place-001",
+          "category": "place-name",
+          "ok": true,
+          "generationMs": 93,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0465,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-place-002",
+          "category": "place-name",
+          "ok": true,
+          "generationMs": 98,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.049,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-number-001",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 96,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.048,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-number-002",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 98,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.049,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-number-003",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 98,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.049,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-number-004",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 89,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0445,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-abbr-001",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 89,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0445,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-abbr-002",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 89,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0445,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-abbr-003",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 128,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.064,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-codeswitch-001",
+          "category": "code-switch",
+          "ok": true,
+          "generationMs": 110,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.055,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-codeswitch-002",
+          "category": "code-switch",
+          "ok": true,
+          "generationMs": 83,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0415,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-punct-001",
+          "category": "punctuation",
+          "ok": true,
+          "generationMs": 101,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0505,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-punct-002",
+          "category": "punctuation",
+          "ok": true,
+          "generationMs": 107,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0535,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-long-001",
+          "category": "long",
+          "ok": true,
+          "generationMs": 89,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0445,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-long-002",
+          "category": "long",
+          "ok": true,
+          "generationMs": 113,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0565,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-safety-001",
+          "category": "safety",
+          "ok": true,
+          "generationMs": 138,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.069,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "en-safety-002",
+          "category": "safety",
+          "ok": true,
+          "generationMs": 107,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0535,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        }
+      ],
+      "generatedAt": "2026-10-09T08:45:00.720Z",
+      "gate": {
+        "passed": false,
+        "failures": [
+          "missing-human-ratings"
+        ]
+      }
+    },
+    {
+      "provider": "e2e-tone",
+      "model": "ffmpeg-sine",
+      "modelVersion": "e2e-tone-2026.10.0",
+      "voiceId": "tone-fr",
+      "locale": "fr",
+      "count": 19,
+      "ok": 19,
+      "failed": 0,
+      "p50GenerationMs": 88,
+      "p95GenerationMs": 105,
+      "meanRealTimeFactor": 0.044894736842105265,
+      "totalSizeBytes": 1677282,
+      "samples": [
+        {
+          "id": "fr-poi-001",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 102,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.051,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-poi-002",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 105,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0525,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-poi-003",
+          "category": "poi-name",
+          "ok": true,
+          "generationMs": 96,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.048,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-place-001",
+          "category": "place-name",
+          "ok": true,
+          "generationMs": 104,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.052,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-place-002",
+          "category": "place-name",
+          "ok": true,
+          "generationMs": 85,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0425,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-number-001",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 88,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.044,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-number-002",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 100,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.05,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-number-003",
+          "category": "number-date",
+          "ok": true,
+          "generationMs": 81,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0405,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-abbr-001",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 79,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0395,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-abbr-002",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 83,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0415,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-abbr-003",
+          "category": "abbreviation",
+          "ok": true,
+          "generationMs": 87,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0435,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-codeswitch-001",
+          "category": "code-switch",
+          "ok": true,
+          "generationMs": 85,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0425,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-codeswitch-002",
+          "category": "code-switch",
+          "ok": true,
+          "generationMs": 82,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.041,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-punct-001",
+          "category": "punctuation",
+          "ok": true,
+          "generationMs": 89,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0445,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-punct-002",
+          "category": "punctuation",
+          "ok": true,
+          "generationMs": 81,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0405,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-long-001",
+          "category": "long",
+          "ok": true,
+          "generationMs": 84,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.042,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-long-002",
+          "category": "long",
+          "ok": true,
+          "generationMs": 94,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.047,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-safety-001",
+          "category": "safety",
+          "ok": true,
+          "generationMs": 88,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.044,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        },
+        {
+          "id": "fr-safety-002",
+          "category": "safety",
+          "ok": true,
+          "generationMs": 93,
+          "durationSeconds": 2,
+          "realTimeFactor": 0.0465,
+          "sizeBytes": 88278,
+          "automatedChecks": {
+            "decodable": true,
+            "clippedSampleRatio": 0.0,
+            "leadingSilenceSeconds": 0.0,
+            "trailingSilenceSeconds": 0.0,
+            "internalSilenceRatio": 0.0
+          }
+        }
+      ],
+      "generatedAt": "2026-10-09T08:45:02.426Z",
+      "gate": {
+        "passed": false,
+        "failures": [
+          "missing-human-ratings"
+        ]
+      }
+    }
+  ]
+}

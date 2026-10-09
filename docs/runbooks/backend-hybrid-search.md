@@ -40,8 +40,15 @@ their order — and any failure falls back to lexical automatically.
    (worker embedding pipeline, migration 005).
 2. The embedding service reachable at `SEARCH_EMBEDDING_URL`, returning
    `{ "vector": number[1024] }`.
-3. The 50-query evaluation shows no regression vs the T41 lexical baseline
-   (`data/search-evaluation`); otherwise keep the flag off (ADR 0012 gate).
+3. Both checks pass, otherwise keep the flag off:
+   a. **ADR 0012 gate (unchanged):** Recall@10/MRR/nDCG@10 not below the T41
+      baseline (`baseline_report.json`, 0.911/0.906/0.900). The live API is
+      at 0.600 today (see below), so this gate currently FAILS; only an
+      ADR 0012 amendment approved by the coordinator may re-base it.
+   b. **No regression vs the live API with the flag OFF** on the same
+      database (run both with `run_http_search.py`). This isolates the effect
+      of the flag, because `baseline_report.json` is the Python bag-of-words
+      runner (`lexical_baseline.py`), not the API.
 
 ## Verify
 
@@ -50,8 +57,33 @@ their order — and any failure falls back to lexical automatically.
 - Local real path: with a DB + embeddings + embedding endpoint and the flag on,
   run the 50-query HTTP evaluation:
   `python3 data/search-evaluation/run_http_search.py` →
-  `python3 data/search-evaluation/evaluate.py …` and compare to
-  `baseline_report.json`.
+  `python3 data/search-evaluation/evaluate.py …` and compare to both
+  `baseline_report.json` (gate a) and the same run with
+  `SEARCH_HYBRID_ENABLED=false` (check b).
+
+## Live lexical baseline (I04, 2026-10-09)
+
+Measured on the 5 fixture POIs (migrations 001–012, `damsen_i04`), API with
+`SEARCH_HYBRID_ENABLED=false`; identical with the flag on and no embedder:
+
+| Metric | Live API, flag off (check b reference) | `baseline_report.json` (T41 Python runner, gate a) |
+|---|---:|---:|
+| Recall@10 / MRR / nDCG@10 | 0.600 / 0.600 / 0.600 | 0.911 / 0.906 / 0.900 |
+| Zero-result rate | 0.46 | 0.10 |
+| Expected-zero accuracy | 1.00 | 0.60 |
+| Recall@10 exact / no-diacritic / typo | 1.0 / 1.0 / 1.0 | 1.0 / 1.0 / 1.0 |
+| Recall@10 semantic_intent / category_location | 0.1 / 0.0 | 0.9 / 0.667 |
+
+Root cause of the gap (not a regression; T40 already recorded 0.60): the API
+matches with `plainto_tsquery`, which ANDs every query token, over
+name + descriptions only; the Python runner scores any matching token (OR) and
+also indexes the category slug. So natural-language queries with words absent
+from the POI text ("learn how the water cycle works") and category/location
+phrasings ("garden category", "westernmost …") return nothing from the API.
+Hybrid re-ranks the lexical set (ADR 0012) and cannot recover them. Raising
+recall needs a lexical change (OR/websearch tsquery with a minimum-match rule,
+category labels in the document) or vector retrieval as a candidate source —
+a search follow-up with its own evaluation, not a flag flip.
 
 ## Troubleshooting
 

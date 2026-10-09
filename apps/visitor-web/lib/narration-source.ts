@@ -73,6 +73,14 @@ export function createFixtureNarrationSource(
                   usageRights: 'Demo only',
                   playbackUrl: url,
                   playbackExpiresAt: '2099-01-01T00:00:00.000Z',
+                  generatedBy: {
+                    provider: 'demo',
+                    model: 'browser-tone',
+                    modelVersion: '1',
+                    voiceId: 'demo-tone',
+                    license: 'Demo only',
+                    generatedAt: '2026-01-01T00:00:00.000Z',
+                  },
                 }
               : null,
           };
