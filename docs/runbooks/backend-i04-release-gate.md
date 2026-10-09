@@ -23,8 +23,8 @@ Inputs: `frontend-i01-integration-report.md`, `backend-i02-integration-fixes.md`
 I04's checklist: evidence aggregated and fault-injection/rollback drills run
 (boxes 1–2 met). Box 3 ("DONE only when B03/real object storage and the root
 quality gate pass") is **not** met: the root gate passed locally only (GitHub
-CI not run) and B03 is mitigated with an unapproved dev build. **I04 is not
-DONE**; it closes when the coordinator approves the MinIO evidence (or an
+CI not run) and B03 is mitigated with an unapproved dev build. **I04 was not
+DONE** at the time of writing; it closes (§9) when the coordinator approves the MinIO evidence (or an
 approved image reruns `scripts/smoke-media.mjs`) and CI passes on the branch.
 
 ## 1. Evidence matrix
@@ -251,7 +251,7 @@ none in this run.
 | F9 CORS | Preflight from `http://localhost:3001` allowed with the three signed headers; foreign origin gets no `Access-Control-Allow-Origin`. **Browser** upload from admin-web PASS (`apps/admin-web/scripts/audio-upload-browser-smoke.mjs`). It exposed a real bug: the default `fetch` in `NarrationAdminAdapter` was called unbound → `Illegal invocation` in every browser; fixed + regression test. |
 | Real voice E2E | `scripts/e2e-tts-real-storage.mjs vi|en|fr`: login → draft → TTS job (`queued→running→succeeded`, worker process, Piper) → draft audio (sha + RIFF) → submit → approve → public narration with `audio.generatedBy` (no job id) → same bytes. PASS for all three locales. |
 | Admin/visitor browser smokes (api mode, real Piper + MinIO) | admin narration + AI generation smoke PASS; visitor narration smoke PASS (vi/en/fr, AI label iff `generatedBy`). |
-| Root gate (clean env) | format, lint, typecheck, test (all workspaces), build, geo/research/search-eval/tts-eval validators PASS; worker Postgres integration (6) PASS. GitHub CI: see the PR. |
+| Root gate (clean env) | format, lint, typecheck, test (all workspaces), build, geo/research/search-eval/tts-eval validators PASS; worker Postgres integration (6) PASS. GitHub CI (Node 24) green on PR #14: `quality` 3m15s, `fixture-contracts`. |
 
 Voices (licenses read from each MODEL_CARD; `config/tts-voices.json`):
 vi `vi_VN-vais1000-medium` CC-BY-4.0 (attribution required), en
