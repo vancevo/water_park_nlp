@@ -161,7 +161,11 @@ const vi: UiText = {
   mapExperimental:
     'Bản đồ mới đang thử nghiệm: chưa căn chỉnh chính xác với đường đi thật. Đường màu kem là dữ liệu OSM.',
   mapPicture: 'Ảnh',
-  mapPictureNames: { illustrated: 'Minh họa', official: 'Chính thức (nội bộ)' },
+  mapPictureNames: {
+    illustrated: 'Minh họa 1',
+    illustrated2: 'Minh họa 2 (độ tin cậy thấp)',
+    official: 'Chính thức (nội bộ)',
+  },
   mapLabel: 'Bản đồ điểm khám phá',
   locateMe: '◎ Vị trí của tôi',
   researchBadge: 'POI + lối đi tham khảo từ OSM · Cần kiểm tra thực địa',

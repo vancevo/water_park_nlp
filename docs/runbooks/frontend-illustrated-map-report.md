@@ -78,3 +78,25 @@ Khớp bằng hồ chính (có đảo) và hồ Khu B của OSM, phép biến đ
   hoặc phép khớp chưa đủ chính xác ở đó. Cần điểm đối chiếu thực địa (GPS tại cổng,
   cầu, ngã ba) để chốt; không dùng để dẫn đường trước khi làm việc này.
 
+## Minh họa 2 (ảnh "Đầm Sen Khô" thứ hai) — khớp được nhưng độ tin cậy thấp
+
+Ảnh vẽ cả viền công viên (có thùy tây bắc, thùy tây nam) trên nền xanh nhạt, nên
+khớp bằng **viền công viên + hồ** so với ranh giới OSM (way 32735046) và hồ
+(`fit_silhouette.py`, chạy lại được). Đã thử 3 cách:
+
+| Cách | Kết quả |
+|---|---|
+| Viền + hồ, affine (cách chọn) | xoay ~300°; trùng viền 0,58; trùng hồ **0,31**; 0,9% đường OSM rơi xuống nước; 72% đường OSM nằm trong viền ảnh |
+| Chỉ ưu tiên hồ | trùng hồ 0,33 nhưng trùng viền chỉ 0,50 |
+| Qua bản đồ chính thức bằng 7 điểm chung (cổng, đảo, đài phun, cầu, ao) | sai số trung bình ~120 m, vẽ OSM co nhỏ một nửa → bỏ |
+
+Kết luận: ảnh này **không phải bản vẽ tỉ lệ thật** — hồ là một hình tam giác lớn
+cộng một hồ phía tây tách riêng, vị trí các cổng so với hồ khác bản chính thức, thùy
+tây nam là khu vườn không có ao như trong OSM. Nó nhìn đẹp nhưng không có phép
+biến đổi đơn giản nào khớp tốt (hồ chỉ trùng ~31%, kém ảnh minh họa 1 là 53% và
+bản chính thức là 83%). Trong app nó được gắn nhãn "Minh họa 2 (độ tin cậy thấp)".
+
+Khuyến nghị: dùng ảnh này chỉ để xem. Nếu muốn dùng thật thì cần vẽ lại cho đúng
+bố cục (hoặc nắn từng vùng bằng nhiều điểm đối chiếu thực địa — ảnh sẽ bị biến
+dạng nhiều); bản chính thức vẫn là bản khớp tốt nhất cho tới nay.
+
