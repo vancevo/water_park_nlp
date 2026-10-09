@@ -138,6 +138,17 @@ try {
   await page.getByRole('button', { name: 'Giao diện tiếng Việt' }).click();
   await page.getByLabel('Ngôn ngữ thuyết minh').waitFor();
 
+  // Old / new / overlay map switch must not break the page.
+  for (const label of ['Mới', 'Chồng lớp', 'Cũ']) {
+    await page.getByRole('button', { name: label, exact: true }).click();
+    assert.equal(
+      await page
+        .getByRole('button', { name: label, exact: true })
+        .getAttribute('aria-pressed'),
+      'true',
+    );
+  }
+
   // Escape closes the POI card; reopen it for the rest of the run.
   await page.keyboard.press('Escape');
   await page.locator('.poi-detail').waitFor({ state: 'detached' });

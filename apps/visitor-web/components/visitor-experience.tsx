@@ -46,6 +46,45 @@ import {
 import { NarrationSection, useVisitorNarration } from './narration-section';
 
 const FALLBACK_CENTER: [number, number] = [106.63853, 10.76433];
+type MapKind = 'old' | 'new' | 'overlay';
+const ILLUSTRATED_SOURCE = 'damsen-illustrated';
+const ILLUSTRATED_LAYER = 'damsen-illustrated-layer';
+
+/**
+ * Adds the illustrated map as a hidden raster layer under the OSM walkways, so
+ * real routes stay drawn on top and any misalignment is visible. Corners come
+ * from `scripts/georeference-illustrated-map/fit.py` (provisional fit).
+ */
+async function addIllustratedMap(map: MapLibreMap): Promise<void> {
+  try {
+    const georef = (await (
+      await fetch('/maps/damsen-illustrated.georef.json')
+    ).json()) as { corners: [number, number][] };
+    if (!map.getStyle()) return;
+    map.addSource(ILLUSTRATED_SOURCE, {
+      type: 'image',
+      url: '/maps/damsen-illustrated.jpg',
+      coordinates: georef.corners as [
+        [number, number],
+        [number, number],
+        [number, number],
+        [number, number],
+      ],
+    });
+    map.addLayer(
+      {
+        id: ILLUSTRATED_LAYER,
+        type: 'raster',
+        source: ILLUSTRATED_SOURCE,
+        layout: { visibility: 'none' },
+        paint: { 'raster-opacity': 1, 'raster-fade-duration': 0 },
+      },
+      'damsen-osm-walkways-outline',
+    );
+  } catch {
+    // The illustrated map is optional; the old map keeps working.
+  }
+}
 const MAP_TILE_URL = process.env.NEXT_PUBLIC_MAP_TILE_URL;
 const MAP_TILE_ATTRIBUTION =
   process.env.NEXT_PUBLIC_MAP_TILE_ATTRIBUTION ??
@@ -212,6 +251,8 @@ export function VisitorExperience() {
   const narrationSpeakerRef = useRef<() => void>(() => {});
   const narrationAudioRef = useRef<HTMLAudioElement | null>(null);
   const [mapReady, setMapReady] = useState(false);
+  const [mapKind, setMapKind] = useState<MapKind>('old');
+  const [illustratedOpacity, setIllustratedOpacity] = useState(0.55);
   const [locale, setLocaleState] = useState<UiLocale>('vi');
   const t = uiText(locale);
   const changeLocale = useCallback((next: UiLocale) => {
@@ -368,6 +409,7 @@ export function VisitorExperience() {
           data: '/data/damsen-osm-walkways.geojson',
           attribution: '© OpenStreetMap contributors',
         });
+        void addIllustratedMap(map);
         map.addLayer({
           id: 'damsen-osm-walkways-outline',
           type: 'line',
@@ -417,6 +459,22 @@ export function VisitorExperience() {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [arrivalOpen, authMode, detailCardOpen, stopPlayback]);
+
+  // Old map = OSM base + walkways; new = the illustrated map; overlay = both.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady || !map.getLayer(ILLUSTRATED_LAYER)) return;
+    map.setLayoutProperty(
+      ILLUSTRATED_LAYER,
+      'visibility',
+      mapKind === 'old' ? 'none' : 'visible',
+    );
+    map.setPaintProperty(
+      ILLUSTRATED_LAYER,
+      'raster-opacity',
+      mapKind === 'new' ? 1 : illustratedOpacity,
+    );
+  }, [illustratedOpacity, mapKind, mapReady]);
 
   // Remembered interface language (read after mount so SSR markup stays 'vi').
   useEffect(() => {
@@ -870,6 +928,43 @@ export function VisitorExperience() {
             {t.locateMe}
           </button>
           <div className="research-badge">{t.researchBadge}</div>
+          <div className="map-kind" role="group" aria-label={t.mapKindLabel}>
+            {(
+              [
+                ['old', t.mapOld],
+                ['new', t.mapNew],
+                ['overlay', t.mapOverlay],
+              ] as const
+            ).map(([kind, label]) => (
+              <button
+                key={kind}
+                type="button"
+                className={mapKind === kind ? 'active' : ''}
+                aria-pressed={mapKind === kind}
+                onClick={() => setMapKind(kind)}
+              >
+                {label}
+              </button>
+            ))}
+            {mapKind === 'overlay' ? (
+              <label className="map-opacity">
+                <span>{t.mapOpacity}</span>
+                <input
+                  type="range"
+                  min={0.1}
+                  max={0.9}
+                  step={0.05}
+                  value={illustratedOpacity}
+                  onChange={(event) =>
+                    setIllustratedOpacity(Number(event.target.value))
+                  }
+                />
+              </label>
+            ) : null}
+            {mapKind !== 'old' ? (
+              <small className="map-note">{t.mapExperimental}</small>
+            ) : null}
+          </div>
           {message ? <div className="toast">{message}</div> : null}
           {selected && detailCardOpen ? (
             <PoiDetailCard

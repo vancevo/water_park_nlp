@@ -43,6 +43,12 @@ export interface UiText {
   loadPlacesFailed: string;
 
   // Map
+  mapKindLabel: string;
+  mapOld: string;
+  mapNew: string;
+  mapOverlay: string;
+  mapOpacity: string;
+  mapExperimental: string;
   mapLabel: string;
   locateMe: string;
   researchBadge: string;
@@ -145,6 +151,13 @@ const vi: UiText = {
   noPlaces: 'Không tìm thấy địa điểm phù hợp.',
   loadPlacesFailed: 'Không tải được địa điểm.',
 
+  mapKindLabel: 'Kiểu bản đồ',
+  mapOld: 'Cũ',
+  mapNew: 'Mới',
+  mapOverlay: 'Chồng lớp',
+  mapOpacity: 'Độ mờ bản đồ mới',
+  mapExperimental:
+    'Bản đồ mới đang thử nghiệm: chưa căn chỉnh chính xác với đường đi thật. Đường màu kem là dữ liệu OSM.',
   mapLabel: 'Bản đồ điểm khám phá',
   locateMe: '◎ Vị trí của tôi',
   researchBadge: 'POI + lối đi tham khảo từ OSM · Cần kiểm tra thực địa',
@@ -258,6 +271,13 @@ const en: UiText = {
   noPlaces: 'No matching places found.',
   loadPlacesFailed: 'Could not load places.',
 
+  mapKindLabel: 'Map style',
+  mapOld: 'Old',
+  mapNew: 'New',
+  mapOverlay: 'Overlay',
+  mapOpacity: 'New map opacity',
+  mapExperimental:
+    'The new map is experimental: it is not precisely aligned with the real paths. The cream lines are OSM data.',
   mapLabel: 'Map of places to explore',
   locateMe: '◎ My location',
   researchBadge: 'Reference POIs and OSM paths · Needs field verification',
@@ -370,6 +390,13 @@ const fr: UiText = {
   noPlaces: 'Aucun lieu correspondant.',
   loadPlacesFailed: 'Impossible de charger les lieux.',
 
+  mapKindLabel: 'Style de carte',
+  mapOld: 'Ancienne',
+  mapNew: 'Nouvelle',
+  mapOverlay: 'Superposition',
+  mapOpacity: 'Opacité de la nouvelle carte',
+  mapExperimental:
+    "La nouvelle carte est expérimentale : elle n'est pas alignée précisément avec les vrais sentiers. Les lignes crème sont des données OSM.",
   mapLabel: 'Carte des lieux à découvrir',
   locateMe: '◎ Ma position',
   researchBadge:
