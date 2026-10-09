@@ -1,7 +1,11 @@
 openapi: 3.0.3
 info:
   title: Dam Sen Smart Guide API
-  version: 0.1.0
+  version: 0.1.1
+  description: >-
+    0.1.1 = narration/TTS contract v1.1 (additive over v1, ADR 0014): TTS error
+    responses documented, job artifact summary, latest job per narration,
+    admin audio preview and AI provenance on narration audio.
 servers:
   - url: http://localhost:3000
 paths:
@@ -431,6 +435,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/AdminNarration' }
+        '409':
+          description: >-
+            Not editable, or TTS_JOB_IN_PROGRESS while a TTS job of this
+            narration is queued/running (v1.1)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
     delete:
       operationId: deleteAdminNarration
       security: [{ bearerAuth: [] }]
@@ -456,6 +467,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/AdminNarration' }
+        '409':
+          description: >-
+            Not editable, or TTS_JOB_IN_PROGRESS while a TTS job of this
+            narration is queued/running (v1.1)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
   /v1/admin/narrations/{id}/approve:
     post:
       operationId: approveAdminNarration
@@ -505,11 +523,17 @@ paths:
     post:
       operationId: createTtsJob
       summary: Queue a TTS generation job for a draft narration
+      description: >-
+        Roles EDITOR/ADMIN. Idempotent by narration + transcript + model version:
+        a queued/running/succeeded job is returned as-is, a failed/cancelled one
+        is re-queued in place (same id). The worker attaches the generated audio
+        to the DRAFT narration only (never publishes).
       security: [{ bearerAuth: [] }]
       parameters:
         - name: narrationId
           in: path
           required: true
+          description: Any UUID version (seeded narrations are not v4)
           schema: { type: string, format: uuid }
       requestBody:
         required: true
@@ -518,14 +542,61 @@ paths:
             schema: { $ref: '#/components/schemas/CreateTtsJobRequest' }
       responses:
         '202':
-          description: Job accepted and queued
+          description: Job accepted and queued (or the existing idempotent job)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/TtsGenerationJob' }
+        '400':
+          description: >-
+            Invalid request. code is one of NARRATION_LOCALE_DISABLED,
+            TTS_JOB_LOCALE_MISMATCH, TTS_JOB_TRANSCRIPT_EMPTY,
+            TTS_VOICE_UNAVAILABLE (no enabled worker voice for the
+            locale/provider/model) or BAD_REQUEST (body/uuid validation).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: >-
+            NARRATION_NOT_DRAFT (only a draft narration can get AI audio) or
+            TTS_JOB_IN_PROGRESS (another job of this narration is queued/running).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+        '429': { $ref: '#/components/responses/TtsQuotaExceeded' }
+        '503':
+          description: AI_FEATURE_DISABLED — the TTS kill switch is off
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+  /v1/admin/narrations/{narrationId}/tts-jobs/latest:
+    get:
+      operationId: getLatestTtsJob
+      summary: Most recent TTS job of a narration (contract v1.1)
+      description: Roles EDITOR/REVIEWER/ADMIN. `job` is null when none exists.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: narrationId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Latest job or null
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LatestTtsJobResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
   /v1/admin/tts-jobs/{jobId}:
     get:
       operationId: getTtsJob
       summary: Poll a TTS generation job
+      description: Roles EDITOR/REVIEWER/ADMIN.
       security: [{ bearerAuth: [] }]
       parameters:
         - name: jobId
@@ -538,10 +609,22 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/TtsGenerationJob' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404':
+          description: Unknown job (or removed by the retention policy)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
   /v1/admin/tts-jobs/{jobId}/cancel:
     post:
       operationId: cancelTtsJob
       summary: Request cancellation of a queued or running job
+      description: >-
+        Roles EDITOR/ADMIN. Conditional: only a queued/running job becomes
+        cancelled (a running job's result is then discarded by the worker); a
+        terminal job is returned unchanged.
       security: [{ bearerAuth: [] }]
       parameters:
         - name: jobId
@@ -554,6 +637,42 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/TtsGenerationJob' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /v1/admin/narrations/{id}/audio/playback:
+    get:
+      operationId: getAdminNarrationAudioPlayback
+      summary: Ten-minute signed URL to preview a narration's current audio (v1.1)
+      description: >-
+        Roles EDITOR/REVIEWER/ADMIN. Works for any workflow status, so editors
+        and reviewers can listen to draft (e.g. AI-generated) audio before
+        publish.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Signed playback URL
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NarrationAudioPlayback' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404':
+          description: Unknown narration, or NARRATION_AUDIO_NOT_FOUND
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+        '503':
+          description: MEDIA_STORAGE_UNAVAILABLE
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
   /v1/routes:
     post:
       operationId: createRoute
@@ -625,6 +744,18 @@ components:
           schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
     Conflict:
       description: Resource state conflict
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+    TtsQuotaExceeded:
+      description: >-
+        AI08 quota. code rate_limited (per-user window) or concurrency_limited
+        (queued+running backlog full); details.retryAfterSeconds is a hint.
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
@@ -901,7 +1032,62 @@ components:
         modelVersion: { type: string }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
-        errorCode: { type: string, description: Stable error code only }
+        errorCode:
+          type: string
+          description: >-
+            Stable error code only, present only when status is failed:
+            TTS_PROVIDER_ERROR, TTS_TIMEOUT, TTS_AUDIO_INVALID,
+            TTS_STORAGE_ERROR, TTS_MODEL_UNAVAILABLE, TTS_NARRATION_NOT_DRAFT,
+            TTS_TRANSCRIPT_STALE. Consumers must tolerate new codes.
+        artifact:
+          allOf: [{ $ref: '#/components/schemas/TtsJobArtifactSummary' }]
+          description: v1.1 — present only when status is succeeded
+    TtsJobArtifactSummary:
+      type: object
+      required:
+        [
+          voiceId,
+          license,
+          audioSha256,
+          sizeBytes,
+          durationSeconds,
+          sampleRateHz,
+          mimeType,
+        ]
+      properties:
+        voiceId: { type: string }
+        license: { type: string }
+        audioSha256: { type: string, pattern: '^[0-9a-f]{64}$' }
+        sizeBytes: { type: integer, minimum: 1 }
+        durationSeconds: { type: number }
+        sampleRateHz: { type: integer }
+        mimeType: { type: string, enum: [audio/wav] }
+    LatestTtsJobResponse:
+      type: object
+      required: [job]
+      properties:
+        job:
+          allOf: [{ $ref: '#/components/schemas/TtsGenerationJob' }]
+          nullable: true
+    NarrationAudioGeneratedBy:
+      type: object
+      readOnly: true
+      required:
+        [provider, model, modelVersion, voiceId, license, jobId, generatedAt]
+      properties:
+        provider: { type: string }
+        model: { type: string }
+        modelVersion: { type: string }
+        voiceId: { type: string }
+        license: { type: string }
+        jobId: { type: string, format: uuid }
+        generatedAt: { type: string, format: date-time }
+    NarrationAudioPlayback:
+      type: object
+      required: [playbackUrl, playbackExpiresAt]
+      properties:
+        playbackUrl: { type: string, format: uri }
+        playbackExpiresAt: { type: string, format: date-time }
     AdminNarration:
       allOf:
         - { $ref: '#/components/schemas/NarrationInput' }
@@ -915,6 +1101,12 @@ components:
               type: string
               enum: [draft, pending_review, published, rejected, superseded]
             rejectionReason: { type: string }
+            audioGeneratedBy:
+              allOf:
+                [{ $ref: '#/components/schemas/NarrationAudioGeneratedBy' }]
+              description: >-
+                v1.1, response-only — AI provenance when the current audio was
+                generated by a TTS job; absent for editor-uploaded audio
             createdAt: { type: string, format: date-time }
             updatedAt: { type: string, format: date-time }
     PublicNarrationAudio:

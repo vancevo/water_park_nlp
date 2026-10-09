@@ -40,6 +40,10 @@ export type {
   TtsJobStatus,
   TtsGenerationJob,
   CreateTtsJobRequest,
+  NarrationAudioGeneratedBy,
+  NarrationAudioPlayback,
+  TtsJobArtifactSummary,
+  LatestTtsJobResponse,
 } from '@damsen/shared-types';
 
 import type {
@@ -72,6 +76,8 @@ import type {
   NarrationLocaleCatalog,
   TtsGenerationJob,
   CreateTtsJobRequest,
+  NarrationAudioPlayback,
+  LatestTtsJobResponse,
 } from '@damsen/shared-types';
 
 export interface ApiClientOptions {
@@ -259,6 +265,30 @@ export class DamSenApiClient {
     return this.request(
       `/v1/admin/tts-jobs/${encodeURIComponent(jobId)}/cancel`,
       { method: 'POST', accessToken },
+    );
+  }
+
+  // --- Contract v1.1 (additive, ADR 0014) ---
+
+  /** Most recent TTS job of a narration (`{ job: null }` when none). */
+  getLatestTtsJob(
+    narrationId: string,
+    accessToken: string,
+  ): Promise<LatestTtsJobResponse> {
+    return this.request(
+      `/v1/admin/narrations/${encodeURIComponent(narrationId)}/tts-jobs/latest`,
+      { accessToken },
+    );
+  }
+
+  /** Ten-minute signed URL to preview a narration's current (draft) audio. */
+  getAdminNarrationAudioPlayback(
+    narrationId: string,
+    accessToken: string,
+  ): Promise<NarrationAudioPlayback> {
+    return this.request(
+      `/v1/admin/narrations/${encodeURIComponent(narrationId)}/audio/playback`,
+      { accessToken },
     );
   }
 
