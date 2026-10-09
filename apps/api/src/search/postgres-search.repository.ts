@@ -5,6 +5,7 @@ import type {
   SearchRepository,
   SearchRepositoryQuery,
 } from './search.models.js';
+import { searchTerms } from './search-text.js';
 
 interface SearchRow {
   id: string;
@@ -50,6 +51,8 @@ function rowToCandidate(row: SearchRow): SearchCandidate {
   };
 }
 
+const DOCUMENT_TSV = `to_tsvector('simple', search_normalize(t.name || ' ' || t.short_description || ' ' || t.long_description))`;
+
 export class PostgresSearchRepository implements SearchRepository {
   constructor(private readonly client: SqlClient) {}
 
@@ -59,10 +62,22 @@ export class PostgresSearchRepository implements SearchRepository {
       values.push(value);
       return `$${values.length}`;
     };
+    const { terms, minMatch } = searchTerms(query.query);
+    const termsParam = bind(terms);
+    const termsLength = terms.length;
+    const minMatchParam = bind(minMatch);
+    const orQueryParam = bind(terms.join(' | '));
+    // Matches when at least `minMatch` significant terms occur in the name,
+    // descriptions or category slug (OR semantics, not every word required);
+    // a close whole-name fuzzy match still counts so typos keep working.
+    const termsMatched = `(
+      SELECT count(*) FROM unnest(${termsParam}::text[]) AS term(word)
+      WHERE ${DOCUMENT_TSV} @@ plainto_tsquery('simple', term.word)
+         OR search_normalize(c.slug) = term.word
+    )`;
     const filters = [
       `p.status = 'published'`,
-      `(to_tsvector('simple', search_normalize(t.name || ' ' || t.short_description || ' ' || t.long_description))
-         @@ plainto_tsquery('simple', search_normalize($1))
+      `(${termsMatched} >= ${minMatchParam}
         OR search_normalize(t.name) % search_normalize($1))`,
     ];
     if (query.category) filters.push(`c.slug = ${bind(query.category)}`);
@@ -107,10 +122,8 @@ export class PostgresSearchRepository implements SearchRepository {
              WHEN search_normalize(t.name) = search_normalize($1) THEN 3.0
              ELSE 0.0
            END
-           + 1.5 * ts_rank_cd(
-               to_tsvector('simple', search_normalize(t.name || ' ' || t.short_description || ' ' || t.long_description)),
-               plainto_tsquery('simple', search_normalize($1))
-             )
+           + 1.5 * ts_rank_cd(${DOCUMENT_TSV}, to_tsquery('simple', ${orQueryParam}))
+           + 0.75 * (${termsMatched})::double precision / ${termsLength}
            + similarity(search_normalize(t.name), search_normalize($1))) AS lexical_score
         FROM pois p
         JOIN poi_categories c ON c.id = p.category_id

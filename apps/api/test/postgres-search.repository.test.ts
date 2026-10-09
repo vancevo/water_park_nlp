@@ -29,9 +29,13 @@ describe('PostgresSearchRepository', () => {
     expect(sql).toContain('COUNT(*) OVER()');
     expect(sql).toContain('t.locale AS resolved_locale');
     expect(sql).toContain('jsonb_build_object(\n          resolved_locale');
+    expect(sql).toContain('unnest($3::text[])'); // OR terms, min-match filter
     expect(values).toEqual([
       'vuon cau vong',
       'vi',
+      ['vuon', 'cau', 'vong'],
+      2,
+      'vuon | cau | vong',
       'garden',
       106.635,
       10.767,

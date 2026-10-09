@@ -218,7 +218,7 @@ d. **(I03 review, High) md5-seeded narration ids rejected** — fixed:
 | — | Blocker for I04 DONE | B03: coordinator approval of the MinIO dev-build evidence, or `smoke-media.mjs` on an approved image; GitHub CI green on the branch | coordinator/platform |
 | — | Blocker for AI go-live | Real voice (Piper 403) + T06 blind review (I03 box 4), AI00 voice-consent/commercial-use ADR | Công + Tú |
 | — | Open | Storage-restore drill, metrics scrape endpoint (ADR 0013) | Công |
-| — | Open | Lexical recall (OR/minimum-match, categories) and a production embedding endpoint before enabling hybrid | search/Công |
+| — | Open | Lexical recall: DONE in L3 (0.60 → 0.90; 4 semantic/geo-intent queries remain). Still open: production embedding endpoint before enabling hybrid, and the ADR 0012 gate re-base decision | search/Công |
 | — | Frontend | Show `audio.generatedBy` as "AI-generated" in visitor web; keep `NEXT_PUBLIC_TTS_GENERATION_MODE=off` until the AI NO-GO items close | Tú |
 
 ## 8. Reproduce
