@@ -30,10 +30,26 @@ raw GPS.
   in the log); in-flight jobs finish; queued jobs wait. Wired in I02 (ADR 0014).
 - **Disable hybrid search:** `SEARCH_HYBRID_ENABLED=false` (ADR 0012).
 - **Model rollback:** disable the bad voice/model version in the registry/voice
-  manifest (`enabled: false`) and enable the previous pinned `modelVersion`.
-  Because jobs are idempotent by `narrationId+transcriptHash+modelVersion`, a
-  rollback re-generates under the previous version without touching published
-  audio.
+  manifest (`enabled: false`) and enable the previous pinned `modelVersion`
+  in the SAME manifest file read by API and worker (`TTS_VOICES_MANIFEST_PATH`),
+  then restart both. Drilled at I04 (`backend-i04-release-gate.md` §4):
+  jobs already queued under the bad version fail fast with
+  `TTS_MODEL_UNAVAILABLE` (re-create them); a new create gets a NEW job (the
+  idempotency key includes `modelVersion`) that regenerates the draft audio
+  under the previous version; published audio is untouched. Rolling forward
+  again re-queues the old row only if the draft no longer carries its audio.
+- **Frontend panel:** `NEXT_PUBLIC_TTS_GENERATION_MODE` is build-time and
+  fails closed (`off` unless exactly `api`/`demo`); prefer the backend kill
+  switch (no rebuild) and rebuild with `off` only to hide the panel.
+- **Migration 012 rollback (ADR 0014):** the I02+ API and worker do NOT run on
+  the 011 schema (API narration reads 500, worker claims fail `42703`); the
+  pre-I02 API runs on both 011 and 012. Order: (1) `TTS_GENERATION_ENABLED=false`
+  and stop the I02+ worker (SIGTERM drains); (2) deploy the pre-I02 API;
+  (3) run `012…down.sql` and delete its `schema_migrations` row. AI provenance
+  (`audio_generated_by`) is lost; audio stays. Roll forward: (1) migrate 012 up;
+  (2) deploy the I02+ API; (3) start the worker. Jobs the old API stamped with
+  `TTS_DEFAULT_*` fail `TTS_MODEL_UNAVAILABLE` under a manifest that lacks
+  them — re-create them.
 
 ## Quotas
 
@@ -65,7 +81,9 @@ Always back up before a bulk delete; delete in batches on large tables.
 
 ## Incident drills (acceptance)
 
-Run these in staging and confirm the behavior:
+Run these in staging and confirm the behavior (all four plus DB/S3/worker
+crash, kill-switch, quota, race and API-restart drills were run on a local
+real stack at I04 — results in `backend-i04-release-gate.md` §3):
 
 1. **Provider failure:** point the provider at a failing binary → jobs retry with
    backoff, then dead-letter; `tts_job_dead_letters_total` rises and the
@@ -90,5 +108,10 @@ locale mapping), watch `tts_generation_duration_ms` and dead-letter metrics by
 `npm run test --workspace @damsen/worker` covers metrics, quota, retention and
 the kill switch (incl. the consumer); `npm run test --workspace @damsen/api`
 covers the API kill switch/quota. Live evidence: `backend-i02-integration-fixes.md`. Fault-injection and restore drills are run in staging per above.
-`B03` (real object storage smoke) remains open and gates the storage-restore
-drill.
+Operational notes from the I04 drills: after a worker crash a job reads
+`running` until `TTS_JOB_STALE_RUNNING_MS` (30 min default) before it is
+re-claimed; keep each manifest entry's provider `timeoutMs` ≤
+`TTS_JOB_TIMEOUT_MS`, otherwise a timed-out attempt's provider process keeps
+running beside the retry; keep `TTS_JOB_STALE_RUNNING_MS` above
+`TTS_JOB_TIMEOUT_MS` + 120 s (bucket check + upload each have a 60 s timeout).
+The storage-restore drill (object loss) is still not run.

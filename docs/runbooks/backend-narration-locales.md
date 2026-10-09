@@ -49,6 +49,14 @@ enabled, not point to itself and not form a cycle. Array order is display order.
    audio URLs keep working.
 3. Do not delete `vi` or `en`, and do not point another locale's
    `fallbackLocale` at a disabled one (the loader rejects that).
+4. Visitor reads are lenient by design (verified at I03/I04): requesting a
+   disabled code, e.g. `GET /v1/pois/{id}/narration?locale=fr` while FR is
+   off, returns **200** with the default-locale narration,
+   `requestedLocale: "fr"`, `resolvedLocale: "vi"`, `fallbackUsed: true` — not a
+   400. Its published FR narration is no longer served (the stored row and
+   object stay and reappear when FR is re-enabled). Clients must show the
+   fallback note from `fallbackUsed`; admin writes for the disabled code are
+   the ones rejected (`400 NARRATION_LOCALE_DISABLED`).
 
 ## Reorder / change label or fallback
 

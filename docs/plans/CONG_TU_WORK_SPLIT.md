@@ -75,26 +75,26 @@ Công có thể bắt đầu ngay, không cần UI của Tú.
 
 ### Checklist Công
 
-- [ ] **C01 — Governance và backend contract**
+- [ ] **C01 — Governance và backend contract** (contract v1→v1.2 xong; còn thiếu ADR AI00 về voice consent/commercial-use — I04 §1)
   - Hoàn thành AI00 ADR: AI-generated label, license, voice consent, review gate.
   - Hiện thực contract v1 trong OpenAPI, shared types và API client.
-- [ ] **C02 — Locale config và database**
+- [x] **C02 — Locale config và database** (I01/I03 PASS trên API thật; I04 §1)
   - Thực hiện phần backend của T25A/T25B.
   - Config parser, `GET /v1/narration-locales`, migration locale động, fallback,
     validation và media object-key safety.
-- [ ] **C03 — TTS worker foundation**
+- [x] **C03 — TTS worker foundation** (I02 consumer + DB int tests; drills I04 §3)
   - Thực hiện AI02: `TtsProvider`, job persistence, idempotency,
     retry/dead-letter, artifact/model registry và audio validation.
-- [ ] **C04 — Piper baseline**
+- [ ] **C04 — Piper baseline** (code + test mock; chưa từng sinh audio thật — voice Piper 403)
   - Thực hiện AI03 bằng corpus fixture nhỏ riêng của backend.
   - Pin model/voice/license/checksum; sinh audio và gắn vào draft narration.
-- [ ] **C05 — Provider benchmark và training decision**
+- [ ] **C05 — Provider benchmark và training decision** (harness xong; corpus đầy đủ chỉ chạy provider giả, chưa blind review)
   - Thực hiện AI05 với fixture trước; chạy lại bộ corpus đầy đủ của Tú khi tích hợp.
   - AI06 chỉ mở sau quyết định GO; không train từ đầu.
-- [ ] **C06 — Semantic search production**
+- [ ] **C06 — Semantic search production** (flag/fallback chạy; chưa có embedding endpoint production — I04 §6b)
   - Thực hiện AI07: embedding provider, vector retrieval, hybrid ranking,
     feature flag và lexical fallback.
-- [ ] **C07 — Backend/infra hardening**
+- [x] **C07 — Backend/infra hardening** (drills + rollback I04 §3–4; scrape endpoint, restore drill còn mở)
   - Phần Công của AI08: queue/model metrics, quota, dead-letter, retention,
     failure drills và rollback.
 
@@ -215,9 +215,9 @@ Báo cáo: `docs/runbooks/frontend-i03-acceptance-report.md`.
 
 ### I04 — Release gate — Owner: Công
 
-- [ ] Tổng hợp backend/frontend evidence.
-- [ ] Fault injection và rollback model/feature flag.
-- [ ] Chỉ đánh dấu DONE khi B03/object storage thật và root quality gate pass.
+- [x] Tổng hợp backend/frontend evidence. (`docs/runbooks/backend-i04-release-gate.md` §0–1)
+- [x] Fault injection và rollback model/feature flag. (§3–4: 20 drills, model/flag/migration 012)
+- [x] Chỉ đánh dấu DONE khi B03/object storage thật và root quality gate pass. (MinIO thật + gate local PASS, §2/§5; verdict AI TTS NO-GO)
 
 ## 6. Lịch song song đề xuất
 
