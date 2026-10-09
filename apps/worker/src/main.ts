@@ -1,3 +1,8 @@
+import {
+  startTtsWorker,
+  type RunningTtsWorker,
+} from './tts/tts-worker-runtime.js';
+
 export { EmbeddingService } from './embedding/embedding-service.js';
 export type {
   EmbeddingRunOptions,
@@ -20,6 +25,9 @@ export type {
 export {
   TtsGenerationService,
   TtsTimeoutError,
+  buildTtsArtifact,
+  errorCodeOf,
+  withTimeout,
 } from './tts/tts-generation-service.js';
 export type {
   TtsGenerationRequest,
@@ -44,6 +52,55 @@ export {
 } from './tts/tts-hash.js';
 export { InMemoryTtsJobRepository } from './tts/in-memory-tts-job.repository.js';
 export { PostgresTtsJobRepository } from './tts/postgres-tts-job.repository.js';
+
+// I02 — queue consumer: claim → synthesize → store audio → attach to draft.
+export type {
+  ClaimedTtsJob,
+  DraftAudioAttachment,
+  TtsAudioProvenance,
+  TtsCompletionOutcome,
+  TtsJobQueue,
+  TtsNarrationSnapshot,
+} from './tts/tts-job-queue.js';
+export { InMemoryTtsJobQueue } from './tts/in-memory-tts-job-queue.js';
+export { PostgresTtsJobQueue } from './tts/postgres-tts-job-queue.js';
+export type {
+  PostgresTtsJobQueueOptions,
+  SqlTransactionalPool,
+} from './tts/postgres-tts-job-queue.js';
+export {
+  InMemoryTtsAudioStore,
+  S3TtsAudioStore,
+  TtsStorageError,
+} from './tts/tts-audio-store.js';
+export type {
+  S3TtsAudioStoreConfig,
+  TtsAudioPut,
+  TtsAudioStore,
+} from './tts/tts-audio-store.js';
+export {
+  TTS_JOB_PRECONDITION_CODES,
+  TtsJobConsumer,
+  TtsJobRunner,
+} from './tts/tts-job-runner.js';
+export type {
+  TtsConsumerTick,
+  TtsJobConsumerOptions,
+  TtsJobRunnerConfig,
+  TtsJobRunnerDeps,
+  TtsVoiceBinding,
+} from './tts/tts-job-runner.js';
+export {
+  loadTtsWorkerConfig,
+  loadVoiceBindings,
+  startTtsWorker,
+  TtsWorkerConfigError,
+} from './tts/tts-worker-runtime.js';
+export type {
+  RunningTtsWorker,
+  TtsWorkerConfig,
+  TtsWorkerEngine,
+} from './tts/tts-worker-runtime.js';
 export { isTerminalTtsStatus } from './tts/types.js';
 export type {
   TtsArtifact,
@@ -153,8 +210,13 @@ export {
 } from './ops/ai-feature-flags.js';
 export type { AiFeatureFlags } from './ops/ai-feature-flags.js';
 
-export function startWorker(): void {
-  // Queue/CLI composition belongs here once a production embedding provider and
-  // database client are selected. The domain service itself remains injectable.
-  console.log('Dam Sen worker ready');
+/**
+ * Start the worker process: the TTS queue consumer (I02). The embedding
+ * pipeline stays a library until a production embedding provider is selected.
+ * The process entrypoint is `src/worker.ts`.
+ */
+export function startWorker(
+  env: NodeJS.ProcessEnv = process.env,
+): RunningTtsWorker {
+  return startTtsWorker(env);
 }

@@ -87,6 +87,12 @@ export interface TtsArtifact {
   durationSeconds: number;
   sampleRateHz: number;
   mimeType: 'audio/wav';
+  /**
+   * Private object-storage key of the stored audio (I02). Set only by the queue
+   * consumer, which uploads the bytes and attaches them to the draft narration.
+   * Never returned by the public API.
+   */
+  objectKey?: string;
 }
 
 export interface TtsJobRecord {

@@ -226,4 +226,46 @@ describe('TtsGenerationService', () => {
       service(new FakeProvider('ok')).generate({ ...request, locale: 'fr' }),
     ).rejects.toThrow('no enabled voice');
   });
+
+  it('a cancel landing during synthesis is not overwritten by the result (I02-2)', async () => {
+    const repo = new InMemoryTtsJobRepository();
+    let jobId = '';
+    const provider = new FakeProvider('ok');
+    const original = provider.synthesize.bind(provider);
+    const svc = new TtsGenerationService(repo, provider, registry(), deps());
+    provider.synthesize = async (req) => {
+      const job = await repo.findByIdempotencyKey(
+        `${NARRATION_ID}:${transcriptHash(TRANSCRIPT)}:2026.01.0`,
+      );
+      jobId = job!.id;
+      await svc.cancel(jobId);
+      return original(req);
+    };
+    const job = await svc.generate(request);
+    expect(job.status).toBe('cancelled');
+    expect((await repo.findById(jobId))?.status).toBe('cancelled');
+    expect((await repo.findById(jobId))?.artifact).toBeNull();
+  });
+
+  it('keeps errorCode null while a retried job is still running (I02-10)', async () => {
+    const repo = new InMemoryTtsJobRepository();
+    const seen: Array<string | null> = [];
+    const provider = new FakeProvider('failN', 1);
+    const original = provider.synthesize.bind(provider);
+    provider.synthesize = async (req) => {
+      const job = await repo.findByIdempotencyKey(
+        `${NARRATION_ID}:${transcriptHash(TRANSCRIPT)}:2026.01.0`,
+      );
+      seen.push(job!.errorCode);
+      return original(req);
+    };
+    const job = await new TtsGenerationService(
+      repo,
+      provider,
+      registry(),
+      deps(),
+    ).generate(request, { maxAttempts: 3 });
+    expect(job.status).toBe('succeeded');
+    expect(seen).toEqual([null, null]);
+  });
 });
