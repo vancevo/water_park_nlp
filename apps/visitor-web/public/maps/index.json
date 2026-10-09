@@ -1,6 +1,12 @@
 {
   "pictures": [
     {
+      "id": "illustrated4",
+      "url": "/maps/damsen-illustrated-4.jpg",
+      "georef": "/maps/damsen-illustrated-4.georef.json",
+      "confidence": "fitted"
+    },
+    {
       "id": "illustrated3",
       "url": "/maps/damsen-illustrated-3.jpg",
       "georef": "/maps/damsen-illustrated-3.georef.json",

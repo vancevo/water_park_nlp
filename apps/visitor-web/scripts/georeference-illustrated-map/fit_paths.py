@@ -98,6 +98,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--image", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--path-color", help="r,g,b of the painted paths (default: cream paths)")
+    ap.add_argument("--tolerance", type=float, default=32, help="colour distance for --path-color")
+    ap.add_argument(
+        "--init-from",
+        type=Path,
+        help="georef.json of a picture with the same layout: start from its transform and learn the path colour from it",
+    )
     args = ap.parse_args()
 
     pixels = np.array(Image.open(args.image).convert("RGB")).astype(int)
@@ -105,10 +112,41 @@ def main():
     r, g, b = pixels[:, :, 0], pixels[:, :, 1], pixels[:, :, 2]
     cream = (r >= 238) & (g >= 212) & (b >= 150) & (b <= 228) & (r - b >= 18)
     w, h = width // K, height // K
+    init_A = None
+    if args.init_from:  # same layout as an already fitted picture: reuse its transform
+        prev = json.loads(args.init_from.read_text())
+        pw, ph = prev["imageSizePx"]
+        corner = [to_m(*c) for c in prev["corners"]]
+        ex = ((corner[1][0] - corner[0][0]) / pw, (corner[1][1] - corner[0][1]) / pw)
+        ey = ((corner[3][0] - corner[0][0]) / ph, (corner[3][1] - corner[0][1]) / ph)
+        pdet = ex[0] * ey[1] - ex[1] * ey[0]
+        # metres -> pixels (full res of the previous picture, assumed to be the same size)
+        full = [ey[1] / pdet, -ey[0] / pdet, -ex[1] / pdet, ex[0] / pdet]
+        init_A = [
+            full[0] / K, full[1] / K, full[2] / K, full[3] / K,
+            -(full[0] * corner[0][0] + full[1] * corner[0][1]) / K,
+            -(full[2] * corner[0][0] + full[3] * corner[0][1]) / K,
+        ]
 
     def small(mask):
         return np.array(Image.fromarray(mask.astype("uint8") * 255).resize((w, h), Image.NEAREST)) > 0
 
+    if args.path_color or init_A:
+        if args.path_color:
+            target = np.array(list(map(int, args.path_color.split(","))), float)
+        else:  # most common colour (16-level bins) along the OSM paths at the inherited transform
+            seen = []
+            for f in json.loads(WALKWAYS.read_text())["features"]:
+                for lon, lat in f["geometry"]["coordinates"]:
+                    x, y = to_m(lon, lat)
+                    xi = int(round((init_A[0] * x + init_A[1] * y + init_A[4]) * K))
+                    yi = int(round((init_A[2] * x + init_A[3] * y + init_A[5]) * K))
+                    if 0 <= xi < width and 0 <= yi < height:
+                        seen.append(pixels[yi, xi] // 16)
+            bins, counts = np.unique(np.array(seen), axis=0, return_counts=True)
+            target = bins[counts.argmax()] * 16 + 8.0
+        cream = np.sqrt(((pixels - target) ** 2).sum(2)) < args.tolerance
+        print("path colour", [round(float(v)) for v in target])
     label, sizes = components(small(cream), eight=True)
     paths = np.isin(label, [i for i, s in sizes.items() if s > 600])  # drop sand patches
     dist = distance_to(paths)
@@ -132,7 +170,7 @@ def main():
     ys, xs = np.nonzero(paths)
     ox0, ox1, oy0, oy1 = samples[:, 0].min(), samples[:, 0].max(), samples[:, 1].min(), samples[:, 1].max()
     s = ((xs.max() - xs.min()) / (ox1 - ox0) + (ys.max() - ys.min()) / (oy1 - oy0)) / 2  # north-up start
-    A = [s, 0, 0, -s, (xs.min() + xs.max()) / 2 - s * (ox0 + ox1) / 2, (ys.min() + ys.max()) / 2 + s * (oy0 + oy1) / 2]
+    A = init_A or [s, 0, 0, -s, (xs.min() + xs.max()) / 2 - s * (ox0 + ox1) / 2, (ys.min() + ys.max()) / 2 + s * (oy0 + oy1) / 2]
     start = cost(A)
     best = (start[0], A)
     rng = random.Random(2)

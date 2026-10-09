@@ -125,3 +125,24 @@ app nó là ảnh mặc định của mục **Mới**. Giới hạn: ảnh khớ
 kiểm tra thực địa), không chứng minh OSM đúng với thực tế; phần ngoài mạng đường
 (nhà, cây, hồ) là minh họa.
 
+## Minh họa 4 — cùng bố cục với ảnh 3, khớp sát hơn (ảnh mặc định)
+
+Ảnh thứ tư có cùng bố cục với ảnh 3 nhưng nét đường màu be (không viền xanh). Khớp bằng
+`fit_paths.py --path-color 248,216,184` (bắt đầu từ ước lượng khung bao, **không** lấy
+phép biến đổi của ảnh 3):
+
+| Chỉ số | Giá trị |
+|---|---|
+| Sai số trung bình đường OSM ↔ đường vẽ | **~0,8 m** |
+| Điểm đường OSM trong ≤ 3 pixel (nửa độ phân giải) | **94%** (điểm xuất phát 83%) |
+| Góc xoay / tỉ lệ | −0,4° (hướng bắc ở trên) / ~0,77 m/pixel |
+| So với ảnh 3 | bốn góc ảnh chênh nhau chỉ 3–5 m: cùng bố cục, độ chính xác tương đương |
+
+Khi khởi tạo từ phép biến đổi của ảnh 3 (`--init-from`) kết quả trùng với cách trên
+(bốn góc cách nhau ≤ 1,5 m), nên không phải kết quả của cách chọn điểm xuất phát.
+Màu đường được xác định từ chính ảnh. Kiểm tra độc lập bằng hồ cho kết quả như ảnh 3
+(bộ lọc màu hồ chỉ bắt được ~38% vì sen/bèo không tính là nước).
+
+Ảnh 4 là ảnh mặc định của mục **Mới**; ảnh 3 vẫn có trong ô chọn. Cả hai chỉ chứng
+minh khớp với *đường OSM*, chưa phải với thực địa.
+

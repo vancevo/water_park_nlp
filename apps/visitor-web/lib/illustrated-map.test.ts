@@ -90,8 +90,29 @@ describe('quality numbers are recorded', () => {
       g.startingGuessWithin3HalfPixels,
     );
     expect(Math.abs(g.rotationDegrees)).toBeLessThan(2); // drawn north-up
-    expect(manifest.pictures[0]?.id).toBe('illustrated3'); // default picture
+    expect(manifest.pictures[1]?.id).toBe('illustrated3');
+    expect(manifest.pictures[1]?.confidence).toBe('fitted');
+  });
+
+  it('illustrated 4 (default): paths within about a metre, same layout as 3', () => {
+    const g = read('damsen-illustrated-4.georef.json') as Georef & {
+      meanDistanceMetres: number;
+      osmPathSamplesWithin3HalfPixels: number;
+      rotationDegrees: number;
+    };
+    expect(g.meanDistanceMetres).toBeLessThan(1.5);
+    expect(g.osmPathSamplesWithin3HalfPixels).toBeGreaterThan(0.9);
+    expect(Math.abs(g.rotationDegrees)).toBeLessThan(2);
+    expect(manifest.pictures[0]?.id).toBe('illustrated4'); // default picture
     expect(manifest.pictures[0]?.confidence).toBe('fitted');
+    // Same layout as picture 3: the two fits agree to within a few metres.
+    const three = read('damsen-illustrated-3.georef.json');
+    const kx = Math.cos((10.764 * Math.PI) / 180) * 111320;
+    g.corners.forEach(([lon, lat], i) => {
+      const [lon3, lat3] = three.corners[i]!;
+      const metres = Math.hypot((lon - lon3) * kx, (lat - lat3) * 110574);
+      expect(metres).toBeLessThan(8);
+    });
   });
 
   it('illustrated: beats a north-up guess but leaves footpaths on water', () => {
