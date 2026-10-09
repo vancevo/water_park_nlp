@@ -809,6 +809,17 @@ button {
   border-radius: 8px;
 }
 
+.narration .ai-audio-label {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #ede7fb;
+  color: #4b2d8f;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .narration .narration-note {
   color: var(--danger);
   font-size: 13px;

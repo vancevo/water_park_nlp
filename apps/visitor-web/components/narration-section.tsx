@@ -7,6 +7,7 @@ import type {
   SupportedLocale,
 } from '@damsen/shared-types';
 import { useCallback, useEffect, useId, useState } from 'react';
+import { aiAudioLabel } from '@/lib/ai-audio-label';
 import {
   OFFLINE_NARRATION_LOCALE_CATALOG,
   localeLabel,
@@ -144,6 +145,9 @@ export function NarrationSection({
 }) {
   const selectId = useId();
   const fallback = narrationFallbackNotice(catalog, narration);
+  const aiLabel = narration?.audio
+    ? aiAudioLabel(narration.resolvedLocale, narration.audio.generatedBy)
+    : null;
   return (
     <section className="narration" aria-label="Thuyết minh">
       <div className="narration-locale">
@@ -210,14 +214,25 @@ export function NarrationSection({
             </strong>
             <p lang={narration.resolvedLocale}>{narration.transcript}</p>
             {narration.audio ? (
-              <audio
-                controls
-                preload="none"
-                src={narration.audio.playbackUrl}
-                // Recorded audio wins: silence any browser TTS still speaking.
-                onPlay={() => window.speechSynthesis?.cancel()}
-                aria-label={`Audio thuyết minh ${localeLabel(catalog, narration.resolvedLocale)}`}
-              />
+              <>
+                {aiLabel ? (
+                  <small
+                    className="ai-audio-label"
+                    lang={aiLabel.lang}
+                    title={aiLabel.detail}
+                  >
+                    {aiLabel.text}
+                  </small>
+                ) : null}
+                <audio
+                  controls
+                  preload="none"
+                  src={narration.audio.playbackUrl}
+                  // Recorded audio wins: silence any browser TTS still speaking.
+                  onPlay={() => window.speechSynthesis?.cancel()}
+                  aria-label={`Audio thuyết minh ${localeLabel(catalog, narration.resolvedLocale)}${aiLabel ? ` (${aiLabel.text})` : ''}`}
+                />
+              </>
             ) : speechSupported ? (
               <button
                 type="button"

@@ -141,3 +141,11 @@ thật, provider giả, S3 emulator); benchmark corpus chỉ là kiểm tra pipe
 (PARTIAL); hybrid search on/off PASS về chức năng (số liệu không đổi giữa các
 chế độ, search sống thấp hơn baseline — chuyển I04). Flag TTS vẫn mặc định
 `off`; bản build staging/acceptance đặt `api` tường minh.
+
+## 8. Nhãn AI cho visitor (L5)
+
+Khi `PoiNarration.audio.generatedBy` (contract v1.2) có mặt, visitor hiện nhãn
+"Giọng đọc do AI tạo" (vi) / "AI-generated voice" (en) / "Voix générée par IA"
+(fr) phía trên player, theo ngôn ngữ của audio; locale khác dùng English. Tooltip
+chỉ chứa provider/model/version (không có job id). Không có `generatedBy` →
+không hiện nhãn. Logic ở `apps/visitor-web/lib/ai-audio-label.ts`.
