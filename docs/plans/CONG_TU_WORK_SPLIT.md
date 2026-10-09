@@ -94,7 +94,7 @@ Công có thể bắt đầu ngay, không cần UI của Tú.
 - [ ] **C06 — Semantic search production** (flag/fallback chạy; chưa có embedding endpoint production — I04 §6b)
   - Thực hiện AI07: embedding provider, vector retrieval, hybrid ranking,
     feature flag và lexical fallback.
-- [x] **C07 — Backend/infra hardening** (drills + rollback I04 §3–4; scrape endpoint, restore drill còn mở)
+- [ ] **C07 — Backend/infra hardening** (drills + rollback xong I04 §3–4; chưa tick: metrics scrape endpoint và storage-restore drill còn mở)
   - Phần Công của AI08: queue/model metrics, quota, dead-letter, retention,
     failure drills và rollback.
 
@@ -217,7 +217,7 @@ Báo cáo: `docs/runbooks/frontend-i03-acceptance-report.md`.
 
 - [x] Tổng hợp backend/frontend evidence. (`docs/runbooks/backend-i04-release-gate.md` §0–1)
 - [x] Fault injection và rollback model/feature flag. (§3–4: 20 drills, model/flag/migration 012)
-- [x] Chỉ đánh dấu DONE khi B03/object storage thật và root quality gate pass. (MinIO thật + gate local PASS, §2/§5; verdict AI TTS NO-GO)
+- [ ] Chỉ đánh dấu DONE khi B03/object storage thật và root quality gate pass. (CHƯA đạt: gate chỉ PASS local, CI chưa chạy; B03 mới MITIGATED bằng bản MinIO dev build tự compile — cần coordinator duyệt hoặc chạy lại trên image được duyệt, §2/§5)
 
 ## 6. Lịch song song đề xuất
 

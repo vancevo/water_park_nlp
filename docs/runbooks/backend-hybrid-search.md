@@ -40,11 +40,15 @@ their order — and any failure falls back to lexical automatically.
    (worker embedding pipeline, migration 005).
 2. The embedding service reachable at `SEARCH_EMBEDDING_URL`, returning
    `{ "vector": number[1024] }`.
-3. The 50-query HTTP evaluation with the flag ON shows no regression vs the
-   **live API with the flag OFF** on the same database (run both with
-   `run_http_search.py`); otherwise keep the flag off (ADR 0012 gate).
-   Do **not** compare against `baseline_report.json`: that is the Python
-   bag-of-words runner (`lexical_baseline.py`), not the API (see below).
+3. Both checks pass, otherwise keep the flag off:
+   a. **ADR 0012 gate (unchanged):** Recall@10/MRR/nDCG@10 not below the T41
+      baseline (`baseline_report.json`, 0.911/0.906/0.900). The live API is
+      at 0.600 today (see below), so this gate currently FAILS; only an
+      ADR 0012 amendment approved by the coordinator may re-base it.
+   b. **No regression vs the live API with the flag OFF** on the same
+      database (run both with `run_http_search.py`). This isolates the effect
+      of the flag, because `baseline_report.json` is the Python bag-of-words
+      runner (`lexical_baseline.py`), not the API.
 
 ## Verify
 
@@ -53,15 +57,16 @@ their order — and any failure falls back to lexical automatically.
 - Local real path: with a DB + embeddings + embedding endpoint and the flag on,
   run the 50-query HTTP evaluation:
   `python3 data/search-evaluation/run_http_search.py` →
-  `python3 data/search-evaluation/evaluate.py …` and compare to the same
-  run with `SEARCH_HYBRID_ENABLED=false`.
+  `python3 data/search-evaluation/evaluate.py …` and compare to both
+  `baseline_report.json` (gate a) and the same run with
+  `SEARCH_HYBRID_ENABLED=false` (check b).
 
 ## Live lexical baseline (I04, 2026-10-09)
 
 Measured on the 5 fixture POIs (migrations 001–012, `damsen_i04`), API with
 `SEARCH_HYBRID_ENABLED=false`; identical with the flag on and no embedder:
 
-| Metric | Live API (gate reference) | `baseline_report.json` (Python runner) |
+| Metric | Live API, flag off (check b reference) | `baseline_report.json` (T41 Python runner, gate a) |
 |---|---:|---:|
 | Recall@10 / MRR / nDCG@10 | 0.600 / 0.600 / 0.600 | 0.911 / 0.906 / 0.900 |
 | Zero-result rate | 0.46 | 0.10 |

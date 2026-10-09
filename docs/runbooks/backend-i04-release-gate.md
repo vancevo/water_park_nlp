@@ -11,17 +11,21 @@ Inputs: `frontend-i01-integration-report.md`, `backend-i02-integration-fixes.md`
 
 | Component | Verdict | Why |
 |---|---|---|
-| Object storage (B03) | **GO** | Real MinIO (built from the official Go module, §5) enforces SigV4, signed headers, expiry and `x-amz-checksum-sha256`; media smoke, full TTS E2E and an editor upload pass on it. B03 surfaced and fixed a release blocker: every editor upload was rejected by real S3/MinIO. |
+| Object storage (B03) | **MITIGATED locally — not closed** | A MinIO *development* build compiled from the official Go module (§5) enforces SigV4, signed headers, expiry and `x-amz-checksum-sha256`; media smoke, full TTS E2E and an editor upload pass on it, and it surfaced and fixed a release blocker (every editor upload was rejected by real S3/MinIO). But B03 asks for Quay access or an **approved** S3-compatible image; a `DEVELOPMENT.GOGET` source build is not an approved image, and approving it is a coordinator decision. B03 stays open until the coordinator accepts this evidence or `smoke-media.mjs` passes on an approved image. |
 | Narration locales (C02/T25A–E) | **GO** | I01/I03 PASS on the real API; disabled-locale fallback documented (§6c). |
 | TTS pipeline: API + worker + review gate (I02) | **GO with the generation flag OFF** | All drills pass after three fixes (§3); draft-only + human review verified on real storage. |
 | AI TTS for editors (`TTS_GENERATION_ENABLED` + `NEXT_PUBLIC_TTS_GENERATION_MODE=api`) | **NO-GO** | No real voice has ever run (Piper voices 403; only a sine-tone CLI fake), T06 corpus benchmark has no real provider and no blind review (I03 box 4), AI00 governance (voice consent / commercial-use review) not written. Keep backend kill switch `false` and frontend mode `off` (I03 review default). |
 | Public "AI-generated" label | **GO (API)** / UI pending | Contract v1.2 field shipped (§6a); visitor UI label is Tú's follow-up. |
 | Hybrid search (`SEARCH_HYBRID_ENABLED`) | **NO-GO to enable** (flag works) | On/off is functional and fails closed, but there is no production embedding endpoint/embeddings, and the live lexical baseline is 0.600 recall (§6b). Keep `false`. |
 | Root quality gate | **PASS (local)** | §2. GitHub CI not run (branch not pushed). |
-| **Overall release** | **NO-GO for public/AI release; GO to merge the backend with AI flags off** | B01 (content/map rights) is still open for any public release; AI TTS blocked by the voice/benchmark/governance items above. |
+| **Overall release** | **NO-GO for public/AI release; GO to merge the backend with AI flags off** | B01 (content/map rights) is still open for any public release; AI TTS blocked by the voice/benchmark/governance items above; B03 awaits coordinator approval. |
 
-I04's own checklist (aggregate evidence; fault injection + rollback; B03 and
-root gate pass) is met — the gate ran and its verdict is the table above.
+I04's checklist: evidence aggregated and fault-injection/rollback drills run
+(boxes 1–2 met). Box 3 ("DONE only when B03/real object storage and the root
+quality gate pass") is **not** met: the root gate passed locally only (GitHub
+CI not run) and B03 is mitigated with an unapproved dev build. **I04 is not
+DONE**; it closes when the coordinator approves the MinIO evidence (or an
+approved image reruns `scripts/smoke-media.mjs`) and CI passes on the branch.
 
 ## 1. Evidence matrix
 
@@ -52,7 +56,7 @@ MinIO.
 | AI07 hybrid search | functional, not production | §6b | fake embedder |
 | AI08 drills: failed provider, full queue, corrupt audio, model rollback | PASS | §3, §4 | real processes |
 | AI08 restore drill / metrics scrape endpoint | **OPEN** | deferred (ADR 0013) | — |
-| B03 real object storage | **CLOSED (local)** | §5 | real MinIO |
+| B03 real object storage | **MITIGATED (local), awaiting coordinator approval** | §5 | real MinIO protocol, dev build (not an approved image) |
 
 ## 2. Root quality gate (what CI runs, run locally)
 
@@ -65,8 +69,9 @@ MinIO.
 | Migrations: 001→012 up, all 12 downs in reverse, 001→012 up again (fresh DB) | pass, no errors |
 | `python3 data/{geojson,research-damsen,search-evaluation}/validate.py`, `search-evaluation/test_evaluation.py`, `tts-evaluation/validate.py` | pass |
 
-CI change: `data/tts-evaluation/validate.py` added to the `fixture-contracts`
-job (standard library only). `npm ci` was not re-run (dependencies already
+CI change: `data/tts-evaluation/validate.py` and its self-test
+`test_validate.py` added to the `fixture-contracts` job (standard library
+only; both pass from a clean `git archive`). `npm ci` was not re-run (dependencies already
 installed in the worktree).
 
 ## 3. Fault injection
@@ -165,7 +170,16 @@ from the review edit of 012).
   submit HEAD verification and public signed GET; editor upload through
   `POST /v1/admin/media/presign` → PUT 200 (tampered retry 400) → submit 200 →
   approve → public GET sha256 match.
-- Not covered: AWS S3 itself, TLS endpoints, the storage-restore drill.
+- Not covered: AWS S3 itself, TLS endpoints, the storage-restore drill, and a
+  browser upload straight to the bucket (the editor-upload check above used
+  Node `fetch`, which needs no CORS). The presigned URL carries no
+  `x-amz-sdk-checksum-algorithm`/trailer, and `x-amz-checksum-sha256` is the
+  base64 of the raw digest, which is what AWS S3 `PutObject` expects, but this
+  was not run against AWS.
+- **B03 verdict (review):** MITIGATED, not closed. The binary is a
+  `DEVELOPMENT.GOGET` build fetched through the Go module proxy, not the
+  "approved S3-compatible image" B03 asks for; only the coordinator can accept
+  it as equivalent. Until then B03 and I04 stay open.
 
 ## 6. Issues raised by I03
 
@@ -176,9 +190,14 @@ a. **Public AI flag** — fixed, additive contract v1.2: `PoiNarration.audio.gen
    not changed (Tú).
 b. **Search far below baseline** — not a bug in the release: the committed
    baseline is the Python OR-scoring runner, the API ANDs all tokens
-   (`plainto_tsquery`) over name/descriptions only (T40 recorded 0.60). Live
-   API baseline recorded and the hybrid gate corrected to compare against it
-   (`backend-hybrid-search.md`). Improving recall is a search follow-up.
+   (`plainto_tsquery`) over name/descriptions only (T40 recorded 0.60). The
+   live API scores **0.600 Recall@10 vs 0.911** for the committed T41 baseline
+   (`baseline_report.json`, unchanged). The live-off run is recorded as an
+   *additional* no-regression reference in `backend-hybrid-search.md`; the
+   ADR 0012 gate (not below the T41 baseline) is unchanged and currently
+   FAILS, so hybrid stays off. Re-basing the gate would need an ADR 0012
+   amendment approved by the coordinator. Improving recall is a search
+   follow-up.
 c. **Disabled locale falls back silently** — by design; documented in
    `backend-narration-locales.md` (Disable a locale, step 4).
 d. **(I03 review, High) md5-seeded narration ids rejected** — fixed:
@@ -195,6 +214,8 @@ d. **(I03 review, High) md5-seeded narration ids rejected** — fixed:
 | F6 | Low | DB outage answers `500 INTERNAL_ERROR`; map connection errors to `503` | Công |
 | F7 | Low | Worker config only checks stale window > attempt timeout; storage calls can take up to 120 s (re-claim mid-upload is fenced, but wasted) | Công |
 | F8 | Info | After a worker crash, editors see `running` for up to 30 min (stale window) | Công/ops |
+| F9 | Medium | Browser editor uploads go straight to the bucket with signed `content-type`/`x-amz-checksum-sha256`/`x-amz-meta-sha256` headers: the staging/production bucket needs a CORS rule allowing `PUT` from the admin origin with those headers (no CORS config exists in `infra/`). Run one browser upload + `smoke-media.mjs` against the real target store (AWS S3 or the approved image) at T60 | Công/platform |
+| — | Blocker for I04 DONE | B03: coordinator approval of the MinIO dev-build evidence, or `smoke-media.mjs` on an approved image; GitHub CI green on the branch | coordinator/platform |
 | — | Blocker for AI go-live | Real voice (Piper 403) + T06 blind review (I03 box 4), AI00 voice-consent/commercial-use ADR | Công + Tú |
 | — | Open | Storage-restore drill, metrics scrape endpoint (ADR 0013) | Công |
 | — | Open | Lexical recall (OR/minimum-match, categories) and a production embedding endpoint before enabling hybrid | search/Công |
