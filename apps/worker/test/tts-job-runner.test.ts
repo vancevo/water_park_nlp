@@ -215,6 +215,60 @@ describe('TtsJobRunner (I02 queue consumer)', () => {
     expect(box.ctx.queue.attachedAudio(NARRATION_ID)).toBeNull();
   });
 
+  it('a claim superseded by cancel → re-queue → re-claim never writes (lease fencing)', async () => {
+    const box = {} as {
+      ctx: ReturnType<typeof setup>;
+      fresh?: Awaited<ReturnType<InMemoryTtsJobQueue['claimNext']>>;
+    };
+    const provider = new ScriptedProvider(['ok'], async (call) => {
+      if (call !== 1) return;
+      // While the first claim synthesizes: API cancel, API re-queue of the
+      // same id, and another worker claims it.
+      box.ctx.queue.cancel('job-1');
+      box.ctx.queue.enqueue(queuedJob());
+      box.fresh = await box.ctx.queue.claimNext();
+    });
+    box.ctx = setup({ provider });
+    const stale = await runOne(box.ctx);
+    expect(stale.status).toBe('running'); // owned by the fresh claim now
+    expect(box.ctx.queue.attachedAudio(NARRATION_ID)).toBeNull();
+    expect(box.ctx.store.objects.size).toBe(0);
+
+    const job = await box.ctx.runner.process(box.fresh!);
+    expect(job.status).toBe('succeeded');
+    expect(box.ctx.queue.attachedAudio(NARRATION_ID)?.generatedBy.jobId).toBe(
+      'job-1',
+    );
+  });
+
+  it('a stale re-claim continues after the spent attempts and dead-letters an exhausted job', async () => {
+    const provider = new ScriptedProvider(['ok']);
+    const ctx = setup({ provider });
+    const first = await ctx.queue.claimNext();
+    await ctx.queue.updateRunning(
+      { ...first!.job, attempts: 2 },
+      first!.leaseToken,
+    );
+    const resumed = await ctx.runner.process(ctx.queue.reclaimStale('job-1')!);
+    expect(resumed).toMatchObject({ status: 'succeeded', attempts: 3 });
+    expect(provider.calls).toBe(1);
+
+    const lost = setup({ provider: new ScriptedProvider(['ok']) });
+    const claim = await lost.queue.claimNext();
+    await lost.queue.updateRunning(
+      { ...claim!.job, attempts: 3 },
+      claim!.leaseToken,
+    );
+    const job = await lost.runner.process(lost.queue.reclaimStale('job-1')!);
+    expect(job).toMatchObject({
+      status: 'failed',
+      deadLettered: true,
+      attempts: 3,
+      errorCode: 'TTS_WORKER_LOST',
+    });
+    expect(lost.provider.calls).toBe(0);
+  });
+
   it('a running job never exposes the previous attempt errorCode (I02-10)', async () => {
     const seen: Array<string | null> = [];
     const box = {} as { ctx: ReturnType<typeof setup> };

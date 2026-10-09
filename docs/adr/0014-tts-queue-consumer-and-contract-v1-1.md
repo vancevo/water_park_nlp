@@ -25,14 +25,20 @@ additive contract changes (v1.1).
 1. **Worker consumes the table.** `apps/worker/src/worker.ts` (`npm run start`)
    runs `TtsJobConsumer`: one sequential dispatcher claims the oldest `queued`
    row with `UPDATE … FROM (SELECT … FOR UPDATE SKIP LOCKED LIMIT 1)`, moving it
-   to `running` with `attempts = 0` and `error_code = NULL`. Claimed jobs run
-   concurrently up to the quota. A `running` row not updated for
-   `TTS_JOB_STALE_RUNNING_MS` (default 30 min, must exceed the attempt timeout)
-   is re-claimable, so a crashed worker never strands a job.
-2. **Cancel always wins.** Every worker write after the claim is conditional
-   on `status = 'running'`; the API's cancel and re-enqueue are conditional
+   to `running` with `attempts = 0`, `error_code = NULL` and a fresh
+   `lease_token` (migration 012). Claimed jobs run concurrently up to the
+   quota. A `running` row not updated for `TTS_JOB_STALE_RUNNING_MS` (default
+   30 min, must exceed the attempt timeout) is re-claimable, so a crashed
+   worker never strands a job; a stale re-claim keeps the attempts already
+   spent, so a job that keeps killing workers is dead-lettered with
+   `TTS_WORKER_LOST` once they are exhausted instead of looping forever.
+2. **Cancel always wins; a superseded claim never writes.** Every worker write
+   after the claim is conditional on `status = 'running'` **and** the claim's
+   `lease_token` (fencing); the API's cancel and re-enqueue are conditional
    single-statement UPDATEs (`queued/running → cancelled`,
-   `failed/cancelled → queued`). Neither side overwrites the other. A cancel
+   `failed/cancelled/succeeded → queued`). Neither side overwrites the other,
+   and a worker whose job was cancelled → re-queued → claimed again (or
+   re-claimed after the stale window) cannot touch the row any more. A cancel
    while synthesizing discards the result at the next checkpoint (before upload
    and in the commit transaction).
 3. **Audio is stored and attached to the DRAFT only.** On success the worker
@@ -103,8 +109,10 @@ the admin UI's mapping).
 
 Migration `012_tts_draft_audio_provenance` (additive, reversible): nullable
 `poi_narrations.audio_generated_by jsonb`, a check that it is null without
-audio, and a partial index on queued jobs. Down drops them (provenance of
-already-attached AI audio is lost on rollback; the audio columns stay).
+audio, `tts_generation_jobs.lease_token uuid` (claim fencing token, never
+exposed by the API) and a partial index on queued jobs. Down drops them
+(provenance of already-attached AI audio is lost on rollback; the audio
+columns stay; the I02 worker must be rolled back with it).
 
 ## Consequences
 
@@ -112,8 +120,14 @@ already-attached AI audio is lost on rollback; the audio columns stay).
   human review → publish.
 - The API now depends on the TTS job repository inside `NarrationService`
   (same module) for the submit/PATCH lock.
-- A cancelled-after-upload job can leave an unreferenced, content-addressed
-  object; ADR 0004's audited lifecycle job removes it.
+- A job cancelled/superseded after upload, or one that fails the commit-time
+  draft/transcript check, leaves an unreferenced, content-addressed object
+  (as does an editor replacing AI audio). ADR 0004 reserves deletion for an
+  audited lifecycle job that is **not implemented yet**, so such objects
+  accumulate until it exists (small: one WAV per discarded run).
+- A `succeeded` job is only an idempotent answer while the draft still carries
+  its audio (`audioGeneratedBy.jobId` + sha256); otherwise create re-queues the
+  same row, so "succeeded" never claims audio that was since replaced.
 - Local smoke used an S3 **emulator** (moto) because MinIO images/binaries are
   not reachable here (B03). moto does not enforce presigned signatures or
   `x-amz-checksum-sha256`, so real MinIO/S3 remains required for I04.

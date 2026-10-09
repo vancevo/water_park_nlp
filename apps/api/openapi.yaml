@@ -1038,7 +1038,9 @@ components:
             Stable error code only, present only when status is failed:
             TTS_PROVIDER_ERROR, TTS_TIMEOUT, TTS_AUDIO_INVALID,
             TTS_STORAGE_ERROR, TTS_MODEL_UNAVAILABLE, TTS_NARRATION_NOT_DRAFT,
-            TTS_TRANSCRIPT_STALE. Consumers must tolerate new codes.
+            TTS_TRANSCRIPT_STALE, TTS_WORKER_LOST (re-claimed after a worker
+            stopped with every attempt spent). Consumers must tolerate new
+            codes.
         artifact:
           allOf: [{ $ref: '#/components/schemas/TtsJobArtifactSummary' }]
           description: v1.1 — present only when status is succeeded

@@ -79,7 +79,9 @@ new generation for that locale, but stored artifacts are unaffected.
 
 - Error codes are stable and safe to log/alert on: `TTS_TIMEOUT`,
   `TTS_AUDIO_INVALID`, `TTS_PROVIDER_ERROR`, `TTS_STORAGE_ERROR`,
-  `TTS_MODEL_UNAVAILABLE`, `TTS_NARRATION_NOT_DRAFT`, `TTS_TRANSCRIPT_STALE`.
+  `TTS_MODEL_UNAVAILABLE`, `TTS_NARRATION_NOT_DRAFT`, `TTS_TRANSCRIPT_STALE`,
+  `TTS_WORKER_LOST` (a stale re-claim found every attempt already spent —
+  investigate worker crashes/OOM for that job).
 - Cancel a non-terminal job with `TtsGenerationService.cancel(jobId)`; terminal
   jobs are returned unchanged.
 - Re-running a dead-lettered job is deliberate, not automatic: the editor
@@ -87,8 +89,11 @@ new generation for that locale, but stored artifacts are unaffected.
 
 ## Migrations 010 / 012
 
-- 012 (I02): `poi_narrations.audio_generated_by jsonb` + check + queued-job
-  partial index. Down drops them (AI provenance is lost; audio stays).
+- 012 (I02): `poi_narrations.audio_generated_by jsonb` + check,
+  `tts_generation_jobs.lease_token uuid` (claim fencing token) + queued-job
+  partial index. Down drops them (AI provenance is lost; audio stays). Roll
+  the worker back together with 012-down: the I02 worker writes
+  `lease_token`.
 
 
 - Up: `npm run db:migrate` applies `010_tts_generation_jobs.up.sql`

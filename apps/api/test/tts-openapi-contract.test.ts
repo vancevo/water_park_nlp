@@ -65,6 +65,7 @@ describe('OpenAPI TTS contract (v1.1)', () => {
       'TTS_MODEL_UNAVAILABLE',
       'TTS_NARRATION_NOT_DRAFT',
       'TTS_TRANSCRIPT_STALE',
+      'TTS_WORKER_LOST',
     ])
       expect(spec, code).toContain(code);
   });

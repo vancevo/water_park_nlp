@@ -39,6 +39,12 @@ export interface S3TtsAudioStoreConfig {
   bucket: string;
   accessKey: string;
   secretKey: string;
+  /**
+   * Abort an S3 call after this long (default 60 s). Without it a hung upload
+   * would hold a concurrency slot and stop heart-beating until the stale
+   * window re-claims the job.
+   */
+  requestTimeoutMs?: number;
 }
 
 export class S3TtsAudioStore implements TtsAudioStore {
@@ -75,6 +81,7 @@ export class S3TtsAudioStore implements TtsAudioStore {
           ChecksumSHA256: Buffer.from(input.sha256, 'hex').toString('base64'),
           Metadata: { sha256: input.sha256 },
         }),
+        { abortSignal: this.timeoutSignal() },
       );
     } catch {
       // Never surface provider/storage messages (may contain endpoints/keys).
@@ -88,6 +95,7 @@ export class S3TtsAudioStore implements TtsAudioStore {
       try {
         await this.client.send(
           new HeadBucketCommand({ Bucket: this.config.bucket }),
+          { abortSignal: this.timeoutSignal() },
         );
       } catch (error) {
         const status = (error as { $metadata?: { httpStatusCode?: number } })
@@ -95,6 +103,7 @@ export class S3TtsAudioStore implements TtsAudioStore {
         if (status !== 404) throw error;
         await this.client.send(
           new CreateBucketCommand({ Bucket: this.config.bucket }),
+          { abortSignal: this.timeoutSignal() },
         );
       }
     })().catch((error: unknown) => {
@@ -102,6 +111,10 @@ export class S3TtsAudioStore implements TtsAudioStore {
       throw error;
     });
     return this.bucketReady;
+  }
+
+  private timeoutSignal(): AbortSignal {
+    return AbortSignal.timeout(this.config.requestTimeoutMs ?? 60_000);
   }
 
   destroy(): void {

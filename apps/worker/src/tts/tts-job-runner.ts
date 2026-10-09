@@ -55,6 +55,8 @@ export const TTS_JOB_PRECONDITION_CODES = {
   modelUnavailable: 'TTS_MODEL_UNAVAILABLE',
   narrationNotDraft: 'TTS_NARRATION_NOT_DRAFT',
   transcriptStale: 'TTS_TRANSCRIPT_STALE',
+  /** Re-claimed after the stale window with every attempt already spent. */
+  workerLost: 'TTS_WORKER_LOST',
 } as const;
 
 /**
@@ -63,7 +65,8 @@ export const TTS_JOB_PRECONDITION_CODES = {
  * the job `succeeded` and attach the audio + AI provenance to the DRAFT
  * narration in one transaction. Never publishes and never touches a
  * non-draft narration. Every write is conditional on the job still being
- * `running`, so an API cancel always wins. Logs carry ids, statuses and codes
+ * `running` under this claim's lease token, so an API cancel always wins and
+ * a superseded claim never writes. Logs carry ids, statuses and codes
  * only — never transcript text or audio bytes.
  */
 export class TtsJobRunner {
@@ -91,7 +94,9 @@ export class TtsJobRunner {
 
   async process(claimed: ClaimedTtsJob): Promise<TtsJobRecord> {
     const job: TtsJobRecord = { ...claimed.job, artifact: null };
-    const { narration } = claimed;
+    const { narration, leaseToken } = claimed;
+    const update = (record: TtsJobRecord) =>
+      this.queue.updateRunning(record, leaseToken);
     this.metrics?.recordJobTransition('running', job);
 
     const binding = this.voices(narration.locale);
@@ -104,23 +109,38 @@ export class TtsJobRunner {
     ) {
       // The API stamped a provider/model/version this worker does not serve
       // (I02-8): fail fast and visibly instead of leaving the job queued.
-      return this.failNow(job, TTS_JOB_PRECONDITION_CODES.modelUnavailable);
+      return this.failNow(
+        job,
+        TTS_JOB_PRECONDITION_CODES.modelUnavailable,
+        update,
+      );
     }
     if (narration.status !== 'draft') {
-      return this.failNow(job, TTS_JOB_PRECONDITION_CODES.narrationNotDraft);
+      return this.failNow(
+        job,
+        TTS_JOB_PRECONDITION_CODES.narrationNotDraft,
+        update,
+      );
     }
     const tHash = transcriptHash(narration.transcript);
     if (tHash !== job.transcriptHash) {
-      return this.failNow(job, TTS_JOB_PRECONDITION_CODES.transcriptStale);
+      return this.failNow(
+        job,
+        TTS_JOB_PRECONDITION_CODES.transcriptStale,
+        update,
+      );
     }
 
     const startedAt = this.clock().getTime();
-    let lastCode = 'TTS_PROVIDER_ERROR';
-    for (let attempt = 1; attempt <= job.maxAttempts; attempt += 1) {
+    // A stale re-claim continues after the attempts already spent, so a job
+    // that keeps crashing workers is dead-lettered instead of looping.
+    const firstAttempt = job.attempts + 1;
+    let lastCode: string = TTS_JOB_PRECONDITION_CODES.workerLost;
+    for (let attempt = firstAttempt; attempt <= job.maxAttempts; attempt += 1) {
       job.attempts = attempt;
       job.errorCode = null; // I02-10: never expose a previous attempt's code
       job.updatedAt = this.clock();
-      if (!(await this.queue.updateRunning(job))) return this.cancelled(job);
+      if (!(await update(job))) return this.cancelled(job);
 
       let attachment: DraftAudioAttachment;
       let done: TtsJobRecord;
@@ -147,7 +167,7 @@ export class TtsJobRunner {
 
         // Heartbeat + cancel checkpoint before spending an upload.
         job.updatedAt = this.clock();
-        if (!(await this.queue.updateRunning(job))) return this.cancelled(job);
+        if (!(await update(job))) return this.cancelled(job);
 
         await this.audioStore.put({
           objectKey,
@@ -199,6 +219,7 @@ export class TtsJobRunner {
         done,
         attachment,
         transcriptHash,
+        leaseToken,
       );
       switch (outcome) {
         case 'succeeded':
@@ -212,16 +233,21 @@ export class TtsJobRunner {
           );
           return done;
         case 'not_running':
-          // Object stays unreferenced; content-addressed, removed by the
-          // audited lifecycle job (ADR 0004).
+          // Object stays unreferenced (content-addressed). ADR 0004 reserves
+          // deletion for an audited lifecycle job, not implemented yet.
           return this.cancelled(job);
         case 'narration_not_draft':
           return this.failNow(
             job,
             TTS_JOB_PRECONDITION_CODES.narrationNotDraft,
+            update,
           );
         case 'transcript_changed':
-          return this.failNow(job, TTS_JOB_PRECONDITION_CODES.transcriptStale);
+          return this.failNow(
+            job,
+            TTS_JOB_PRECONDITION_CODES.transcriptStale,
+            update,
+          );
       }
     }
 
@@ -229,7 +255,7 @@ export class TtsJobRunner {
     job.deadLettered = true;
     job.errorCode = lastCode;
     job.updatedAt = this.clock();
-    if (!(await this.queue.updateRunning(job))) return this.cancelled(job);
+    if (!(await update(job))) return this.cancelled(job);
     this.metrics?.recordJobTransition('failed', job);
     this.metrics?.recordDeadLetter(job);
     this.log(
@@ -241,12 +267,13 @@ export class TtsJobRunner {
   private async failNow(
     job: TtsJobRecord,
     code: string,
+    update: (record: TtsJobRecord) => Promise<boolean>,
   ): Promise<TtsJobRecord> {
     job.status = 'failed';
     job.errorCode = code;
     job.deadLettered = false;
     job.updatedAt = this.clock();
-    if (!(await this.queue.updateRunning(job))) return this.cancelled(job);
+    if (!(await update(job))) return this.cancelled(job);
     this.metrics?.recordJobTransition('failed', job);
     this.log(`tts job ${job.id}: failed ${code}`);
     return job;
@@ -259,14 +286,17 @@ export class TtsJobRunner {
     };
     this.metrics?.recordJobTransition(current.status, current);
     this.log(
-      `tts job ${job.id}: ${current.status} while running; result discarded`,
+      `tts job ${job.id}: no longer owned by this claim (now ${current.status}); result discarded`,
     );
     return current;
   }
 }
 
 export interface TtsJobConsumerOptions {
-  /** Read on every tick, so a flag source can change without a redeploy. */
+  /**
+   * Read on every tick. The runtime passes `process.env`, so in practice the
+   * kill switch takes effect on restart; a dynamic source would not need one.
+   */
   flags: () => AiFeatureFlags;
   quota: QuotaGuard;
   /** Quota key (one per worker pool). */

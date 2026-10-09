@@ -144,7 +144,10 @@ describe.skipIf(!url)('PostgresTtsJobQueue (real database)', () => {
     while (claimed && claimed.job.id !== jobId)
       claimed = await queue.claimNext();
     const job = claimed!.job;
-    expect(await queue.updateRunning({ ...job, attempts: 1 })).toBe(true);
+    const lease = claimed!.leaseToken;
+    expect(await queue.updateRunning({ ...job, attempts: 1 }, lease)).toBe(
+      true,
+    );
 
     // What the API cancel does: conditional on queued/running.
     await pool.query(
@@ -152,12 +155,15 @@ describe.skipIf(!url)('PostgresTtsJobQueue (real database)', () => {
          AND status IN ('queued', 'running')`,
       [jobId],
     );
-    expect(await queue.updateRunning({ ...job, attempts: 2 })).toBe(false);
+    expect(await queue.updateRunning({ ...job, attempts: 2 }, lease)).toBe(
+      false,
+    );
     expect(
       await queue.completeWithDraftAudio(
         succeeded(job),
         attachment(job),
         transcriptHash,
+        lease,
       ),
     ).toBe('not_running');
     const row = await pool.query<{ status: string; artifact: unknown }>(
@@ -184,6 +190,7 @@ describe.skipIf(!url)('PostgresTtsJobQueue (real database)', () => {
         succeeded(job),
         attachment(job),
         transcriptHash,
+        claimed!.leaseToken,
       ),
     ).toBe('succeeded');
     const n = await pool.query<{
@@ -219,22 +226,98 @@ describe.skipIf(!url)('PostgresTtsJobQueue (real database)', () => {
         succeeded(job),
         attachment(job),
         transcriptHash,
+        claimed!.leaseToken,
       ),
     ).toBe('narration_not_draft');
     expect((await queue.findById(jobId))?.status).toBe('running');
   });
 
-  it('re-claims a running job orphaned past the stale window', async () => {
-    const jobId = await enqueue(await draft());
+  it('re-claims a running job orphaned past the stale window, keeping its attempts and fencing the old claim', async () => {
+    const narrationId = await draft();
+    const jobId = await enqueue(narrationId);
+    let first = await queue.claimNext();
+    while (first && first.job.id !== jobId) first = await queue.claimNext();
+    expect(
+      await queue.updateRunning(
+        { ...first!.job, attempts: 2 },
+        first!.leaseToken,
+      ),
+    ).toBe(true);
     await pool.query(
-      `UPDATE tts_generation_jobs SET status = 'running',
-         updated_at = now() - interval '2 hours' WHERE id = $1`,
+      `UPDATE tts_generation_jobs SET updated_at = now() - interval '2 hours'
+       WHERE id = $1`,
       [jobId],
     );
     const fast = new PostgresTtsJobQueue(pool, { staleRunningMs: 60_000 });
     let claimed = await fast.claimNext();
     while (claimed && claimed.job.id !== jobId)
       claimed = await fast.claimNext();
-    expect(claimed?.job.status).toBe('running');
+    expect(claimed?.job).toMatchObject({ status: 'running', attempts: 2 });
+    expect(claimed!.leaseToken).not.toBe(first!.leaseToken);
+
+    // The presumed-dead first worker wakes up: every write is refused.
+    expect(
+      await queue.updateRunning(
+        { ...first!.job, attempts: 3 },
+        first!.leaseToken,
+      ),
+    ).toBe(false);
+    expect(
+      await queue.completeWithDraftAudio(
+        succeeded(first!.job),
+        attachment(first!.job),
+        transcriptHash,
+        first!.leaseToken,
+      ),
+    ).toBe('not_running');
+    const n = await pool.query<{ audio_object_key: string | null }>(
+      'SELECT audio_object_key FROM poi_narrations WHERE id = $1',
+      [narrationId],
+    );
+    expect(n.rows[0]!.audio_object_key).toBeNull();
+  });
+
+  it('a claim superseded by cancel → re-queue → re-claim can no longer write', async () => {
+    const narrationId = await draft();
+    const jobId = await enqueue(narrationId);
+    let old = await queue.claimNext();
+    while (old && old.job.id !== jobId) old = await queue.claimNext();
+    // API cancel, then API requeue of the same id (both conditional UPDATEs).
+    await pool.query(
+      `UPDATE tts_generation_jobs SET status = 'cancelled' WHERE id = $1
+         AND status IN ('queued', 'running')`,
+      [jobId],
+    );
+    await pool.query(
+      `UPDATE tts_generation_jobs SET status = 'queued', attempts = 0
+       WHERE id = $1 AND status IN ('failed', 'cancelled')`,
+      [jobId],
+    );
+    let fresh = await queue.claimNext();
+    while (fresh && fresh.job.id !== jobId) fresh = await queue.claimNext();
+    expect(fresh?.job.status).toBe('running');
+
+    const failed = {
+      ...old!.job,
+      status: 'failed' as const,
+      errorCode: 'TTS_PROVIDER_ERROR',
+    };
+    expect(await queue.updateRunning(failed, old!.leaseToken)).toBe(false);
+    expect(
+      await queue.completeWithDraftAudio(
+        succeeded(old!.job),
+        attachment(old!.job),
+        transcriptHash,
+        old!.leaseToken,
+      ),
+    ).toBe('not_running');
+    expect(
+      await queue.completeWithDraftAudio(
+        succeeded(fresh!.job),
+        attachment(fresh!.job),
+        transcriptHash,
+        fresh!.leaseToken,
+      ),
+    ).toBe('succeeded');
   });
 });

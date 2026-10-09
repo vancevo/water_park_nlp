@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import type { SqlQueryClient } from './postgres-tts-job.repository.js';
 import type {
   ClaimedTtsJob,
@@ -74,6 +76,7 @@ export class PostgresTtsJobQueue implements TtsJobQueue {
   }
 
   async claimNext(): Promise<ClaimedTtsJob | null> {
+    const leaseToken = randomUUID();
     const claimed = await this.pool.query<JobRow>(
       `WITH next AS (
          SELECT id FROM tts_generation_jobs
@@ -85,11 +88,14 @@ export class PostgresTtsJobQueue implements TtsJobQueue {
          LIMIT 1
        )
        UPDATE tts_generation_jobs j
-       SET status = 'running', attempts = 0, error_code = NULL,
-           dead_lettered = false, artifact = NULL, updated_at = $2
+       SET status = 'running',
+           -- SET sees the pre-update row: a stale re-claim keeps its attempts.
+           attempts = CASE WHEN j.status = 'running' THEN j.attempts ELSE 0 END,
+           error_code = NULL, dead_lettered = false, artifact = NULL,
+           lease_token = $3::uuid, updated_at = $2
        FROM next WHERE j.id = next.id
        RETURNING ${CLAIM_RETURNING}`,
-      [this.staleRunningMs, this.clock().toISOString()],
+      [this.staleRunningMs, this.clock().toISOString(), leaseToken],
     );
     const job = mapJob(claimed.rows[0]);
     if (!job) return null;
@@ -102,6 +108,7 @@ export class PostgresTtsJobQueue implements TtsJobQueue {
     if (!row) return null; // narration deleted → job row cascaded away
     return {
       job,
+      leaseToken,
       narration: {
         id: row.id,
         poiId: row.poi_id,
@@ -112,12 +119,15 @@ export class PostgresTtsJobQueue implements TtsJobQueue {
     };
   }
 
-  async updateRunning(record: TtsJobRecord): Promise<boolean> {
+  async updateRunning(
+    record: TtsJobRecord,
+    leaseToken: string,
+  ): Promise<boolean> {
     const result = await this.pool.query<{ id: string }>(
       `UPDATE tts_generation_jobs
        SET status = $2, attempts = $3, max_attempts = $4, dead_lettered = $5,
            error_code = $6, artifact = NULL, updated_at = $7
-       WHERE id = $1 AND status = 'running'
+       WHERE id = $1 AND status = 'running' AND lease_token = $8::uuid
        RETURNING id::text`,
       [
         record.id,
@@ -127,6 +137,7 @@ export class PostgresTtsJobQueue implements TtsJobQueue {
         record.deadLettered,
         record.errorCode,
         record.updatedAt.toISOString(),
+        leaseToken,
       ],
     );
     return result.rows.length === 1;
@@ -136,6 +147,7 @@ export class PostgresTtsJobQueue implements TtsJobQueue {
     record: TtsJobRecord,
     attachment: DraftAudioAttachment,
     transcriptHashOf: (transcript: string) => string,
+    leaseToken: string,
   ): Promise<TtsCompletionOutcome> {
     if (record.status !== 'succeeded' || record.artifact === null) {
       throw new Error('completeWithDraftAudio requires a succeeded record');
@@ -144,11 +156,18 @@ export class PostgresTtsJobQueue implements TtsJobQueue {
     try {
       await client.query('BEGIN');
       // Lock order: job row first, then the narration row.
-      const job = await client.query<{ status: TtsJobStatus }>(
-        'SELECT status FROM tts_generation_jobs WHERE id = $1 FOR UPDATE',
+      const job = await client.query<{
+        status: TtsJobStatus;
+        lease_token: string | null;
+      }>(
+        `SELECT status, lease_token::text FROM tts_generation_jobs
+         WHERE id = $1 FOR UPDATE`,
         [record.id],
       );
-      if (job.rows[0]?.status !== 'running') {
+      if (
+        job.rows[0]?.status !== 'running' ||
+        job.rows[0].lease_token !== leaseToken
+      ) {
         await client.query('ROLLBACK');
         return 'not_running';
       }
