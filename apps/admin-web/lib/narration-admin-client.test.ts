@@ -1,7 +1,9 @@
+import { ApiClientError } from '@damsen/api-client';
 import type { AdminNarration } from '@damsen/shared-types';
 import { describe, expect, it, vi } from 'vitest';
 import {
   NarrationAdminAdapter,
+  narrationErrorMessage,
   narrationPermissions,
   newestNarration,
 } from './narration-admin-client';
@@ -37,6 +39,10 @@ function fakeApi() {
     submitAdminNarration: vi.fn(async () => narration()),
     approveAdminNarration: vi.fn(async () => narration()),
     rejectAdminNarration: vi.fn(async () => narration()),
+    getAdminNarrationAudioPlayback: vi.fn(async () => ({
+      playbackUrl: 'https://storage.example/signed',
+      playbackExpiresAt: '2026-01-01T00:10:00.000Z',
+    })),
   };
 }
 
@@ -125,5 +131,46 @@ describe('narration UI state', () => {
       canEdit: false,
       canReview: false,
     });
+  });
+});
+
+describe('narration v1.1 playback and error copy', () => {
+  it('fetches the signed admin playback URL with the session token', async () => {
+    const api = fakeApi();
+    const adapter = new NarrationAdminAdapter(api, () => 'access-token');
+    expect(await adapter.playback('n1')).toEqual({
+      playbackUrl: 'https://storage.example/signed',
+      playbackExpiresAt: '2026-01-01T00:10:00.000Z',
+    });
+    expect(api.getAdminNarrationAudioPlayback).toHaveBeenCalledWith(
+      'n1',
+      'access-token',
+    );
+  });
+
+  it('maps AI-related workflow codes and never shows their server text', () => {
+    const coded = (status: number, code: string) =>
+      new ApiClientError(status, {
+        code,
+        message: 'A TTS job for this narration is still queued or running',
+        details: null,
+        requestId: 'r',
+      });
+    const busy = narrationErrorMessage(
+      coded(409, 'TTS_JOB_IN_PROGRESS'),
+      'fallback',
+    );
+    expect(busy).toContain('đang tạo audio AI');
+    expect(busy).not.toContain('queued');
+    expect(
+      narrationErrorMessage(coded(409, 'NARRATION_NOT_DRAFT'), 'fallback'),
+    ).toContain('không còn ở trạng thái nháp');
+    expect(
+      narrationErrorMessage(coded(404, 'NARRATION_AUDIO_NOT_FOUND'), 'x'),
+    ).toContain('Không tìm thấy audio');
+    expect(narrationErrorMessage(new Error('Lỗi khác'), 'fallback')).toBe(
+      'Lỗi khác',
+    );
+    expect(narrationErrorMessage('boom', 'fallback')).toBe('fallback');
   });
 });

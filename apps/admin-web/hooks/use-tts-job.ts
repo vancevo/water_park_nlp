@@ -17,12 +17,13 @@ import {
 } from '@/lib/tts-job-machine';
 
 /**
- * Drives one narration's TTS job through the port: create → poll until a
- * terminal status → cancel/retry. Polling stops on unmount and never runs
- * against a terminal job; responses that arrive after the narration changed or
- * the component unmounted are dropped. Calls `onSucceeded` once per succeeded
- * job so the caller can reload the draft (which carries the generated audio
- * once the backend attaches it — not yet at I01, see I02-3).
+ * Drives one narration's TTS job through the port: resume (latest job) →
+ * create → poll until a terminal status → cancel/retry. Polling stops on
+ * unmount and never runs against a terminal job; responses that arrive after
+ * the narration changed or the component unmounted are dropped. Calls
+ * `onSucceeded` once per job seen succeeding on this page so the caller can
+ * reload the draft, which then carries the generated audio and its
+ * `audioGeneratedBy` provenance (contract v1.1).
  */
 export function useTtsJob(
   port: TtsGenerationPort | null,
@@ -55,6 +56,29 @@ export function useTtsJob(
       current.current += 1;
     };
   }, []);
+
+  // v1.1: ask the server for the narration's latest job so tracking survives a
+  // page reload (the in-memory registry only covers remounts). A failure here
+  // is not shown: the editor can still create a job, and the server rejects a
+  // duplicate with 409 TTS_JOB_IN_PROGRESS.
+  useEffect(() => {
+    if (!port?.latest || !narrationId) return;
+    const started = epoch.current;
+    let cancelled = false;
+    port
+      .latest(narrationId)
+      .then((job) => {
+        if (cancelled || epoch.current !== started || !job) return;
+        // A job that already finished before this mount was not produced by
+        // this page; do not reload the draft for it.
+        if (job.status === 'succeeded') notified.current.add(job.id);
+        dispatch({ type: 'job_restored', job });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [port, narrationId]);
 
   useEffect(() => rememberTtsJob(state.job), [state.job]);
 

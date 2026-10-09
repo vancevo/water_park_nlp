@@ -2,6 +2,7 @@ import type { TtsGenerationJob, TtsJobStatus } from '@damsen/shared-types';
 import { describe, expect, it } from 'vitest';
 import {
   MAX_POLL_FAILURES,
+  aiAudioAttachment,
   canCancelJob,
   canRetryJob,
   inFlightTtsJob,
@@ -161,6 +162,46 @@ describe('TTS job UI state machine', () => {
     expect(trackingStateFor(null)).toEqual(initialTtsJobState);
   });
 
+  it('restores the server latest job after a reload (v1.1), polling only if in flight', () => {
+    const running = run([{ type: 'job_restored', job: job('running') }]);
+    expect(running).toMatchObject({ phase: 'tracking', pollAttempt: 0 });
+    expect(shouldPoll(running)).toBe(true);
+    expect(isTtsJobInFlight(running)).toBe(true);
+    // A terminal latest job is shown (result + provenance) but never polled.
+    const failed = run([{ type: 'job_restored', job: job('failed') }]);
+    expect(failed).toMatchObject({ phase: 'idle', job: { status: 'failed' } });
+    expect(shouldPoll(failed)).toBe(false);
+    expect(canRetryJob(failed)).toBe(true);
+    // Fresher server state for the job already tracked from the registry.
+    expect(
+      run([{ type: 'job_restored', job: job('succeeded') }], running).phase,
+    ).toBe('idle');
+  });
+
+  it('never lets a restored job clobber a pending request or another job', () => {
+    const creating = run([{ type: 'create_requested' }]);
+    expect(run([{ type: 'job_restored', job: job('running') }], creating)).toBe(
+      creating,
+    );
+    const tracking = run([{ type: 'reset', job: job('queued', 'j2') }]);
+    expect(run([{ type: 'job_restored', job: job('failed') }], tracking)).toBe(
+      tracking,
+    );
+    const cancelling = run(
+      [{ type: 'cancel_requested' }],
+      run([{ type: 'job_restored', job: job('running') }]),
+    );
+    expect(cancelling.phase).toBe('cancelling');
+    expect(
+      run([{ type: 'job_restored', job: job('running') }], cancelling),
+    ).toBe(cancelling);
+    // Terminal locally stays terminal (same stale-response rule as polling).
+    const done = run([{ type: 'job_restored', job: job('cancelled') }]);
+    expect(run([{ type: 'job_restored', job: job('running') }], done)).toBe(
+      done,
+    );
+  });
+
   it('reports a job in flight from create request until a terminal status', () => {
     expect(isTtsJobInFlight(initialTtsJobState)).toBe(false);
     let state = run([{ type: 'create_requested' }]);
@@ -225,6 +266,75 @@ describe('TTS job UI state machine', () => {
     expect(ttsErrorLabel('AI_FEATURE_DISABLED')).toContain('kill switch');
   });
 
+  it('labels every v1.1 job error code in Vietnamese', () => {
+    for (const code of [
+      'TTS_PROVIDER_ERROR',
+      'TTS_TIMEOUT',
+      'TTS_AUDIO_INVALID',
+      'TTS_STORAGE_ERROR',
+      'TTS_MODEL_UNAVAILABLE',
+      'TTS_NARRATION_NOT_DRAFT',
+      'TTS_TRANSCRIPT_STALE',
+      'TTS_WORKER_LOST',
+    ]) {
+      const label = ttsErrorLabel(code);
+      expect(label).not.toBe('Lỗi không xác định.');
+      expect(label).not.toContain(code);
+    }
+    expect(ttsErrorLabel('TTS_STORAGE_ERROR')).toContain('lưu trữ');
+    expect(ttsErrorLabel('TTS_TRANSCRIPT_STALE')).toContain('không được gắn');
+  });
+
+  it('tells whether the draft still carries the audio of a succeeded job', () => {
+    const done = {
+      ...job('succeeded'),
+      artifact: {
+        voiceId: 'tone-vi',
+        license: 'l',
+        audioSha256: 'a'.repeat(64),
+        sizeBytes: 10,
+        durationSeconds: 2,
+        sampleRateHz: 22_050,
+        mimeType: 'audio/wav' as const,
+      },
+    };
+    const audio = {
+      objectKey: 'k',
+      mimeType: 'audio/wav' as const,
+      sizeBytes: 10,
+      sha256: 'a'.repeat(64),
+      durationSeconds: 2,
+      rightsOwner: 'o',
+      rightsSource: 's',
+      usageRights: 'u',
+    };
+    const generatedBy = {
+      provider: 'p',
+      model: 'm',
+      modelVersion: 'v1',
+      voiceId: 'tone-vi',
+      license: 'l',
+      jobId: 'j1',
+      generatedAt: '2026-10-09T00:00:00.000Z',
+    };
+    expect(
+      aiAudioAttachment({ audio, audioGeneratedBy: generatedBy }, done),
+    ).toBe('attached');
+    expect(
+      aiAudioAttachment(
+        {
+          audio: { ...audio, sha256: 'b'.repeat(64) },
+          audioGeneratedBy: generatedBy,
+        },
+        done,
+      ),
+    ).toBe('replaced');
+    expect(aiAudioAttachment({ audio }, done)).toBe('replaced');
+    expect(aiAudioAttachment({ audio: null }, done)).toBe('pending');
+    expect(aiAudioAttachment(undefined, done)).toBe('pending');
+    expect(aiAudioAttachment({ audio }, job('failed'))).toBe('none');
+  });
+
   it('flags a job stuck in queued (no worker consuming the queue)', () => {
     const at = Date.parse('2026-10-09T00:00:00.000Z');
     const job = {
@@ -264,17 +374,21 @@ describe('TTS generation RBAC/visibility guard', () => {
     expect(reviewer).toMatchObject({ visible: true, canGenerate: false });
   });
 
-  it('lets editors and admins generate for a saved draft or rejected revision', () => {
+  it('lets editors and admins generate for a saved draft only (v1.1 409 NARRATION_NOT_DRAFT)', () => {
     expect(ttsGenerationGuard({ ...base, roles: ['EDITOR'] }).canGenerate).toBe(
       true,
     );
-    expect(
-      ttsGenerationGuard({
-        ...base,
-        roles: ['ADMIN'],
-        narration: { ...base.narration, status: 'rejected' },
-      }).canGenerate,
-    ).toBe(true);
+    expect(ttsGenerationGuard({ ...base, roles: ['ADMIN'] }).canGenerate).toBe(
+      true,
+    );
+    // A rejected revision goes back to draft when it is saved again.
+    const rejected = ttsGenerationGuard({
+      ...base,
+      roles: ['ADMIN'],
+      narration: { ...base.narration, status: 'rejected' },
+    });
+    expect(rejected.canGenerate).toBe(false);
+    expect(rejected.reason).toContain('đưa về nháp');
   });
 
   it('blocks published/pending, unsaved, unsaved-new and disabled-locale cases', () => {

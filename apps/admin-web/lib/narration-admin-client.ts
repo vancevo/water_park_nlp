@@ -1,4 +1,4 @@
-import { DamSenApiClient } from '@damsen/api-client';
+import { ApiClientError, DamSenApiClient } from '@damsen/api-client';
 import type {
   AdminNarration,
   MediaUploadIntent,
@@ -18,6 +18,7 @@ type NarrationSdk = Pick<
   | 'submitAdminNarration'
   | 'approveAdminNarration'
   | 'rejectAdminNarration'
+  | 'getAdminNarrationAudioPlayback'
 >;
 
 export class NarrationAdminAdapter {
@@ -50,6 +51,11 @@ export class NarrationAdminAdapter {
     );
   }
 
+  /** v1.1: ten-minute signed GET to preview the narration's current audio. */
+  playback(id: string) {
+    return this.api.getAdminNarrationAudioPlayback(id, this.token());
+  }
+
   async uploadAudio(
     request: MediaUploadIntentRequest,
     body: Blob,
@@ -73,6 +79,28 @@ export class NarrationAdminAdapter {
       throw new Error(`Tải audio thất bại (HTTP ${response.status}).`);
     return intent;
   }
+}
+
+/**
+ * Codes the narration endpoints return because of AI generation (contract
+ * v1.1). Mapped to Vietnamese so the editor never sees raw server text for
+ * them; other failures keep the existing behaviour.
+ */
+const NARRATION_ERROR_LABELS: Record<string, string> = {
+  TTS_JOB_IN_PROGRESS:
+    'Không thể lưu hay gửi duyệt: máy chủ đang tạo audio AI cho bản nháp này. Chờ hoàn tất hoặc huỷ job trước.',
+  NARRATION_NOT_DRAFT:
+    'Không thể thao tác: bản thuyết minh không còn ở trạng thái nháp. Tải lại trang để xem trạng thái mới.',
+  NARRATION_AUDIO_NOT_FOUND:
+    'Không tìm thấy audio của bản thuyết minh này (có thể đã được thay hoặc gỡ). Tải lại trang.',
+};
+
+export function narrationErrorMessage(cause: unknown, fallback: string) {
+  if (cause instanceof ApiClientError) {
+    const known = NARRATION_ERROR_LABELS[cause.body?.code ?? ''];
+    if (known) return known;
+  }
+  return cause instanceof Error ? cause.message : fallback;
 }
 
 export function narrationPermissions(roles: UserRole[]) {

@@ -1,5 +1,5 @@
-/* global process, console, document, sessionStorage, fetch */
-// Browser smoke for T25C/T02 + AI04/T04 + I01 (locale tabs and AI generation UX).
+/* global process, console, document, sessionStorage, fetch, Buffer */
+// Browser smoke for T25C/T02 + AI04/T04 + I01/I03 (locale tabs and AI generation UX).
 // Not part of `npm test`: it needs the admin app built/started, the API with a
 // dev admin account, and a local Chromium + playwright-core.
 //
@@ -16,10 +16,16 @@
 // in `queued` for a few seconds before a worker claims it; cancel is exercised
 // in that window. SMOKE_FAIL_MARKER (api mode, optional): text the worker's
 // provider is known to reject, to exercise the failed → retry path.
+// Api mode also checks contract v1.1 (ADR 0014): the succeeded audio is
+// attached to the draft with `audioGeneratedBy`, plays through the admin
+// playback URL (bytes hashed against the draft's sha256, so object storage must
+// be reachable from this process), and a page reload resumes an in-flight job
+// through `GET …/tts-jobs/latest`.
 //
 // It creates one draft narration revision (marked "[smoke]") and deletes it at
 // the end. Credentials come from the environment and are never printed.
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 
@@ -66,6 +72,23 @@ const waitForStatus = (pattern) =>
     pattern.source,
     { timeout: jobTimeout },
   );
+// The draft's AI audio preview: labelled, with provenance, and the signed
+// playback URL serves exactly the bytes recorded on the draft.
+const expectDraftAiAudio = async (draft) => {
+  const preview = page.locator('.draft-audio.ai-preview');
+  await preview.locator('audio').waitFor({ timeout: jobTimeout });
+  const text = await preview.innerText();
+  assert.match(text, /AI-generated/);
+  assert.ok(text.includes(draft.audioGeneratedBy.voiceId), 'voice shown');
+  assert.ok(text.includes(draft.audioGeneratedBy.license), 'license shown');
+  const src = await preview.locator('audio').getAttribute('src');
+  const bytes = Buffer.from(await (await fetch(src)).arrayBuffer());
+  assert.equal(
+    createHash('sha256').update(bytes).digest('hex'),
+    draft.audio.sha256,
+    'playback bytes match the draft audio',
+  );
+};
 const sessionToken = () =>
   page.evaluate(
     () =>
@@ -85,8 +108,11 @@ page.on('response', async (response) => {
   if (!/\/v1\/admin\/(narrations\/[^/]+\/)?tts-jobs/.test(response.url()))
     return;
   try {
-    const job = await response.json();
-    const entry = `${response.request().method()} ${response.status()} ${job.id?.slice(0, 8)} ${job.status ?? job.code}`;
+    const body = await response.json();
+    // v1.1 `…/tts-jobs/latest` wraps the job: { job: TtsGenerationJob | null }.
+    const latest = response.url().endsWith('/latest');
+    const job = (latest ? body.job : body) ?? {};
+    const entry = `${response.request().method()}${latest ? '(latest)' : ''} ${response.status()} ${job.id?.slice(0, 8) ?? '-'} ${job.status ?? body.code ?? 'none'}`;
     if (jobLog.at(-1) !== entry) jobLog.push(entry);
   } catch {
     /* non-JSON response */
@@ -131,7 +157,7 @@ try {
   // generate before a draft is saved.
   assert.match(
     await page.locator('.tts-generation').innerText(),
-    /Lưu bản nháp thuyết minh trước|Chỉ tạo audio cho bản nháp/,
+    /Lưu bản nháp thuyết minh trước|Chỉ tạo audio AI cho bản nháp|đưa về nháp/,
   );
   await page.keyboard.press('Home');
 
@@ -172,16 +198,27 @@ try {
   const panel = page.locator('.tts-generation');
   assert.match(await panel.innerText(), /AI-generated/);
   assert.match(
-    await page.locator('.tts-provenance').innerText(),
+    await page.locator('.tts-generation .tts-provenance').innerText(),
     /Phiên bản model/,
   );
   if (mode === 'api') {
-    // Output stays a draft and is never published; the panel must not claim
-    // an attachment the backend did not make.
+    // v1.1: output stays a draft (never published) and carries the audio with
+    // AI provenance; the editor plays it through the admin playback URL.
     const draft = await smokeDraft();
     assert.equal(draft.status, 'draft', 'AI output never publishes');
-    if (!draft.audio)
-      assert.match(await panel.innerText(), /chưa gắn audio AI/);
+    assert.ok(draft.audio, 'succeeded job attached audio to the draft');
+    assert.ok(draft.audioGeneratedBy?.jobId, 'audioGeneratedBy provenance');
+    await expectDraftAiAudio(draft);
+    assert.match(await panel.innerText(), /đã được gắn vào bản nháp/);
+    // Reload: the latest job (terminal) and the draft audio come back.
+    await page.reload({ waitUntil: 'networkidle' });
+    await waitForStatus(/^Đã tạo xong/);
+    await expectDraftAiAudio(draft);
+    assert.match(
+      await page.locator('.narration-history').innerText(),
+      /Audio AI/,
+      'revision history shows AI provenance',
+    );
     // Same transcript + model version is idempotent server-side, so a new job
     // needs a changed, saved transcript.
     await saveDraft(
@@ -191,6 +228,15 @@ try {
 
   await page.getByRole('button', { name: 'Tạo lại audio AI' }).click();
   await waitForStatus(/Đang chờ|Đang tạo/);
+  if (mode === 'api') {
+    // A full reload loses all page state; tracking resumes from the server.
+    await page.reload({ waitUntil: 'networkidle' });
+    await waitForStatus(/Đang chờ|Đang tạo/);
+    assert.ok(
+      await page.getByRole('button', { name: 'Gửi duyệt' }).isDisabled(),
+      'submit still blocked after reload',
+    );
+  }
   // Switching locale tabs remounts the editor; the running job is resumed.
   await page.locator('[role=tab][aria-selected=true]').focus();
   await page.keyboard.press('End');

@@ -1,5 +1,5 @@
-/* global process, console, document, window, localStorage, fetch */
-// Browser smoke for T25D/T03 + I01 (narration locale selector). Not part of
+/* global process, console, document, window, localStorage, fetch, Buffer */
+// Browser smoke for T25D/T03 + I01/I03 (narration locale selector). Not part of
 // `npm test`: it needs a running visitor web app and a local Chromium +
 // playwright-core.
 //
@@ -12,8 +12,11 @@
 // audio wins over browser TTS. SMOKE_MODE=api (app built with `api`) checks the
 // select against the real `GET /v1/narration-locales` (second argument = API
 // base) and, for any locale with a fallback, that the fallback notice matches
-// what the real narration endpoint resolved.
+// what the real narration endpoint resolved; when that narration has audio, the
+// player must serve exactly the published bytes (sha256 of the playback URL),
+// so object storage must be reachable from this process.
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 
@@ -120,9 +123,10 @@ try {
       catalog.locales.map((option) => option.code),
       'select mirrors the configured catalog',
     );
-    // Every non-default locale: what the real endpoint resolved drives the
-    // fallback notice and the transcript language shown to the visitor.
-    for (const option of catalog.locales.slice(1)) {
+    // Every locale: what the real endpoint resolved drives the fallback
+    // notice, the transcript language and the audio played to the visitor.
+    const withAudio = [];
+    for (const option of [...catalog.locales.slice(1), catalog.locales[0]]) {
       await select.selectOption(option.code);
       await page.waitForFunction(
         (code) => window.__smokeNarrations?.[code] !== undefined,
@@ -142,8 +146,21 @@ try {
         await notice.waitFor();
         assert.match(await notice.innerText(), new RegExp(option.nativeLabel));
       } else assert.equal(await notice.count(), 0);
+      if (resolved.audio) {
+        const player = page.locator('.narration-body audio');
+        await player.waitFor();
+        const src = await player.getAttribute('src');
+        const bytes = Buffer.from(await (await fetch(src)).arrayBuffer());
+        assert.equal(
+          createHash('sha256').update(bytes).digest('hex'),
+          resolved.audio.sha256,
+          `${option.code}: player serves the published audio`,
+        );
+        withAudio.push(`${option.code}→${resolved.resolvedLocale}`);
+      }
       remembered = option.code;
     }
+    console.log(`audio checked: ${withAudio.join(', ') || 'none published'}`);
   }
 
   // Preference survives reload; keyboard can change the selection.

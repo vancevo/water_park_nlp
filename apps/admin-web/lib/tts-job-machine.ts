@@ -23,7 +23,13 @@ export type TtsJobEvent =
   | { type: 'poll_failed'; error: string }
   | { type: 'resume_polling' }
   /** Back to idle, or resume tracking a job still in flight for this narration. */
-  | { type: 'reset'; job?: TtsGenerationJob | null };
+  | { type: 'reset'; job?: TtsGenerationJob | null }
+  /**
+   * The narration's latest job as reported by the server (v1.1
+   * `GET …/tts-jobs/latest`) after a reload or remount. Shown even when
+   * terminal so the editor sees the last result and its provenance.
+   */
+  | { type: 'job_restored'; job: TtsGenerationJob };
 
 export const MAX_POLL_FAILURES = 3;
 
@@ -89,6 +95,23 @@ export function ttsJobReducer(
       return { ...state, pollFailures: 0, error: '' };
     case 'reset':
       return trackingStateFor(event.job);
+    case 'job_restored': {
+      // Never clobber a pending request or local knowledge of another job; a
+      // job already terminal here is final (stale-response rule above).
+      if (state.phase === 'creating' || state.phase === 'cancelling')
+        return state;
+      const current = state.job;
+      if (
+        current &&
+        (current.id !== event.job.id || isTerminalTtsStatus(current.status))
+      )
+        return state;
+      return {
+        ...initialTtsJobState,
+        phase: isTerminalTtsStatus(event.job.status) ? 'idle' : 'tracking',
+        job: event.job,
+      };
+    }
   }
 }
 
@@ -132,10 +155,10 @@ export function isTtsJobInFlight(state: TtsJobUiState): boolean {
 }
 
 /**
- * Jobs still in flight, per narration, for this page session. Contract v1 has
- * no "latest job for a narration" endpoint, so without this a locale-tab switch
- * (which remounts the editor) would forget a running job, stop polling and let
- * the draft be submitted while generation is still writing to it.
+ * Jobs still in flight, per narration, for this page session. It gives an
+ * instant tracking state when a locale-tab switch remounts the editor; the
+ * server's v1.1 `GET …/tts-jobs/latest` (via `job_restored`) then confirms it
+ * and also covers a full page reload, which this in-memory map cannot.
  */
 const inFlightJobs = new Map<string, TtsGenerationJob>();
 
@@ -166,17 +189,26 @@ export function canRetryJob(state: TtsJobUiState): boolean {
 export const TTS_STATUS_LABELS: Record<TtsJobStatus, string> = {
   queued: 'Đang chờ xử lý',
   running: 'Đang tạo audio',
-  succeeded: 'Đã tạo xong audio AI (chỉ cho bản nháp, chưa xuất bản)',
+  succeeded: 'Đã tạo xong audio AI cho bản nháp (chưa xuất bản)',
   failed: 'Tạo audio thất bại',
   cancelled: 'Đã huỷ tạo audio',
 };
 
+/** Job `errorCode` values (only present on `failed`, contract v1.1). */
 const ERROR_LABELS: Record<string, string> = {
   TTS_TIMEOUT: 'Quá thời gian tạo audio.',
   TTS_AUDIO_INVALID: 'Audio tạo ra không đạt kiểm tra chất lượng.',
-  TTS_PROVIDER_ERROR: 'Dịch vụ TTS gặp lỗi.',
+  TTS_PROVIDER_ERROR: 'Dịch vụ giọng đọc AI gặp lỗi sau nhiều lần thử.',
   TTS_LOCALE_UNSUPPORTED: 'Chưa có giọng đọc cho ngôn ngữ này.',
-  TTS_TRANSCRIPT_STALE: 'Nội dung đã thay đổi sau khi tạo; hãy tạo lại.',
+  TTS_MODEL_UNAVAILABLE:
+    'Giọng đọc AI cho ngôn ngữ này chưa sẵn sàng trên máy chủ. Liên hệ quản trị.',
+  TTS_STORAGE_ERROR: 'Không lưu được tệp audio vào kho lưu trữ. Thử lại sau.',
+  TTS_NARRATION_NOT_DRAFT:
+    'Bản thuyết minh đã rời trạng thái nháp trong lúc tạo, nên audio không được gắn.',
+  TTS_TRANSCRIPT_STALE:
+    'Nội dung đã thay đổi trong lúc tạo nên audio không được gắn; hãy tạo lại.',
+  TTS_WORKER_LOST:
+    'Tiến trình tạo audio bị gián đoạn nhiều lần. Thử lại hoặc liên hệ quản trị.',
   AI_FEATURE_DISABLED: 'Tính năng tạo audio AI đang tạm tắt (kill switch).',
 };
 
@@ -202,6 +234,25 @@ export function isQueuedStalled(
 export function ttsErrorLabel(errorCode?: string): string {
   if (!errorCode) return 'Không rõ nguyên nhân.';
   return ERROR_LABELS[errorCode] ?? 'Lỗi không xác định.';
+}
+
+/**
+ * Whether the draft currently carries the audio of this succeeded job (v1.1:
+ * the worker attaches it and stamps `audioGeneratedBy.jobId`). `replaced` means
+ * the editor has since uploaded/removed audio; `pending` means the reloaded
+ * narration has not arrived yet (or is from a server without v1.1).
+ */
+export function aiAudioAttachment(
+  narration: Pick<AdminNarration, 'audio' | 'audioGeneratedBy'> | undefined,
+  job: Pick<TtsGenerationJob, 'id' | 'status' | 'artifact'> | null,
+): 'attached' | 'replaced' | 'pending' | 'none' {
+  if (job?.status !== 'succeeded') return 'none';
+  const generatedBy = narration?.audioGeneratedBy;
+  if (generatedBy?.jobId === job.id) {
+    const sha = job.artifact?.audioSha256;
+    return !sha || narration?.audio?.sha256 === sha ? 'attached' : 'replaced';
+  }
+  return narration?.audio || generatedBy ? 'replaced' : 'pending';
 }
 
 export interface TtsGenerationGuardInput {
@@ -243,8 +294,13 @@ export function ttsGenerationGuard({
   if (!localeEnabled) return deny('Ngôn ngữ này đang tắt trong cấu hình.');
   if (!narration || isNewRevision)
     return deny('Lưu bản nháp thuyết minh trước khi tạo audio AI.');
-  if (narration.status !== 'draft' && narration.status !== 'rejected')
-    return deny('Chỉ tạo audio cho bản nháp hoặc bản bị từ chối.');
+  if (narration.status === 'rejected')
+    return deny(
+      'Bản bị từ chối: lưu lại thuyết minh (đưa về nháp) trước khi tạo audio AI.',
+    );
+  // Backend v1.1 answers 409 NARRATION_NOT_DRAFT for anything but a draft.
+  if (narration.status !== 'draft')
+    return deny('Chỉ tạo audio AI cho bản nháp.');
   if (hasUnsavedChanges)
     return deny(
       'Lưu thay đổi nội dung trước; audio phải khớp transcript đã lưu.',
