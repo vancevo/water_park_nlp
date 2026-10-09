@@ -5,7 +5,9 @@ info:
   description: >-
     0.1.1 = narration/TTS contract v1.1 (additive over v1, ADR 0014): TTS error
     responses documented, job artifact summary, latest job per narration,
-    admin audio preview and AI provenance on narration audio.
+    admin audio preview and AI provenance on narration audio. 0.1.2 =
+    contract v1.2 (additive, ADR 0014 amendment): optional public
+    PoiNarration.audio.generatedBy (AI provenance without the internal job id).
 servers:
   - url: http://localhost:3000
 paths:
