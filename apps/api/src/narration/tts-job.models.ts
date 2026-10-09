@@ -54,7 +54,7 @@ export interface TtsJobArtifactRecord {
  * Persistence port for admin TTS jobs. `insert` creates a brand-new queued row
  * (and fails on a duplicate idempotency key). Every state change after that is
  * a CONDITIONAL write (I02-2): the API only re-enqueues a row that is still
- * terminal (failed/cancelled) and only cancels a row that is still
+ * terminal and only cancels a row that is still
  * queued/running, so it can never overwrite the worker's result and the worker
  * can never overwrite a cancel.
  */
@@ -69,8 +69,9 @@ export interface TtsJobRepository {
   countActive(): Promise<number>;
   insert(record: TtsJobRecord): Promise<void>;
   /**
-   * Reset a `failed`/`cancelled` row to `queued` with `record`'s fields.
-   * Returns false when the row is no longer failed/cancelled.
+   * Reset a terminal (`failed`/`cancelled`, or `succeeded` whose audio the
+   * draft no longer carries) row to `queued` with `record`'s fields. Never
+   * touches a `queued`/`running` row; returns false when the row is active.
    */
   requeue(record: TtsJobRecord): Promise<boolean>;
   /**

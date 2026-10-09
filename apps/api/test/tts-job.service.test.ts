@@ -347,6 +347,60 @@ describe('AdminTtsJobService', () => {
     expect((await built.service.cancel(created.id)).status).toBe('succeeded');
   });
 
+  it('a succeeded job is idempotent only while the draft still carries its audio', async () => {
+    const draft = narration();
+    const built = build({ narrations: [draft] });
+    const created = await built.service.create(NARRATION_ID, { locale: 'vi' });
+    const stored = (await built.repo.findById(created.id))!;
+    const sha = 'c'.repeat(64);
+    await built.repo.workerWrite({
+      ...stored,
+      status: 'succeeded',
+      attempts: 1,
+      artifact: {
+        voiceId: 'vi-voice',
+        license: 'MIT',
+        audioSha256: sha,
+        sizeBytes: 100,
+        durationSeconds: 2,
+        sampleRateHz: 22050,
+        mimeType: 'audio/wav',
+      },
+    });
+    // What the worker attached to the draft.
+    draft.audio = {
+      objectKey: `poi/${draft.poiId}/vi/${sha}.wav`,
+      mimeType: 'audio/wav',
+      sizeBytes: 100,
+      sha256: sha,
+      durationSeconds: 2,
+      rightsOwner: 'Project',
+      rightsSource: 'AI-generated draft',
+      usageRights: 'Draft only',
+    };
+    draft.audioGeneratedBy = {
+      provider: 'piper',
+      model: 'piper',
+      modelVersion: 'test-1',
+      voiceId: 'vi-voice',
+      license: 'MIT',
+      jobId: created.id,
+      generatedAt: '2026-02-02T02:02:02.000Z',
+    };
+    expect(
+      await built.service.create(NARRATION_ID, { locale: 'vi' }),
+    ).toMatchObject({ id: created.id, status: 'succeeded' });
+
+    // The editor replaced the audio (or edited the transcript away and back):
+    // "succeeded" would lie, so the same row is re-run.
+    draft.audio = { ...draft.audio, sha256: 'd'.repeat(64) };
+    draft.audioGeneratedBy = null;
+    const rerun = await built.service.create(NARRATION_ID, { locale: 'vi' });
+    expect(rerun).toMatchObject({ id: created.id, status: 'queued' });
+    expect(rerun.artifact).toBeUndefined();
+    expect((await built.repo.findById(created.id))?.artifact).toBeNull();
+  });
+
   it('hides errorCode unless the job failed, and exposes the artifact summary on success (I02-10, I02-3)', async () => {
     const running = build({
       jobs: [job({ status: 'running', errorCode: 'TTS_TIMEOUT' })],

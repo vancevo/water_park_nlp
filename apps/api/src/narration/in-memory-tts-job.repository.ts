@@ -57,7 +57,10 @@ export class InMemoryTtsJobRepository implements TtsJobRepository {
 
   async requeue(record: TtsJobRecord): Promise<boolean> {
     const current = this.byId.get(record.id);
-    if (!current || !['failed', 'cancelled'].includes(current.status))
+    if (
+      !current ||
+      !['failed', 'cancelled', 'succeeded'].includes(current.status)
+    )
       return false;
     this.write({ ...record, artifact: null });
     return true;

@@ -116,7 +116,7 @@ export class PostgresTtsJobRepository implements TtsJobRepository {
        SET status = 'queued', provider = $2, model = $3, model_version = $4,
            attempts = 0, max_attempts = $5, dead_lettered = false,
            error_code = NULL, artifact = NULL, updated_at = $6
-       WHERE id = $1 AND status IN ('failed', 'cancelled')
+       WHERE id = $1 AND status IN ('failed', 'cancelled', 'succeeded')
        RETURNING id::text`,
       [
         record.id,

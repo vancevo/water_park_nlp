@@ -525,9 +525,11 @@ paths:
       summary: Queue a TTS generation job for a draft narration
       description: >-
         Roles EDITOR/ADMIN. Idempotent by narration + transcript + model version:
-        a queued/running/succeeded job is returned as-is, a failed/cancelled one
-        is re-queued in place (same id). The worker attaches the generated audio
-        to the DRAFT narration only (never publishes).
+        a queued/running job is returned as-is, and so is a succeeded one while
+        the draft still carries its audio; a failed/cancelled job, or a
+        succeeded one whose audio the draft no longer carries, is re-queued in
+        place (same id). The worker attaches the generated audio to the DRAFT
+        narration only (never publishes).
       security: [{ bearerAuth: [] }]
       parameters:
         - name: narrationId

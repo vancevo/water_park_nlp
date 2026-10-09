@@ -58,8 +58,10 @@ it writes the shared Postgres table (migration 010 + 012).
 - **Review gate.** While a job is queued/running, submit and PATCH of the
   narration return `409 TTS_JOB_IN_PROGRESS`; one active job per narration.
 - **Idempotent.** Re-creating for the same narration + transcript + model version
-  returns the existing queued/running/succeeded job; a failed or cancelled job is
-  re-queued in place (same id). Replays do not consume quota.
+  returns the existing queued/running job, or the succeeded job while the draft
+  still carries its audio; a failed or cancelled job — or a succeeded one whose
+  audio was since replaced — is re-queued in place (same id). Replays do not
+  consume quota.
 - **Cancel** is a conditional write: it never overwrites a result the worker
   already committed; a running job's result is discarded.
 - **Errors:** 400 `NARRATION_LOCALE_DISABLED`, `TTS_JOB_LOCALE_MISMATCH`,

@@ -14,6 +14,7 @@ import type {
 
 import {
   NARRATION_REPOSITORY,
+  type NarrationRecord,
   type NarrationRepository,
 } from './narration.models.js';
 import { NarrationLocalesService } from './narration-locales.service.js';
@@ -109,9 +110,12 @@ export class AdminTtsJobService {
     const existing = await this.jobs.findByIdempotencyKey(key);
     if (
       existing &&
-      (existing.status === 'succeeded' || !isTerminalTtsStatus(existing.status))
+      (!isTerminalTtsStatus(existing.status) ||
+        (existing.status === 'succeeded' &&
+          this.draftStillHasAudioOf(narration, existing)))
     ) {
-      // Already queued, running or succeeded → idempotent, return as-is.
+      // Queued/running, or succeeded and its audio is still the draft's
+      // current audio → idempotent, return as-is.
       return this.toPublic(existing);
     }
 
@@ -123,7 +127,9 @@ export class AdminTtsJobService {
     this.controls.consume(actorId);
 
     if (existing) {
-      // Previously failed or cancelled → re-enqueue the same row.
+      // Failed or cancelled, or succeeded but the editor has since replaced
+      // that audio (e.g. transcript A → B → A) → re-enqueue the same row, so
+      // a "succeeded" answer always means "this audio is on the draft".
       const reenqueued: TtsJobRecord = {
         ...existing,
         status: 'queued',
@@ -193,6 +199,19 @@ export class AdminTtsJobService {
     const cancelled = await this.jobs.cancelIfActive(jobId, this.now());
     if (cancelled) return this.toPublic(cancelled);
     return this.toPublic(await this.require(jobId));
+  }
+
+  /** True when the narration's current audio is the job's generated audio. */
+  private draftStillHasAudioOf(
+    narration: NarrationRecord,
+    job: TtsJobRecord,
+  ): boolean {
+    return (
+      narration.audio !== null &&
+      job.artifact != null &&
+      narration.audio.sha256 === job.artifact.audioSha256 &&
+      narration.audioGeneratedBy?.jobId === job.id
+    );
   }
 
   private voiceFor(locale: string, input: CreateTtsJobDto): TtsVoiceDefaults {
