@@ -106,6 +106,11 @@ try {
     // Demo fixture: VI carries recorded audio, so it wins over browser TTS.
     await select.selectOption('vi');
     await page.locator('.narration-body audio').waitFor();
+    // Contract v1.2: generated audio carries a visible, labelled AI notice.
+    assert.equal(
+      await page.locator('.narration-body .ai-audio-label').innerText(),
+      'Giọng đọc do AI tạo',
+    );
     assert.equal(
       await page.locator('.narration-body .secondary-action').count(),
       0,
@@ -149,6 +154,11 @@ try {
       if (resolved.audio) {
         const player = page.locator('.narration-body audio');
         await player.waitFor();
+        assert.equal(
+          await page.locator('.narration-body .ai-audio-label').count(),
+          resolved.audio.generatedBy ? 1 : 0,
+          `${option.code}: AI label iff audio.generatedBy`,
+        );
         const src = await player.getAttribute('src');
         const bytes = Buffer.from(await (await fetch(src)).arrayBuffer());
         assert.equal(
@@ -176,6 +186,12 @@ try {
   assert.equal(await reloaded.inputValue(), remembered);
   await reloaded.focus();
   await page.keyboard.press('Home');
+  if ((await reloaded.inputValue()) !== codes[0]) {
+    // macOS Chromium opens a native popup instead of moving a closed select
+    // with Home; type-ahead on the first option's label is still keyboard-only.
+    const first = await reloaded.locator('option').first().innerText();
+    await page.keyboard.press(first[0]);
+  }
   assert.equal(await reloaded.inputValue(), codes[0]);
 
   // Blocked storage and phone width still work without horizontal scroll.
