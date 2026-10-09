@@ -13,7 +13,10 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import type { AdminNarration } from '@damsen/shared-types';
+import type {
+  AdminNarration,
+  NarrationAudioPlayback,
+} from '@damsen/shared-types';
 
 import {
   AccessTokenGuard,
@@ -39,6 +42,8 @@ const bodyPipe = <T>(expectedType: new () => T) =>
     whitelist: true,
   });
 
+// Narration `:id` params accept any UUID version: seeded narrations use
+// md5-derived ids (I02-9). POI ids stay v4.
 @Controller('v1/admin')
 @UseGuards(AccessTokenGuard, RolesGuard)
 export class AdminNarrationController {
@@ -76,7 +81,7 @@ export class AdminNarrationController {
   @Patch('narrations/:id')
   @Roles('EDITOR', 'ADMIN')
   update(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body(bodyPipe(UpdateNarrationDto)) input: UpdateNarrationDto,
   ): Promise<AdminNarration> {
     return this.narrations.update(id, input);
@@ -85,17 +90,24 @@ export class AdminNarrationController {
   @Delete('narrations/:id')
   @Roles('EDITOR', 'ADMIN')
   @HttpCode(204)
-  remove(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-  ): Promise<void> {
+  remove(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
     return this.narrations.remove(id);
+  }
+
+  /** v1.1: preview the current (draft) audio — e.g. AI audio before submit. */
+  @Get('narrations/:id/audio/playback')
+  @Roles('EDITOR', 'REVIEWER', 'ADMIN')
+  audioPlayback(
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): Promise<NarrationAudioPlayback> {
+    return this.narrations.audioPlayback(id);
   }
 
   @Post('narrations/:id/submit')
   @Roles('EDITOR', 'ADMIN')
   @HttpCode(200)
   submit(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<AdminNarration> {
     return this.narrations.submit(id);
   }
@@ -104,7 +116,7 @@ export class AdminNarrationController {
   @Roles('REVIEWER', 'ADMIN')
   @HttpCode(200)
   approve(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Request() request: AuthenticatedRequest,
   ): Promise<AdminNarration> {
     return this.narrations.approve(id, request.principal!.userId);
@@ -114,7 +126,7 @@ export class AdminNarrationController {
   @Roles('REVIEWER', 'ADMIN')
   @HttpCode(200)
   reject(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body(bodyPipe(RejectNarrationDto)) input: RejectNarrationDto,
     @Request() request: AuthenticatedRequest,
   ): Promise<AdminNarration> {

@@ -25,7 +25,13 @@ import { AdminTtsJobService } from './tts-job.service.js';
 import { InMemoryTtsJobRepository } from './in-memory-tts-job.repository.js';
 import { PostgresTtsJobRepository } from './postgres-tts-job.repository.js';
 import {
+  loadTtsJobControlsConfig,
+  TTS_JOB_CONTROLS,
+  TtsJobControls,
+} from './tts-job-controls.js';
+import {
   loadTtsJobDefaults,
+  usesFallbackTtsDefaults,
   TTS_JOB_CLOCK,
   TTS_JOB_DEFAULTS,
   TTS_JOB_REPOSITORY,
@@ -49,6 +55,15 @@ function createRepository(): NarrationRepository {
     : new InMemoryNarrationRepository();
 }
 
+function createTtsJobDefaults() {
+  if (usesFallbackTtsDefaults() && process.env.NODE_ENV !== 'test') {
+    console.warn(
+      'TTS: no TTS_VOICES_MANIFEST_PATH or TTS_DEFAULT_MODEL_VERSION; jobs use fallback defaults that no worker voice serves (they will fail with TTS_MODEL_UNAVAILABLE).',
+    );
+  }
+  return loadTtsJobDefaults();
+}
+
 function createTtsJobRepository(): TtsJobRepository {
   const client = sqlClient();
   return client
@@ -70,7 +85,11 @@ function createTtsJobRepository(): TtsJobRepository {
     MediaService,
     AdminTtsJobService,
     { provide: TTS_JOB_CLOCK, useValue: () => new Date() },
-    { provide: TTS_JOB_DEFAULTS, useFactory: () => loadTtsJobDefaults() },
+    { provide: TTS_JOB_DEFAULTS, useFactory: createTtsJobDefaults },
+    {
+      provide: TTS_JOB_CONTROLS,
+      useFactory: () => new TtsJobControls(loadTtsJobControlsConfig()),
+    },
     { provide: TTS_JOB_REPOSITORY, useFactory: createTtsJobRepository },
     {
       provide: NARRATION_LOCALE_CONFIG,

@@ -14,6 +14,10 @@ import {
   AUTH_REPOSITORY,
   type AuthRepository,
 } from '../src/auth/auth.models.js';
+import {
+  NARRATION_REPOSITORY,
+  type NarrationRepository,
+} from '../src/narration/narration.models.js';
 
 const POI_ID = '00000000-0000-4000-8000-000000000101';
 const UNKNOWN_ID = '00000000-0000-4000-8000-0000000009ff';
@@ -174,5 +178,159 @@ describe('admin TTS job HTTP API', () => {
       { token: editorToken },
     );
     expect(unknownJob.status).toBe(404);
+  }, 30_000);
+
+  // --- I02 ---
+
+  async function freshDraft(poiId: string, locale = 'en'): Promise<string> {
+    const created = await request(
+      baseUrl,
+      `/v1/admin/pois/${poiId}/narrations`,
+      {
+        method: 'POST',
+        token: editorToken,
+        body: {
+          locale,
+          transcript: 'An English draft narration used by the I02 HTTP tests.',
+        },
+      },
+    );
+    expect(created.status).toBe(201);
+    return ((await created.json()) as AdminNarration).id;
+  }
+
+  it('locks submit and edit while a job is queued; unlocks after cancel (I02-6)', async () => {
+    const id = await freshDraft('00000000-0000-4000-8000-000000000102');
+    const created = await request(
+      baseUrl,
+      `/v1/admin/narrations/${id}/tts-jobs`,
+      {
+        method: 'POST',
+        token: editorToken,
+        body: { locale: 'en' },
+      },
+    );
+    const job = (await created.json()) as TtsGenerationJob;
+
+    const submit = await request(baseUrl, `/v1/admin/narrations/${id}/submit`, {
+      method: 'POST',
+      token: editorToken,
+    });
+    expect(submit.status).toBe(409);
+    expect(await submit.json()).toMatchObject({ code: 'TTS_JOB_IN_PROGRESS' });
+    const edit = await request(baseUrl, `/v1/admin/narrations/${id}`, {
+      method: 'PATCH',
+      token: editorToken,
+      body: {
+        transcript: 'An edited English draft narration for the I02 test.',
+      },
+    });
+    expect(edit.status).toBe(409);
+
+    await request(baseUrl, `/v1/admin/tts-jobs/${job.id}/cancel`, {
+      method: 'POST',
+      token: editorToken,
+    });
+    const submitted = await request(
+      baseUrl,
+      `/v1/admin/narrations/${id}/submit`,
+      {
+        method: 'POST',
+        token: editorToken,
+      },
+    );
+    expect(submitted.status).toBe(200);
+
+    // I02-5: a pending_review narration cannot get a job.
+    const pending = await request(
+      baseUrl,
+      `/v1/admin/narrations/${id}/tts-jobs`,
+      {
+        method: 'POST',
+        token: editorToken,
+        body: { locale: 'en' },
+      },
+    );
+    expect(pending.status).toBe(409);
+    expect(await pending.json()).toMatchObject({ code: 'NARRATION_NOT_DRAFT' });
+  }, 30_000);
+
+  it('latest job endpoint, RBAC and non-v4 seeded narration ids (I02-9, I02-11)', async () => {
+    const id = await freshDraft('00000000-0000-4000-8000-000000000103');
+    const none = await request(
+      baseUrl,
+      `/v1/admin/narrations/${id}/tts-jobs/latest`,
+      { token: editorToken },
+    );
+    expect(none.status).toBe(200);
+    expect(await none.json()).toEqual({ job: null });
+
+    const visitor = await request(
+      baseUrl,
+      `/v1/admin/narrations/${id}/tts-jobs/latest`,
+      { token: visitorToken },
+    );
+    expect(visitor.status).toBe(403);
+
+    // md5-derived (version 3-like) id as created by migration 006 seeds.
+    const seededId = '5d41402a-bc4b-3a76-b971-9d911017c592';
+    const repo = app.get<NarrationRepository>(NARRATION_REPOSITORY);
+    const at = new Date();
+    await repo.save({
+      id: seededId,
+      poiId: '00000000-0000-4000-8000-000000000104',
+      locale: 'vi',
+      revision: 9,
+      transcript: 'Bản nháp seed có id không phải UUID v4 để kiểm thử I02.',
+      status: 'draft',
+      audio: null,
+      createdAt: at,
+      updatedAt: at,
+    });
+    const seeded = await request(
+      baseUrl,
+      `/v1/admin/narrations/${seededId}/tts-jobs`,
+      { method: 'POST', token: editorToken, body: { locale: 'vi' } },
+    );
+    expect(seeded.status).toBe(202);
+    const latest = await request(
+      baseUrl,
+      `/v1/admin/narrations/${seededId}/tts-jobs/latest`,
+      { token: editorToken },
+    );
+    expect(
+      ((await latest.json()) as { job: TtsGenerationJob }).job.narrationId,
+    ).toBe(seededId);
+  }, 30_000);
+
+  it('admin audio playback: 404 without audio, 503 when storage is off (I02-11)', async () => {
+    const id = await freshDraft('00000000-0000-4000-8000-000000000105');
+    const missing = await request(
+      baseUrl,
+      `/v1/admin/narrations/${id}/audio/playback`,
+      { token: editorToken },
+    );
+    expect(missing.status).toBe(404);
+    expect(await missing.json()).toMatchObject({
+      code: 'NARRATION_AUDIO_NOT_FOUND',
+    });
+  }, 30_000);
+
+  it('kill switch: create answers 503 AI_FEATURE_DISABLED (I02-4)', async () => {
+    const id = await freshDraft('00000000-0000-4000-8000-000000000101', 'en');
+    process.env.TTS_GENERATION_ENABLED = 'false';
+    try {
+      const blocked = await request(
+        baseUrl,
+        `/v1/admin/narrations/${id}/tts-jobs`,
+        { method: 'POST', token: editorToken, body: { locale: 'en' } },
+      );
+      expect(blocked.status).toBe(503);
+      expect(await blocked.json()).toMatchObject({
+        code: 'AI_FEATURE_DISABLED',
+      });
+    } finally {
+      delete process.env.TTS_GENERATION_ENABLED;
+    }
   }, 30_000);
 });
