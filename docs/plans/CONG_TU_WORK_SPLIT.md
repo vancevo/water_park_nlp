@@ -191,9 +191,9 @@ thời gian rảnh trước checkpoint này.
 
 ### I02 — Contract/integration fixes — Owner: Công
 
-- [ ] Sửa backend nếu response không đúng contract v1.
-- [ ] Không yêu cầu Tú đổi UI để che lỗi contract backend.
-- [ ] Chạy migration + API + worker + object storage smoke.
+- [x] Sửa backend nếu response không đúng contract v1. (11/11 mục I01 — `docs/runbooks/backend-i02-integration-fixes.md`, ADR 0014)
+- [x] Không yêu cầu Tú đổi UI để che lỗi contract backend. (v1 giữ nguyên; v1.1 chỉ thêm field/endpoint tuỳ chọn)
+- [x] Chạy migration + API + worker + object storage smoke. (S3 emulator moto + provider CLI giả; MinIO/S3 thật vẫn là B03 → I04)
 
 ### I03 — End-to-end acceptance — Owner: Tú
 

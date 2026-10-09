@@ -6,9 +6,9 @@
 
 - Current wave: `W5/W6 — Search, analytics and release hardening`
 - Integration status: `SEARCH_ANALYTICS_POSTGIS_PASS`
-- Active blockers: B01 blocks public map/content release; B03 blocks local real-object-storage smoke only
-- Last updated: 2026-10-08
-- Updated by: Công (AI08 backend)
+- Active blockers: B01 blocks public map/content release; B03 (real MinIO/S3) gates I04 only — I02 smoke ran on an S3 emulator
+- Last updated: 2026-10-09
+- Updated by: Công (I02 backend, executed on Tú's request)
 
 ## Task board
 
@@ -30,7 +30,8 @@
 | T25A/T25B Configurable narration locales (backend, C02) | IN_PROGRESS | Công backend | T24–T25, C01 | Config loader + `GET /v1/narration-locales` + fallback + write validation + migration 009 + ADR 0007 on `codex/cong-c02-locale-backend`; T25C–E (Tú) + integration I01 pending |
 | T01–T07 Narration locale UI, AI TTS UX, mobile BCP 47, TTS eval corpus (T25C–E, AI01, AI04 UI) | DONE (mock/fixture level) | Tú | contract v1 | Merged (PR #9): mock ports + fixtures, admin tabs/AI generation (save/submit locked while a job runs), visitor selector, mobile transport, `data/tts-evaluation`; runbook `docs/runbooks/frontend-narration-locales-tts.md`. Full T25C–E/AI04 acceptance (real catalog with FR, real jobs/audio) closes only at I01–I04 |
 | I01 Adapter swap (narration locales + TTS jobs) | REVIEW | Tú | T01–T07, C01–C07 | `tu/i01-adapter-swap`: real catalog + AI04 endpoints verified in browser (`SMOKE_MODE=api`), error-code mapping, honest succeeded copy; TTS flag default stays `off`. E2E ran via a claim harness over real worker code + fake tone provider (no consumer/Piper voices here); audio not attached to draft — 11 I02 issues in `docs/runbooks/frontend-i01-integration-report.md` |
-| AI00–AI08 AI/TTS/search hardening | IN_PROGRESS | Công backend / Tú UX+eval | T41–T42 | AI02 (C03) + AI03 (C04) + AI04 admin TTS API merged; AI05 provider benchmark (ADR 0011) merged; AI07/T43 hybrid search (ADR 0012) merged; AI08/C07 ops hardening (metrics/quota/retention/kill-switch + alerts + runbook, ADR 0013) done on `codex/cong-ai08-backend-hardening` — live scrape endpoint + storage-restore (B03) deferred; AI06 requires explicit GO; remaining for Công = integration gates I02/I04 |
+| AI00–AI08 AI/TTS/search hardening | IN_PROGRESS | Công backend / Tú UX+eval | T41–T42 | AI02–AI05, AI07, AI08 merged; I02 wires the AI08 kill switch/quota into API + worker (ADR 0014); live scrape endpoint + storage-restore (B03) deferred; AI06 requires explicit GO; remaining for Công = I04 |
+| I02 Contract/integration fixes | REVIEW | Công (executed on Tú's request) | I01 | `cong/i02-i04`: worker queue consumer (claim/cancel-safe/attach audio + AI provenance to draft), AI08 kill switch + quota in API/worker, draft-only create + submit/PATCH lock, OpenAPI errors, voice-manifest stamp, contract v1.1 additive (ADR 0014), migration 012; all 11 I01 issues fixed — `docs/runbooks/backend-i02-integration-fixes.md`. Live smoke: real API + worker + Postgres + S3 **emulator** (moto) + fake CLI tone provider (Piper voices blocked) |
 | T30 Mobile map | DONE | mobile agent | T21 contract | Typecheck + 10 shared mobile tests pass |
 | T31 GPS session | DONE | mobile agent | T30 | Permission/signal state machine + explicit follow mode |
 | T32 Walkway graph | DONE | geo agent | W1 | 7-node/8-edge fixture, topology validator and migration 004 |
@@ -60,7 +61,7 @@ Status hợp lệ: `TODO`, `READY`, `IN_PROGRESS`, `REVIEW`, `DONE`, `BLOCKED`.
 |---|---|---|---|---|
 | B01 | Production release | coordinator | Confirm Dam Sen content/map rights and provider terms; field-verify POIs, entrances and OSM paths | OPEN; OSM snapshot powers local research demo only and is visibly marked unverified |
 | B02 | Legacy mobile prototype | mobile/platform | Add SecureStore/Keychain adapter and verify iOS/Android native builds only if native distribution resumes | DEFERRED by ADR-0006; no longer blocks visitor web |
-| B03 | Local media smoke | platform | Authenticate Docker to Quay or supply an approved S3-compatible image; rerun `scripts/smoke-media.mjs` | OPEN, `quay.io/minio/minio` pull returned 401 |
+| B03 | Local media smoke | platform | Authenticate Docker to Quay or supply an approved S3-compatible image; rerun `scripts/smoke-media.mjs` | OPEN for real MinIO/S3 (no Docker daemon here; `dl.min.io` 403). I02 ran `smoke-media.mjs` + the TTS upload on the moto S3 emulator (dev-only; does not enforce SigV4/checksum) |
 
 ## Recent decisions
 
@@ -74,6 +75,7 @@ Chỉ ghi ID và link ADR; không ghi lại nội dung ADR.
 | ADR-0004 | S3-compatible media and reviewed audio | 2026-09-24 |
 | ADR-0005 | On-device GPS progress and privacy | 2026-09-24 |
 | ADR-0006 | Web-first visitor client | 2026-09-25 |
+| ADR-0014 | TTS queue consumer, draft-audio attach, contract v1.1 (additive) | 2026-10-09 |
 
 ## Update checklist
 

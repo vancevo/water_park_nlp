@@ -1,6 +1,6 @@
 # ADR 0010 — Admin TTS job API
 
-- Status: Accepted (AI04)
+- Status: Accepted (AI04); the claiming/reconciliation boundary below is closed by ADR 0014 (I02)
 - Date: 2026-10-02
 - Deciders: Công (backend), coordinator
 - Related: `docs/plans/AI_TTS_AND_TRAINING_ROADMAP.md`, ADR 0007, ADR 0008, ADR 0009

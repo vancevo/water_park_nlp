@@ -1,8 +1,29 @@
 # Runbook — TTS worker foundation (backend)
 
-Operate the provider-neutral TTS generation pipeline (C03 / AI02). Scope: the
-worker foundation only — there is no real engine yet (Piper is AI03) and no admin
-API/UI (AI04). See ADR 0008 and `docs/plans/AI_TTS_AND_TRAINING_ROADMAP.md`.
+Operate the provider-neutral TTS generation pipeline (C03 / AI02) and its queue
+consumer (I02). See ADR 0008, ADR 0014 and
+`docs/plans/AI_TTS_AND_TRAINING_ROADMAP.md`.
+
+## Run the worker process (I02)
+
+```bash
+npm run build --workspace @damsen/worker
+DATABASE_URL=… S3_ENDPOINT=… S3_BUCKET=… S3_ACCESS_KEY=… S3_SECRET_KEY=… \
+TTS_WORKER_ENGINE=piper|cli TTS_VOICES_MANIFEST_PATH=<same file as the API> \
+  npm run start --workspace @damsen/worker   # dev: npm run dev --workspace @damsen/worker
+```
+
+- Fails fast on bad config (missing DB/S3, `S3_ENABLED=false`, empty manifest).
+- Loop: kill switch → quota `peek` → claim oldest queued row (`FOR UPDATE SKIP
+  LOCKED`) → synthesize (retry/backoff/timeout) → upload WAV to
+  `poi/{poi}/{locale}/{sha256}.wav` → one transaction: job `succeeded` +
+  draft `audio_*` + `audio_generated_by` (only if still draft with the same
+  transcript). Never publishes.
+- Cancel wins at every checkpoint; SIGINT/SIGTERM stop claiming and drain.
+- A `running` row older than `TTS_JOB_STALE_RUNNING_MS` (30 min) is re-claimed.
+- Log lines carry job ids, statuses and codes only.
+- Tuning: `TTS_WORKER_POLL_MS`, `TTS_JOB_TIMEOUT_MS`, `TTS_JOB_BACKOFF_MS`,
+  `TTS_QUOTA_MAX_CONCURRENT`, `TTS_AUDIO_RIGHTS_OWNER`.
 
 ## Where it lives
 
@@ -57,15 +78,18 @@ new generation for that locale, but stored artifacts are unaffected.
   ```
 
 - Error codes are stable and safe to log/alert on: `TTS_TIMEOUT`,
-  `TTS_AUDIO_INVALID`, `TTS_PROVIDER_ERROR`, plus registry errors at request time.
+  `TTS_AUDIO_INVALID`, `TTS_PROVIDER_ERROR`, `TTS_STORAGE_ERROR`,
+  `TTS_MODEL_UNAVAILABLE`, `TTS_NARRATION_NOT_DRAFT`, `TTS_TRANSCRIPT_STALE`.
 - Cancel a non-terminal job with `TtsGenerationService.cancel(jobId)`; terminal
   jobs are returned unchanged.
-- Re-running a dead-lettered job is deliberate, not automatic. The foundation
-  returns a dead-lettered job as-is; a forced re-run belongs to the admin flow
-  (AI04). As a stop-gap, an operator can delete the specific
-  `tts_generation_jobs` row and request generation again.
+- Re-running a dead-lettered job is deliberate, not automatic: the editor
+  presses generate again (the API re-queues the failed row in place).
 
-## Migration 010
+## Migrations 010 / 012
+
+- 012 (I02): `poi_narrations.audio_generated_by jsonb` + check + queued-job
+  partial index. Down drops them (AI provenance is lost; audio stays).
+
 
 - Up: `npm run db:migrate` applies `010_tts_generation_jobs.up.sql`
   (unique idempotency key, `artifact` jsonb, artifact-state check, dead-letter

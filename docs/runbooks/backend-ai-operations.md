@@ -23,9 +23,11 @@ raw GPS.
 
 ## Kill switches / rollback
 
-- **Disable TTS generation:** `TTS_GENERATION_ENABLED=false` (default on). The
-  worker's generation entrypoint calls `assertTtsGenerationEnabled()` and refuses
-  new work; in-flight jobs finish. No redeploy.
+- **Disable TTS generation:** `TTS_GENERATION_ENABLED=false` (default on) on
+  BOTH processes, then restart them (env is read at boot; no rebuild/redeploy).
+  API: create answers `503 AI_FEATURE_DISABLED` (poll/cancel keep working).
+  Worker: `TtsJobConsumer` stops claiming (`tts consumer: TTS_GENERATION_ENABLED=false`
+  in the log); in-flight jobs finish; queued jobs wait. Wired in I02 (ADR 0014).
 - **Disable hybrid search:** `SEARCH_HYBRID_ENABLED=false` (ADR 0012).
 - **Model rollback:** disable the bad voice/model version in the registry/voice
   manifest (`enabled: false`) and enable the previous pinned `modelVersion`.
@@ -35,10 +37,15 @@ raw GPS.
 
 ## Quotas
 
-`QuotaGuard` (env `TTS_QUOTA_WINDOW_MS`, `TTS_QUOTA_MAX_PER_WINDOW`,
-`TTS_QUOTA_MAX_CONCURRENT`; defaults 60s / 120 / 4) caps submissions per key and
-concurrency so a flood cannot exhaust the pipeline. Admit with `tryAcquire(key)`,
-always `release(key)` in a finally.
+Wired in I02 (ADR 0014):
+
+- API create: per-user fixed window (`TTS_QUOTA_WINDOW_MS`,
+  `TTS_QUOTA_MAX_PER_WINDOW`; 60s / 120; per API process) → `429 rate_limited`;
+  backlog cap on queued+running rows (`TTS_QUEUE_MAX_ACTIVE`, 50) →
+  `429 concurrency_limited`. `details.retryAfterSeconds` is a hint.
+- Worker: `QuotaGuard` (same window vars + `TTS_QUOTA_MAX_CONCURRENT`, 4) is
+  checked with `peek()` before each claim and acquired after it, released when
+  the job ends — bounding claim rate and parallel synthesis.
 
 ## Retention
 
@@ -81,6 +88,7 @@ locale mapping), watch `tts_generation_duration_ms` and dead-letter metrics by
 ## Verify
 
 `npm run test --workspace @damsen/worker` covers metrics, quota, retention and
-the kill switch. Fault-injection and restore drills are run in staging per above.
+the kill switch (incl. the consumer); `npm run test --workspace @damsen/api`
+covers the API kill switch/quota. Live evidence: `backend-i02-integration-fixes.md`. Fault-injection and restore drills are run in staging per above.
 `B03` (real object storage smoke) remains open and gates the storage-restore
 drill.
