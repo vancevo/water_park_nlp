@@ -15,3 +15,6 @@ config/tts-benchmark-report.json
 config/zerotts/
 config/moss-tts/
 config/tts-provider-benchmark-report.json
+
+__pycache__/
+*.pyc

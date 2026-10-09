@@ -238,3 +238,34 @@ S3_ENDPOINT=http://127.0.0.1:3391 S3_BUCKET=damsen-media-b03 node scripts/smoke-
 # provider|corrupt|killswitch|quota|races|api-restart>, model-rollback.mjs,
 # mig012.mjs <probe-new|probe-old|down|up>, s3-fidelity.mjs, manual-upload.mjs
 ```
+
+## 9. Closure run with a real network (2026-10-09, macOS arm64, Node 26)
+
+Re-run of the items cloud could not do. Real: Postgres 16 (pgvector/pgRouting),
+API + worker processes, **MinIO server**, **Piper voices** (vi/en/fr). Emulated:
+none in this run.
+
+| Item | Result |
+|---|---|
+| B03 object storage | `quay.io/minio/minio` and `minio/minio` are withdrawn upstream (401 / "repository does not exist"). `infra/docker/docker-compose.yml` now pins `bitnamilegacy/minio` by digest (last archived Bitnami MinIO build), with `MINIO_API_CORS_ALLOW_ORIGIN` for the admin/visitor origins. `npm run smoke:media` PASS; tampered body → 400, wrong `x-amz-checksum-sha256` → 403, valid PUT → 200. Not an upstream-official image: a production/staging bucket (AWS S3) is still T60. |
+| F9 CORS | Preflight from `http://localhost:3001` allowed with the three signed headers; foreign origin gets no `Access-Control-Allow-Origin`. **Browser** upload from admin-web PASS (`apps/admin-web/scripts/audio-upload-browser-smoke.mjs`). It exposed a real bug: the default `fetch` in `NarrationAdminAdapter` was called unbound → `Illegal invocation` in every browser; fixed + regression test. |
+| Real voice E2E | `scripts/e2e-tts-real-storage.mjs vi|en|fr`: login → draft → TTS job (`queued→running→succeeded`, worker process, Piper) → draft audio (sha + RIFF) → submit → approve → public narration with `audio.generatedBy` (no job id) → same bytes. PASS for all three locales. |
+| Admin/visitor browser smokes (api mode, real Piper + MinIO) | admin narration + AI generation smoke PASS; visitor narration smoke PASS (vi/en/fr, AI label iff `generatedBy`). |
+| Root gate (clean env) | format, lint, typecheck, test (all workspaces), build, geo/research/search-eval/tts-eval validators PASS; worker Postgres integration (6) PASS. GitHub CI: see the PR. |
+
+Voices (licenses read from each MODEL_CARD; `config/tts-voices.json`):
+vi `vi_VN-vais1000-medium` CC-BY-4.0 (attribution required), en
+`en_US-ljspeech-medium` public domain (chosen over `lessac`, whose Blizzard
+licence is granted per registered licensee), fr `fr_FR-siwis-medium` CC-BY-4.0.
+CC-BY attribution must ship with any public release (credits screen / docs).
+
+Infra fixes found on the way: the Postgres image build failed because the base
+image's pgdg suite moved to `apt-archive.postgresql.org` (Dockerfile fixed);
+`postgis/postgis` has no arm64 image, so Apple-silicon needs Colima with Rosetta
+(`colima start --vm-type vz --vz-rosetta`) and `DOCKER_DEFAULT_PLATFORM=linux/amd64`
+for the Postgres build only.
+
+Still **NO-GO** (unchanged): AI TTS go-live (no human blind rating, AI00
+voice-consent/commercial-use ADR missing), hybrid enable (no embedding endpoint,
+recall below baseline), public release (B01).
+
