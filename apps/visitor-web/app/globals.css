@@ -952,3 +952,78 @@ audio:focus-visible {
     font-size: 11px;
   }
 }
+
+/* UX pass: sticky primary action, calmer controls, touch targets, motion. */
+.poi-detail .primary-action {
+  position: sticky;
+  bottom: -25px;
+  width: 100%;
+  margin-top: 14px;
+  box-shadow: 0 -14px 14px -6px var(--surface);
+}
+
+.simulation-controls.is-collapsed .simulation-heading strong {
+  white-space: nowrap;
+}
+
+.simulation-controls.is-collapsed {
+  width: auto;
+  max-width: calc(100% - 20px);
+}
+
+@media (max-width: 820px) {
+  /* Leave the map visible above the sheet and more of the list below the map. */
+  .map-panel {
+    height: 50dvh;
+    min-height: 360px;
+  }
+
+  .poi-detail {
+    max-height: 64%;
+  }
+
+  .intro h1 {
+    font-size: 34px;
+  }
+
+  /* The sentence under the title pushes the list below the fold on phones. */
+  .intro > p:last-child {
+    display: none;
+  }
+
+  .discovery-panel {
+    padding-top: 20px;
+  }
+
+  .list-heading {
+    margin-top: 18px;
+  }
+
+  .poi-detail .primary-action {
+    bottom: -20px;
+  }
+
+  .locale-switch button {
+    min-width: 36px;
+    min-height: 32px;
+  }
+
+  .close-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .account-button {
+    min-height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

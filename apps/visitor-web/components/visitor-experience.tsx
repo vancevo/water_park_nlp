@@ -202,6 +202,7 @@ type AuthMode = 'login' | 'register';
 
 export function VisitorExperience() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapPanelRef = useRef<HTMLElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef<Marker[]>([]);
   const userMarkerRef = useRef<Marker | null>(null);
@@ -277,6 +278,16 @@ export function VisitorExperience() {
       stopPlayback();
       setSelected(poi);
       setDetailCardOpen(true);
+      // On phones the list is below the map: bring the detail card into view.
+      if (window.matchMedia('(max-width: 820px)').matches) {
+        mapPanelRef.current?.scrollIntoView({
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)')
+            .matches
+            ? 'auto'
+            : 'smooth',
+          block: 'start',
+        });
+      }
     },
     [cancelSimulationAnimation, stopPlayback],
   );
@@ -388,6 +399,20 @@ export function VisitorExperience() {
       mapRef.current = null;
     };
   }, []);
+
+  // Escape closes the top-most layer: auth dialog, arrival dialog, POI card.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      if (authMode) setAuthMode(null);
+      else if (arrivalOpen) {
+        stopPlayback();
+        setArrivalOpen(false);
+      } else if (detailCardOpen) setDetailCardOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [arrivalOpen, authMode, detailCardOpen, stopPlayback]);
 
   // Remembered interface language (read after mount so SSR markup stays 'vi').
   useEffect(() => {
@@ -795,8 +820,10 @@ export function VisitorExperience() {
                 <span className="poi-copy">
                   <strong>{poi.name}</strong>
                   <small>
-                    {categoryLabel(poi.category, locale)} ·{' '}
-                    {formatDistance(poi.distanceMeters, locale)}
+                    {categoryLabel(poi.category, locale)}
+                    {poi.distanceMeters === undefined
+                      ? ''
+                      : ` · ${formatDistance(poi.distanceMeters, locale)}`}
                   </small>
                 </span>
                 <span className="poi-arrow">→</span>
@@ -806,6 +833,7 @@ export function VisitorExperience() {
         </aside>
 
         <section
+          ref={mapPanelRef}
           className={`map-panel${isPickingSimulation ? ' is-picking-human' : ''}`}
           aria-label={t.mapLabel}
         >

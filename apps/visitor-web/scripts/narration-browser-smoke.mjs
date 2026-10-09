@@ -126,6 +126,17 @@ try {
     'en',
   );
 
+  // Escape closes the POI card; reopen it for the rest of the run.
+  await page.keyboard.press('Escape');
+  await page.locator('.poi-detail').waitFor({ state: 'detached' });
+  await page.locator('.poi-card').first().click();
+  await page.locator('.poi-detail').waitFor();
+  assert.doesNotMatch(
+    await page.locator('.poi-card').first().innerText(),
+    /Chưa xác định|Unknown/,
+    'unknown distance is not shown in the list',
+  );
+
   // Locale whose preference is checked after reload.
   let remembered = 'en';
   if (mode === 'demo') {
