@@ -185,9 +185,12 @@ thời gian rảnh trước checkpoint này.
 ### I01 — Adapter swap — Owner: Tú
 
 - [x] Thay mock locale port bằng generated API client của Công.
-- [x] Thay mock TTS job port bằng endpoints thật.
+- [x] Thay mock TTS job port bằng endpoints thật. (chế độ `api` chạy với AI04
+  thật; mặc định flag vẫn `off` tới khi I02 xong)
 - [x] Không đổi UI state machine nếu contract v1 được giữ đúng.
-- [x] Giữ fixtures cho unit/component tests; chỉ E2E dùng backend thật.
+- [x] Giữ fixtures cho unit/component tests; chỉ E2E dùng backend thật. (E2E
+  worker chạy qua harness claim ngoài repo + provider âm sine giả, vì worker
+  chưa có consumer — xem `docs/runbooks/frontend-i01-integration-report.md` §5)
 
 ### I02 — Contract/integration fixes — Owner: Công
 

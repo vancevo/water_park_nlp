@@ -237,6 +237,13 @@ describe('TTS job UI state machine', () => {
       isQueuedStalled({ ...job, status: 'running' }, at + QUEUED_STALL_MS * 5),
     ).toBe(false);
     expect(isQueuedStalled(null, at)).toBe(false);
+    // Observed-since (client clock) wins over a skewed server timestamp.
+    const skewed = {
+      status: 'queued' as const,
+      updatedAt: '2020-01-01T00:00:00.000Z',
+    };
+    expect(isQueuedStalled(skewed, at, at - 1_000)).toBe(false);
+    expect(isQueuedStalled(skewed, at, at - QUEUED_STALL_MS)).toBe(true);
   });
 });
 

@@ -33,7 +33,7 @@ Kiểm bằng HTTP thật (`curl`/script) và browser:
 | Không token | `401` | Đã map |
 | Narration/job không tồn tại | `404` | Đã map (kèm khả năng bị dọn theo retention) |
 | Lỗi job | `errorCode` `TTS_PROVIDER_ERROR` (thấy thật), `TTS_TIMEOUT`, `TTS_AUDIO_INVALID` | Đã map; thêm `AI_FEATURE_DISABLED` |
-| Quota/kill switch AI08 | **Không có ở API** (chưa wiring) | Map sẵn `rate_limited`, `concurrency_limited`, `AI_FEATURE_DISABLED`, HTTP 429/503 |
+| Quota/kill switch AI08 | **Không có ở API** (chưa wiring; API không trả 429 ở đâu cả) | Map sẵn `rate_limited`, `concurrency_limited`, `AI_FEATURE_DISABLED`, HTTP 429/503 — **dự phòng, chưa kiểm được với backend**. Lưu ý: nếu `AiFeatureDisabledError` bị ném trong lúc tổng hợp, `errorCodeOf` của worker chỉ giữ mã `TTS_*` nên job sẽ mang `TTS_PROVIDER_ERROR`, không phải `AI_FEATURE_DISABLED` (`apps/worker/src/tts/tts-generation-service.ts:275-287`) |
 
 Sửa phía frontend trong I01:
 
@@ -44,6 +44,10 @@ Sửa phía frontend trong I01:
   URL nghe thử.
 - Ghi chú khi job `queued` quá 2 phút (không có worker tiêu thụ hàng đợi).
 - Browser smoke hai app có `SMOKE_MODE=api`.
+- Review I01: lỗi `SyntaxError` (trang lỗi HTML không phải JSON) cũng hiện câu
+  chung; ghi chú "chờ quá 2 phút" tính theo đồng hồ trình duyệt từ lúc thấy job
+  `queued` (không phụ thuộc lệch giờ server) và nằm trong vùng `role=status`
+  để trình đọc màn hình đọc được (kiểm bằng Playwright với đồng hồ giả).
 
 ## 3. Quyết định mặc định
 
@@ -72,7 +76,7 @@ bằng `off`. Đề xuất đổi mặc định sau khi I02-1/3/4 xong và I03 c
 | I02-5 | Trung bình | Create không kiểm trạng thái workflow; OpenAPI ghi "for a draft narration" nhưng narration `pending_review` vẫn nhận `202` (đã thử thật) | `apps/api/src/narration/tts-job.service.ts:54-77`; `apps/api/openapi.yaml:507` |
 | I02-6 | Trung bình | Submit không bị chặn khi narration còn job `queued`/`running` (đã thử thật: submit `200` khi job `queued`) — UI chặn được trong phiên trang nhưng server mới là nguồn quyết định | `apps/api/src/narration/narration.service.ts:164-167` |
 | I02-7 | Trung bình | OpenAPI chỉ khai báo `202`/`200` cho 3 endpoint TTS; thiếu `400` (+ mã `NARRATION_LOCALE_DISABLED`, `TTS_JOB_LOCALE_MISMATCH`, `TTS_JOB_TRANSCRIPT_EMPTY`), `401`, `403`, `404` | `apps/api/openapi.yaml:519-556` |
-| I02-8 | Trung bình | `TTS_DEFAULT_PROVIDER/MODEL/MODEL_VERSION` không có trong `.env.example`; fallback `modelVersion: '0'` không khớp voice nào của worker → khoá idempotency API ≠ worker | `apps/api/src/narration/tts-job.models.ts:256-276`; `.env.example` |
+| I02-8 | Trung bình | `TTS_DEFAULT_PROVIDER/MODEL/MODEL_VERSION` không có trong `.env.example`; fallback `modelVersion: '0'` không khớp voice nào của worker → khoá idempotency API ≠ worker | `apps/api/src/narration/tts-job.models.ts:63-82`; `.env.example` (không có biến `TTS_*`) |
 | I02-9 | Thấp | `ParseUUIDPipe({ version: '4' })` từ chối id narration seed (không phải v4) với `400 "uuid v 4 is expected"` | `apps/api/src/narration/admin-tts-job.controller.ts:43,53,62` |
 | I02-10 | Thấp | Job `running` có thể mang `errorCode` của lần thử trước (worker lưu mã lỗi giữa các lần retry, API trả nguyên) | `apps/worker/src/tts/tts-generation-service.ts:163-165`; `apps/api/src/narration/tts-job.service.ts:162` |
 | I02-11 | Thông tin | Khoảng trống contract cũ vẫn mở: không `playbackUrl` cho audio AI, không provenance trên narration, không endpoint job gần nhất của narration | `docs/product/tts-admin-generation-ux.md` (mục khoảng trống) |
@@ -83,11 +87,18 @@ Dịch vụ: API `npm run dev:api` (S3 tắt, `TTS_DEFAULT_PROVIDER=e2e-tone`,
 `TTS_DEFAULT_MODEL=ffmpeg-sine`, `TTS_DEFAULT_MODEL_VERSION=e2e-tone-2026.10.0`),
 admin/visitor `next build` + `next start` ở `api`.
 
-Worker: vì I02-1, một harness ngoài repo (scratchpad của phiên I01) chỉ bổ sung
-vòng "claim": `UPDATE … SET status='running' WHERE status='queued'` nguyên tử,
-rồi gọi **`TtsGenerationService.generate()` thật** với
-`PostgresTtsJobRepository`, `TtsModelRegistry`, `CliTtsProvider` (mã worker
-thật) trên bảng thật. Provider là **CLI giả** (`ffmpeg` sinh âm sine 2 s, chờ
+Worker: vì I02-1, một harness ngoài repo (scratchpad của phiên I01, **không
+commit**, không thể tái hiện chỉ từ repo) bổ sung vòng "claim":
+`UPDATE … SET status='running' WHERE status='queued'` nguyên tử, rồi gọi
+**`TtsGenerationService.generate()` thật** với `PostgresTtsJobRepository`,
+`TtsModelRegistry`, `CliTtsProvider` (mã worker thật) trên bảng thật. Để
+`generate()` không trả nguyên hàng đã claim (`tts-generation-service.ts:117`),
+harness **bọc `findByIdempotencyKey`** để hàng đang được nó xử lý hiện ra như
+`failed`/chưa dead-letter (retryable); harness cũng tự gọi
+`assertTtsGenerationEnabled()` mỗi vòng — tức kill switch chỉ có hiệu lực trong
+harness, không phải trong worker thật (I02-4). Đây là bằng chứng cho đường
+API ↔ UI và mã domain worker, **không** phải bằng chứng một worker sản xuất
+chạy được. Provider là **CLI giả** (`ffmpeg` sinh âm sine 2 s, chờ
 5 s; transcript chứa `[fail]` thì thoát lỗi) — không phải giọng đọc. Piper:
 engine tải được từ PyPI nhưng voice trên HuggingFace bị chặn (`403` proxy),
 nên không chạy được Piper thật ở môi trường này.

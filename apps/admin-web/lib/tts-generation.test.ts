@@ -150,6 +150,11 @@ describe('HTTP TTS generation port', () => {
     expect(ttsRequestErrorMessage(new TypeError('Failed to fetch'))).toBe(
       'Không thể kết nối dịch vụ tạo audio.',
     );
+    expect(
+      ttsRequestErrorMessage(
+        new SyntaxError('Unexpected token \'<\', "<html>" is not valid JSON'),
+      ),
+    ).toBe('Không thể kết nối dịch vụ tạo audio.');
   });
 
   it('maps the real AI04/AI08 error codes before falling back to status', () => {
