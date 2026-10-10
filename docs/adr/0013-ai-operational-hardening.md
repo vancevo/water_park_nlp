@@ -1,6 +1,7 @@
 # ADR 0013 — AI/TTS operational hardening
 
-- Status: Accepted (AI08 / C07, partial — B03 gates storage-restore)
+- Status: Accepted (AI08 / C07; metrics endpoint, restore drill and load test
+  added 2026-10-10)
 - Date: 2026-10-08
 - Deciders: Công (backend), coordinator
 - Related: `docs/plans/AI_TTS_AND_TRAINING_ROADMAP.md` (AI08), ADR 0008–0012, migration 010/011
@@ -38,10 +39,17 @@ transport-agnostic.
 
 ## Out of scope / deferred
 
-- Wiring a metrics HTTP endpoint and a scrape target, and emitting these metrics
-  from the live worker queue consumer (worker claiming is finalized at
-  integration). The recorders are ready to call.
-- The storage backup/restore drill needs real object storage — blocked by **B03**.
+- ~~Wiring a metrics HTTP endpoint and a scrape target~~ — **done 2026-10-10
+  (C07):** the worker serves `GET /metrics` + `/healthz`
+  (`apps/worker/src/ops/metrics-server.ts`, `WORKER_METRICS_*`); the live
+  consumer already records the series since I02. Scrape config:
+  `infra/observability/README.md`.
+- ~~The storage backup/restore drill~~ — **done 2026-10-10 (C07):**
+  `scripts/storage-restore-drill.mjs` (audit/backup/restore/drill) re-hashes
+  every DB-referenced audio object and restores from a backup bucket; drill
+  PASS on an S3 emulator (`backend-ai-operations.md`). Re-run on the target
+  store (MinIO/S3) at T60.
+- Load test of the visitor read paths: `scripts/load-test.mjs` (C07).
 
 ## Consequences
 

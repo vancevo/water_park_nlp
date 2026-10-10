@@ -17,9 +17,11 @@ pipeline (no new AI capability). See ADR 0013, ADR 0008–0011 and
 
 `TtsMetrics` records `tts_jobs_total`, `tts_job_retries_total`,
 `tts_job_dead_letters_total`, `tts_generation_duration_ms`, `tts_queue_depth`
-(labels: status/provider/model/model_version/error_code only). Expose with
-`registry.toPrometheus()`. **Never** log or label a transcript, prompt, query or
-raw GPS.
+(labels: status/provider/model/model_version/error_code only). The worker
+serves them at `GET /metrics` (Prometheus text) and `GET /healthz` on
+`WORKER_METRICS_HOST:WORKER_METRICS_PORT` (default `127.0.0.1:9464`); scrape
+config in `infra/observability/README.md`. **Never** log or label a transcript,
+prompt, query or raw GPS.
 
 ## Kill switches / rollback
 
@@ -114,4 +116,50 @@ re-claimed; keep each manifest entry's provider `timeoutMs` ≤
 `TTS_JOB_TIMEOUT_MS`, otherwise a timed-out attempt's provider process keeps
 running beside the retry; keep `TTS_JOB_STALE_RUNNING_MS` above
 `TTS_JOB_TIMEOUT_MS` + 120 s (bucket check + upload each have a 60 s timeout).
-The storage-restore drill (object loss) is still not run.
+
+## Storage backup, audit and restore (C07)
+
+Narration audio exists only in object storage; `poi_narrations.audio_*` holds
+the key, MIME type, size and sha256 of every attached file.
+`scripts/storage-restore-drill.mjs` uses those records:
+
+| Command | Effect |
+|---|---|
+| `npm run storage:audit` | Read-only: each referenced object exists with the recorded size, sha256 (bytes re-hashed) and MIME |
+| `npm run storage:backup` | Copy every referenced object to `BACKUP_S3_BUCKET` (default `${S3_BUCKET}-backup`); idempotent; never backs up a missing/corrupt primary |
+| `npm run storage:restore` | Re-create missing/corrupt objects from the backup, then audit |
+| `STORAGE_DRILL_CONFIRM=delete-objects npm run storage:drill` | Backup → delete `STORAGE_DRILL_LOSE` objects from the primary → audit must find exactly them → restore → audit clean; reports RTO. Refuses without the confirm env and on any bucket named `*prod*` |
+
+Needs `DATABASE_URL` and the `S3_*` variables (same as the API). Objects are
+copied by GET + PUT with the original `Content-Type`, `sha256` metadata and
+`x-amz-checksum-sha256`, so the API's `verifyAudioObject` accepts a restored
+object like the original. `STORAGE_DRILL_REPORT=<path>` writes a JSON report.
+Schedule `storage:backup` (or use bucket replication/`mc mirror`) and
+`storage:audit` daily in staging/production.
+
+Drill evidence 2026-10-10 (Postgres 16 + moto S3 emulator, 2 AI-generated
+objects mp3/m4a): backup 2/2 → 2 deleted → detection exact → restored and
+re-verified in 57 ms → PASS; a corrupted object (wrong bytes) was flagged
+`size_mismatch` by `audit` and repaired by `restore`; the API then served both
+published narrations with matching sha256. Re-run on the target store
+(MinIO/S3) at T60 — the emulator does not enforce checksums.
+
+## Load test (C07)
+
+`npm run load:api` drives the visitor read paths (POI list, search, narration
+locales, POI narration, walking route) with `LOAD_CONCURRENCY` users for
+`LOAD_DURATION_S`, then fails if any scenario's p95 exceeds `LOAD_P95_MS`
+(500) or the error rate exceeds `LOAD_MAX_ERROR_RATE` (1 %). 404 on a missing
+narration locale and 422 on an off-graph route origin count as handled.
+`LOAD_REPORT=<path>` writes JSON.
+
+Local result 2026-10-10 (API + Postgres 16/PostGIS/pgRouting on one 2-vCPU
+container, 5 POIs, hybrid off):
+
+| Users | req/s | p95 list / search / narration / route | Errors |
+|---|---:|---|---:|
+| 20 | 802 | 33 / 40 / 47 / 55 ms | 0 % |
+| 100 | 931 | 152 / 144 / 181 / 325 ms | 0 % |
+
+Routing (pgRouting) is the slowest path. Re-run on staging hardware at T60
+with the full POI catalogue before setting production budgets.

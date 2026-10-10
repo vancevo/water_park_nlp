@@ -55,7 +55,7 @@ MinIO.
 | AI06 fine-tuning | not started (needs explicit GO) | ADR 0011 | — |
 | AI07 hybrid search | functional, not production | §6b | fake embedder |
 | AI08 drills: failed provider, full queue, corrupt audio, model rollback | PASS | §3, §4 | real processes |
-| AI08 restore drill / metrics scrape endpoint | **OPEN** | deferred (ADR 0013) | — |
+| AI08 restore drill / metrics scrape endpoint | DONE 2026-10-10 (C07) | `backend-ai-operations.md` (drill on S3 emulator; re-run on target store at T60) | real processes, emulator storage |
 | B03 real object storage | **MITIGATED (local), awaiting coordinator approval** | §5 | real MinIO protocol, dev build (not an approved image) |
 
 ## 2. Root quality gate (what CI runs, run locally)
@@ -216,9 +216,9 @@ d. **(I03 review, High) md5-seeded narration ids rejected** — fixed:
 | F8 | Info | After a worker crash, editors see `running` for up to 30 min (stale window) | Công/ops **ACCEPTED (L4): left as is — shortening the window raises the re-claim-while-running risk fixed by F7; operators see `running` ≤ `TTS_JOB_STALE_RUNNING_MS` after a worker crash. A heartbeat/lease would change semantics and needs an ADR** |
 | F9 | Medium | Browser editor uploads go straight to the bucket with signed `content-type`/`x-amz-checksum-sha256`/`x-amz-meta-sha256` headers: the staging/production bucket needs a CORS rule allowing `PUT` from the admin origin with those headers (no CORS config exists in `infra/`). Run one browser upload + `smoke-media.mjs` against the real target store (AWS S3 or the approved image) at T60 | Công/platform |
 | — | Blocker for I04 DONE | B03: coordinator approval of the MinIO dev-build evidence, or `smoke-media.mjs` on an approved image; GitHub CI green on the branch | coordinator/platform |
-| — | Blocker for AI go-live | Real voice (Piper 403) + T06 blind review (I03 box 4), AI00 voice-consent/commercial-use ADR | Công + Tú |
-| — | Open | Storage-restore drill, metrics scrape endpoint (ADR 0013) | Công |
-| — | Open | Lexical recall: DONE in L3 (0.60 → 0.90; 4 semantic/geo-intent queries remain). Still open: production embedding endpoint before enabling hybrid, and the ADR 0012 gate re-base decision | search/Công |
+| — | Blocker for AI go-live | Real voice (Piper 403) + T06 blind review (I03 box 4), AI00 voice-consent/commercial-use ADR (drafted 2026-10-10 as ADR 0015 — Proposed, needs coordinator sign-off) | Công + Tú |
+| — | Done 2026-10-10 | Storage-restore drill, metrics scrape endpoint, load test (ADR 0013 updated) | Công |
+| — | Open | Lexical recall: L3 0.60 → 0.90, L4 direction intent → 0.956 (ADR 0012 gate passes, `backend-hybrid-search.md`). Still open: production embedding endpoint before enabling hybrid (2 synonym queries) | search/Công |
 | — | Frontend | Show `audio.generatedBy` as "AI-generated" in visitor web; keep `NEXT_PUBLIC_TTS_GENERATION_MODE=off` until the AI NO-GO items close | Tú |
 
 ## 8. Reproduce

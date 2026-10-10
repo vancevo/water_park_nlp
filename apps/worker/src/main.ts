@@ -185,9 +185,38 @@ export {
   ProviderBenchmarkReportError,
 } from './tts/providers/provider-benchmark-report.js';
 
+// C04 — release encoding (mp3/m4a) of the validated WAV intermediate.
+export {
+  FfmpegAudioEncoder,
+  createAudioEncoder,
+  loadAudioEncoderConfig,
+  verifyEncodedAudio,
+  AudioEncoderConfigError,
+  TtsEncodeError,
+  RELEASE_MIME,
+} from './tts/audio-encoder.js';
+export type {
+  AudioEncoder,
+  AudioEncoderConfig,
+  EncodedAudio,
+  TtsReleaseFormat,
+  TtsReleaseMimeType,
+} from './tts/audio-encoder.js';
+
 // AI08 — operational hardening (metrics, quota, retention, kill-switches).
 export { MetricsRegistry, DEFAULT_LATENCY_BUCKETS_MS } from './ops/metrics.js';
 export type { Labels, MetricsSnapshot } from './ops/metrics.js';
+export {
+  createMetricsServer,
+  loadMetricsServerConfig,
+  startMetricsServer,
+  MetricsServerConfigError,
+  PROMETHEUS_CONTENT_TYPE,
+} from './ops/metrics-server.js';
+export type {
+  MetricsServerConfig,
+  RunningMetricsServer,
+} from './ops/metrics-server.js';
 export { TtsMetrics } from './ops/tts-metrics.js';
 export type { TtsJobLabels } from './ops/tts-metrics.js';
 export {

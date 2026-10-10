@@ -2,8 +2,14 @@ import { createRequire } from 'node:module';
 
 import { loadAiFeatureFlags } from '../ops/ai-feature-flags.js';
 import { MetricsRegistry } from '../ops/metrics.js';
+import {
+  loadMetricsServerConfig,
+  startMetricsServer,
+  type RunningMetricsServer,
+} from '../ops/metrics-server.js';
 import { loadQuotaConfig, QuotaGuard } from '../ops/quota.js';
 import { TtsMetrics } from '../ops/tts-metrics.js';
+import { createAudioEncoder, loadAudioEncoderConfig } from './audio-encoder.js';
 import {
   buildPiperProvider,
   loadPiperVoiceManifest,
@@ -193,6 +199,8 @@ export function startTtsWorker(
   log: (line: string) => void = (line) => console.log(line),
 ): RunningTtsWorker {
   const config = loadTtsWorkerConfig(env);
+  const metricsServerConfig = loadMetricsServerConfig(env);
+  const encoderConfig = loadAudioEncoderConfig(env);
   const bindings = loadVoiceBindings(config);
   const require = createRequire(import.meta.url);
   const pg = require('pg') as {
@@ -231,7 +239,7 @@ export function startTtsWorker(
       baseBackoffMs: config.baseBackoffMs,
       rightsOwner: config.rightsOwner,
     },
-    { metrics, log },
+    { metrics, log, encoder: createAudioEncoder(encoderConfig) },
   );
   const consumer = new TtsJobConsumer(queue, runner, {
     flags: () => loadAiFeatureFlags(env),
@@ -246,13 +254,36 @@ export function startTtsWorker(
         `${entry.locale}=${entry.provider}/${entry.model}@${entry.modelVersion}`,
     )
     .join(', ');
-  log(`tts worker: engine=${config.engine} voices: ${voices}`);
+  log(
+    `tts worker: engine=${config.engine} release=${encoderConfig.format} voices: ${voices}`,
+  );
   consumer.start();
+  // Prometheus scrape endpoint (C07). A bind failure is logged, not fatal:
+  // losing observability must never stop audio generation.
+  let metricsServer: Promise<RunningMetricsServer | null> =
+    Promise.resolve(null);
+  if (metricsServerConfig.enabled) {
+    metricsServer = startMetricsServer(registry, metricsServerConfig).then(
+      (running) => {
+        log(
+          `tts worker: metrics on http://${metricsServerConfig.host}:${running.port}/metrics`,
+        );
+        return running;
+      },
+      (error: Error & { code?: string }) => {
+        log(
+          `tts worker: metrics endpoint disabled (${error.code ?? error.name})`,
+        );
+        return null;
+      },
+    );
+  }
   return {
     consumer,
     metrics: registry,
     async stop() {
       await consumer.stop();
+      await (await metricsServer)?.close();
       store.destroy();
       await pool.end();
     },

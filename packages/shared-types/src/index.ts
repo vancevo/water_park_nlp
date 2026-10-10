@@ -429,7 +429,11 @@ export interface TtsJobArtifactSummary {
   sizeBytes: number;
   durationSeconds: number;
   sampleRateHz: number;
-  mimeType: 'audio/wav';
+  /**
+   * `audio/wav` by default; `audio/mpeg`/`audio/mp4` when the worker encodes
+   * a release format (contract v1.3, additive — C04).
+   */
+  mimeType: 'audio/wav' | 'audio/mpeg' | 'audio/mp4';
 }
 
 /** `GET /v1/admin/narrations/:narrationId/tts-jobs/latest` (contract v1.1). */

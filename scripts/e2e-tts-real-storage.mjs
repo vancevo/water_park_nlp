@@ -10,6 +10,12 @@
 // → public audio bytes. Then storage integrity: a presigned PUT with a tampered
 // body and one with a wrong checksum header must be refused, and a browser
 // CORS preflight from the admin origin must be allowed (other origins not).
+//
+// The draft audio may be WAV (default) or the worker's release encoding
+// (TTS_AUDIO_RELEASE_FORMAT=mp3|m4a, C04); its container is checked against
+// the stored MIME type. E2E_SKIP_STORAGE_INTEGRITY=1 skips the storage
+// integrity/CORS probes on an S3 EMULATOR (moto does not enforce them) — never
+// on MinIO/S3, where they are part of the release gate.
 import assert from 'node:assert/strict';
 import { Buffer } from 'node:buffer';
 import { createHash, randomUUID } from 'node:crypto';
@@ -98,10 +104,18 @@ const playback = await call(
 const draftBytes = Buffer.from(
   await (await fetch(playback.playbackUrl)).arrayBuffer(),
 );
-assert.equal(draftBytes.subarray(0, 4).toString(), 'RIFF');
+const magic = {
+  'audio/wav': (b) => b.subarray(0, 4).toString('latin1') === 'RIFF',
+  'audio/mpeg': (b) =>
+    b.subarray(0, 3).toString('latin1') === 'ID3' ||
+    (b[0] === 0xff && (b[1] & 0xe0) === 0xe0),
+  'audio/mp4': (b) => b.subarray(4, 8).toString('latin1') === 'ftyp',
+};
+const mime = draftNarration.audio.mimeType;
+assert.ok(magic[mime]?.(draftBytes), `draft audio is not a valid ${mime}`);
 assert.equal(sha256(draftBytes), draftNarration.audio.sha256);
 step(
-  `draft audio ${draftBytes.length} B, ${draftNarration.audio.durationSeconds}s by ${draftNarration.audioGeneratedBy.provider}/${draftNarration.audioGeneratedBy.voiceId}`,
+  `draft audio ${mime} ${draftBytes.length} B, ${draftNarration.audio.durationSeconds}s by ${draftNarration.audioGeneratedBy.provider}/${draftNarration.audioGeneratedBy.voiceId}`,
 );
 
 await call('POST', `/v1/admin/narrations/${created.id}/submit`, {}, 200);
@@ -121,6 +135,11 @@ const pubBytes = Buffer.from(
 );
 assert.equal(sha256(pubBytes), pub.audio.sha256);
 step('public narration serves the same bytes with generatedBy');
+
+if (process.env.E2E_SKIP_STORAGE_INTEGRITY === '1') {
+  console.log(`PASS e2e-tts-real-storage (${locale}; storage probes skipped)`);
+  process.exit(0);
+}
 
 // Storage-side integrity on the real S3 endpoint.
 const good = Buffer.from(`integrity probe ${randomUUID()}`);

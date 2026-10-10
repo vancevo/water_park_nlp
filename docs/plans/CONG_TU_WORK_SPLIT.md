@@ -75,7 +75,7 @@ Công có thể bắt đầu ngay, không cần UI của Tú.
 
 ### Checklist Công
 
-- [ ] **C01 — Governance và backend contract** (contract v1→v1.2 xong; còn thiếu ADR AI00 về voice consent/commercial-use — I04 §1)
+- [ ] **C01 — Governance và backend contract** (contract v1→v1.3 xong; 2026-10-10: bản nháp ADR AI00 = `docs/adr/0015-ai-governance-voice-consent-and-release-gates.md` (Proposed) — chỉ còn coordinator/nhóm duyệt và rà lại model card từng giọng)
   - Hoàn thành AI00 ADR: AI-generated label, license, voice consent, review gate.
   - Hiện thực contract v1 trong OpenAPI, shared types và API client.
 - [x] **C02 — Locale config và database** (I01/I03 PASS trên API thật; I04 §1)
@@ -85,16 +85,16 @@ Công có thể bắt đầu ngay, không cần UI của Tú.
 - [x] **C03 — TTS worker foundation** (I02 consumer + DB int tests; drills I04 §3)
   - Thực hiện AI02: `TtsProvider`, job persistence, idempotency,
     retry/dead-letter, artifact/model registry và audio validation.
-- [x] **C04 — Piper baseline** (2026-10-09: giọng Piper thật vi/en/fr trong `config/tts-voices.json`, E2E sinh audio → draft PASS với MinIO — PR #14; còn lại: encode mp3/m4a, nhãn ghi công CC-BY cho visitor)
+- [x] **C04 — Piper baseline** (2026-10-09: giọng Piper thật vi/en/fr trong `config/tts-voices.json`, E2E sinh audio → draft PASS với MinIO — PR #14; 2026-10-10: encode mp3/m4a qua ffmpeg (`TTS_AUDIO_RELEASE_FORMAT`, contract v1.3), E2E mp3/m4a PASS. Dòng ghi công CC-BY trên visitor thuộc phần UI của Tú — ADR 0015 §4)
   - Thực hiện AI03 bằng corpus fixture nhỏ riêng của backend.
   - Pin model/voice/license/checksum; sinh audio và gắn vào draft narration.
-- [ ] **C05 — Provider benchmark và training decision** (harness xong; corpus 64 câu đã chạy qua Piper THẬT 64/64 ok — PR #14; còn lại: chạy ZeroTTS/MOSS, blind review của người, quyết định chọn provider)
+- [ ] **C05 — Provider benchmark và training decision** (harness xong; corpus 64 câu đã chạy qua Piper THẬT 64/64 ok — PR #14; còn lại: chạy ZeroTTS/MOSS (cần tải model/GPU), blind review của người, quyết định chọn provider)
   - Thực hiện AI05 với fixture trước; chạy lại bộ corpus đầy đủ của Tú khi tích hợp.
   - AI06 chỉ mở sau quyết định GO; không train từ đầu.
-- [ ] **C06 — Semantic search production** (flag/fallback chạy; lexical Recall@10 0,60 → 0,90 ở PR #16, vẫn thấp hơn ngưỡng ADR 0012 0,911; chưa có embedding endpoint production)
+- [ ] **C06 — Semantic search production** (flag/fallback chạy; lexical Recall@10 0,60 → 0,90 (L3) → **0,956** (L4 hiểu hướng đông/tây/nam/bắc, 2026-10-10) — đã qua ngưỡng ADR 0012 0,911; còn thiếu embedding endpoint production cho 2 truy vấn đồng nghĩa)
   - Thực hiện AI07: embedding provider, vector retrieval, hybrid ranking,
     feature flag và lexical fallback.
-- [ ] **C07 — Backend/infra hardening** (drills + rollback xong I04 §3–4; F5–F7 sửa ở PR #15; chưa tick: metrics scrape endpoint, storage-restore drill và load test còn mở)
+- [x] **C07 — Backend/infra hardening** (drills + rollback xong I04 §3–4; F5–F7 sửa ở PR #15; 2026-10-10: worker `GET /metrics`, script + drill backup/restore storage, load test — `backend-ai-operations.md`. Chạy lại drill/load test trên MinIO/S3 + staging ở T60)
   - Phần Công của AI08: queue/model metrics, quota, dead-letter, retention,
     failure drills và rollback.
 
