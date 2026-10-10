@@ -46,4 +46,56 @@ describe('PostgresPoiRepository', () => {
       [id],
     );
   });
+
+  describe('review workflow pointers (pending version / rejection reason)', () => {
+    const row = (overrides: Record<string, unknown>) => ({
+      id: 'p1',
+      slug: 'x',
+      category: 'show',
+      status: 'draft',
+      latitude: 10.7,
+      longitude: 106.6,
+      translations: {},
+      entrances: [],
+      operating_hours: [],
+      pending_version_id: null,
+      rejection_reason: null,
+      ...overrides,
+    });
+    const load = async (overrides: Record<string, unknown>) => {
+      const query = vi.fn().mockResolvedValue({ rows: [row(overrides)] });
+      const repository = new PostgresPoiRepository({ query } as SqlClient);
+      return { record: await repository.findForAdmin('p1'), query };
+    };
+
+    it('selects them from the version rows', async () => {
+      const { query } = await load({});
+      const [sql] = query.mock.calls[0] as [string];
+      expect(sql).toContain("v.workflow_status = 'pending_review'");
+      expect(sql).toContain("v.workflow_status = 'rejected'");
+    });
+
+    it('exposes the pending version id so approve/reject can find it', async () => {
+      const { record } = await load({
+        status: 'pending_review',
+        pending_version_id: 'v-1',
+      });
+      expect(record?.pendingVersionId).toBe('v-1');
+    });
+
+    it('exposes the rejection reason only for rejected POIs', async () => {
+      const rejected = await load({
+        status: 'rejected',
+        rejection_reason: 'no',
+      });
+      expect(rejected.record?.rejectionReason).toBe('no');
+      const published = await load({
+        status: 'published',
+        pending_version_id: 'stale',
+        rejection_reason: 'old',
+      });
+      expect(published.record?.pendingVersionId).toBeUndefined();
+      expect(published.record?.rejectionReason).toBeUndefined();
+    });
+  });
 });
