@@ -70,6 +70,7 @@ npm test
 npm run build
 python3 data/geojson/validate.py
 python3 data/research-damsen/validate.py
+python3 data/pois/validate.py
 python3 data/search-evaluation/validate.py
 python3 data/search-evaluation/test_evaluation.py
 ```

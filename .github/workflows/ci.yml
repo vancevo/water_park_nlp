@@ -39,6 +39,7 @@ jobs:
           python-version: '3.13'
       - run: python3 data/geojson/validate.py
       - run: python3 data/research-damsen/validate.py
+      - run: python3 data/pois/validate.py
       - run: python3 data/search-evaluation/validate.py
       - run: python3 data/search-evaluation/test_evaluation.py
       - run: python3 data/tts-evaluation/validate.py
