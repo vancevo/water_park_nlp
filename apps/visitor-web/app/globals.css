@@ -123,17 +123,102 @@ button {
   border: 0;
 }
 
+/* macOS-style easing: quick start, long soft landing. */
 .workspace {
+  --panel-width: 430px;
+  --ease-mac: cubic-bezier(0.32, 0.72, 0, 1);
   display: grid;
-  grid-template-columns: minmax(340px, 430px) 1fr;
+  grid-template-columns: var(--panel-width) 1fr;
   height: calc(100dvh - 76px);
+  transition: grid-template-columns 520ms var(--ease-mac);
+}
+
+.workspace.panel-closed {
+  grid-template-columns: 0px 1fr;
 }
 
 .discovery-panel {
-  padding: 36px 28px 28px;
-  overflow: auto;
+  min-width: 0;
+  overflow: hidden auto;
   background: var(--paper);
   border-right: 1px solid var(--line);
+  transition:
+    border-color 320ms ease,
+    opacity 360ms var(--ease-mac);
+}
+
+.panel-closed .discovery-panel {
+  opacity: 0;
+  border-color: transparent;
+}
+
+/* Fixed width, so the content slides away instead of re-wrapping while the column shrinks. */
+.discovery-inner {
+  width: var(--panel-width);
+  padding: 36px 28px 28px;
+}
+
+.panel-closed .discovery-inner {
+  pointer-events: none;
+}
+
+/* Smooth height collapse without measuring: 1fr -> 0fr. */
+.collapse {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 420ms var(--ease-mac),
+    opacity 300ms ease;
+}
+
+.collapse.is-collapsed {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.collapse-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panel-handle {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 64px;
+  padding: 0 0 2px;
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  border: 1px solid var(--line);
+  border-left: 0;
+  border-radius: 0 14px 14px 0;
+  box-shadow: 0 6px 18px #23392e2e;
+  backdrop-filter: blur(10px) saturate(1.4);
+  transform: translateY(-50%);
+  transition:
+    width 200ms var(--ease-mac),
+    background 200ms ease;
+}
+
+.panel-handle:hover {
+  width: 32px;
+  background: var(--surface);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace,
+  .discovery-panel,
+  .collapse,
+  .panel-handle {
+    transition: none;
+  }
 }
 
 .eyebrow {
@@ -200,6 +285,7 @@ button {
 
 .poi-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
 }
 
@@ -274,9 +360,6 @@ button {
   inset: 0;
 }
 
-.locate-button,
-.research-badge,
-.simulation-controls,
 .toast {
   position: absolute;
   z-index: 5;
@@ -286,39 +369,62 @@ button {
   backdrop-filter: blur(8px);
 }
 
-.simulation-controls {
-  position: absolute;
-  top: 58px;
-  left: 18px;
-  z-index: 7;
-  display: grid;
+.top-tools {
+  display: flex;
+  flex: 1;
   gap: 10px;
-  width: min(270px, calc(100% - 36px));
-  padding: 13px;
-  border-radius: 15px;
-  transition:
-    width 180ms ease,
-    padding 180ms ease;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 16px;
 }
 
-.simulation-controls.is-collapsed {
-  width: 205px;
-  padding: 9px 42px 9px 10px;
+/* The walker pill sits in the header; its panel drops down below it. */
+.simulation-controls {
+  position: relative;
+  z-index: 40;
+  flex: 0 1 auto;
+  min-width: 0;
+  padding: 5px 46px 5px 7px;
+  background: var(--paper);
+  border: 1px solid var(--line);
   border-radius: 999px;
 }
 
-.simulation-controls.is-collapsed
-  > :not(.simulation-heading, .simulation-toggle) {
+.simulation-body {
   display: none;
+}
+
+.simulation-controls:not(.is-collapsed) .simulation-body {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  display: grid;
+  gap: 10px;
+  width: 270px;
+  padding: 13px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  box-shadow: 0 18px 48px #17261f40;
+  animation: drop-in 220ms var(--ease-mac, ease-out);
+}
+
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
 }
 
 .simulation-toggle {
   position: absolute;
-  top: 9px;
-  right: 9px;
+  top: 50%;
+  right: 6px;
   display: grid;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
+  transform: translateY(-50%);
   place-items: center;
   padding: 0;
   color: var(--green);
@@ -336,11 +442,7 @@ button {
   align-items: center;
 }
 
-.simulation-controls:not(.is-collapsed) .simulation-heading {
-  padding-right: 34px;
-}
-
-.simulation-controls.is-collapsed .human-icon {
+.simulation-controls .human-icon {
   width: 32px;
   height: 32px;
 }
@@ -497,26 +599,27 @@ button {
 }
 
 .locate-button {
-  top: 18px;
-  right: 18px;
+  flex: none;
   padding: 11px 14px;
+  font: inherit;
   font-weight: 750;
+  white-space: nowrap;
   cursor: pointer;
+  background: var(--paper);
+  border: 1px solid var(--line);
   border-radius: 99px;
 }
 
-.research-badge {
-  top: 18px;
-  left: 18px;
-  padding: 8px 11px;
-  color: var(--danger);
-  font-size: 11px;
-  font-weight: 750;
-  border-radius: 9px;
+.locate-button span[aria-hidden] {
+  margin-right: 6px;
+}
+
+.locate-button:hover {
+  background: var(--green-soft);
 }
 
 .toast {
-  top: 70px;
+  top: 18px;
   right: 18px;
   max-width: 340px;
   padding: 11px 14px;
@@ -524,15 +627,32 @@ button {
   border-radius: 10px;
 }
 
+.pin-anchor {
+  width: var(--pin-size, 34px);
+  height: var(--pin-size, 34px);
+  pointer-events: none;
+}
+
+.pin-anchor.sub {
+  width: calc(var(--pin-size, 34px) * 0.76);
+  height: calc(var(--pin-size, 34px) * 0.76);
+}
+
+/* The tip is the bottom-left corner: the pin turns about it, so the tip stays on the coordinates. */
 .map-pin {
-  width: 34px;
-  height: 34px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--pin-size, 34px);
+  height: var(--pin-size, 34px);
+  font-size: calc(var(--pin-size, 34px) * 0.4);
+  pointer-events: auto;
+  transform-origin: 0 100%;
   color: white;
-  font-size: 11px;
   font-weight: 850;
   cursor: pointer;
   background: var(--green);
-  border: 3px solid white;
+  border: max(2px, calc(var(--pin-size, 34px) * 0.085)) solid white;
   border-radius: 50% 50% 50% 4px;
   box-shadow: 0 5px 15px #152a2088;
   transform: rotate(-45deg);
@@ -572,24 +692,135 @@ button {
 }
 
 .map-pin.selected {
-  width: 40px;
-  height: 40px;
+  z-index: 2;
   background: var(--gold);
   box-shadow:
     0 0 0 4px var(--gold),
     0 5px 15px #152a2088;
+  transform: rotate(-45deg) scale(1.18);
+}
+
+/* MapLibre makes the marker absolute; do not override `position` here. */
+.amenity-pin {
+  display: grid;
+  place-items: center;
+  width: calc(var(--pin-size, 34px) * 0.9);
+  height: calc(var(--pin-size, 34px) * 0.9);
+  padding: 0;
+  cursor: pointer;
+  background: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1px #1b4b3a55,
+    0 3px 8px #152a2099;
+}
+
+.amenity-pin::before {
+  position: absolute;
+  inset: calc((var(--hit-size, 34px) - var(--pin-size, 34px) * 0.9) / -2);
+  content: '';
+}
+
+.amenity-pin img {
+  width: 76%;
+  height: 76%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.amenity-pin.selected {
+  z-index: 2;
+  border-color: var(--gold);
+  transform: scale(1.25);
+}
+
+.poi-index.icon img {
+  display: block;
+  object-fit: contain;
+}
+
+.map-pin.new span {
+  font-size: 0.78em;
+  letter-spacing: -0.02em;
+}
+
+/* A touch area of at least --hit-size around the pin body, without changing how it looks. */
+.map-pin::before {
+  position: absolute;
+  inset: calc((var(--hit-size, 34px) - var(--pin-size, 34px)) / -2);
+  content: '';
 }
 
 .map-pin.sub {
-  width: 26px;
-  height: 26px;
-  font-size: 8px;
+  width: calc(var(--pin-size, 34px) * 0.76);
+  height: calc(var(--pin-size, 34px) * 0.76);
+  font-size: calc(var(--pin-size, 34px) * 0.3);
   border-width: 2px;
 }
 
-.map-pin.sub.selected {
-  width: 30px;
-  height: 30px;
+.map-pin.priority {
+  z-index: 2;
+}
+
+.cluster-pin {
+  display: grid;
+  place-items: center;
+  width: var(--cluster-size, 30px);
+  height: var(--cluster-size, 30px);
+  padding: 0;
+  font-size: calc(var(--cluster-size, 30px) * 0.42);
+  font-weight: 850;
+  color: white;
+  cursor: pointer;
+  background: #1b4b3a;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px #1b4b3a55,
+    0 4px 12px #152a2088;
+}
+
+.cluster-pin.attached {
+  background: #6b7a72;
+}
+
+.cluster-menu {
+  position: absolute;
+  z-index: 8;
+  width: 230px;
+  max-height: 60%;
+  padding: 10px;
+  overflow: auto;
+  background: var(--surface);
+  border-radius: 14px;
+  box-shadow: 0 14px 40px #17261f66;
+}
+
+.cluster-menu ul {
+  padding: 0;
+  margin: 6px 0 0;
+  list-style: none;
+}
+
+.cluster-menu li button {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 4px 6px;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+}
+
+.cluster-menu li button:hover {
+  background: #f3e8c5;
 }
 
 .sub-places {
@@ -702,6 +933,15 @@ button {
   filter: drop-shadow(0 5px 7px #17261f55);
 }
 
+.chibi-flip {
+  position: absolute;
+  inset: 0;
+  /* Mirror around the feet, which sit on the path line, so the walker does not slide. */
+  transform: scaleX(var(--facing, 1));
+  transform-origin: 38px 96px;
+  transition: transform 140ms ease-out;
+}
+
 .chibi-sprite-window {
   position: absolute;
   inset: 0 0 6px;
@@ -721,10 +961,10 @@ button {
 
 .chibi-shadow {
   position: absolute;
-  right: 8px;
-  bottom: 2px;
-  left: 8px;
-  height: 8px;
+  top: 91px;
+  left: 18px;
+  width: 40px;
+  height: 9px;
   background: #17261f4d;
   border-radius: 50%;
   filter: blur(2px);
@@ -763,17 +1003,21 @@ button {
 }
 
 .poi-detail {
-  position: absolute;
-  right: 18px;
-  bottom: 18px;
-  z-index: 6;
-  width: min(430px, calc(100% - 36px));
-  max-height: calc(100% - 100px);
-  padding: 25px;
-  overflow: auto;
+  position: relative;
+  padding: 22px;
+  margin: 14px 0 4px;
   background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 20px;
-  box-shadow: 0 22px 70px #17261f4a;
+  box-shadow: 0 10px 30px #17261f1f;
+  animation: card-in 380ms var(--ease-mac, ease-out);
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
 }
 
 .poi-detail h2,
@@ -973,12 +1217,43 @@ button {
   border: 0;
 }
 
+.narration-bar {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
 .narration-locale {
   display: grid;
+  flex: 0 0 auto;
   gap: 6px;
-  margin-bottom: 10px;
   font-size: 12px;
   font-weight: 800;
+}
+
+.narration-locale label {
+  white-space: nowrap;
+}
+
+.narration-bar .listen-row {
+  position: relative;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 0;
+}
+
+.narration-bar .listen-row > * {
+  white-space: nowrap;
+}
+
+.narration-bar .narration-locale select {
+  width: 98px;
+  min-height: 44px;
+  padding: 10px 8px;
 }
 
 .narration-locale select {
@@ -1006,17 +1281,6 @@ button {
   background: #fbefcf;
   border-left: 4px solid var(--gold);
   border-radius: 8px;
-}
-
-.narration .ai-audio-label {
-  display: inline-block;
-  margin-bottom: 6px;
-  padding: 3px 8px;
-  border-radius: 6px;
-  background: #ede7fb;
-  color: #4b2d8f;
-  font-size: 12px;
-  font-weight: 800;
 }
 
 .narration .narration-note {
@@ -1075,10 +1339,30 @@ audio:focus-visible {
     min-height: 430px;
   }
 
-  .discovery-panel {
-    padding: 28px 18px 70px;
+  /* On phones the panel is a normal block below the map: it is never collapsed. */
+  .workspace,
+  .workspace.panel-closed {
+    transition: none;
+  }
+
+  .discovery-panel,
+  .panel-closed .discovery-panel {
     overflow: visible;
+    opacity: 1;
     border: 0;
+  }
+
+  .discovery-inner {
+    width: auto;
+    padding: 28px 18px 70px;
+  }
+
+  .panel-closed .discovery-inner {
+    pointer-events: auto;
+  }
+
+  .panel-handle {
+    display: none;
   }
 
   .intro h1 {
@@ -1086,28 +1370,31 @@ audio:focus-visible {
   }
 
   .poi-detail {
-    right: 10px;
-    bottom: 10px;
-    width: calc(100% - 20px);
-    max-height: 72%;
     padding: 20px;
   }
 
-  .research-badge {
-    top: 10px;
-    left: 10px;
-    max-width: 190px;
+  .top-tools {
+    gap: 6px;
+    padding: 0 8px;
   }
 
-  .locate-button {
-    top: 10px;
-    right: 10px;
+  /* Phones: the header keeps only icons for the map tools. */
+  .brand > span:last-child,
+  .simulation-heading > span:last-child,
+  .locate-label {
+    display: none;
   }
 
   .simulation-controls {
-    top: 72px;
-    left: 10px;
-    width: min(250px, calc(100% - 20px));
+    padding-right: 42px;
+  }
+
+  .locate-button {
+    padding: 9px 12px;
+  }
+
+  .locate-button span[aria-hidden] {
+    margin: 0;
   }
 
   .arrival-dialog {
@@ -1155,19 +1442,14 @@ audio:focus-visible {
 /* UX pass: sticky primary action, calmer controls, touch targets, motion. */
 .poi-detail .primary-action {
   position: sticky;
-  bottom: -25px;
+  bottom: 0;
   width: 100%;
   margin-top: 14px;
   box-shadow: 0 -14px 14px -6px var(--surface);
 }
 
-.simulation-controls.is-collapsed .simulation-heading strong {
+.simulation-heading strong {
   white-space: nowrap;
-}
-
-.simulation-controls.is-collapsed {
-  width: auto;
-  max-width: calc(100% - 20px);
 }
 
 @media (max-width: 820px) {
@@ -1175,10 +1457,6 @@ audio:focus-visible {
   .map-panel {
     height: 50dvh;
     min-height: 360px;
-  }
-
-  .poi-detail {
-    max-height: 64%;
   }
 
   .intro h1 {
@@ -1190,7 +1468,7 @@ audio:focus-visible {
     display: none;
   }
 
-  .discovery-panel {
+  .discovery-inner {
     padding-top: 20px;
   }
 
@@ -1199,7 +1477,7 @@ audio:focus-visible {
   }
 
   .poi-detail .primary-action {
-    bottom: -20px;
+    bottom: 8px;
   }
 
   .locale-switch button {
@@ -1321,4 +1599,329 @@ audio:focus-visible {
 .auto-guide li.near small {
   font-weight: 700;
   color: var(--gold);
+}
+
+.listen-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.listening,
+.heard-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.heard-badge::before {
+  margin-right: 4px;
+  content: '✓';
+}
+
+.camera-controls {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  z-index: 7;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  max-width: calc(100% - 28px);
+  padding: 6px;
+  background: #fffdf7f2;
+  border: 1px solid #1b4b3a33;
+  border-radius: 999px;
+  box-shadow: 0 6px 20px #152a2066;
+}
+
+.camera-controls button {
+  min-height: 40px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--green);
+  border: 0;
+  border-radius: 999px;
+}
+
+.camera-controls .camera-stop {
+  color: var(--green);
+  background: #1b4b3a14;
+}
+
+.camera-remaining {
+  padding: 0 8px 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  white-space: nowrap;
+}
+
+.narration-bar .secondary-action {
+  width: auto;
+  min-height: 44px;
+  padding-inline: 8px;
+  font-size: 13px;
+}
+
+.narration-bar .stop-action {
+  min-width: 52px;
+  color: var(--danger);
+  background: #f6e3df;
+}
+
+/* Pause and Resume share one slot, so the row never changes width or order when they swap. */
+.narration-bar .pause-action {
+  width: 82px;
+}
+
+/* The dot hangs outside the row: it adds no width, so nothing moves when it appears. */
+.narration-bar .listening {
+  position: absolute;
+  top: 50%;
+  left: -15px;
+  width: 9px;
+  height: 9px;
+  margin-top: -4.5px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: listening-pulse 1.1s ease-in-out infinite alternate;
+}
+
+/* Very narrow screens: the buttons drop under the select, still in the same fixed slots. */
+@media (max-width: 420px) {
+  .narration-bar {
+    flex-wrap: wrap;
+  }
+
+  .narration-bar .listen-row {
+    flex: 1 0 100%;
+  }
+
+  .narration-bar .listening {
+    display: none;
+  }
+}
+
+@keyframes listening-pulse {
+  from {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Zone introduction and the "what next" box: cards in the left panel, under the search box. */
+.zone-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.zone-card,
+.next-stop {
+  position: relative;
+  padding: 18px;
+  margin-top: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px #17261f1f;
+  animation: card-in 380ms var(--ease-mac, ease-out);
+}
+
+.zone-stack > :first-child {
+  margin-top: 14px;
+}
+
+.zone-stack > * + * {
+  margin-top: 0;
+}
+
+.zone-card h3,
+.next-stop h3 {
+  margin: 0 36px 10px 0;
+  font-family: Georgia, serif;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.zone-card dl {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.zone-card dt {
+  margin-top: 8px;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.zone-card dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.zone-speaking {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 8px 12px;
+  margin: 0 0 10px;
+  background: var(--green-soft);
+  border-radius: 12px;
+}
+
+.zone-speaking-label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.zone-speaking-dot {
+  width: 9px;
+  height: 9px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: listening-pulse 1.1s ease-in-out infinite alternate;
+}
+
+.zone-stop {
+  min-height: 36px;
+  padding: 0 16px;
+  color: var(--danger);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  background: #f6e3df;
+  border: 0;
+  border-radius: 10px;
+}
+
+.next-stop p {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.next-stop-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.next-stop-options button {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  min-height: 64px;
+  padding: 10px 8px;
+  color: var(--green);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  background: var(--green-soft);
+  border: 0;
+  border-radius: 14px;
+}
+
+.next-stop-options button span {
+  font-size: 22px;
+}
+
+.next-stop-options button:hover {
+  color: white;
+  background: color-mix(in srgb, var(--green-soft) 70%, var(--green));
+}
+
+/* What is being narrated, pinned to the top of the panel with a Stop button. */
+.now-playing {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  margin-top: 12px;
+  background: var(--green-soft);
+  border: 1px solid color-mix(in srgb, var(--green) 25%, transparent);
+  border-radius: 16px;
+  box-shadow: 0 8px 22px #17261f26;
+}
+
+.now-playing-name {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.now-playing-name small {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.now-playing-name strong,
+.now-playing-open {
+  overflow: hidden;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.now-playing-open {
+  padding: 0;
+  color: var(--ink);
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.now-playing-open:hover {
+  text-decoration: underline;
+}
+
+.now-playing-button {
+  min-height: 36px;
+  padding: 0 12px;
+  color: var(--green);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  background: white;
+  border: 0;
+  border-radius: 10px;
 }

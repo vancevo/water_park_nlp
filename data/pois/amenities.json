@@ -1,0 +1,317 @@
+{
+  "note": "Service points of the official park map (icons image supplied 2026-10-10): food, toilets, parking, first aid, security. `kind` picks the sprite apps/visitor-web/public/icons/svc-<kind>.png (cut out by data/walkways-new/extract_amenities.py); `pixel` is the icon centre in the 2048x1315 map frame. The names of the three unlabelled food areas and the numbering of toilets and parking are the project team's.",
+  "places": [
+    {
+      "slug": "svc-food-1",
+      "kind": "food",
+      "category": "food",
+      "nameVi": "Nhà hàng Cầu Vồng",
+      "nameEn": "Cau Vong Restaurant",
+      "noteVi": "Khu vực ăn uống.",
+      "noteEn": "Food and drink area.",
+      "pixel": {
+        "x": 747.0,
+        "y": 303.5
+      }
+    },
+    {
+      "slug": "svc-food-2",
+      "kind": "food",
+      "category": "food",
+      "nameVi": "Ẩm thực món ngon",
+      "nameEn": "Delicious Food Court",
+      "noteVi": "Khu vực ăn uống.",
+      "noteEn": "Food and drink area.",
+      "pixel": {
+        "x": 1334.5,
+        "y": 314.5
+      }
+    },
+    {
+      "slug": "svc-food-3",
+      "kind": "food",
+      "category": "food",
+      "nameVi": "Nhà hàng Thủy Tạ",
+      "nameEn": "Thuy Ta Restaurant",
+      "noteVi": "Khu vực ăn uống.",
+      "noteEn": "Food and drink area.",
+      "pixel": {
+        "x": 1629.5,
+        "y": 432.5
+      }
+    },
+    {
+      "slug": "svc-food-4",
+      "kind": "food",
+      "category": "food",
+      "nameVi": "Nhà hàng Hương Sen",
+      "nameEn": "Huong Sen Restaurant",
+      "noteVi": "Khu vực ăn uống.",
+      "noteEn": "Food and drink area.",
+      "pixel": {
+        "x": 966.5,
+        "y": 434.5
+      }
+    },
+    {
+      "slug": "svc-food-5",
+      "kind": "food",
+      "category": "food",
+      "nameVi": "Khu ăn uống (khu thiếu nhi)",
+      "nameEn": "Food Area (Children's Zone)",
+      "noteVi": "Khu vực ăn uống.",
+      "noteEn": "Food and drink area.",
+      "pixel": {
+        "x": 1771.5,
+        "y": 614.0
+      }
+    },
+    {
+      "slug": "svc-food-6",
+      "kind": "food",
+      "category": "food",
+      "nameVi": "Khu ăn uống Sân khấu Ngôi Sao",
+      "nameEn": "Food Area (Star Stage)",
+      "noteVi": "Khu vực ăn uống.",
+      "noteEn": "Food and drink area.",
+      "pixel": {
+        "x": 1251.5,
+        "y": 691.0
+      }
+    },
+    {
+      "slug": "svc-food-7",
+      "kind": "food",
+      "category": "food",
+      "nameVi": "Khu ăn uống ven hồ (phía tây nam)",
+      "nameEn": "Food Area (South-west Lakeside)",
+      "noteVi": "Khu vực ăn uống.",
+      "noteEn": "Food and drink area.",
+      "pixel": {
+        "x": 1016.5,
+        "y": 779.5
+      }
+    },
+    {
+      "slug": "svc-wc-1",
+      "kind": "wc",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh 1",
+      "nameEn": "Restroom 1",
+      "noteVi": "Nhà vệ sinh.",
+      "noteEn": "Restroom.",
+      "pixel": {
+        "x": 826.5,
+        "y": 143.5
+      }
+    },
+    {
+      "slug": "svc-wc-2",
+      "kind": "wc",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh 2",
+      "nameEn": "Restroom 2",
+      "noteVi": "Nhà vệ sinh.",
+      "noteEn": "Restroom.",
+      "pixel": {
+        "x": 1338.5,
+        "y": 218.5
+      }
+    },
+    {
+      "slug": "svc-wc-3",
+      "kind": "wc",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh 3",
+      "nameEn": "Restroom 3",
+      "noteVi": "Nhà vệ sinh.",
+      "noteEn": "Restroom.",
+      "pixel": {
+        "x": 208.0,
+        "y": 240.5
+      }
+    },
+    {
+      "slug": "svc-wc-4",
+      "kind": "wc",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh 4",
+      "nameEn": "Restroom 4",
+      "noteVi": "Nhà vệ sinh.",
+      "noteEn": "Restroom.",
+      "pixel": {
+        "x": 419.5,
+        "y": 351.5
+      }
+    },
+    {
+      "slug": "svc-wc-5",
+      "kind": "wc",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh 5",
+      "nameEn": "Restroom 5",
+      "noteVi": "Nhà vệ sinh.",
+      "noteEn": "Restroom.",
+      "pixel": {
+        "x": 1250.0,
+        "y": 635.0
+      }
+    },
+    {
+      "slug": "svc-wc-6",
+      "kind": "wc",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh 6",
+      "nameEn": "Restroom 6",
+      "noteVi": "Nhà vệ sinh.",
+      "noteEn": "Restroom.",
+      "pixel": {
+        "x": 1083.0,
+        "y": 817.0
+      }
+    },
+    {
+      "slug": "svc-wc-7",
+      "kind": "wc",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh 7",
+      "nameEn": "Restroom 7",
+      "noteVi": "Nhà vệ sinh.",
+      "noteEn": "Restroom.",
+      "pixel": {
+        "x": 1264.0,
+        "y": 949.0
+      }
+    },
+    {
+      "slug": "svc-wc-8",
+      "kind": "wc",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh 8",
+      "nameEn": "Restroom 8",
+      "noteVi": "Nhà vệ sinh.",
+      "noteEn": "Restroom.",
+      "pixel": {
+        "x": 1394.0,
+        "y": 1024.0
+      }
+    },
+    {
+      "slug": "svc-wc-access-1",
+      "kind": "wc-access",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh (lối cho người khuyết tật) 1",
+      "nameEn": "Accessible restroom 1",
+      "noteVi": "Nhà vệ sinh có lối cho người khuyết tật.",
+      "noteEn": "Restroom with wheelchair access.",
+      "pixel": {
+        "x": 755.0,
+        "y": 370.0
+      }
+    },
+    {
+      "slug": "svc-wc-access-2",
+      "kind": "wc-access",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh (lối cho người khuyết tật) 2",
+      "nameEn": "Accessible restroom 2",
+      "noteVi": "Nhà vệ sinh có lối cho người khuyết tật.",
+      "noteEn": "Restroom with wheelchair access.",
+      "pixel": {
+        "x": 1134.0,
+        "y": 454.0
+      }
+    },
+    {
+      "slug": "svc-wc-access-3",
+      "kind": "wc-access",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh (lối cho người khuyết tật) 3",
+      "nameEn": "Accessible restroom 3",
+      "noteVi": "Nhà vệ sinh có lối cho người khuyết tật.",
+      "noteEn": "Restroom with wheelchair access.",
+      "pixel": {
+        "x": 1793.5,
+        "y": 479.0
+      }
+    },
+    {
+      "slug": "svc-wc-access-4",
+      "kind": "wc-access",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh (lối cho người khuyết tật) 4",
+      "nameEn": "Accessible restroom 4",
+      "noteVi": "Nhà vệ sinh có lối cho người khuyết tật.",
+      "noteEn": "Restroom with wheelchair access.",
+      "pixel": {
+        "x": 893.5,
+        "y": 631.0
+      }
+    },
+    {
+      "slug": "svc-wc-access-5",
+      "kind": "wc-access",
+      "category": "restroom",
+      "nameVi": "Nhà vệ sinh (lối cho người khuyết tật) 5",
+      "nameEn": "Accessible restroom 5",
+      "noteVi": "Nhà vệ sinh có lối cho người khuyết tật.",
+      "noteEn": "Restroom with wheelchair access.",
+      "pixel": {
+        "x": 1732.0,
+        "y": 663.5
+      }
+    },
+    {
+      "slug": "svc-parking-1",
+      "kind": "parking",
+      "category": "parking",
+      "nameVi": "Bãi đậu xe 1",
+      "nameEn": "Parking 1",
+      "noteVi": "Bãi đậu xe.",
+      "noteEn": "Parking lot.",
+      "pixel": {
+        "x": 1813.0,
+        "y": 368.0
+      }
+    },
+    {
+      "slug": "svc-parking-2",
+      "kind": "parking",
+      "category": "parking",
+      "nameVi": "Bãi đậu xe 2",
+      "nameEn": "Parking 2",
+      "noteVi": "Bãi đậu xe.",
+      "noteEn": "Parking lot.",
+      "pixel": {
+        "x": 1354.5,
+        "y": 1097.5
+      }
+    },
+    {
+      "slug": "svc-first-aid",
+      "kind": "first-aid",
+      "category": "first_aid",
+      "nameVi": "Trạm sơ cứu y tế",
+      "nameEn": "First-aid Station",
+      "noteVi": "Trạm sơ cứu y tế.",
+      "noteEn": "First-aid station.",
+      "pixel": {
+        "x": 904.5,
+        "y": 938.5
+      }
+    },
+    {
+      "slug": "svc-security",
+      "kind": "security",
+      "category": "security",
+      "nameVi": "Phòng bảo vệ",
+      "nameEn": "Security Office",
+      "noteVi": "Phòng bảo vệ.",
+      "noteEn": "Security office.",
+      "pixel": {
+        "x": 937.5,
+        "y": 938.5
+      }
+    }
+  ]
+}

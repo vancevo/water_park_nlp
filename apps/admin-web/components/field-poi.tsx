@@ -6,9 +6,11 @@ import type {
 } from '@damsen/shared-types';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFieldData } from '@/hooks/use-field-data';
+import { useSimulatedFix } from '@/hooks/use-simulated-fix';
 import { useWatchPosition, type LiveFix } from '@/hooks/use-watch-position';
 import { readAuthSession } from '@/lib/auth-session';
 import { fieldApi } from '@/lib/field-client';
+import { FIELD_SIMULATION_SLUG } from '@/lib/field-simulation';
 import { enqueueCheck } from '@/lib/field-queue';
 import { describeOffset, formatMetres } from '@/lib/geo-math';
 import {
@@ -60,8 +62,17 @@ const referenceOf = (poi: AdminPoi, target: Target) =>
 
 export function FieldPoi({ id }: { id: string }) {
   const data = useFieldData();
-  const { fix, error: gpsError } = useWatchPosition();
   const poi = data.pois.find((item) => item.id === id);
+  // The experimental place is measured with a SIMULATED GPS next to it: the screen behaves as
+  // when standing there, but nothing is saved or sent and the real position is never touched.
+  const simulated = poi?.slug === FIELD_SIMULATION_SLUG;
+  const { fix: realFix, error: gpsError } = useWatchPosition(
+    poi !== undefined && !simulated,
+  );
+  const simulatedPosition = useSimulatedFix(
+    simulated && poi ? poi.location : null,
+  );
+  const fix = simulated ? simulatedPosition : realFix;
   const [measuring, setMeasuring] = useState<{
     target: Target;
     startedAt: number;
@@ -160,7 +171,7 @@ export function FieldPoi({ id }: { id: string }) {
   }
 
   async function save(applyNow = false) {
-    if (!poi || !draft) return;
+    if (!poi || !draft || simulated) return;
     const input: FieldCheckInput = {
       clientId: crypto.randomUUID(),
       target: draft.target.kind,
@@ -318,6 +329,7 @@ export function FieldPoi({ id }: { id: string }) {
 
       {measuring && (
         <section className="field-card measure" aria-live="polite">
+          <span className="field-radar" aria-hidden="true" />
           <b>
             Đang đo — đứng yên tại{' '}
             {measuring.target.kind === 'poi' ? 'giữa địa điểm' : 'cổng vào'}
@@ -410,33 +422,51 @@ export function FieldPoi({ id }: { id: string }) {
               placeholder="VD: cổng phụ cách 10 m về phía hồ; đường bị rào"
             />
           </label>
-          <div className="button-row">
-            {canApply && draft.outcome === 'corrected' && (
+          {simulated ? (
+            <div className="button-row">
+              <p className="helper">
+                Mô phỏng: kết quả này không được lưu và không thay đổi vị trí
+                địa điểm.
+              </p>
               <button
-                className="button primary"
-                disabled={tooCoarse || needsNote}
-                onClick={() => void save(true)}
+                className="button ghost"
+                onClick={() => begin(draft.target)}
               >
-                Lưu và cập nhật luôn
+                Đo lại
               </button>
-            )}
-            <button
-              className={`button ${canApply && draft.outcome === 'corrected' ? 'ghost' : 'primary'}`}
-              disabled={tooCoarse || needsNote}
-              onClick={() => void save()}
-            >
-              Chỉ lưu kết quả
-            </button>
-            <button
-              className="button ghost"
-              onClick={() => begin(draft.target)}
-            >
-              Đo lại
-            </button>
-            <button className="button ghost" onClick={() => setDraft(null)}>
-              Bỏ
-            </button>
-          </div>
+              <button className="button primary" onClick={() => setDraft(null)}>
+                Xong
+              </button>
+            </div>
+          ) : (
+            <div className="button-row">
+              {canApply && draft.outcome === 'corrected' && (
+                <button
+                  className="button primary"
+                  disabled={tooCoarse || needsNote}
+                  onClick={() => void save(true)}
+                >
+                  Lưu và cập nhật luôn
+                </button>
+              )}
+              <button
+                className={`button ${canApply && draft.outcome === 'corrected' ? 'ghost' : 'primary'}`}
+                disabled={tooCoarse || needsNote}
+                onClick={() => void save()}
+              >
+                Chỉ lưu kết quả
+              </button>
+              <button
+                className="button ghost"
+                onClick={() => begin(draft.target)}
+              >
+                Đo lại
+              </button>
+              <button className="button ghost" onClick={() => setDraft(null)}>
+                Bỏ
+              </button>
+            </div>
+          )}
         </section>
       )}
 
@@ -449,18 +479,6 @@ export function FieldPoi({ id }: { id: string }) {
           >
             📍 Đo vị trí địa điểm tại đây
           </button>
-          {poi.entrances.map((entrance) => (
-            <button
-              key={entrance.id}
-              className="button ghost big"
-              disabled={!fix}
-              onClick={() =>
-                begin({ kind: 'entrance', entranceId: entrance.id ?? '' })
-              }
-            >
-              🚪 Đo cổng: {entrance.labelVi || entrance.graphNodeRef}
-            </button>
-          ))}
           <button
             className="button ghost big warn"
             disabled={!fix}

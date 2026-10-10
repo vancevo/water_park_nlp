@@ -19,3 +19,6 @@ ADMIN_PASSWORD=... node scripts/import-pois.mjs    # tạo + gửi duyệt + duy
 Import chạy lại được (bỏ qua slug đã có). `--no-publish` để giữ ở trạng thái nháp.
 Lối vào chính của mỗi địa điểm được gắn vào điểm đường đi bộ OSM gần nhất; 9 điểm cách đường > 75 m
 (ví dụ cổng 1A, đài nhạc nước) sẽ chưa chỉ đường được tới nơi cho tới khi chỉnh lối vào ngoài thực địa.
+
+`new-places.json`: địa điểm thêm sau bản đồ đánh số (không có số, ghim ghi **New**, slug `new-…`). Vị trí lấy từ điểm
+được đánh dấu trên bản đồ; `import-pois.mjs` tạo chúng sau 50 địa điểm đánh số.

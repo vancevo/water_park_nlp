@@ -2,6 +2,18 @@ import type { GeoPoint, GeoJsonLineString } from '@damsen/shared-types';
 
 const EARTH_RADIUS_METERS = 6_371_008.8;
 export const SIMULATION_DURATION_MS = 5_000;
+/** The walker's pace: slow enough to watch the camera follow (about 6× a stroll). */
+export const SIMULATION_SPEED_MPS = 8;
+export const SIMULATION_MIN_MS = 15_000;
+export const SIMULATION_MAX_MS = 100_000;
+
+/** How long the simulated walk takes: the route length at the walker's pace, within limits. */
+export function simulationDurationMs(totalMeters: number): number {
+  return Math.min(
+    SIMULATION_MAX_MS,
+    Math.max(SIMULATION_MIN_MS, (totalMeters / SIMULATION_SPEED_MPS) * 1000),
+  );
+}
 
 export interface RouteProgress {
   position: GeoPoint;

@@ -2,14 +2,32 @@
   "status": "traced-and-fitted",
   "method": "svg_to_geojson.py: footpaths traced on this picture, fitted (trimmed ICP) onto the paths painted in the earlier illustrated picture, whose corners were fitted to the OSM footpaths",
   "image": "damsen-map.jpg",
-  "imageSizePx": [2048, 1315],
+  "imageSizePx": [
+    2048,
+    1315
+  ],
   "bearingDegrees": 266.56,
-  "centre": [106.6386356, 10.7644268],
+  "centre": [
+    106.6385811,
+    10.7641688
+  ],
   "note": "Estimate, not surveyed (~3-8 m). Rotate the map to bearingDegrees to see the picture upright (gate 1 at the bottom).",
   "corners": [
-    [106.6350845, 10.7586683],
-    [106.6347521, 10.7697438],
-    [106.6421867, 10.7701852],
-    [106.6425191, 10.7591098]
+    [
+      106.63503,
+      10.7584104
+    ],
+    [
+      106.6346976,
+      10.7694858
+    ],
+    [
+      106.6421322,
+      10.7699272
+    ],
+    [
+      106.6424646,
+      10.7588518
+    ]
   ]
 }

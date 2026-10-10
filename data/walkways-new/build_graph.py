@@ -178,6 +178,42 @@ def main():
         joined.append(round(dist, 1))
         print(f"joined an isolated piece of {len(rest)} nodes with a connector of {round(dist, 1)} px at {np.round(nodes[n])}")
 
+    # pixel -> lon/lat (see svg_to_geojson.py)
+    g = json.loads(GEOREF.read_text())
+    w, h = g["imageSizePx"]
+    tl, tr, _br, bl = (np.array(c) for c in g["corners"])
+
+    def ll_fitted(px):  # picture px -> lon/lat as fitted to the OSM footpaths
+        px = np.atleast_2d(px)
+        pic = np.c_[px, np.ones(len(px))] @ SVG_TO_PICTURE
+        return tl + (pic[:, 0:1] / w) * (tr - tl) + (pic[:, 1:2] / h) * (bl - tl)
+
+    def to_m(lonlat):
+        lonlat = np.atleast_2d(lonlat)
+        return np.c_[(lonlat[:, 0] - LON0) * KX, (lonlat[:, 1] - LAT0) * KY]
+
+    def to_lonlat(m):
+        return np.c_[m[:, 0] / KX + LON0, m[:, 1] / KY + LAT0]
+
+    # Control points (control-points.json): spots whose real lon/lat is known and whose pixel on the
+    # picture was read off. 1 point = shift, 2 = shift + rotate + scale, 3+ = full affine.
+    cps = json.loads((HERE / "control-points.json").read_text())["points"]
+    cp_src = to_m(ll_fitted(np.array([c["pixel"] for c in cps], float)))
+    cp_dst = to_m(np.array([[c["lon"], c["lat"]] for c in cps], float))
+    if len(cps) == 1:
+        correction = lambda m: m + (cp_dst[0] - cp_src[0])
+    elif len(cps) == 2:
+        z = lambda a: a[:, 0] + 1j * a[:, 1]
+        k = (z(cp_dst)[1] - z(cp_dst)[0]) / (z(cp_src)[1] - z(cp_src)[0])
+        t = z(cp_dst)[0] - k * z(cp_src)[0]
+        correction = lambda m: np.c_[(k * z(m) + t).real, (k * z(m) + t).imag]
+    else:
+        aff = np.linalg.lstsq(np.c_[cp_src, np.ones(len(cp_src))], cp_dst, rcond=None)[0]
+        correction = lambda m: np.c_[m, np.ones(len(m))] @ aff
+
+    def ll(px):  # picture px -> lon/lat, corrected so every control point lands on its real coordinate
+        return to_lonlat(correction(to_m(ll_fitted(px))))
+
     # 5. POI entrances: project each numbered pin onto the nearest edge and split it there.
     # A place with sub-pins (11 -> 11.1..11.4) is drawn at the centre of those sub-pins.
     pins = json.loads((HERE / "pins.json").read_text())["pins"]
@@ -185,10 +221,31 @@ def main():
         subs = [q for q in pins if q["number"].startswith(pin["number"] + ".")]
         if subs:
             pin["tipPx"] = [round(float(np.mean([q["tipPx"][0] for q in subs])), 1), round(float(np.mean([q["tipPx"][1] for q in subs])), 1)]
+    # places added after the numbered map (data/pois/new-places.json) get an entrance the same way
+    pois_dir = HERE.parents[0] / "pois"
+    new_places = json.loads((pois_dir / "new-places.json").read_text())["places"]
+    new_places += json.loads((pois_dir / "amenities.json").read_text())["places"]  # no pin colour
+    targets = [{"number": p["number"], "slug": None, "color": p["color"], "tipPx": p["tipPx"]} for p in pins if "." not in p["number"]]
+    # a new place may be given as lat/lon: invert the (affine) px -> lon/lat map to find its pixel
+    grid = np.array([[x, y] for x in range(0, 2049, 256) for y in range(0, 1316, 263)], float)
+    px_to_ll = np.linalg.lstsq(np.c_[grid, np.ones(len(grid))], ll(grid), rcond=None)[0]
+
+    def pixel_of(lon, lat):
+        A = px_to_ll[:2].T  # lon/lat = A @ px + b
+        return np.linalg.solve(A, np.array([lon, lat]) - px_to_ll[2])
+
+    targets += [
+        {
+            "number": None,
+            "slug": p["slug"],
+            "color": p.get("pin"),
+            "tipPx": [p["pixel"]["x"], p["pixel"]["y"]] if "pixel" in p else [round(float(v), 1) for v in pixel_of(p["longitude"], p["latitude"])],
+            "given": (p["longitude"], p["latitude"]) if "latitude" in p else None,
+        }
+        for p in new_places
+    ]
     entrances = []
-    for pin in pins:
-        if "." in pin["number"]:
-            continue
+    for pin in targets:
         pt = np.array(pin["tipPx"], float)
         best = None
         for ei, (_a, _b, poly, _pid) in enumerate(edges):
@@ -206,7 +263,7 @@ def main():
             edges.append((n, b, right, pid))
         else:
             n = existing
-        entrances.append({"number": pin["number"], "node": n, "distPx": round(dist, 1)})
+        entrances.append({"target": pin, "node": n, "distPx": round(dist, 1)})
 
     # 5b. a node about every NODE_SPACING_PX along long edges, so a new place can snap to the path
     # (and the admin form's nearest-node snapping stays within a few metres of it)
@@ -232,15 +289,6 @@ def main():
         e["node"] = renum[e["node"]]
 
     # 6. to lon/lat
-    g = json.loads(GEOREF.read_text())
-    w, h = g["imageSizePx"]
-    tl, tr, _br, bl = (np.array(c) for c in g["corners"])
-
-    def ll(px):
-        px = np.atleast_2d(px)
-        pic = np.c_[px, np.ones(len(px))] @ SVG_TO_PICTURE
-        return tl + (pic[:, 0:1] / w) * (tr - tl) + (pic[:, 1:2] / h) * (bl - tl)
-
     def metres(lonlat):
         return np.c_[(lonlat[:, 0] - LON0) * KX, (lonlat[:, 1] - LAT0) * KY]
 
@@ -285,11 +333,12 @@ def main():
     ent_out = []
     for e in entrances:
         n = out_nodes[e["node"]]
-        pin = next(p for p in pins if p["number"] == e["number"])
-        pl = ll(np.array(pin["tipPx"]))[0]
+        pin = e["target"]
+        pl = np.array(pin["given"]) if pin.get("given") else ll(np.array(pin["tipPx"]))[0]
         ent_out.append(
             {
-                "number": int(e["number"]),
+                "number": int(pin["number"]) if pin["number"] is not None else None,
+                "slug": pin["slug"],
                 "color": pin["color"],
                 "pinPx": pin["tipPx"],
                 "latitude": round(float(pl[1]), 7),
@@ -355,7 +404,7 @@ def main():
     far = sorted((e for e in ent_out if e["entranceDistancePx"] > 30), key=lambda e: -e["entranceDistancePx"])
     comps = components()
     print(f"{len(out_nodes)} nodes, {len(out_edges)} edges, {len(comps)} component(s), total {sum(e['lengthM'] for e in out_edges):.0f} m")
-    print("entrances > 30 px (~18 m) from a path:", [(e["number"], e["entranceDistancePx"]) for e in far])
+    print("entrances > 30 px (~18 m) from a path:", [(e["number"] or e["slug"], e["entranceDistancePx"]) for e in far])
 
 
 if __name__ == "__main__":

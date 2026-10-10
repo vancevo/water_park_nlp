@@ -27,6 +27,32 @@ const data = JSON.parse(
   ),
 );
 const MAX_SNAP_METERS = 75;
+// Places added after the numbered map (no number): the "New" ones (new-places.json) and the
+// service points - food, toilets, parking, first aid, security (amenities.json). Names/notes
+// come from those files, positions from the graph build (data/walkways-new).
+const readPlaces = (name) =>
+  JSON.parse(
+    readFileSync(new URL(`../data/pois/${name}`, import.meta.url), 'utf8'),
+  ).places;
+const newPlaces = [
+  ...readPlaces('new-places.json'),
+  ...readPlaces('amenities.json'),
+].map((place) => {
+  const built = JSON.parse(
+    readFileSync(
+      new URL('../data/walkways-new/damsen-pois-new.json', import.meta.url),
+      'utf8',
+    ),
+  ).pois.find((entry) => entry.slug === place.slug);
+  if (!built)
+    throw new Error(`run data/walkways-new/build_graph.py: no ${place.slug}`);
+  return {
+    ...place,
+    number: null,
+    latitude: built.latitude,
+    longitude: built.longitude,
+  };
+});
 
 const pool = new pg.Pool({
   connectionString:
@@ -66,7 +92,7 @@ try {
   let created = 0;
   let skipped = 0;
   const far = [];
-  for (const place of data.pois) {
+  for (const place of [...data.pois, ...newPlaces]) {
     const exists = await pool.query('SELECT 1 FROM pois WHERE slug = $1', [
       place.slug,
     ]);
@@ -88,15 +114,17 @@ try {
       );
     const metres = Math.round(node.metres);
     if (metres > MAX_SNAP_METERS)
-      far.push(`#${place.number} ${place.nameVi} (${metres} m)`);
+      far.push(`#${place.number ?? 'New'} ${place.nameVi} (${metres} m)`);
     if (dryRun) {
       logger.log(
-        `would create #${place.number} ${place.slug} → ${node.external_id} (${metres} m)`,
+        `would create #${place.number ?? 'New'} ${place.slug} → ${node.external_id} (${metres} m)`,
       );
       continue;
     }
-    const note = `Điểm số ${place.number} trên bản đồ công viên.`;
-    const noteEn = `Place number ${place.number} on the park map.`;
+    const note =
+      place.noteVi ?? `Điểm số ${place.number} trên bản đồ công viên.`;
+    const noteEn =
+      place.noteEn ?? `Place number ${place.number} on the park map.`;
     const poi = await call(
       'POST',
       '/v1/admin/pois',

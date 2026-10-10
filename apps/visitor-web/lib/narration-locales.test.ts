@@ -152,4 +152,21 @@ describe('Web Speech voice selection', () => {
     expect(pickSpeechVoice(voices, 'ja-JP')).toBeNull();
     expect(pickSpeechVoice([], 'vi-VN')).toBeNull();
   });
+
+  it('skips gimmick voices and prefers natural ones in the same language', () => {
+    const mac = [
+      { lang: 'en-US', name: 'Albert' },
+      { lang: 'en-US', name: 'Bad News' },
+      { lang: 'en-GB', name: 'Daniel' },
+      { lang: 'en-US', name: 'Samantha' },
+      { lang: 'en-US', name: 'Zarvox' },
+    ];
+    // Exact tag wins over the same language, and Samantha over the novelty voices.
+    expect(pickSpeechVoice(mac, 'en-US')?.name).toBe('Samantha');
+    expect(pickSpeechVoice(mac, 'en-GB')?.name).toBe('Daniel');
+    // Only gimmick voices exist: still better than silence.
+    expect(
+      pickSpeechVoice([{ lang: 'en-US', name: 'Zarvox' }], 'en-US')?.name,
+    ).toBe('Zarvox');
+  });
 });

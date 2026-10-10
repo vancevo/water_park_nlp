@@ -6,7 +6,6 @@ import type {
   PoiNarration,
 } from '@damsen/shared-types';
 import { useCallback, useEffect, useId, useState } from 'react';
-import { aiAudioLabel } from '@/lib/ai-audio-label';
 import {
   OFFLINE_NARRATION_LOCALE_CATALOG,
   localeLabel,
@@ -16,6 +15,7 @@ import {
   saveNarrationLocalePreference,
 } from '@/lib/narration-locales';
 import { getNarrationPorts } from '@/lib/narration-source';
+import type { PlayerStatus } from '@/lib/narration-player';
 import type { UiLocale, UiText } from '@/lib/ui-text';
 
 export type CatalogStatus = 'loading' | 'ready' | 'error';
@@ -125,10 +125,14 @@ export function NarrationSection({
   narration,
   status,
   speechSupported,
+  playback,
   onLocaleChange,
   onRetry,
   onRetryCatalog,
-  onSpeak,
+  onListen,
+  onPause,
+  onResume,
+  onStop,
 }: {
   t: UiText;
   catalog: NarrationLocaleCatalog;
@@ -137,36 +141,59 @@ export function NarrationSection({
   narration: PoiNarration | null;
   status: NarrationStatus;
   speechSupported: boolean;
+  /** State of the shared player for THIS place, and whether it was already heard. */
+  playback: { status: PlayerStatus; heard: boolean };
   onLocaleChange(code: NarrationLocaleCode): void;
   onRetry(): void;
   onRetryCatalog(): void;
-  onSpeak(): void;
+  onListen(): void;
+  onPause(): void;
+  onResume(): void;
+  onStop(): void;
 }) {
   const selectId = useId();
   const fallback = narrationFallbackNotice(catalog, narration);
-  const aiLabel = narration?.audio
-    ? aiAudioLabel(narration.resolvedLocale, narration.audio.generatedBy)
-    : null;
+  // The listen button sits next to the language select; with a fallback language the
+  // body offers "listen in <language>" instead, so the row has no button.
+  const canListen =
+    narration !== null &&
+    status === 'ready' &&
+    !narration.fallbackUsed &&
+    Boolean(narration.audio || speechSupported);
   return (
     <section className="narration" aria-label={t.narrationLabel}>
-      <div className="narration-locale">
-        <label htmlFor={selectId}>{t.narrationLanguage}</label>
-        <select
-          id={selectId}
-          value={narrationLocale ?? ''}
-          disabled={catalogStatus === 'loading' || !narrationLocale}
-          aria-busy={catalogStatus === 'loading'}
-          onChange={(event) => onLocaleChange(event.target.value)}
-        >
-          {catalogStatus === 'loading' && !narrationLocale ? (
-            <option value="">{t.loadingLanguages}</option>
-          ) : null}
-          {catalog.locales.map((option) => (
-            <option key={option.code} value={option.code} lang={option.code}>
-              {option.nativeLabel}
-            </option>
-          ))}
-        </select>
+      <div className="narration-bar">
+        <div className="narration-locale">
+          <label htmlFor={selectId}>{t.narrationLanguage}</label>
+          <select
+            id={selectId}
+            value={narrationLocale ?? ''}
+            disabled={catalogStatus === 'loading' || !narrationLocale}
+            aria-busy={catalogStatus === 'loading'}
+            onChange={(event) => onLocaleChange(event.target.value)}
+          >
+            {catalogStatus === 'loading' && !narrationLocale ? (
+              <option value="">{t.loadingLanguages}</option>
+            ) : null}
+            {catalog.locales.map((option) => (
+              <option key={option.code} value={option.code} lang={option.code}>
+                {option.nativeLabel}
+              </option>
+            ))}
+          </select>
+        </div>
+        {narration && canListen ? (
+          <ListenControls
+            t={t}
+            status={playback.status}
+            heard={playback.heard}
+            canPause={Boolean(narration.audio)}
+            onListen={onListen}
+            onPause={onPause}
+            onResume={onResume}
+            onStop={onStop}
+          />
+        ) : null}
       </div>
       {catalogStatus === 'error' ? (
         <p className="narration-note" role="status">
@@ -209,40 +236,115 @@ export function NarrationSection({
               {t.narrationTitle(localeLabel(catalog, narration.resolvedLocale))}
             </strong>
             <p lang={narration.resolvedLocale}>{narration.transcript}</p>
-            {narration.audio ? (
-              <>
-                {aiLabel ? (
-                  <small
-                    className="ai-audio-label"
-                    lang={aiLabel.lang}
-                    title={aiLabel.detail}
-                  >
-                    {aiLabel.text}
-                  </small>
-                ) : null}
-                <audio
-                  controls
-                  preload="none"
-                  src={narration.audio.playbackUrl}
-                  // Recorded audio wins: silence any browser TTS still speaking.
-                  onPlay={() => window.speechSynthesis?.cancel()}
-                  aria-label={`${t.audioLabel(localeLabel(catalog, narration.resolvedLocale))}${aiLabel ? ` (${aiLabel.text})` : ''}`}
-                />
-              </>
-            ) : speechSupported ? (
+            {narration.fallbackUsed ? (
+              // Never play another language under the chosen one: offer to switch.
               <button
                 type="button"
                 className="secondary-action"
-                onClick={onSpeak}
+                onClick={() => onLocaleChange(narration.resolvedLocale)}
               >
-                {t.speakWithBrowser}
+                {t.listenInLanguage(
+                  localeLabel(catalog, narration.resolvedLocale),
+                )}
               </button>
-            ) : (
+            ) : canListen ? null : (
               <small className="muted">{t.noAudioNoAutoRead}</small>
             )}
           </>
         ) : null}
       </div>
     </section>
+  );
+}
+
+/** The card's buttons; the sound itself comes from the one shared player. */
+function ListenControls({
+  t,
+  status,
+  heard,
+  canPause,
+  onListen,
+  onPause,
+  onResume,
+  onStop,
+}: {
+  t: UiText;
+  status: PlayerStatus;
+  heard: boolean;
+  canPause: boolean;
+  onListen(): void;
+  onPause(): void;
+  onResume(): void;
+  onStop(): void;
+}) {
+  const stopButton = (
+    <button
+      type="button"
+      className="secondary-action stop-action"
+      onClick={onStop}
+    >
+      {t.stopAudio}
+    </button>
+  );
+  if (status === 'loading' || status === 'playing') {
+    return (
+      <div className="listen-row">
+        {/* A pulsing dot; the words stay for screen readers, the buttons say the rest. */}
+        <span className="listening" role="status">
+          <span className="sr-only">{t.listeningNow}</span>
+        </span>
+        {canPause && status === 'playing' ? (
+          <button
+            type="button"
+            className="secondary-action pause-action"
+            onClick={onPause}
+          >
+            {t.pauseAudio}
+          </button>
+        ) : null}
+        {stopButton}
+      </div>
+    );
+  }
+  if (status === 'paused') {
+    return (
+      <div className="listen-row">
+        <button
+          type="button"
+          className="secondary-action pause-action"
+          onClick={onResume}
+        >
+          {t.resumeAudio}
+        </button>
+        {stopButton}
+      </div>
+    );
+  }
+  if (status === 'blocked') {
+    return (
+      <div className="listen-row">
+        <button type="button" className="secondary-action" onClick={onListen}>
+          {t.tapToListen}
+        </button>
+      </div>
+    );
+  }
+  if (status === 'error') {
+    return (
+      <div className="listen-row">
+        <small role="alert">{t.playbackFailed}</small>
+        <button type="button" className="secondary-action" onClick={onListen}>
+          {t.retry}
+        </button>
+      </div>
+    );
+  }
+  return (
+    <div className="listen-row">
+      {heard ? <span className="heard-badge">{t.listened}</span> : null}
+      <button type="button" className="secondary-action" onClick={onListen}>
+        {heard ? t.listenAgain : t.listenNarration}
+      </button>
+    </div>
   );
 }

@@ -1,0 +1,14 @@
+{
+  "note": "Spots whose real lon/lat is known and whose pixel on the official map (2048x1315 frame, apps/visitor-web/public/maps/damsen-map.jpg) was read off. build_graph.py corrects the georeference so each lands on its coordinate: one point shifts the whole map, two also rotate/scale, three or more fit an affine. Add more points (gate 1, far corners) to remove rotation/scale error.",
+  "points": [
+    {
+      "name": "End of the fountain pool, Quảng trường La Mã (orange dot in the user's screenshot)",
+      "pixel": [
+        1460.6,
+        344.7
+      ],
+      "lat": 10.7664249,
+      "lon": 106.6367418
+    }
+  ]
+}

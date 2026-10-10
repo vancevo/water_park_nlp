@@ -6,6 +6,7 @@ import {
   routeLengthMeters,
   routeProgressAt,
   simulationDistanceAtTime,
+  simulationDurationMs,
   walkwayLinesFromGeoJson,
 } from './route-simulation';
 
@@ -138,5 +139,14 @@ describe('route simulation', () => {
     expect(simulationDistanceAtTime(80, 2_500)).toBe(40);
     expect(simulationDistanceAtTime(80, 5_000)).toBe(80);
     expect(simulationDistanceAtTime(80, 9_000)).toBe(80);
+  });
+});
+
+describe('simulated walk pace', () => {
+  it('takes the route length at a calm pace, within 15 s and 100 s', () => {
+    expect(simulationDurationMs(80)).toBe(15_000); // short leg: not a blink
+    expect(simulationDurationMs(400)).toBe(50_000);
+    expect(simulationDurationMs(750)).toBeCloseTo(93_750, 0);
+    expect(simulationDurationMs(5000)).toBe(100_000); // very long: capped
   });
 });

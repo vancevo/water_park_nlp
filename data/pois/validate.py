@@ -12,7 +12,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 CATEGORIES = {
     "gate", "ride", "thrill_ride", "children", "interactive", "show", "exhibit",
-    "garden", "indoor", "landmark", "food", "restroom", "parking", "first_aid",
+    "garden", "indoor", "landmark", "food", "restroom", "parking", "first_aid", "security",
 }
 PIN_COLORS = {"white", "blue", "purple", "pink", "red", "yellow"}  # legend of the official map
 # Generous box around the park (OSM boundary 106.6352–106.6418 E, 10.7597–10.769 N).
@@ -46,6 +46,28 @@ def main() -> int:
     coords = [(p["latitude"], p["longitude"]) for p in pois]
     if len(set(coords)) != len(coords):
         errors.append("two places share the same coordinates")
+    new_places = json.loads((HERE / "new-places.json").read_text(encoding="utf-8"))["places"]
+    for p in new_places:
+        label = p.get("slug", "?")
+        if not re.fullmatch(r"new-[a-z0-9-]{1,95}", p.get("slug", "")) or p["slug"] in slugs:
+            errors.append(f"{label}: slug must be unique and start with new-")
+        if p["category"] not in CATEGORIES or p.get("pin") not in PIN_COLORS:
+            errors.append(f"{label}: bad category or pin colour")
+        if "pixel" in p:
+            if not (0 <= p["pixel"]["x"] <= 2048 and 0 <= p["pixel"]["y"] <= 1315):
+                errors.append(f"{label}: pixel outside the 2048x1315 map")
+        elif not (LAT_RANGE[0] <= p.get("latitude", 0) <= LAT_RANGE[1] and LON_RANGE[0] <= p.get("longitude", 0) <= LON_RANGE[1]):
+            errors.append(f"{label}: needs a pixel or coordinates inside the park area")
+    amenities = json.loads((HERE / "amenities.json").read_text(encoding="utf-8"))["places"]
+    kinds = {"food", "wc", "wc-access", "parking", "first-aid", "security"}
+    for p in amenities:
+        label = p.get("slug", "?")
+        if not re.fullmatch(r"svc-[a-z0-9-]{1,95}", p.get("slug", "")) or p["slug"] in slugs:
+            errors.append(f"{label}: slug must be unique and start with svc-")
+        if p["kind"] not in kinds or p["category"] not in CATEGORIES or not p["slug"].startswith(f"svc-{p['kind']}"):
+            errors.append(f"{label}: bad kind/category")
+        if not (0 <= p["pixel"]["x"] <= 2048 and 0 <= p["pixel"]["y"] <= 1315):
+            errors.append(f"{label}: pixel outside the 2048x1315 map")
     gates = [p["number"] for p in pois if p["category"] == "gate"]
     if len(gates) < 1:
         errors.append("expected at least one gate")
@@ -54,7 +76,7 @@ def main() -> int:
     if errors:
         print(f"FAIL: {len(errors)} problem(s)")
         return 1
-    print(f"PASS: {len(pois)} places, {len(gates)} gates, all inside the park area")
+    print(f"PASS: {len(pois)} places + {len(new_places)} new + {len(amenities)} service points, {len(gates)} gates, all inside the park area")
     return 0
 
 

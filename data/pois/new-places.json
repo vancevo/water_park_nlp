@@ -1,0 +1,68 @@
+{
+  "note": "Places added after the numbered pin map. They have no number: the map pin says \"New\". A place gives either `pixel` (the spot marked on the official map, apps/visitor-web/public/maps/damsen-map.jpg, 2048x1315) or `latitude`/`longitude` (then the pixel is derived). Position and entrance node are computed by data/walkways-new/build_graph.py; names and colours are the project team's.",
+  "places": [
+    {
+      "slug": "new-truot-phao-tren-tham",
+      "nameVi": "Trượt phao trên thảm",
+      "nameEn": "Mat Tube Slide",
+      "noteVi": "Trò chơi mới: trượt phao trên thảm.",
+      "noteEn": "New ride: sliding on a tube down a mat.",
+      "category": "thrill_ride",
+      "pin": "red",
+      "pixel": {
+        "x": 1285.5,
+        "y": 362.7
+      }
+    },
+    {
+      "slug": "new-cafe-windy",
+      "nameVi": "Quán cà phê Windy",
+      "nameEn": "Windy Café",
+      "noteVi": "Quán cà phê mới: Windy.",
+      "noteEn": "New café: Windy.",
+      "category": "food",
+      "pin": "white",
+      "pixel": {
+        "x": 1332.3,
+        "y": 451.4
+      }
+    },
+    {
+      "slug": "new-diem-thu",
+      "nameVi": "Điểm thử nghiệm",
+      "nameEn": "Test spot",
+      "noteVi": "Điểm thử nghiệm để xem vị trí trên bản đồ.",
+      "noteEn": "Test spot to check a position on the map.",
+      "category": "landmark",
+      "pin": "blue",
+      "latitude": 10.7664249,
+      "longitude": 106.6367418
+    },
+    {
+      "slug": "new-dao-than-tai",
+      "nameVi": "Đảo Thần Tài",
+      "nameEn": "God of Fortune Island",
+      "noteVi": "Điểm ngắm cảnh trên cao giữa hồ, dùng để nghỉ chân.",
+      "noteEn": "A high viewpoint on the lake, used as a place to rest.",
+      "category": "landmark",
+      "pin": "white",
+      "pixel": {
+        "x": 1005.6,
+        "y": 586.3
+      }
+    },
+    {
+      "slug": "new-cong-lien-thong",
+      "nameVi": "Cổng liên thông Công viên nước Đầm Sen",
+      "nameEn": "Connecting Gate to Dam Sen Water Park",
+      "noteVi": "Cổng đi sang Công viên nước Đầm Sen từ Đầm Sen khô.",
+      "noteEn": "The gate from Dam Sen dry park into Dam Sen Water Park.",
+      "category": "gate",
+      "pin": "yellow",
+      "pixel": {
+        "x": 1603.8,
+        "y": 363.1
+      }
+    }
+  ]
+}

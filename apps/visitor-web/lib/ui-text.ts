@@ -44,7 +44,6 @@ export interface UiText {
   mapNew: string;
   mapLabel: string;
   locateMe: string;
-  researchBadge: string;
   subPlacesHeading: string;
   subPlaceCount(count: number): string;
   gpsUnsupported: string;
@@ -65,6 +64,8 @@ export interface UiText {
   simulationLabel: string;
   openSimulation: string;
   collapseSimulation: string;
+  hidePanel: string;
+  showPanel: string;
   walking(percent: number): string;
   remaining(distance: string): string;
   placedOnMap: string;
@@ -101,6 +102,50 @@ export interface UiText {
   autoGuideInaccurate(meters: number): string;
   autoGuideDenied: string;
   autoGuideArrived(name: string): string;
+  zoneCardLabel: string;
+  zoneHere: string;
+  zoneTry: string;
+  zoneTip: string;
+  zoneClose: string;
+  nextTitle(zone: string | null): string;
+  nextQuestion: string;
+  nextEat: string;
+  nextToilet: string;
+  nextRest: string;
+  nextPlay: string;
+  nextHome: string;
+  nextGoing(name: string, meters: number): string;
+  nextNone: string;
+  notInPark: string;
+  autoGuideCount(count: number): string;
+  autoGuideNearest(name: string, distance: string): string;
+  autoGuideStale: string;
+  heardCount(count: number): string;
+  newVisit: string;
+  newVisitConfirm: string;
+  listenNarration: string;
+  listenAgain: string;
+  listeningNow: string;
+  listened: string;
+  pauseAudio: string;
+  resumeAudio: string;
+  stopAudio: string;
+  tapToListen: string;
+  playbackFailed: string;
+  listenInLanguage(label: string): string;
+  audioBarLabel: string;
+  clusterLabel(count: number): string;
+  clusterMenuLabel: string;
+  cameraLabel: string;
+  followMe: string;
+  fullRoute: string;
+  stopGuidance: string;
+  rerouting: string;
+  routeUpdated: string;
+  audioBarState(
+    state: 'loading' | 'playing' | 'paused' | 'blocked' | 'error',
+    name: string,
+  ): string;
   speechUnsupported: string;
   noNarrationToPlay: string;
   noVoice(language: string): string;
@@ -171,8 +216,6 @@ const vi: UiText = {
   mapNew: 'Mới',
   mapLabel: 'Bản đồ điểm khám phá',
   locateMe: '◎ Vị trí của tôi',
-  researchBadge:
-    'POI + lối đi vẽ theo bản đồ công viên · Cần kiểm tra thực địa',
   subPlacesHeading: 'Bên trong khu này',
   subPlaceCount: (count) => `${count} trò chơi, điểm tham quan`,
   gpsUnsupported: 'Trình duyệt không hỗ trợ GPS.',
@@ -191,6 +234,8 @@ const vi: UiText = {
   simulationLabel: 'Mô phỏng người đi bộ',
   openSimulation: 'Mở bảng mô phỏng',
   collapseSimulation: 'Thu gọn bảng mô phỏng',
+  hidePanel: 'Thu gọn bảng bên trái',
+  showPanel: 'Mở bảng tìm kiếm và địa điểm',
   walking: (percent) => `Đang đi · ${percent}%`,
   remaining: (distance) => `Còn ${distance}`,
   placedOnMap: 'Đã đặt trên bản đồ',
@@ -199,8 +244,8 @@ const vi: UiText = {
   repositionWalker: 'Đặt lại vị trí',
   placeWalker: 'Đặt người trên bản đồ',
   progressLabel: 'Tiến độ di chuyển',
-  walkAgain: 'Đi lại tuyến trong 5 giây',
-  startWalking: 'Bắt đầu đi trong 5 giây',
+  walkAgain: 'Đi lại tuyến',
+  startWalking: 'Bắt đầu đi',
   createRouteInCard: 'Tạo tuyến trong thẻ POI',
   choosePoi: 'Chọn một POI',
   clearSimulation: 'Xóa mô phỏng',
@@ -228,6 +273,57 @@ const vi: UiText = {
   autoGuideDenied:
     'Không lấy được vị trí. Hãy cho phép định vị (điện thoại cần HTTPS).',
   autoGuideArrived: (name) => `Bạn đang ở gần ${name} — đang phát thuyết minh.`,
+  zoneCardLabel: 'Gợi ý cho khu này',
+  zoneHere: 'Có gì',
+  zoneTry: 'Nên thử',
+  zoneTip: 'Lưu ý',
+  zoneClose: 'Đóng',
+  nextTitle: (zone) =>
+    zone ? `Bạn đang ở ${zone}` : 'Bạn đang ở trong công viên',
+  nextQuestion: 'Bạn muốn làm gì tiếp theo?',
+  nextEat: 'Đi ăn',
+  nextToilet: 'Nhà vệ sinh',
+  nextRest: 'Nghỉ ngơi',
+  nextPlay: 'Chơi tiếp',
+  nextHome: 'Đi về',
+  nextGoing: (name, meters) => `Đang dẫn bạn tới ${name} (cách ${meters} m).`,
+  nextNone: 'Chưa tìm thấy địa điểm phù hợp gần bạn.',
+  notInPark: 'Có vẻ bạn chưa ở trong công viên Đầm Sen.',
+  autoGuideCount: (count) =>
+    `${count} địa điểm tự thuyết minh khi bạn đứng gần`,
+  autoGuideNearest: (name, distance) => `Gần nhất: ${name} · ${distance}`,
+  autoGuideStale: 'Chưa có vị trí mới, đang chờ…',
+  heardCount: (count) => `Đã nghe ${count} điểm trong lượt này`,
+  newVisit: 'Bắt đầu lượt tham quan mới',
+  newVisitConfirm:
+    'Xoá lịch sử đã nghe để các điểm được tự thuyết minh lại từ đầu?',
+  listenNarration: 'Nghe thuyết minh',
+  listenAgain: 'Nghe lại',
+  listeningNow: 'Đang nghe',
+  listened: 'Đã nghe',
+  pauseAudio: 'Tạm dừng',
+  resumeAudio: 'Tiếp tục',
+  stopAudio: 'Dừng',
+  tapToListen: 'Bấm để nghe',
+  playbackFailed: 'Không phát được thuyết minh.',
+  listenInLanguage: (label) => `Nghe bản ${label}`,
+  audioBarLabel: 'Thuyết minh đang phát',
+  clusterLabel: (count) => `${count} địa điểm gần nhau, bấm để xem`,
+  clusterMenuLabel: 'Chọn địa điểm',
+  cameraLabel: 'Bản đồ khi dẫn đường',
+  followMe: 'Theo tôi',
+  fullRoute: 'Toàn tuyến',
+  stopGuidance: 'Dừng dẫn đường',
+  rerouting: 'Bạn đã đi lệch tuyến, đang tính lại…',
+  routeUpdated: 'Đã cập nhật tuyến mới từ vị trí của bạn.',
+  audioBarState: (state, name) =>
+    ({
+      loading: `Đang tải: ${name}`,
+      playing: `Đang nghe: ${name}`,
+      paused: `Tạm dừng: ${name}`,
+      blocked: `Bấm để nghe: ${name}`,
+      error: `Lỗi phát: ${name}`,
+    })[state],
   speechUnsupported: 'Trình duyệt này không hỗ trợ Web Speech TTS.',
   noNarrationToPlay: 'Chưa có nội dung thuyết minh để phát.',
   noVoice: (language) =>
@@ -287,6 +383,7 @@ const vi: UiText = {
     restroom: 'Nhà vệ sinh',
     parking: 'Bãi đậu xe',
     first_aid: 'Y tế',
+    security: 'Bảo vệ',
   },
 };
 
@@ -317,8 +414,6 @@ const en: UiText = {
   mapNew: 'New',
   mapLabel: 'Map of places to explore',
   locateMe: '◎ My location',
-  researchBadge:
-    'POIs and paths traced from the park map · Needs field verification',
   subPlacesHeading: 'Inside this area',
   subPlaceCount: (count) =>
     `${count} ${count === 1 ? 'attraction' : 'attractions'}`,
@@ -339,6 +434,8 @@ const en: UiText = {
   simulationLabel: 'Pedestrian simulation',
   openSimulation: 'Open simulation panel',
   collapseSimulation: 'Collapse simulation panel',
+  hidePanel: 'Hide the side panel',
+  showPanel: 'Show search and places',
   walking: (percent) => `Walking · ${percent}%`,
   remaining: (distance) => `${distance} left`,
   placedOnMap: 'Placed on the map',
@@ -347,8 +444,8 @@ const en: UiText = {
   repositionWalker: 'Reposition',
   placeWalker: 'Place walker on the map',
   progressLabel: 'Walking progress',
-  walkAgain: 'Walk the route again in 5 s',
-  startWalking: 'Start walking in 5 s',
+  walkAgain: 'Walk the route again',
+  startWalking: 'Start walking',
   createRouteInCard: 'Create a route in the POI card',
   choosePoi: 'Choose a POI',
   clearSimulation: 'Clear simulation',
@@ -376,6 +473,56 @@ const en: UiText = {
   autoGuideDenied:
     'Could not get your location. Allow location access (phones need HTTPS).',
   autoGuideArrived: (name) => `You are near ${name} — playing the narration.`,
+  zoneCardLabel: 'Tips for this area',
+  zoneHere: "What's here",
+  zoneTry: 'Worth trying',
+  zoneTip: 'Good to know',
+  zoneClose: 'Close',
+  nextTitle: (zone) => (zone ? `You are in ${zone}` : 'You are in the park'),
+  nextQuestion: 'What would you like to do next?',
+  nextEat: 'Eat',
+  nextToilet: 'Restroom',
+  nextRest: 'Rest',
+  nextPlay: 'Keep playing',
+  nextHome: 'Head home',
+  nextGoing: (name, meters) => `Guiding you to ${name} (${meters} m away).`,
+  nextNone: 'No suitable place found near you.',
+  notInPark: 'You do not seem to be in Dam Sen park yet.',
+  autoGuideCount: (count) =>
+    `${count} places narrate by themselves when you stand near`,
+  autoGuideNearest: (name, distance) => `Nearest: ${name} · ${distance}`,
+  autoGuideStale: 'No fresh position yet, waiting…',
+  heardCount: (count) => `Heard ${count} places on this visit`,
+  newVisit: 'Start a new visit',
+  newVisitConfirm:
+    'Clear the listening history so places narrate again from the start?',
+  listenNarration: 'Listen',
+  listenAgain: 'Listen again',
+  listeningNow: 'Listening',
+  listened: 'Listened',
+  pauseAudio: 'Pause',
+  resumeAudio: 'Resume',
+  stopAudio: 'Stop',
+  tapToListen: 'Tap to listen',
+  playbackFailed: 'The narration could not be played.',
+  listenInLanguage: (label) => `Listen in ${label}`,
+  audioBarLabel: 'Narration playing',
+  clusterLabel: (count) => `${count} places close together, tap to see`,
+  clusterMenuLabel: 'Choose a place',
+  cameraLabel: 'Map while guiding',
+  followMe: 'Follow me',
+  fullRoute: 'Whole route',
+  stopGuidance: 'Stop guidance',
+  rerouting: 'You left the route, finding a new one…',
+  routeUpdated: 'Route updated from where you are.',
+  audioBarState: (state, name) =>
+    ({
+      loading: `Loading: ${name}`,
+      playing: `Listening: ${name}`,
+      paused: `Paused: ${name}`,
+      blocked: `Tap to listen: ${name}`,
+      error: `Playback failed: ${name}`,
+    })[state],
   speechUnsupported: 'This browser does not support Web Speech TTS.',
   noNarrationToPlay: 'There is no narration to play yet.',
   noVoice: (language) =>
@@ -433,6 +580,7 @@ const en: UiText = {
     restroom: 'Restroom',
     parking: 'Parking',
     first_aid: 'First aid',
+    security: 'Security',
   },
 };
 

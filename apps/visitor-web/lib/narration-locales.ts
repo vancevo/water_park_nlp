@@ -199,11 +199,21 @@ export function saveNarrationLocalePreference(
   }
 }
 
-type VoiceLike = Pick<SpeechSynthesisVoice, 'lang' | 'name'>;
+type VoiceLike = Pick<SpeechSynthesisVoice, 'lang' | 'name'> &
+  Partial<Pick<SpeechSynthesisVoice, 'default' | 'localService'>>;
+
+/** macOS/iOS gimmick voices ("Bad News", "Zarvox"...): never pick them for a narration. */
+const NOVELTY_VOICES =
+  /\b(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|junior|kathy|organ|princess|ralph|superstar|trinoids|whisper|wobble|zarvox|fred|agnes)\b/i;
+/** Voices that sound natural: neural/premium builds and well-known good system voices. */
+const NATURAL_VOICES =
+  /\b(premium|enhanced|natural|neural|online|siri|samantha|alex|ava|allison|susan|serena|daniel|karen|moira|tessa|linh|google)\b/i;
 
 /**
  * Picks a Web Speech voice for a BCP 47 speech tag: exact tag, then same
- * language. Returns null when the device has voices but none for the language.
+ * language, and within those the most natural-sounding voice (never a gimmick
+ * voice when a normal one exists). Returns null when the device has voices but
+ * none for the language.
  */
 export function pickSpeechVoice<T extends VoiceLike>(
   voices: readonly T[],
@@ -212,9 +222,20 @@ export function pickSpeechVoice<T extends VoiceLike>(
   const normalize = (tag: string) => tag.replace(/_/g, '-').toLowerCase();
   const wanted = normalize(speechTag);
   const language = wanted.split('-')[0];
-  return (
-    voices.find((voice) => normalize(voice.lang) === wanted) ??
-    voices.find((voice) => normalize(voice.lang).split('-')[0] === language) ??
-    null
-  );
+  let best: T | null = null;
+  let bestScore = -Infinity;
+  for (const voice of voices) {
+    const tag = normalize(voice.lang);
+    if (tag.split('-')[0] !== language) continue;
+    let score = tag === wanted ? 100 : 0;
+    if (NOVELTY_VOICES.test(voice.name)) score -= 1000;
+    if (NATURAL_VOICES.test(voice.name)) score += 30;
+    if (voice.localService) score += 2;
+    if (voice.default) score += 1;
+    if (score > bestScore) {
+      best = voice;
+      bestScore = score;
+    }
+  }
+  return best;
 }

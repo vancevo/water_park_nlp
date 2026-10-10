@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 1,
+  "reviewNote": "Editorial draft: names come from the park map; the suggestions are general (no menus, prices or opening hours) and must be checked on site before publishing.",
+  "zones": [
+    {
+      "id": "main-gate",
+      "members": [
+        "p01-cong-so-1-duong-lac-long-quan",
+        "p02-cong-so-1a-duong-hoa-binh",
+        "p03-quay-ve-van-phong-cong-vien",
+        "p04-khu-tro-choi-cam-giac-manh",
+        "p08-ca-phe-vuon-da-dam-sen",
+        "p09-vong-luon-tuoi-tho",
+        "svc-parking-2",
+        "svc-wc-7",
+        "svc-wc-8"
+      ],
+      "name": {
+        "vi": "Khu cổng chính",
+        "en": "the Main Gate area"
+      },
+      "intro": {
+        "vi": "Đây là khu cổng chính của công viên, có Cổng số 1, Cổng số 1A phía đường Hòa Bình, quầy vé và văn phòng, bãi đậu xe số hai và nhà vệ sinh.",
+        "en": "This is the main gate area of the park, with Gate 1, Gate 1A on Hoa Binh Street, the ticket counter and park office, car park number two and restrooms."
+      },
+      "try": {
+        "vi": "Nếu còn chờ nhóm, hãy ghé Cà phê Vườn Đá để uống nước giữa cây xanh và những khối đá, hoặc cho các em nhỏ thử Vòng lượn tuổi thơ.",
+        "en": "If you are waiting for your group, stop by Stone Garden Café for a drink among greenery and rocks, or let the little ones try Childhood Loop."
+      },
+      "tip": {
+        "vi": "Hãy chọn một điểm hẹn dễ nhớ và lưu vị trí cổng để cả nhóm dễ tìm nhau khi ra về. Giữ vé hoặc mã vé cẩn thận vì có thể được kiểm tra trong suốt chuyến tham quan.",
+        "en": "Pick an easy-to-remember meeting point and save the gate location so your group can find each other when leaving. Keep your ticket or ticket code safe, as it may be checked during your visit."
+      }
+    },
+    {
+      "id": "children",
+      "members": [
+        "p10-rap-phim-cinemax-dam-sen",
+        "p11-khu-tro-choi-thieu-nhi",
+        "p12-nha-ga-monorail-1-nha-hang-de-men",
+        "p13-kids-playground",
+        "p14-san-khau-de-men",
+        "svc-food-5",
+        "svc-wc-access-5"
+      ],
+      "name": {
+        "vi": "Khu thiếu nhi và Sân khấu Dế Mèn",
+        "en": "the Children's area and Cricket Stage"
+      },
+      "intro": {
+        "vi": "Khu này tập trung các điểm vui chơi cho gia đình: Khu trò chơi thiếu nhi, Kids playground, Sân khấu Dế Mèn, Rạp phim Cinemax và Nhà ga Monorail một.",
+        "en": "This area gathers the family attractions: the Children's play area, the Kids playground, the Cricket Stage, Cinemax and Monorail Station One."
+      },
+      "try": {
+        "vi": "Cho trẻ nhỏ thử các trò trong khu thiếu nhi và Kids playground. Khi muốn ngồi nghỉ, hãy xem lịch biểu diễn ở Sân khấu Dế Mèn hoặc suất chiếu ở Cinemax; còn Monorail là cách ngắm công viên từ trên cao.",
+        "en": "Let young children try the rides in the children's area and the Kids playground. When you want to sit down, check the show schedule at the Cricket Stage or the showtimes at Cinemax; the Monorail is a way to see the park from above."
+      },
+      "tip": {
+        "vi": "Luôn giữ trẻ trong tầm mắt, đọc nội quy trước từng trò và hẹn một điểm gặp cố định sau mỗi lượt chơi.",
+        "en": "Always keep children in sight, read the rules before each ride, and agree on a fixed meeting point after each turn."
+      }
+    },
+    {
+      "id": "gate-2",
+      "members": [
+        "p15-xe-dien-dung-dai-duong",
+        "p16-cong-so-2-nha-hang-thuy-ta",
+        "p17-quay-ve",
+        "p18-dam-sen-plaza",
+        "new-cong-lien-thong",
+        "svc-food-3",
+        "svc-parking-1",
+        "svc-wc-access-3"
+      ],
+      "name": {
+        "vi": "Khu Cổng số 2 và Đầm Sen Plaza",
+        "en": "the Gate 2 and Dam Sen Plaza area"
+      },
+      "intro": {
+        "vi": "Bạn đang ở gần Cổng số 2, với quầy vé, Đầm Sen Plaza, Xe điện đụng đại dương, bãi đậu xe số một điểm ăn uống và cổng liên thông sang Công viên nước Đầm Sen.",
+        "en": "You are near Gate 2, with a ticket counter, Dam Sen Plaza, Ocean Bumper Cars, car park number one a place to eat and the connecting gate to Dam Sen Water Park."
+      },
+      "try": {
+        "vi": "Xe điện đụng đại dương là trò dễ chơi cùng bạn bè hoặc gia đình. Nếu muốn ăn nhẹ, hãy ghé điểm ăn uống gần cổng và xem thực đơn trước khi gọi.",
+        "en": "Ocean Bumper Cars is an easy ride to share with friends or family. If you want a light meal, stop by the food spot near the gate and check the menu before ordering."
+      },
+      "tip": {
+        "vi": "Nếu bạn gửi xe ở bãi số một, hãy nhớ vị trí xe và giữ thẻ gửi xe. Đây cũng là lối ra thuận tiện cho cả nhóm. Muốn sang Công viên nước, hãy xem giá vé và giờ nhận khách tại cổng liên thông trước khi qua.",
+        "en": "If you parked in car park number one, remember where the vehicle is and keep your parking ticket. This is also a convenient exit for the whole group. To visit the Water Park, check the ticket price and the opening hours at the connecting gate before you cross."
+      }
+    },
+    {
+      "id": "lakeside",
+      "members": [
+        "p05-tram-xe-trung-tam",
+        "p06-tiem-ca-phe-sai-gon",
+        "p07-ben-thuyen",
+        "p40-quang-truong-au-lac",
+        "p41-san-khau-ngoi-sao",
+        "p42-bieu-dien-nhac-nuoc",
+        "new-dao-than-tai",
+        "svc-food-6",
+        "svc-wc-5"
+      ],
+      "name": {
+        "vi": "Khu trung tâm ven hồ",
+        "en": "the Lakeside centre"
+      },
+      "intro": {
+        "vi": "Đây là khu trung tâm ven hồ, nơi có Trạm xe trung tâm, Bến thuyền, Quảng trường Âu Lạc, Sân khấu Ngôi Sao khu biểu diễn nhạc nước và Đảo Thần Tài giữa hồ.",
+        "en": "This is the lakeside centre, with the central shuttle station, the Boat Dock, Au Lac Square, the Star Stage the musical fountain and God of Fortune Island in the lake."
+      },
+      "try": {
+        "vi": "Hãy xem lịch Sân khấu Ngôi Sao và giờ nhạc nước để chọn một chương trình, hoặc đi thuyền trên hồ; Đảo Thần Tài là chỗ lên cao ngắm cảnh và nghỉ chân. Tiệm cà phê Sài Gòn là chỗ nghỉ chân tiện lợi giữa các điểm.",
+        "en": "Check the Star Stage schedule and the fountain showtimes to pick a show, or take a boat on the lake; God of Fortune Island is a high viewpoint to look around and rest. Saigon Café is a handy place to rest between attractions."
+      },
+      "tip": {
+        "vi": "Ở gần nước, hãy giữ trẻ bên mình và làm theo hướng dẫn của nhân viên khi lên xuống thuyền. Vào giờ diễn khu khán giả khá đông, nên đến sớm và chừa lối đi.",
+        "en": "Near the water, keep children close and follow the staff's instructions when boarding. The audience area gets busy at showtime, so arrive early and leave the walkways clear."
+      }
+    },
+    {
+      "id": "thrill",
+      "members": [
+        "p19-quang-truong-la-ma",
+        "p20-dam-sen-square",
+        "p21-power-surge",
+        "p22-vong-quay-than-toc",
+        "p23-tau-xoay-cao-toc",
+        "p24-vuot-thac",
+        "p25-du-quay-dung",
+        "new-truot-phao-tren-tham",
+        "new-cafe-windy",
+        "svc-food-2",
+        "svc-wc-2",
+        "svc-wc-access-2"
+      ],
+      "name": {
+        "vi": "Khu trò chơi cảm giác mạnh",
+        "en": "the Thrill Rides area"
+      },
+      "intro": {
+        "vi": "Bạn đang tới khu trò chơi cảm giác mạnh, với Power Surge, Vòng quay thần tốc, Tàu xoay cao tốc, Vượt thác, Trượt phao trên thảm và Đu quay đứng.",
+        "en": "You are arriving at the thrill rides area, with Power Surge, the Speed Spinner, the High-Speed Spinning Train, Rapids Drop, Mat Tube Sliding and the Ferris wheel."
+      },
+      "try": {
+        "vi": "Muốn hồi hộp thì thử Power Surge hoặc Tàu xoay cao tốc; muốn vừa mát vừa vui thì thử Vượt thác hay Trượt phao trên thảm. Đu quay đứng cho góc nhìn toàn công viên rất đáng thử, và Quán cà phê Windy là nơi nghỉ sau khi chơi.",
+        "en": "For a real thrill try Power Surge or the High-Speed Spinning Train; for something cool and fun try Rapids Drop or Mat Tube Sliding. The Ferris wheel gives a view of the whole park and is well worth a ride, and Windy Café is a place to rest afterwards."
+      },
+      "tip": {
+        "vi": "Mỗi trò có điều kiện tham gia riêng, hãy đọc nội quy và cất đồ dễ rơi trước khi chơi. Các trò có nước dễ làm ướt người, nên bảo quản điện thoại. Nên chơi trước khi ăn no.",
+        "en": "Each ride has its own requirements, so read the rules and put away loose belongings first. Water rides can leave you wet, so protect your phone. It is best to ride before a big meal."
+      }
+    },
+    {
+      "id": "garden",
+      "members": [
+        "p34-vuon-xuong-rong",
+        "p35-vuon-nhat-ban",
+        "p36-thuy-cung",
+        "p37-quang-truong-vua-hung",
+        "p38-nam-tu-thuong-uyen",
+        "p39-nha-hang",
+        "p43-cau-cuu-khuc",
+        "svc-first-aid",
+        "svc-food-7",
+        "svc-security",
+        "svc-wc-6"
+      ],
+      "name": {
+        "vi": "Khu vườn và Thủy cung",
+        "en": "the Gardens and Aquarium"
+      },
+      "intro": {
+        "vi": "Khu này có Vườn xương rồng, Vườn Nhật Bản, Nam Tú Thượng Uyển, Thủy cung, Cầu Cửu Khúc và Quảng trường Vua Hùng. Gần đây còn có Trạm sơ cứu y tế và Phòng bảo vệ.",
+        "en": "This area has the Cactus Garden, the Japanese Garden, Nam Tu Thuong Uyen, the Aquarium, the Nine-Bend Bridge and Hung King Square. Nearby are also the first aid station and the security office."
+      },
+      "try": {
+        "vi": "Đây là khu hợp để đi chậm: ngắm hoa ở Nam Tú Thượng Uyển, chụp ảnh ở Vườn Nhật Bản và xem sinh vật dưới nước ở Thủy cung. Nhà hàng trong khu là chỗ ăn trưa thuận tiện.",
+        "en": "This is a good area for a slow walk: enjoy the flowers at Nam Tu Thuong Uyen, take photos in the Japanese Garden and watch the underwater creatures at the Aquarium. The restaurant here is a convenient lunch stop."
+      },
+      "tip": {
+        "vi": "Không hái hoa, không chạm vào gai xương rồng và không gõ kính Thủy cung. Nếu cần hỗ trợ y tế hoặc tìm người thân, hãy đến Trạm sơ cứu hoặc Phòng bảo vệ trong khu.",
+        "en": "Please do not pick flowers, touch cactus spines or tap on the Aquarium glass. If you need medical help or are looking for someone, go to the first aid station or the security office in this area."
+      }
+    },
+    {
+      "id": "explore",
+      "members": [
+        "p26-xe-dien-dung-the-he-moi",
+        "p27-bang-dang",
+        "p28-khu-vuon-khung-long",
+        "p29-quay-luu-niem-hoa-sen",
+        "p30-nha-trung-bay-tieu-ban-dong-thuc-vat",
+        "p31-nha-ga-monorail-2",
+        "p32-dau-truong-bo-tot",
+        "p33-chuong-da-dieu-ngua-van-huou-cao-co",
+        "svc-food-4",
+        "svc-wc-access-4"
+      ],
+      "name": {
+        "vi": "Khu khám phá Băng đăng và Khủng long",
+        "en": "the Ice Lantern and Dinosaur discovery area"
+      },
+      "intro": {
+        "vi": "Bạn đang tới khu có Băng đăng, Vườn Khủng Long, Nhà trưng bày tiêu bản động thực vật, Chuồng đà điểu, ngựa vằn và hươu cao cổ, Đấu trường Bò Tót, Xe điện đụng thế hệ mới và Nhà ga Monorail hai.",
+        "en": "You are arriving at the area with the Ice Lantern Hall, the Dinosaur Garden, the Plant and Animal Specimen Hall, the ostrich, zebra and giraffe enclosure, the Bull Arena, the new-generation bumper cars and Monorail Station Two."
+      },
+      "try": {
+        "vi": "Băng đăng là trải nghiệm đáng thử để tránh nắng, còn Vườn Khủng Long và khu thú rất hợp cho trẻ nhỏ. Quầy lưu niệm Hoa Sen là nơi chọn quà mang về.",
+        "en": "The Ice Lantern Hall is worth trying to escape the sun, while the Dinosaur Garden and the animal area suit young children. The Lotus souvenir shop is a place to pick a keepsake."
+      },
+      "tip": {
+        "vi": "Vào Băng đăng nhớ làm theo hướng dẫn giữ ấm. Ở khu thú hãy đứng sau hàng rào và không tự cho ăn. Nên mua quà lưu niệm gần cuối chuyến đi để khỏi phải mang theo suốt.",
+        "en": "Follow the instructions on keeping warm in the Ice Lantern Hall. At the animal area, stay behind the fence and do not feed the animals. Buy souvenirs near the end of your trip so you do not carry them all day."
+      }
+    },
+    {
+      "id": "circus",
+      "members": [
+        "p44-quay-luu-niem-khu-b",
+        "p49-vuon-chim-thu-thien-nhien",
+        "p50-rap-xiec-dam-sen",
+        "svc-food-1",
+        "svc-wc-1",
+        "svc-wc-access-1"
+      ],
+      "name": {
+        "vi": "Khu xiếc và vườn chim thú",
+        "en": "the Circus and wildlife garden area"
+      },
+      "intro": {
+        "vi": "Khu này có Rạp xiếc Đầm Sen, Vườn chim thú thiên nhiên và Quầy lưu niệm khu B, cùng điểm ăn uống và nhà vệ sinh.",
+        "en": "This area has the Dam Sen Circus, the Bird and Wildlife Garden and the Zone B souvenir shop, together with a place to eat and restrooms."
+      },
+      "try": {
+        "vi": "Hãy xem giờ biểu diễn của Rạp xiếc để chọn một suất, và dành ít phút quan sát chim thú ở vườn thiên nhiên. Quầy lưu niệm khu B là nơi chọn quà trước khi sang khu B.",
+        "en": "Check the circus showtimes to pick a performance, and spend a few minutes watching the birds and animals in the wildlife garden. The Zone B souvenir shop is a place to choose a gift before heading into Zone B."
+      },
+      "tip": {
+        "vi": "Đến Rạp xiếc sớm để chọn chỗ ngồi và giữ lối ra vào thông thoáng. Ở vườn chim thú hãy nói nhỏ và giữ khoảng cách.",
+        "en": "Arrive at the circus early to choose a seat and keep the entrances clear. In the wildlife garden, speak softly and keep your distance."
+      }
+    },
+    {
+      "id": "zone-b",
+      "members": [
+        "p45-lau-dai-kinh-di",
+        "p46-tau-luon-sieu-toc",
+        "p47-vong-xoay-khong-gian",
+        "p48-vuon-rau-thuy-canh",
+        "svc-wc-3",
+        "svc-wc-4"
+      ],
+      "name": {
+        "vi": "Khu B – Tàu lượn và Lâu đài kinh dị",
+        "en": "Zone B – the Roller Coaster and Haunted Castle"
+      },
+      "intro": {
+        "vi": "Đây là khu B, với Tàu lượn siêu tốc, Vòng xoay không gian, Lâu đài kinh dị và Vườn rau thủy canh.",
+        "en": "This is Zone B, with the roller coaster, the Space Spinner, the Haunted Castle and the Hydroponic Vegetable Garden."
+      },
+      "try": {
+        "vi": "Ai thích cảm giác mạnh có thể thử Tàu lượn siêu tốc và Vòng xoay không gian; ai thích hồi hộp kiểu khác thì thử Lâu đài kinh dị. Vườn rau thủy canh là nơi đi chậm để tìm hiểu cách trồng rau không cần đất.",
+        "en": "If you love thrills, try the roller coaster and the Space Spinner; for a different kind of scare, try the Haunted Castle. The Hydroponic Vegetable Garden is a slow stop to learn how vegetables grow without soil."
+      },
+      "tip": {
+        "vi": "Hãy đọc điều kiện tham gia, nhất là khi đi cùng trẻ nhỏ, và cất đồ dễ rơi trước khi chơi. Khu B khá xa các cổng, nên xem nhà vệ sinh và nước uống trước khi vào.",
+        "en": "Read the requirements, especially with young children, and put away loose belongings before riding. Zone B is quite far from the gates, so check restrooms and drinks before you go in."
+      }
+    }
+  ]
+}

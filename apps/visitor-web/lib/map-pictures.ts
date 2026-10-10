@@ -19,6 +19,24 @@ type Corners = [
   [number, number],
 ];
 
+export interface IllustratedGeoref {
+  corners: Corners;
+  bearingDegrees?: number;
+}
+
+let georefPromise: Promise<IllustratedGeoref> | null = null;
+
+/** The picture's georeference, fetched once (the map and the marker sizing both need it). */
+export function loadIllustratedGeoref(): Promise<IllustratedGeoref> {
+  georefPromise ??= fetch(ILLUSTRATED_MAP_GEOREF)
+    .then((response) => response.json() as Promise<IllustratedGeoref>)
+    .catch((error: unknown) => {
+      georefPromise = null;
+      throw error;
+    });
+  return georefPromise;
+}
+
 /**
  * Adds the picture as a hidden layer; resolves the bearing that shows it upright,
  * or null (old map only) on failure.
@@ -27,10 +45,7 @@ export async function addIllustratedMap(
   map: MapLibreMap,
 ): Promise<number | null> {
   try {
-    const georef = (await (await fetch(ILLUSTRATED_MAP_GEOREF)).json()) as {
-      corners: Corners;
-      bearingDegrees?: number;
-    };
+    const georef = await loadIllustratedGeoref();
     if (!map.getStyle()) return null;
     map.addSource(ILLUSTRATED_LAYER, {
       type: 'image',

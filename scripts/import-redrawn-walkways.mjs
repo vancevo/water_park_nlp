@@ -79,22 +79,33 @@ try {
       ],
     );
   }
+  // Generated edges/nodes that are no longer in the graph (a place was removed, a path moved).
   await client.query(
-    `UPDATE walk_edges SET status = 'closed'
-     WHERE source_name = $1 AND NOT (id = ANY($2::bigint[]))`,
+    `DELETE FROM walk_edges WHERE source_name = $1 AND NOT (id = ANY($2::bigint[]))`,
     [SOURCE, edgeIds],
+  );
+  await client.query(
+    `DELETE FROM walk_nodes n
+     WHERE n.source = $1 AND NOT (n.id = ANY($2::bigint[]))
+       AND NOT EXISTS (SELECT 1 FROM poi_entrances e WHERE e.graph_node_ref = n.external_id)
+       AND NOT EXISTS (SELECT 1 FROM walk_edges w WHERE w.source = n.id OR w.target = n.id)`,
+    [
+      SOURCE,
+      graph.nodes.map((node) => (NODE_ID_BASE + BigInt(node.id)).toString()),
+    ],
   );
 
   let moved = 0;
   const missing = [];
   for (const place of places) {
-    const prefix = `p${String(place.number).padStart(2, '0')}-%`;
-    const poi = await client.query(
-      'SELECT id FROM pois WHERE slug LIKE $1 LIMIT 1',
-      [prefix],
-    );
+    // Numbered places have a `pNN-` slug; places added later (no number) are found by slug.
+    const poi = place.slug
+      ? await client.query('SELECT id FROM pois WHERE slug = $1', [place.slug])
+      : await client.query('SELECT id FROM pois WHERE slug LIKE $1 LIMIT 1', [
+          `p${String(place.number).padStart(2, '0')}-%`,
+        ]);
     if (!poi.rowCount) {
-      missing.push(place.number);
+      missing.push(place.number ?? place.slug);
       continue;
     }
     const poiId = poi.rows[0].id;

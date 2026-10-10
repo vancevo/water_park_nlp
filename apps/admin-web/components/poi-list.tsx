@@ -63,7 +63,7 @@ export function PoiList() {
         <div>
           <p className="eyebrow">NỘI DUNG KHÁM PHÁ</p>
           <h1>Điểm tham quan</h1>
-          <p>Quản lý vị trí, cổng dẫn đường và thuyết minh đa ngôn ngữ.</p>
+          <p>Quản lý vị trí, nội dung và thuyết minh đa ngôn ngữ.</p>
         </div>
         <Link className="button primary" href="/pois/new">
           + Thêm POI
@@ -136,9 +136,7 @@ export function PoiList() {
                   <tr key={poi.id}>
                     <td>
                       <strong>{vi?.name || 'Chưa có tên tiếng Việt'}</strong>
-                      <small>
-                        {poi.slug} • {poi.entrances.length} cổng
-                      </small>
+                      <small>{poi.slug}</small>
                     </td>
                     <td>{poi.category}</td>
                     <td>

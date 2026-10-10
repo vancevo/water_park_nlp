@@ -14,6 +14,12 @@ node apps/admin-web/scripts/export-walk-nodes.mjs     # danh sách nút cho form
 cp data/walkways-new/{dam-sen-map.jpg,damsen-map.georef.json,damsen-walkways.geojson} ... # xem apps/*/public
 ```
 
+**Điểm chuẩn (`control-points.json`):** các vị trí đã biết toạ độ thật và đã đọc pixel trên ảnh bản đồ. `build_graph.py`
+dời georeference để mỗi điểm rơi đúng toạ độ của nó (1 điểm: dời cả bản đồ; 2 điểm: dời + xoay + co giãn; từ 3 điểm: biến đổi
+affine). Hiện có 1 điểm (cuối hồ nước quảng trường La Mã), nên chỉ sửa lệch tịnh tiến; thêm điểm ở xa nhau (cổng 1, góc đối
+diện) để sửa cả xoay/co giãn. Sau khi đổi: `build_graph.py` → `sync_pois.py` → copy file vào `apps/*/public` → `import-redrawn-walkways.mjs`.
+Ghim trên bản đồ có mũi nhọn nằm đúng toạ độ (không phải tâm ghim).
+
 **Độ chính xác:** toạ độ là ước lượng (~3–8 m): đường được ghép vào ảnh minh họa cũ (đã khớp OSM), không đo thực địa.
 Bản đồ chính thức không vẽ đúng tỉ lệ nên một phép biến đổi affine không khớp mọi nơi. Các nhánh
 `poi-access-*` nối graph tới POI 19, 20, 22–27, 41, 42 và 49 để controller có thể đi vào vùng
