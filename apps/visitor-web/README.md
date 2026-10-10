@@ -34,7 +34,7 @@ tọa độ, lối vào, tình trạng mở cửa và khả năng tiếp cận v
 
 1. Bấm **Đặt người trên bản đồ**, sau đó click vào một lối đi trong công viên.
 2. Chọn POI và bấm **Dẫn đường từ người mô phỏng**.
-3. Thẻ POI tự đóng và mascot indie tự đi hết geometry của tuyến trong 5 giây;
+3. Thẻ POI tự đóng và mascot indie tự đi hết geometry của tuyến với tốc độ chậm (8 m/s, từ 15 đến 100 giây tuỳ độ dài tuyến);
    quãng đường mỗi frame được tính từ tổng chiều dài tuyến và thời gian đã trôi.
 4. Spritesheet 6 frame tạo chu kỳ bước chân trong lúc marker di chuyển.
 5. Khi đến đích, dialog thuyết minh tự mở và Web Speech TTS đọc transcript đã

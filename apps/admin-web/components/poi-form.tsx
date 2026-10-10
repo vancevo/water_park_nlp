@@ -10,15 +10,12 @@ import {
   type Poi,
   type PoiDraft,
 } from '@/lib/poi-contract';
+import { withPrimaryEntrance } from '@/lib/poi-entrance';
 import { validatePoi } from '@/lib/poi-validation';
 import { useUnsavedGuard } from '@/hooks/use-unsaved-guard';
 import { getDevicePosition } from '@/lib/geolocate';
 import { categoryOptions } from '@/lib/poi-categories';
-import {
-  MAX_SNAP_METERS,
-  loadWalkNodes,
-  nearestWalkNode,
-} from '@/lib/walk-nodes';
+import { loadWalkNodes } from '@/lib/walk-nodes';
 import { StatusBadge } from './status-badge';
 import { PoiLocationMap } from './poi-location-map';
 import { NarrationPanel } from './narration-panel';
@@ -89,10 +86,25 @@ export function PoiForm({
   }
 
   async function save() {
-    const validation = validatePoi(draft);
-    setErrors(validation);
     setMessage('');
+    let toSave = draft;
+    try {
+      toSave = withPrimaryEntrance(
+        draft,
+        (JSON.parse(baseline) as PoiDraft).location,
+        await loadWalkNodes(),
+      );
+    } catch {
+      // Without the path data a place that already has an entrance can still be saved.
+    }
+    const validation = validatePoi(toSave);
+    setErrors(validation);
     if (Object.keys(validation).length) {
+      setMessage(
+        validation.entrances
+          ? 'Không tải được dữ liệu đường đi để gắn lối vào. Thử lại sau.'
+          : '',
+      );
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -100,8 +112,8 @@ export function PoiForm({
     try {
       const client = await clientPromise;
       const saved = id
-        ? await client.update(id, draft)
-        : await client.create(draft);
+        ? await client.update(id, toSave)
+        : await client.create(toSave);
       const savedDraft = poiToDraft(saved);
       setPoi(saved);
       setDraft(savedDraft);
@@ -226,7 +238,9 @@ export function PoiForm({
             <div className="section-heading">
               <div>
                 <h2>Vị trí POI</h2>
-                <p>WGS84; cổng dẫn đường được quản lý riêng bên dưới.</p>
+                <p>
+                  WGS84; lối vào dẫn đường tự gắn vào đường đi gần nhất khi lưu.
+                </p>
               </div>
               <span className="tag">WGS84</span>
             </div>
@@ -296,11 +310,10 @@ export function PoiForm({
               }
             />
             <small className="helper">
-              Bấm lên bản đồ để đặt vị trí. Chấm xanh = POI, chấm vàng = cổng
-              dẫn đường.
+              Bấm lên bản đồ để đặt vị trí. Chấm xanh = POI, chấm vàng = lối vào
+              dẫn đường (tự gắn khi lưu).
             </small>
           </div>
-          <EntranceEditor draft={draft} setDraft={setDraft} errors={errors} />
           <HoursEditor draft={draft} setDraft={setDraft} errors={errors} />
         </div>
         <aside className="form-side">
@@ -378,13 +391,6 @@ export function PoiForm({
             >
               Nội dung English
             </p>
-            <p
-              className={
-                draft.entrances.some((item) => item.isPrimary) ? 'ok' : ''
-              }
-            >
-              Cổng chính + graph node
-            </p>
             <p>Thuyết minh: thêm ở mục thuyết minh sau khi lưu POI</p>
           </div>
         </aside>
@@ -443,274 +449,6 @@ function WorkflowActions({
       </div>
     );
   return <p>Không có hành động workflow phù hợp.</p>;
-}
-
-function EntranceEditor({
-  draft,
-  setDraft,
-  errors,
-}: {
-  draft: PoiDraft;
-  setDraft: (value: PoiDraft) => void;
-  errors: Record<string, string>;
-}) {
-  const [notes, setNotes] = useState<Record<number, string>>({});
-  const [busyIndex, setBusyIndex] = useState<number | null>(null);
-  const update = (
-    index: number,
-    patch: Partial<PoiDraft['entrances'][number]>,
-  ) =>
-    setDraft({
-      ...draft,
-      entrances: draft.entrances.map((item, i) =>
-        i === index ? { ...item, ...patch } : item,
-      ),
-    });
-  const note = (index: number, text: string) =>
-    setNotes((before) => ({ ...before, [index]: text }));
-
-  async function entranceFromDevice(index: number) {
-    setBusyIndex(index);
-    note(index, '');
-    try {
-      const fix = await getDevicePosition();
-      update(index, {
-        location: {
-          latitude: Number(fix.latitude.toFixed(7)),
-          longitude: Number(fix.longitude.toFixed(7)),
-        },
-      });
-      note(
-        index,
-        `Đã lấy vị trí hiện tại (sai số khoảng ${Math.round(fix.accuracyMeters)} m). Bấm "Gắn vào đường gần nhất" để chọn graph node.`,
-      );
-    } catch (cause) {
-      note(
-        index,
-        cause instanceof Error ? cause.message : 'Không lấy được vị trí.',
-      );
-    } finally {
-      setBusyIndex(null);
-    }
-  }
-
-  async function snapEntrance(index: number) {
-    const entrance = draft.entrances[index];
-    if (!entrance) return;
-    setBusyIndex(index);
-    note(index, '');
-    try {
-      const snap = nearestWalkNode(await loadWalkNodes(), entrance.location);
-      if (!snap) {
-        note(index, 'Chưa có dữ liệu đường đi để gắn.');
-        return;
-      }
-      update(index, {
-        graphNodeRef: snap.node.ref,
-        location: { latitude: snap.node.lat, longitude: snap.node.lon },
-      });
-      const metres = Math.round(snap.distanceMeters);
-      note(
-        index,
-        metres > MAX_SNAP_METERS
-          ? `Đã gắn vào ${snap.node.ref}, nhưng cách ${metres} m: khá xa đường đi bộ, hãy kiểm tra lại vị trí.`
-          : `Đã gắn vào ${snap.node.ref} (cách vị trí đã chọn ${metres} m).`,
-      );
-    } catch {
-      note(index, 'Không tải được dữ liệu đường đi. Thử lại sau.');
-    } finally {
-      setBusyIndex(null);
-    }
-  }
-  return (
-    <div className="panel card">
-      <div className="section-heading">
-        <div>
-          <h2>Cổng vào dẫn đường</h2>
-          <p>Đích route là graph node của cổng, không phải tâm POI.</p>
-        </div>
-        <button
-          className="button ghost"
-          onClick={() =>
-            setDraft({
-              ...draft,
-              entrances: [
-                ...draft.entrances,
-                {
-                  labelVi: '',
-                  labelEn: '',
-                  location: { ...draft.location },
-                  graphNodeRef: '',
-                  isPrimary: false,
-                  accessibility: 'standard',
-                },
-              ],
-            })
-          }
-        >
-          + Thêm cổng
-        </button>
-      </div>
-      {errors.entrances && (
-        <small className="field-error">{errors.entrances}</small>
-      )}
-      {draft.entrances.map((entrance, index) => (
-        <div className="entrance-card" key={entrance.id ?? index}>
-          <div className="repeat-row">
-            <label>
-              Tên VI
-              <input
-                value={entrance.labelVi}
-                onChange={(e) => update(index, { labelVi: e.target.value })}
-              />
-              {errors[`entrances.${index}.labelVi`] && (
-                <small className="field-error">
-                  {errors[`entrances.${index}.labelVi`]}
-                </small>
-              )}
-            </label>
-            <label>
-              Tên EN
-              <input
-                value={entrance.labelEn}
-                onChange={(e) => update(index, { labelEn: e.target.value })}
-              />
-              {errors[`entrances.${index}.labelEn`] && (
-                <small className="field-error">
-                  {errors[`entrances.${index}.labelEn`]}
-                </small>
-              )}
-            </label>
-            <label>
-              Graph node
-              <input
-                value={entrance.graphNodeRef}
-                onChange={(e) =>
-                  update(index, { graphNodeRef: e.target.value })
-                }
-              />
-              {errors[`entrances.${index}.graphNodeRef`] && (
-                <small className="field-error">
-                  {errors[`entrances.${index}.graphNodeRef`]}
-                </small>
-              )}
-            </label>
-            <button
-              aria-label="Xóa cổng"
-              onClick={() =>
-                setDraft({
-                  ...draft,
-                  entrances: draft.entrances.filter((_, i) => i !== index),
-                })
-              }
-            >
-              ×
-            </button>
-          </div>
-          <div className="coords">
-            <label>
-              Vĩ độ
-              <input
-                type="number"
-                step="any"
-                value={entrance.location.latitude}
-                onChange={(e) =>
-                  update(index, {
-                    location: {
-                      ...entrance.location,
-                      latitude: Number(e.target.value),
-                    },
-                  })
-                }
-              />
-              {errors[`entrances.${index}.latitude`] && (
-                <small className="field-error">
-                  {errors[`entrances.${index}.latitude`]}
-                </small>
-              )}
-            </label>
-            <label>
-              Kinh độ
-              <input
-                type="number"
-                step="any"
-                value={entrance.location.longitude}
-                onChange={(e) =>
-                  update(index, {
-                    location: {
-                      ...entrance.location,
-                      longitude: Number(e.target.value),
-                    },
-                  })
-                }
-              />
-              {errors[`entrances.${index}.longitude`] && (
-                <small className="field-error">
-                  {errors[`entrances.${index}.longitude`]}
-                </small>
-              )}
-            </label>
-          </div>
-          <div className="geo-actions">
-            <button
-              type="button"
-              className="button ghost small"
-              disabled={busyIndex === index}
-              onClick={() => void entranceFromDevice(index)}
-            >
-              📍 Dùng vị trí hiện tại
-            </button>
-            <button
-              type="button"
-              className="button ghost small"
-              disabled={busyIndex === index}
-              onClick={() => void snapEntrance(index)}
-            >
-              Gắn vào đường gần nhất
-            </button>
-            {notes[index] && (
-              <small className="geo-note" role="status">
-                {notes[index]}
-              </small>
-            )}
-          </div>
-          <div className="entrance-options">
-            <label>
-              <input
-                type="radio"
-                name="primaryEntrance"
-                checked={entrance.isPrimary}
-                onChange={() =>
-                  setDraft({
-                    ...draft,
-                    entrances: draft.entrances.map((item, i) => ({
-                      ...item,
-                      isPrimary: i === index,
-                    })),
-                  })
-                }
-              />{' '}
-              Cổng chính
-            </label>
-            <label>
-              Tiếp cận
-              <select
-                value={entrance.accessibility}
-                onChange={(e) =>
-                  update(index, {
-                    accessibility: e.target.value as 'standard' | 'step_free',
-                  })
-                }
-              >
-                <option value="standard">Tiêu chuẩn</option>
-                <option value="step_free">Không bậc</option>
-              </select>
-            </label>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
 }
 
 function HoursEditor({

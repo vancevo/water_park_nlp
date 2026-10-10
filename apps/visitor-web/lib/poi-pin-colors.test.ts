@@ -32,6 +32,8 @@ describe('poiPinColor', () => {
   it('colours the new places like the data file says', () => {
     expect(poiPinColor('new-truot-phao-tren-tham')).toBe('red');
     expect(poiPinColor('new-cafe-windy')).toBe('white');
+    expect(poiPinColor('new-dao-than-ky')).toBe('white');
+    expect(poiPinColor('new-cong-lien-thong')).toBe('yellow');
     expect(poiPinColor('new-unknown')).toBeNull();
     const file = JSON.parse(
       readFileSync(

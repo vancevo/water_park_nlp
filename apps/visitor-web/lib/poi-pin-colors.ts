@@ -70,6 +70,9 @@ export const POI_PIN_COLORS: Readonly<Record<number, PoiPinColor>> = {
 export const NEW_PLACE_COLORS: Readonly<Record<string, PoiPinColor>> = {
   'new-truot-phao-tren-tham': 'red',
   'new-cafe-windy': 'white',
+  'new-diem-thu': 'blue',
+  'new-dao-than-ky': 'white',
+  'new-cong-lien-thong': 'yellow',
 };
 
 /** Pin colour of a place from its `pNN-` slug; places without a number keep the default pin. */

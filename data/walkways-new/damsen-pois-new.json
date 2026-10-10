@@ -8,11 +8,11 @@
     1292.8,
     1204.0
    ],
-   "latitude": 10.7660639,
-   "longitude": 106.6416817,
-   "entranceNode": "nw-201",
-   "entranceLatitude": 10.7659779,
-   "entranceLongitude": 106.641685,
+   "latitude": 10.7658059,
+   "longitude": 106.6416272,
+   "entranceNode": "nw-179",
+   "entranceLatitude": 10.7657199,
+   "entranceLongitude": 106.6416305,
    "entranceDistancePx": 15.9
   },
   {
@@ -23,11 +23,11 @@
     1489.2,
     1073.0
    ],
-   "latitude": 10.767082,
-   "longitude": 106.6409092,
-   "entranceNode": "nw-158",
-   "entranceLatitude": 10.767063,
-   "entranceLongitude": 106.6409721,
+   "latitude": 10.766824,
+   "longitude": 106.6408547,
+   "entranceNode": "nw-136",
+   "entranceLatitude": 10.766805,
+   "entranceLongitude": 106.6409176,
    "entranceDistancePx": 11.8
   },
   {
@@ -38,11 +38,11 @@
     1375.2,
     996.0
    ],
-   "latitude": 10.7664396,
-   "longitude": 106.6404924,
-   "entranceNode": "nw-202",
-   "entranceLatitude": 10.7660993,
-   "entranceLongitude": 106.6405055,
+   "latitude": 10.7661817,
+   "longitude": 106.6404379,
+   "entranceNode": "nw-180",
+   "entranceLatitude": 10.7658414,
+   "entranceLongitude": 106.6404511,
    "entranceDistancePx": 63.0
   },
   {
@@ -53,11 +53,11 @@
     1335.2,
     900.0
    ],
-   "latitude": 10.7661911,
-   "longitude": 106.6399561,
-   "entranceNode": "nw-203",
-   "entranceLatitude": 10.7660627,
-   "entranceLongitude": 106.6399611,
+   "latitude": 10.7659332,
+   "longitude": 106.6399016,
+   "entranceNode": "nw-181",
+   "entranceLatitude": 10.7658047,
+   "entranceLongitude": 106.6399066,
    "entranceDistancePx": 23.8
   },
   {
@@ -68,11 +68,11 @@
     1377.8,
     834.0
    ],
-   "latitude": 10.7663993,
-   "longitude": 106.639576,
-   "entranceNode": "nw-204",
-   "entranceLatitude": 10.7664006,
-   "entranceLongitude": 106.6395917,
+   "latitude": 10.7661414,
+   "longitude": 106.6395216,
+   "entranceNode": "nw-182",
+   "entranceLatitude": 10.7661426,
+   "entranceLongitude": 106.6395372,
    "entranceDistancePx": 2.8
   },
   {
@@ -83,11 +83,11 @@
     1350.8,
     788.0
    ],
-   "latitude": 10.7662379,
-   "longitude": 106.6393204,
-   "entranceNode": "nw-205",
-   "entranceLatitude": 10.7662545,
-   "entranceLongitude": 106.6395974,
+   "latitude": 10.7659799,
+   "longitude": 106.6392659,
+   "entranceNode": "nw-183",
+   "entranceLatitude": 10.7659965,
+   "entranceLongitude": 106.6395429,
    "entranceDistancePx": 49.0
   },
   {
@@ -98,11 +98,11 @@
     1452.8,
     783.0
    ],
-   "latitude": 10.7667878,
-   "longitude": 106.6392755,
-   "entranceNode": "nw-206",
-   "entranceLatitude": 10.7669084,
-   "entranceLongitude": 106.6394686,
+   "latitude": 10.7665298,
+   "longitude": 106.6392211,
+   "entranceNode": "nw-184",
+   "entranceLatitude": 10.7666505,
+   "entranceLongitude": 106.6394141,
    "entranceDistancePx": 40.1
   },
   {
@@ -113,11 +113,11 @@
     1504.3,
     917.0
    ],
-   "latitude": 10.7671113,
-   "longitude": 106.6400248,
-   "entranceNode": "nw-146",
-   "entranceLatitude": 10.7671852,
-   "entranceLongitude": 106.6395638,
+   "latitude": 10.7668533,
+   "longitude": 106.6399703,
+   "entranceNode": "nw-124",
+   "entranceLatitude": 10.7669273,
+   "entranceLongitude": 106.6395093,
    "entranceDistancePx": 83.1
   },
   {
@@ -128,11 +128,11 @@
     1550.8,
     865.0
    ],
-   "latitude": 10.7673453,
-   "longitude": 106.6397232,
-   "entranceNode": "nw-207",
-   "entranceLatitude": 10.7673651,
-   "entranceLongitude": 106.6396019,
+   "latitude": 10.7670874,
+   "longitude": 106.6396688,
+   "entranceNode": "nw-185",
+   "entranceLatitude": 10.7671072,
+   "entranceLongitude": 106.6395474,
    "entranceDistancePx": 21.9
   },
   {
@@ -143,11 +143,11 @@
     1659.2,
     775.0
    ],
-   "latitude": 10.7679013,
-   "longitude": 106.6391968,
-   "entranceNode": "nw-208",
-   "entranceLatitude": 10.7679129,
-   "entranceLongitude": 106.639208,
+   "latitude": 10.7676434,
+   "longitude": 106.6391423,
+   "entranceNode": "nw-186",
+   "entranceLatitude": 10.7676549,
+   "entranceLongitude": 106.6391536,
    "entranceDistancePx": 2.9
   },
   {
@@ -158,11 +158,11 @@
     1614.7,
     676.8
    ],
-   "latitude": 10.7676277,
-   "longitude": 106.6386488,
-   "entranceNode": "nw-209",
-   "entranceLatitude": 10.7672603,
-   "entranceLongitude": 106.6384894,
+   "latitude": 10.7673697,
+   "longitude": 106.6385944,
+   "entranceNode": "nw-187",
+   "entranceLatitude": 10.7670024,
+   "entranceLongitude": 106.6384349,
    "entranceDistancePx": 72.6
   },
   {
@@ -173,11 +173,11 @@
     1749.8,
     576.0
    ],
-   "latitude": 10.7683245,
-   "longitude": 106.638057,
-   "entranceNode": "nw-210",
-   "entranceLatitude": 10.768502,
-   "entranceLongitude": 106.6381106,
+   "latitude": 10.7680665,
+   "longitude": 106.6380026,
+   "entranceNode": "nw-188",
+   "entranceLatitude": 10.768244,
+   "entranceLongitude": 106.6380561,
    "entranceDistancePx": 33.8
   },
   {
@@ -188,11 +188,11 @@
     1617.2,
     582.0
    ],
-   "latitude": 10.7676094,
-   "longitude": 106.6381125,
-   "entranceNode": "nw-211",
-   "entranceLatitude": 10.7675728,
-   "entranceLongitude": 106.6380651,
+   "latitude": 10.7673514,
+   "longitude": 106.638058,
+   "entranceNode": "nw-189",
+   "entranceLatitude": 10.7673148,
+   "entranceLongitude": 106.6380106,
    "entranceDistancePx": 10.6
   },
   {
@@ -203,11 +203,11 @@
     1657.8,
     555.0
    ],
-   "latitude": 10.7678199,
-   "longitude": 106.6379532,
+   "latitude": 10.7675619,
+   "longitude": 106.6378988,
    "entranceNode": "nw-38",
-   "entranceLatitude": 10.7677869,
-   "entranceLongitude": 106.6379084,
+   "entranceLatitude": 10.7675289,
+   "entranceLongitude": 106.6378539,
    "entranceDistancePx": 9.8
   },
   {
@@ -218,11 +218,11 @@
     1761.5,
     529.0
    ],
-   "latitude": 10.768372,
-   "longitude": 106.6377894,
-   "entranceNode": "nw-212",
-   "entranceLatitude": 10.7685466,
-   "entranceLongitude": 106.6378041,
+   "latitude": 10.768114,
+   "longitude": 106.6377349,
+   "entranceNode": "nw-190",
+   "entranceLatitude": 10.7682887,
+   "entranceLongitude": 106.6377497,
    "entranceDistancePx": 32.3
   },
   {
@@ -233,11 +233,11 @@
     1835.8,
     410.0
    ],
-   "latitude": 10.7687338,
-   "longitude": 106.6371045,
-   "entranceNode": "nw-134",
-   "entranceLatitude": 10.7687463,
-   "entranceLongitude": 106.6373874,
+   "latitude": 10.7684759,
+   "longitude": 106.6370501,
+   "entranceNode": "nw-112",
+   "entranceLatitude": 10.7684883,
+   "entranceLongitude": 106.6373329,
    "entranceDistancePx": 50.0
   },
   {
@@ -248,11 +248,11 @@
     1763.2,
     476.0
    ],
-   "latitude": 10.7683634,
-   "longitude": 106.6374895,
-   "entranceNode": "nw-213",
-   "entranceLatitude": 10.7683569,
-   "entranceLongitude": 106.6374075,
+   "latitude": 10.7681054,
+   "longitude": 106.637435,
+   "entranceNode": "nw-191",
+   "entranceLatitude": 10.7680989,
+   "entranceLongitude": 106.637353,
    "entranceDistancePx": 14.5
   },
   {
@@ -263,11 +263,11 @@
     1800.8,
     270.0
    ],
-   "latitude": 10.7684976,
-   "longitude": 106.6363187,
+   "latitude": 10.7682396,
+   "longitude": 106.6362643,
    "entranceNode": "nw-31",
-   "entranceLatitude": 10.768017,
-   "entranceLongitude": 106.6370272,
+   "entranceLatitude": 10.7677591,
+   "entranceLongitude": 106.6369727,
    "entranceDistancePx": 156.0
   },
   {
@@ -278,11 +278,11 @@
     1458.8,
     232.0
    ],
-   "latitude": 10.7666353,
-   "longitude": 106.6361594,
+   "latitude": 10.7663773,
+   "longitude": 106.6361049,
    "entranceNode": "nw-25",
-   "entranceLatitude": 10.7670367,
-   "entranceLongitude": 106.637065,
+   "entranceLatitude": 10.7667787,
+   "entranceLongitude": 106.6370105,
    "entranceDistancePx": 174.3
   },
   {
@@ -293,11 +293,11 @@
     1447.8,
     175.0
    ],
-   "latitude": 10.7665567,
-   "longitude": 106.6358389,
-   "entranceNode": "nw-214",
-   "entranceLatitude": 10.767074,
-   "entranceLongitude": 106.6370487,
+   "latitude": 10.7662987,
+   "longitude": 106.6357844,
+   "entranceNode": "nw-192",
+   "entranceLatitude": 10.766816,
+   "entranceLongitude": 106.6369942,
    "entranceDistancePx": 231.4
   },
   {
@@ -308,11 +308,11 @@
     1244.3,
     373.5
    ],
-   "latitude": 10.7655228,
-   "longitude": 106.6369942,
+   "latitude": 10.7652648,
+   "longitude": 106.6369397,
    "entranceNode": "nw-15",
-   "entranceLatitude": 10.7656579,
-   "entranceLongitude": 106.6373433,
+   "entranceLatitude": 10.7653999,
+   "entranceLongitude": 106.6372888,
    "entranceDistancePx": 65.8
   },
   {
@@ -323,11 +323,11 @@
     1253.4,
     312.0
    ],
-   "latitude": 10.7655514,
-   "longitude": 106.636645,
+   "latitude": 10.7652934,
+   "longitude": 106.6365906,
    "entranceNode": "nw-16",
-   "entranceLatitude": 10.7657471,
-   "entranceLongitude": 106.6373159,
+   "entranceLatitude": 10.7654891,
+   "entranceLongitude": 106.6372614,
    "entranceDistancePx": 122.9
   },
   {
@@ -338,11 +338,11 @@
     1262.2,
     261.0
    ],
-   "latitude": 10.7655818,
-   "longitude": 106.6363552,
+   "latitude": 10.7653239,
+   "longitude": 106.6363008,
    "entranceNode": "nw-17",
-   "entranceLatitude": 10.7657938,
-   "entranceLongitude": 106.6373039,
+   "entranceLatitude": 10.7655358,
+   "entranceLongitude": 106.6372495,
    "entranceDistancePx": 171.0
   },
   {
@@ -353,11 +353,11 @@
     1172.2,
     233.0
    ],
-   "latitude": 10.7650857,
-   "longitude": 106.6362115,
-   "entranceNode": "nw-215",
-   "entranceLatitude": 10.7655565,
-   "entranceLongitude": 106.6373814,
+   "latitude": 10.7648278,
+   "longitude": 106.6361571,
+   "entranceNode": "nw-193",
+   "entranceLatitude": 10.7652986,
+   "entranceLongitude": 106.637327,
    "entranceDistancePx": 221.8
   },
   {
@@ -368,11 +368,11 @@
     1087.8,
     361.0
    ],
-   "latitude": 10.7646723,
-   "longitude": 106.6369489,
-   "entranceNode": "nw-198",
-   "entranceLatitude": 10.7647914,
-   "entranceLongitude": 106.6375684,
+   "latitude": 10.7644143,
+   "longitude": 106.6368945,
+   "entranceNode": "nw-177",
+   "entranceLatitude": 10.7645334,
+   "entranceLongitude": 106.6375139,
    "entranceDistancePx": 111.0
   },
   {
@@ -383,11 +383,11 @@
     895.2,
     496.0
    ],
-   "latitude": 10.763676,
-   "longitude": 106.6377434,
-   "entranceNode": "nw-216",
-   "entranceLatitude": 10.7638568,
-   "entranceLongitude": 106.6381613,
+   "latitude": 10.7634181,
+   "longitude": 106.637689,
+   "entranceNode": "nw-194",
+   "entranceLatitude": 10.7635989,
+   "entranceLongitude": 106.6381068,
    "entranceDistancePx": 80.1
   },
   {
@@ -398,11 +398,11 @@
     829.2,
     478.0
    ],
-   "latitude": 10.763313,
-   "longitude": 106.6376524,
-   "entranceNode": "nw-217",
-   "entranceLatitude": 10.7636291,
-   "entranceLongitude": 106.6382685,
+   "latitude": 10.7630551,
+   "longitude": 106.6375979,
+   "entranceNode": "nw-195",
+   "entranceLatitude": 10.7633712,
+   "entranceLongitude": 106.6382141,
    "entranceDistancePx": 121.9
   },
   {
@@ -413,11 +413,11 @@
     744.2,
     491.0
    ],
-   "latitude": 10.7628577,
-   "longitude": 106.6377397,
-   "entranceNode": "nw-129",
-   "entranceLatitude": 10.7626307,
-   "entranceLongitude": 106.637401,
+   "latitude": 10.7625998,
+   "longitude": 106.6376852,
+   "entranceNode": "nw-107",
+   "entranceLatitude": 10.7623727,
+   "entranceLongitude": 106.6373465,
    "entranceDistancePx": 72.0
   },
   {
@@ -428,11 +428,11 @@
     831.2,
     562.0
    ],
-   "latitude": 10.7633521,
-   "longitude": 106.638127,
+   "latitude": 10.7630941,
+   "longitude": 106.6380725,
    "entranceNode": "nw-2",
-   "entranceLatitude": 10.763491,
-   "entranceLongitude": 106.6383529,
+   "entranceLatitude": 10.7632331,
+   "entranceLongitude": 106.6382984,
    "entranceDistancePx": 46.8
   },
   {
@@ -443,11 +443,11 @@
     858.8,
     551.0
    ],
-   "latitude": 10.7634976,
-   "longitude": 106.6380603,
-   "entranceNode": "nw-4",
-   "entranceLatitude": 10.763605,
-   "entranceLongitude": 106.6382814,
+   "latitude": 10.7632397,
+   "longitude": 106.6380058,
+   "entranceNode": "nw-3",
+   "entranceLatitude": 10.7633471,
+   "entranceLongitude": 106.6382269,
    "entranceDistancePx": 43.3
   },
   {
@@ -458,12 +458,12 @@
     871.2,
     629.0
    ],
-   "latitude": 10.7635909,
-   "longitude": 106.6384993,
-   "entranceNode": "nw-52",
-   "entranceLatitude": 10.7635912,
-   "entranceLongitude": 106.6384313,
-   "entranceDistancePx": 12.0
+   "latitude": 10.7633329,
+   "longitude": 106.6384448,
+   "entranceNode": "nw-2",
+   "entranceLatitude": 10.7632331,
+   "entranceLongitude": 106.6382984,
+   "entranceDistancePx": 31.3
   },
   {
    "number": 32,
@@ -473,11 +473,11 @@
     847.3,
     634.0
    ],
-   "latitude": 10.7634633,
-   "longitude": 106.6385314,
-   "entranceNode": "nw-218",
-   "entranceLatitude": 10.7633806,
-   "entranceLongitude": 106.6384519,
+   "latitude": 10.7632053,
+   "longitude": 106.6384769,
+   "entranceNode": "nw-196",
+   "entranceLatitude": 10.7631226,
+   "entranceLongitude": 106.6383975,
    "entranceDistancePx": 20.4
   },
   {
@@ -488,11 +488,11 @@
     746.8,
     617.0
    ],
-   "latitude": 10.7629141,
-   "longitude": 106.6384516,
-   "entranceNode": "nw-219",
-   "entranceLatitude": 10.7630073,
-   "entranceLongitude": 106.6382948,
+   "latitude": 10.7626561,
+   "longitude": 106.6383971,
+   "entranceNode": "nw-197",
+   "entranceLatitude": 10.7627493,
+   "entranceLongitude": 106.6382404,
    "entranceDistancePx": 33.1
   },
   {
@@ -503,11 +503,11 @@
     945.8,
     846.0
    ],
-   "latitude": 10.7640671,
-   "longitude": 106.639714,
-   "entranceNode": "nw-220",
-   "entranceLatitude": 10.7641026,
-   "entranceLongitude": 106.6395398,
+   "latitude": 10.7638092,
+   "longitude": 106.6396595,
+   "entranceNode": "nw-198",
+   "entranceLatitude": 10.7638447,
+   "entranceLongitude": 106.6394854,
    "entranceDistancePx": 31.7
   },
   {
@@ -518,11 +518,11 @@
     1083.2,
     873.0
    ],
-   "latitude": 10.7648192,
-   "longitude": 106.6398443,
-   "entranceNode": "nw-221",
-   "entranceLatitude": 10.7650007,
-   "entranceLongitude": 106.6398403,
+   "latitude": 10.7645613,
+   "longitude": 106.6397899,
+   "entranceNode": "nw-199",
+   "entranceLatitude": 10.7647427,
+   "entranceLongitude": 106.6397858,
    "entranceDistancePx": 33.5
   },
   {
@@ -533,11 +533,11 @@
     1060.0,
     916.0
    ],
-   "latitude": 10.7647082,
-   "longitude": 106.6400912,
-   "entranceNode": "nw-222",
-   "entranceLatitude": 10.7645187,
-   "entranceLongitude": 106.6401155,
+   "latitude": 10.7644503,
+   "longitude": 106.6400368,
+   "entranceNode": "nw-200",
+   "entranceLatitude": 10.7642607,
+   "entranceLongitude": 106.6400611,
    "entranceDistancePx": 35.4
   },
   {
@@ -548,11 +548,11 @@
     1065.8,
     1006.0
    ],
-   "latitude": 10.7647698,
-   "longitude": 106.6405991,
-   "entranceNode": "nw-223",
-   "entranceLatitude": 10.7647973,
-   "entranceLongitude": 106.6405571,
+   "latitude": 10.7645118,
+   "longitude": 106.6405447,
+   "entranceNode": "nw-201",
+   "entranceLatitude": 10.7645394,
+   "entranceLongitude": 106.6405026,
    "entranceDistancePx": 9.1
   },
   {
@@ -563,11 +563,11 @@
     1188.8,
     887.0
    ],
-   "latitude": 10.765395,
-   "longitude": 106.6399064,
-   "entranceNode": "nw-224",
-   "entranceLatitude": 10.7653935,
-   "entranceLongitude": 106.6396712,
+   "latitude": 10.7651371,
+   "longitude": 106.6398519,
+   "entranceNode": "nw-202",
+   "entranceLatitude": 10.7651355,
+   "entranceLongitude": 106.6396167,
    "entranceDistancePx": 41.6
   },
   {
@@ -578,12 +578,12 @@
     1155.2,
     792.0
    ],
-   "latitude": 10.7651814,
-   "longitude": 106.6393747,
-   "entranceNode": "nw-225",
-   "entranceLatitude": 10.765238,
-   "entranceLongitude": 106.6393746,
-   "entranceDistancePx": 10.5
+   "latitude": 10.7649235,
+   "longitude": 106.6393203,
+   "entranceNode": "nw-161",
+   "entranceLatitude": 10.7649775,
+   "entranceLongitude": 106.639245,
+   "entranceDistancePx": 16.9
   },
   {
    "number": 40,
@@ -593,11 +593,11 @@
     1291.8,
     807.0
    ],
-   "latitude": 10.7659252,
-   "longitude": 106.6394374,
-   "entranceNode": "nw-226",
-   "entranceLatitude": 10.7659161,
-   "entranceLongitude": 106.6395768,
+   "latitude": 10.7656672,
+   "longitude": 106.6393829,
+   "entranceNode": "nw-203",
+   "entranceLatitude": 10.7656582,
+   "entranceLongitude": 106.6395224,
    "entranceDistancePx": 24.8
   },
   {
@@ -608,11 +608,11 @@
     1293.2,
     616.0
    ],
-   "latitude": 10.7658686,
-   "longitude": 106.6383573,
-   "entranceNode": "nw-182",
-   "entranceLatitude": 10.7656832,
-   "entranceLongitude": 106.6388103,
+   "latitude": 10.7656107,
+   "longitude": 106.6383028,
+   "entranceNode": "nw-160",
+   "entranceLatitude": 10.7654252,
+   "entranceLongitude": 106.6387558,
    "entranceDistancePx": 88.2
   },
   {
@@ -623,12 +623,12 @@
     1393.8,
     554.0
    ],
-   "latitude": 10.7663919,
-   "longitude": 106.6379904,
-   "entranceNode": "nw-227",
-   "entranceLatitude": 10.7663441,
-   "entranceLongitude": 106.6373846,
-   "entranceDistancePx": 107.2
+   "latitude": 10.7661339,
+   "longitude": 106.637936,
+   "entranceNode": "nw-21",
+   "entranceLatitude": 10.7661796,
+   "entranceLongitude": 106.6372449,
+   "entranceDistancePx": 122.8
   },
   {
    "number": 43,
@@ -638,11 +638,11 @@
     1084.3,
     697.0
    ],
-   "latitude": 10.7647661,
-   "longitude": 106.6388491,
-   "entranceNode": "nw-228",
-   "entranceLatitude": 10.7647737,
-   "entranceLongitude": 106.6388711,
+   "latitude": 10.7645082,
+   "longitude": 106.6387947,
+   "entranceNode": "nw-204",
+   "entranceLatitude": 10.7645157,
+   "entranceLongitude": 106.6388167,
    "entranceDistancePx": 4.1
   },
   {
@@ -653,11 +653,11 @@
     550.8,
     426.0
    ],
-   "latitude": 10.76179,
-   "longitude": 106.6374036,
-   "entranceNode": "nw-229",
-   "entranceLatitude": 10.7618282,
-   "entranceLongitude": 106.6373878,
+   "latitude": 10.7615321,
+   "longitude": 106.6373491,
+   "entranceNode": "nw-205",
+   "entranceLatitude": 10.7615702,
+   "entranceLongitude": 106.6373333,
    "entranceDistancePx": 7.7
   },
   {
@@ -668,11 +668,11 @@
     458.2,
     286.0
    ],
-   "latitude": 10.7612422,
-   "longitude": 106.6366271,
-   "entranceNode": "nw-230",
-   "entranceLatitude": 10.7617279,
-   "entranceLongitude": 106.6366125,
+   "latitude": 10.7609843,
+   "longitude": 106.6365726,
+   "entranceNode": "nw-206",
+   "entranceLatitude": 10.7614699,
+   "entranceLongitude": 106.636558,
    "entranceDistancePx": 89.8
   },
   {
@@ -683,11 +683,11 @@
     334.7,
     281.0
    ],
-   "latitude": 10.7605727,
-   "longitude": 106.6366188,
-   "entranceNode": "nw-231",
-   "entranceLatitude": 10.760333,
-   "entranceLongitude": 106.6369717,
+   "latitude": 10.7603147,
+   "longitude": 106.6365644,
+   "entranceNode": "nw-207",
+   "entranceLatitude": 10.760075,
+   "entranceLongitude": 106.6369173,
    "entranceDistancePx": 77.7
   },
   {
@@ -698,11 +698,11 @@
     275.6,
     181.0
    ],
-   "latitude": 10.7602195,
-   "longitude": 106.6360631,
-   "entranceNode": "nw-232",
-   "entranceLatitude": 10.7598814,
-   "entranceLongitude": 106.6360708,
+   "latitude": 10.7599616,
+   "longitude": 106.6360086,
+   "entranceNode": "nw-208",
+   "entranceLatitude": 10.7596235,
+   "entranceLongitude": 106.6360164,
    "entranceDistancePx": 62.5
   },
   {
@@ -713,11 +713,11 @@
     209.8,
     64.0
    ],
-   "latitude": 10.7598244,
-   "longitude": 106.6354123,
-   "entranceNode": "nw-115",
-   "entranceLatitude": 10.7600338,
-   "entranceLongitude": 106.6357059,
+   "latitude": 10.7595664,
+   "longitude": 106.6353578,
+   "entranceNode": "nw-93",
+   "entranceLatitude": 10.7597759,
+   "entranceLongitude": 106.6356515,
    "entranceDistancePx": 63.7
   },
   {
@@ -728,11 +728,11 @@
     788.2,
     109.0
    ],
-   "latitude": 10.7629674,
-   "longitude": 106.6355728,
-   "entranceNode": "nw-123",
-   "entranceLatitude": 10.7622779,
-   "entranceLongitude": 106.6363864,
+   "latitude": 10.7627095,
+   "longitude": 106.6355184,
+   "entranceNode": "nw-101",
+   "entranceLatitude": 10.7620199,
+   "entranceLongitude": 106.636332,
    "entranceDistancePx": 195.3
   },
   {
@@ -743,11 +743,11 @@
     739.8,
     246.0
    ],
-   "latitude": 10.7627517,
-   "longitude": 106.6363552,
-   "entranceNode": "nw-233",
-   "entranceLatitude": 10.762318,
-   "entranceLongitude": 106.6365024,
+   "latitude": 10.7624937,
+   "longitude": 106.6363008,
+   "entranceNode": "nw-209",
+   "entranceLatitude": 10.76206,
+   "entranceLongitude": 106.636448,
    "entranceDistancePx": 85.0
   },
   {
@@ -758,11 +758,11 @@
     1285.5,
     362.7
    ],
-   "latitude": 10.765742,
-   "longitude": 106.6369264,
-   "entranceNode": "nw-234",
-   "entranceLatitude": 10.7658277,
-   "entranceLongitude": 106.6372965,
+   "latitude": 10.765484,
+   "longitude": 106.636872,
+   "entranceNode": "nw-210",
+   "entranceLatitude": 10.7655697,
+   "entranceLongitude": 106.637242,
    "entranceDistancePx": 66.8
   },
   {
@@ -773,12 +773,57 @@
     1332.3,
     451.4
    ],
-   "latitude": 10.7660248,
-   "longitude": 106.6374203,
-   "entranceNode": "nw-235",
-   "entranceLatitude": 10.7660275,
-   "entranceLongitude": 106.637432,
-   "entranceDistancePx": 2.1
+   "latitude": 10.7657669,
+   "longitude": 106.6373659,
+   "entranceNode": "nw-18",
+   "entranceLatitude": 10.7657583,
+   "entranceLongitude": 106.6372153,
+   "entranceDistancePx": 26.6
+  },
+  {
+   "number": null,
+   "slug": "new-diem-thu",
+   "color": "blue",
+   "pinPx": [
+    1460.6,
+    344.7
+   ],
+   "latitude": 10.7664249,
+   "longitude": 106.6367418,
+   "entranceNode": "nw-24",
+   "entranceLatitude": 10.7666197,
+   "entranceLongitude": 106.6370934,
+   "entranceDistancePx": 70.8
+  },
+  {
+   "number": null,
+   "slug": "new-dao-than-ky",
+   "color": "white",
+   "pinPx": [
+    1005.6,
+    586.3
+   ],
+   "latitude": 10.7640454,
+   "longitude": 106.6381816,
+   "entranceNode": "nw-173",
+   "entranceLatitude": 10.7641313,
+   "entranceLongitude": 106.638132,
+   "entranceDistancePx": 18.3
+  },
+  {
+   "number": null,
+   "slug": "new-cong-lien-thong",
+   "color": "yellow",
+   "pinPx": [
+    1603.8,
+    363.1
+   ],
+   "latitude": 10.7672055,
+   "longitude": 106.6368226,
+   "entranceNode": "nw-211",
+   "entranceLatitude": 10.7672031,
+   "entranceLongitude": 106.6369019,
+   "entranceDistancePx": 14.1
   },
   {
    "number": null,
@@ -788,11 +833,11 @@
     747.0,
     303.5
    ],
-   "latitude": 10.7628099,
-   "longitude": 106.6366791,
-   "entranceNode": "nw-236",
-   "entranceLatitude": 10.7628022,
-   "entranceLongitude": 106.6370605,
+   "latitude": 10.762552,
+   "longitude": 106.6366247,
+   "entranceNode": "nw-212",
+   "entranceLatitude": 10.7625443,
+   "entranceLongitude": 106.637006,
    "entranceDistancePx": 67.5
   },
   {
@@ -803,11 +848,11 @@
     1334.5,
     314.5
    ],
-   "latitude": 10.7659908,
-   "longitude": 106.636646,
+   "latitude": 10.7657328,
+   "longitude": 106.6365915,
    "entranceNode": "nw-18",
-   "entranceLatitude": 10.7660163,
-   "entranceLongitude": 106.6372698,
+   "entranceLatitude": 10.7657583,
+   "entranceLongitude": 106.6372153,
    "entranceDistancePx": 110.3
   },
   {
@@ -818,12 +863,12 @@
     1629.5,
     432.5
    ],
-   "latitude": 10.7676257,
-   "longitude": 106.6372652,
-   "entranceNode": "nw-74",
-   "entranceLatitude": 10.7676273,
-   "entranceLongitude": 106.6370641,
-   "entranceDistancePx": 35.5
+   "latitude": 10.7673678,
+   "longitude": 106.6372108,
+   "entranceNode": "nw-28",
+   "entranceLatitude": 10.7672714,
+   "entranceLongitude": 106.6369107,
+   "entranceDistancePx": 55.4
   },
   {
    "number": null,
@@ -833,11 +878,11 @@
     966.5,
     434.5
    ],
-   "latitude": 10.7640409,
-   "longitude": 106.6373842,
-   "entranceNode": "nw-237",
-   "entranceLatitude": 10.7642931,
-   "entranceLongitude": 106.6379771,
+   "latitude": 10.763783,
+   "longitude": 106.6373297,
+   "entranceNode": "nw-213",
+   "entranceLatitude": 10.7640352,
+   "entranceLongitude": 106.6379226,
    "entranceDistancePx": 113.3
   },
   {
@@ -848,11 +893,11 @@
     1771.5,
     614.0
    ],
-   "latitude": 10.7684546,
-   "longitude": 106.6382683,
-   "entranceNode": "nw-238",
-   "entranceLatitude": 10.7684551,
-   "entranceLongitude": 106.6382686,
+   "latitude": 10.7681966,
+   "longitude": 106.6382139,
+   "entranceNode": "nw-214",
+   "entranceLatitude": 10.7681972,
+   "entranceLongitude": 106.6382141,
    "entranceDistancePx": 0.1
   },
   {
@@ -863,11 +908,11 @@
     1251.5,
     691.0
    ],
-   "latitude": 10.7656683,
-   "longitude": 106.6387881,
-   "entranceNode": "nw-182",
-   "entranceLatitude": 10.7656832,
-   "entranceLongitude": 106.6388103,
+   "latitude": 10.7654104,
+   "longitude": 106.6387336,
+   "entranceNode": "nw-160",
+   "entranceLatitude": 10.7654252,
+   "entranceLongitude": 106.6387558,
    "entranceDistancePx": 4.7
   },
   {
@@ -878,11 +923,11 @@
     1016.5,
     779.5
    ],
-   "latitude": 10.7644272,
-   "longitude": 106.6393266,
-   "entranceNode": "nw-239",
-   "entranceLatitude": 10.7643949,
-   "entranceLongitude": 106.6396013,
+   "latitude": 10.7641692,
+   "longitude": 106.6392721,
+   "entranceNode": "nw-215",
+   "entranceLatitude": 10.764137,
+   "entranceLongitude": 106.6395469,
    "entranceDistancePx": 49.2
   },
   {
@@ -893,11 +938,11 @@
     826.5,
     143.5
    ],
-   "latitude": 10.7631862,
-   "longitude": 106.6357617,
-   "entranceNode": "nw-123",
-   "entranceLatitude": 10.7622779,
-   "entranceLongitude": 106.6363864,
+   "latitude": 10.7629282,
+   "longitude": 106.6357072,
+   "entranceNode": "nw-101",
+   "entranceLatitude": 10.7620199,
+   "entranceLongitude": 106.636332,
    "entranceDistancePx": 203.9
   },
   {
@@ -908,11 +953,11 @@
     1338.5,
     218.5
    ],
-   "latitude": 10.7659802,
-   "longitude": 106.6361026,
+   "latitude": 10.7657222,
+   "longitude": 106.6360481,
    "entranceNode": "nw-18",
-   "entranceLatitude": 10.7660163,
-   "entranceLongitude": 106.6372698,
+   "entranceLatitude": 10.7657583,
+   "entranceLongitude": 106.6372153,
    "entranceDistancePx": 206.4
   },
   {
@@ -923,11 +968,11 @@
     208.0,
     240.5
    ],
-   "latitude": 10.7598739,
-   "longitude": 106.6364104,
-   "entranceNode": "nw-240",
-   "entranceLatitude": 10.7599472,
-   "entranceLongitude": 106.6363888,
+   "latitude": 10.759616,
+   "longitude": 106.636356,
+   "entranceNode": "nw-216",
+   "entranceLatitude": 10.7596892,
+   "entranceLongitude": 106.6363343,
    "entranceDistancePx": 14.2
   },
   {
@@ -938,11 +983,11 @@
     419.5,
     351.5
    ],
-   "latitude": 10.761055,
-   "longitude": 106.6370037,
-   "entranceNode": "nw-241",
-   "entranceLatitude": 10.7610596,
-   "entranceLongitude": 106.6371963,
+   "latitude": 10.760797,
+   "longitude": 106.6369492,
+   "entranceNode": "nw-217",
+   "entranceLatitude": 10.7608017,
+   "entranceLongitude": 106.6371418,
    "entranceDistancePx": 34.1
   },
   {
@@ -953,11 +998,11 @@
     1250.0,
     635.0
    ],
-   "latitude": 10.7656414,
-   "longitude": 106.6384717,
-   "entranceNode": "nw-182",
-   "entranceLatitude": 10.7656832,
-   "entranceLongitude": 106.6388103,
+   "latitude": 10.7653834,
+   "longitude": 106.6384172,
+   "entranceNode": "nw-160",
+   "entranceLatitude": 10.7654252,
+   "entranceLongitude": 106.6387558,
    "entranceDistancePx": 60.1
   },
   {
@@ -968,11 +1013,11 @@
     1083.0,
     817.0
    ],
-   "latitude": 10.7647994,
-   "longitude": 106.6395278,
-   "entranceNode": "nw-242",
-   "entranceLatitude": 10.7647952,
-   "entranceLongitude": 106.6396495,
+   "latitude": 10.7645414,
+   "longitude": 106.6394733,
+   "entranceNode": "nw-218",
+   "entranceLatitude": 10.7645373,
+   "entranceLongitude": 106.6395951,
    "entranceDistancePx": 21.6
   },
   {
@@ -983,11 +1028,11 @@
     1264.0,
     949.0
    ],
-   "latitude": 10.7658225,
-   "longitude": 106.6402447,
-   "entranceNode": "nw-243",
-   "entranceLatitude": 10.7657827,
-   "entranceLongitude": 106.6402466,
+   "latitude": 10.7655646,
+   "longitude": 106.6401902,
+   "entranceNode": "nw-219",
+   "entranceLatitude": 10.7655247,
+   "entranceLongitude": 106.6401921,
    "entranceDistancePx": 7.4
   },
   {
@@ -998,11 +1043,11 @@
     1394.0,
     1024.0
    ],
-   "latitude": 10.7665507,
-   "longitude": 106.6406476,
-   "entranceNode": "nw-244",
-   "entranceLatitude": 10.76611,
-   "entranceLongitude": 106.6406647,
+   "latitude": 10.7662928,
+   "longitude": 106.6405932,
+   "entranceNode": "nw-220",
+   "entranceLatitude": 10.7658521,
+   "entranceLongitude": 106.6406102,
    "entranceDistancePx": 81.5
   },
   {
@@ -1013,11 +1058,11 @@
     755.0,
     370.0
    ],
-   "latitude": 10.7628755,
-   "longitude": 106.6370538,
-   "entranceNode": "nw-199",
-   "entranceLatitude": 10.7628164,
-   "entranceLongitude": 106.6370613,
+   "latitude": 10.7626176,
+   "longitude": 106.6369994,
+   "entranceNode": "nw-178",
+   "entranceLatitude": 10.7625584,
+   "entranceLongitude": 106.6370068,
    "entranceDistancePx": 11.0
   },
   {
@@ -1028,11 +1073,11 @@
     1134.0,
     454.0
    ],
-   "latitude": 10.7649533,
-   "longitude": 106.6374672,
-   "entranceNode": "nw-245",
-   "entranceLatitude": 10.7650283,
-   "entranceLongitude": 106.6376177,
+   "latitude": 10.7646954,
+   "longitude": 106.6374128,
+   "entranceNode": "nw-221",
+   "entranceLatitude": 10.7647703,
+   "entranceLongitude": 106.6375632,
    "entranceDistancePx": 29.6
   },
   {
@@ -1043,11 +1088,11 @@
     1793.5,
     479.0
    ],
-   "latitude": 10.7685282,
-   "longitude": 106.6375015,
-   "entranceNode": "nw-246",
-   "entranceLatitude": 10.7685201,
-   "entranceLongitude": 106.637399,
+   "latitude": 10.7682703,
+   "longitude": 106.6374471,
+   "entranceNode": "nw-222",
+   "entranceLatitude": 10.7682622,
+   "entranceLongitude": 106.6373446,
    "entranceDistancePx": 18.1
   },
   {
@@ -1058,12 +1103,12 @@
     893.5,
     631.0
    ],
-   "latitude": 10.7637121,
-   "longitude": 106.6385069,
-   "entranceNode": "nw-247",
-   "entranceLatitude": 10.7636559,
-   "entranceLongitude": 106.6383969,
-   "entranceDistancePx": 21.8
+   "latitude": 10.7634542,
+   "longitude": 106.6384525,
+   "entranceNode": "nw-223",
+   "entranceLatitude": 10.7633347,
+   "entranceLongitude": 106.638234,
+   "entranceDistancePx": 43.9
   },
   {
    "number": null,
@@ -1073,11 +1118,11 @@
     1732.0,
     663.5
    ],
-   "latitude": 10.7682576,
-   "longitude": 106.6385546,
-   "entranceNode": "nw-138",
-   "entranceLatitude": 10.7683193,
-   "entranceLongitude": 106.6385936,
+   "latitude": 10.7679996,
+   "longitude": 106.6385001,
+   "entranceNode": "nw-116",
+   "entranceLatitude": 10.7680613,
+   "entranceLongitude": 106.6385391,
    "entranceDistancePx": 13.1
   },
   {
@@ -1088,11 +1133,11 @@
     1813.0,
     368.0
    ],
-   "latitude": 10.7685964,
-   "longitude": 106.6368708,
-   "entranceNode": "nw-248",
-   "entranceLatitude": 10.7686378,
-   "entranceLongitude": 106.637393,
+   "latitude": 10.7683385,
+   "longitude": 106.6368163,
+   "entranceNode": "nw-224",
+   "entranceLatitude": 10.7683798,
+   "entranceLongitude": 106.6373385,
    "entranceDistancePx": 92.4
   },
   {
@@ -1103,11 +1148,11 @@
     1354.5,
     1097.5
    ],
-   "latitude": 10.7663618,
-   "longitude": 106.6410696,
-   "entranceNode": "nw-156",
-   "entranceLatitude": 10.766341,
-   "entranceLongitude": 106.641153,
+   "latitude": 10.7661038,
+   "longitude": 106.6410151,
+   "entranceNode": "nw-134",
+   "entranceLatitude": 10.766083,
+   "entranceLongitude": 106.6410986,
    "entranceDistancePx": 15.3
   },
   {
@@ -1118,11 +1163,11 @@
     904.5,
     938.5
    ],
-   "latitude": 10.7638748,
-   "longitude": 106.6402437,
-   "entranceNode": "nw-159",
-   "entranceLatitude": 10.764521,
-   "entranceLongitude": 106.6401308,
+   "latitude": 10.7636169,
+   "longitude": 106.6401892,
+   "entranceNode": "nw-137",
+   "entranceLatitude": 10.764263,
+   "entranceLongitude": 106.6400764,
    "entranceDistancePx": 121.6
   },
   {
@@ -1133,11 +1178,11 @@
     937.5,
     938.5
    ],
-   "latitude": 10.7640533,
-   "longitude": 106.6402383,
-   "entranceNode": "nw-249",
-   "entranceLatitude": 10.7645234,
-   "entranceLongitude": 106.640142,
+   "latitude": 10.7637953,
+   "longitude": 106.6401839,
+   "entranceNode": "nw-225",
+   "entranceLatitude": 10.7642655,
+   "entranceLongitude": 106.6400876,
    "entranceDistancePx": 89.0
   }
  ]

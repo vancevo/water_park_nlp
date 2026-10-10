@@ -26,6 +26,43 @@
         "x": 1332.3,
         "y": 451.4
       }
+    },
+    {
+      "slug": "new-diem-thu",
+      "nameVi": "Điểm thử nghiệm",
+      "nameEn": "Test spot",
+      "noteVi": "Điểm thử nghiệm để xem vị trí trên bản đồ.",
+      "noteEn": "Test spot to check a position on the map.",
+      "category": "landmark",
+      "pin": "blue",
+      "latitude": 10.7664249,
+      "longitude": 106.6367418
+    },
+    {
+      "slug": "new-dao-than-ky",
+      "nameVi": "Đảo Thần Kỳ",
+      "nameEn": "Magic Island",
+      "noteVi": "Điểm ngắm cảnh trên cao giữa hồ, dùng để nghỉ chân.",
+      "noteEn": "A high viewpoint on the lake, used as a place to rest.",
+      "category": "landmark",
+      "pin": "white",
+      "pixel": {
+        "x": 1005.6,
+        "y": 586.3
+      }
+    },
+    {
+      "slug": "new-cong-lien-thong",
+      "nameVi": "Cổng liên thông Công viên nước Đầm Sen",
+      "nameEn": "Connecting Gate to Dam Sen Water Park",
+      "noteVi": "Cổng đi sang Công viên nước Đầm Sen từ Đầm Sen khô.",
+      "noteEn": "The gate from Dam Sen dry park into Dam Sen Water Park.",
+      "category": "gate",
+      "pin": "yellow",
+      "pixel": {
+        "x": 1603.8,
+        "y": 363.1
+      }
     }
   ]
 }

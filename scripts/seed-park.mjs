@@ -1,6 +1,6 @@
 /* global process */
 // One command that puts the park places into a fresh database: the footpath graph, the
-// 50 numbered places (published, with their entrances on the paths) and their positions.
+// places (published, with their entrances on the paths), their positions and their written content.
 //
 //   # API running (npm run dev:api) against the migrated database
 //   ADMIN_PASSWORD=... node scripts/seed-park.mjs        # or: npm run seed:park
@@ -38,4 +38,6 @@ run('import-redrawn-walkways.mjs', flags);
 run('import-pois.mjs', flags);
 // 3. now that the places exist: exact entrance nodes and pin positions.
 run('import-redrawn-walkways.mjs', flags);
+// 4. the written content of the 77 places (descriptions + narration text), through the admin API.
+run('import-poi-content.mjs', dryRun ? [] : ['--apply']);
 logger.log('\nPark places seeded.');

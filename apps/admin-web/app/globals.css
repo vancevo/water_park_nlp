@@ -1238,3 +1238,45 @@ a:focus-visible,
   gap: 6px;
   margin-bottom: 12px;
 }
+
+/* Measuring animation: a radar ring pulses out from the dot while the fixes are collected. */
+.field-card.measure {
+  position: relative;
+}
+.field-radar {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  width: 14px;
+  height: 14px;
+  background: var(--brand);
+  border-radius: 50%;
+}
+.field-radar::before,
+.field-radar::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  border: 2px solid var(--brand);
+  border-radius: 50%;
+  animation: field-radar 1.6s ease-out infinite;
+}
+.field-radar::after {
+  animation-delay: 0.8s;
+}
+@keyframes field-radar {
+  from {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(3.2);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .field-radar::before,
+  .field-radar::after {
+    animation: none;
+  }
+}

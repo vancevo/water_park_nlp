@@ -46,7 +46,7 @@ npm run dev:visitor
 ```
 
 **Quan trọng:** migration chỉ nạp 5 địa điểm giả để test. 50 địa điểm của bản đồ và đồ thị đường đi
-nằm trong database, không nằm trong repo, nên sau khi kéo code phải chạy `npm run seed:park`
+nằm trong database, không nằm trong repo (nội dung mô tả/thuyết minh của các địa điểm cũng vậy: `data/pois/poi-content.source.txt` → `scripts/import-poi-content.mjs`), nên sau khi kéo code phải chạy `npm run seed:park`
 (cần API đang chạy và tài khoản admin; chạy lại nhiều lần vẫn an toàn). Chạy demo một chạm
 (`demo.mjs start`) đã tự gọi bước này. Không có `DATABASE_URL` thì API dùng bộ nhớ tạm chỉ có 5 địa điểm giả.
 

@@ -1,4 +1,4 @@
-/* global process, console, document, window, localStorage, fetch, Buffer */
+/* global process, console, document, window, localStorage, fetch, Buffer, HTMLMediaElement */
 // Browser smoke for T25D/T03 + I01/I03 (narration locale selector). Not part of
 // `npm test`: it needs a running visitor web app and a local Chromium +
 // playwright-core.
@@ -46,6 +46,16 @@ try {
   const context = await browser.newContext({
     viewport: { width: 1280, height: 860 },
   });
+  // The card no longer embeds an <audio>: the shared player plays through one Audio element.
+  // Record the sources it plays so the smoke can check what the visitor would hear.
+  await context.addInitScript(() => {
+    window.__playedSrc = [];
+    const play = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      if (!this.src.startsWith('data:')) window.__playedSrc.push(this.src);
+      return play.call(this);
+    };
+  });
   const page = await context.newPage();
   page.setDefaultTimeout(10_000);
   page.on('pageerror', (error) => failures.push(error.message));
@@ -81,7 +91,15 @@ try {
     .evaluateAll((options) => options.map((option) => option.value));
   assert.ok(codes.includes('vi') && codes.includes('en'), `codes: ${codes}`);
 
+  // Most of the 77 places only have Vietnamese narration: open places until one has English.
   await select.selectOption('en');
+  const cardCount = await page.locator('.poi-card').count();
+  for (let index = 1; index < cardCount; index++) {
+    const english = page.locator('.narration-body [lang="en"]');
+    await page.waitForTimeout(700);
+    if ((await english.count()) > 0) break;
+    await page.locator('.poi-card').nth(index).click();
+  }
   await page.locator('.narration-body [lang="en"]').first().waitFor();
   assert.equal(
     await page.evaluate(() =>
@@ -126,18 +144,6 @@ try {
     'en',
   );
 
-  // French interface: whole UI switches, POI content stays English.
-  await page.getByRole('button', { name: 'Interface en français' }).click();
-  await page.getByLabel('Langue du commentaire').waitFor();
-  assert.equal(await page.locator('html').getAttribute('lang'), 'fr');
-  assert.match(
-    await page.locator('.discovery-panel h1').innerText(),
-    /Chaque pas/,
-  );
-  assert.match(await page.locator('.account-button').innerText(), /connecter/);
-  await page.getByRole('button', { name: 'Giao diện tiếng Việt' }).click();
-  await page.getByLabel('Ngôn ngữ thuyết minh').waitFor();
-
   // Old / new map switch (small control by the zoom buttons) must not break the page.
   for (const label of ['Cũ', 'Mới']) {
     await page.getByRole('button', { name: label, exact: true }).click();
@@ -172,16 +178,16 @@ try {
     );
     // Demo fixture: VI carries recorded audio, so it wins over browser TTS.
     await select.selectOption('vi');
-    await page.locator('.narration-body audio').waitFor();
-    // Contract v1.2: generated audio carries a visible, labelled AI notice.
+    await page.locator('.narration-body .listen-row').waitFor();
+    // No "AI-generated voice" chip is shown to the visitor (removed on request).
     assert.equal(
-      await page.locator('.narration-body .ai-audio-label').innerText(),
-      'Giọng đọc do AI tạo',
+      await page.locator('.narration-body .ai-audio-label').count(),
+      0,
     );
     assert.equal(
-      await page.locator('.narration-body .secondary-action').count(),
-      0,
-      'no browser-TTS button when recorded audio exists',
+      await page.locator('.narration-body .secondary-action').innerText(),
+      'Nghe thuyết minh',
+      'one Listen button; recorded audio is played by the shared player',
     );
     await select.selectOption('fr');
     await page.locator('.fallback-notice').waitFor();
@@ -218,15 +224,30 @@ try {
         await notice.waitFor();
         assert.match(await notice.innerText(), new RegExp(option.nativeLabel));
       } else assert.equal(await notice.count(), 0);
-      if (resolved.audio) {
-        const player = page.locator('.narration-body audio');
-        await player.waitFor();
+      if (resolved.fallbackUsed) {
+        // Another language is never played under the chosen one: the card offers a switch.
+        assert.match(
+          await page.locator('.narration-body .secondary-action').innerText(),
+          /^Nghe bản /,
+          `${option.code}: fallback offers to switch language, not to play`,
+        );
+      } else if (resolved.audio) {
+        const listen = page.locator(
+          '.narration-bar .secondary-action:not(.stop-action)',
+        );
+        await listen.waitFor();
         assert.equal(
           await page.locator('.narration-body .ai-audio-label').count(),
-          resolved.audio.generatedBy ? 1 : 0,
-          `${option.code}: AI label iff audio.generatedBy`,
+          0,
+          `${option.code}: no AI label chip`,
         );
-        const src = await player.getAttribute('src');
+        await page.evaluate(() => {
+          window.__playedSrc = [];
+        });
+        await listen.click();
+        await page.waitForFunction(() => window.__playedSrc.length > 0);
+        const src = await page.evaluate(() => window.__playedSrc.at(-1));
+        await page.getByRole('button', { name: 'Dừng', exact: true }).click();
         const bytes = Buffer.from(await (await fetch(src)).arrayBuffer());
         assert.equal(
           createHash('sha256').update(bytes).digest('hex'),

@@ -34,32 +34,32 @@
     "nameEn": "Spinning Tower",
     "pin": "11.1",
     "color": "red",
-    "latitude": 10.7677176,
-    "longitude": 106.6387492
+    "latitude": 10.7674597,
+    "longitude": 106.6386948
    },
    {
     "nameVi": "Thảm bay",
     "nameEn": "Flying Carpet",
     "pin": "11.2",
     "color": "red",
-    "latitude": 10.7678289,
-    "longitude": 106.638525
+    "latitude": 10.767571,
+    "longitude": 106.6384705
    },
    {
     "nameVi": "Hải cầu vượt thác",
     "nameEn": "Waterfall Sea Bridge",
     "pin": "11.3",
     "color": "purple",
-    "latitude": 10.7674087,
-    "longitude": 106.6387472
+    "latitude": 10.7671508,
+    "longitude": 106.6386927
    },
    {
     "nameVi": "Điểm 11.4",
     "nameEn": "Spot 11.4",
     "pin": "11.4",
     "color": "blue",
-    "latitude": 10.7675555,
-    "longitude": 106.6385728,
+    "latitude": 10.7672975,
+    "longitude": 106.6385184,
     "needsName": true
    },
    {

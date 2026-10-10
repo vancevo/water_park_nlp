@@ -181,10 +181,36 @@ def main():
     w, h = g["imageSizePx"]
     tl, tr, _br, bl = (np.array(c) for c in g["corners"])
 
-    def ll(px):
+    def ll_fitted(px):  # picture px -> lon/lat as fitted to the OSM footpaths
         px = np.atleast_2d(px)
         pic = np.c_[px, np.ones(len(px))] @ SVG_TO_PICTURE
         return tl + (pic[:, 0:1] / w) * (tr - tl) + (pic[:, 1:2] / h) * (bl - tl)
+
+    def to_m(lonlat):
+        lonlat = np.atleast_2d(lonlat)
+        return np.c_[(lonlat[:, 0] - LON0) * KX, (lonlat[:, 1] - LAT0) * KY]
+
+    def to_lonlat(m):
+        return np.c_[m[:, 0] / KX + LON0, m[:, 1] / KY + LAT0]
+
+    # Control points (control-points.json): spots whose real lon/lat is known and whose pixel on the
+    # picture was read off. 1 point = shift, 2 = shift + rotate + scale, 3+ = full affine.
+    cps = json.loads((HERE / "control-points.json").read_text())["points"]
+    cp_src = to_m(ll_fitted(np.array([c["pixel"] for c in cps], float)))
+    cp_dst = to_m(np.array([[c["lon"], c["lat"]] for c in cps], float))
+    if len(cps) == 1:
+        correction = lambda m: m + (cp_dst[0] - cp_src[0])
+    elif len(cps) == 2:
+        z = lambda a: a[:, 0] + 1j * a[:, 1]
+        k = (z(cp_dst)[1] - z(cp_dst)[0]) / (z(cp_src)[1] - z(cp_src)[0])
+        t = z(cp_dst)[0] - k * z(cp_src)[0]
+        correction = lambda m: np.c_[(k * z(m) + t).real, (k * z(m) + t).imag]
+    else:
+        aff = np.linalg.lstsq(np.c_[cp_src, np.ones(len(cp_src))], cp_dst, rcond=None)[0]
+        correction = lambda m: np.c_[m, np.ones(len(m))] @ aff
+
+    def ll(px):  # picture px -> lon/lat, corrected so every control point lands on its real coordinate
+        return to_lonlat(correction(to_m(ll_fitted(px))))
 
     # 5. POI entrances: project each numbered pin onto the nearest edge and split it there.
     # A place with sub-pins (11 -> 11.1..11.4) is drawn at the centre of those sub-pins.

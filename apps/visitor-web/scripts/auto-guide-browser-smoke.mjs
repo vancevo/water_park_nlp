@@ -1,158 +1,201 @@
-/* global process, console, document, window, HTMLMediaElement */
-// Browser smoke for the proximity auto narration + fixed POI numbers. Needs the
-// API with the 50 POIs and narrations for #25/#26, the visitor app on :3002 and
-// a local Chromium + playwright-core (same setup as narration-browser-smoke).
+/* global process, console, document, window, performance, fetch, HTMLMediaElement, setInterval, clearInterval, setTimeout */
+// Browser smoke for the click / GPS / audio rules (PLAN_1): one shared player, no overlap,
+// no replay of what was heard. Not part of `npm test`: it needs the API with places 25 and 26
+// published WITH audio (they are the only ones with a narration so far), the visitor app on
+// :3002 and a local Chromium + playwright-core.
 //
 //   PLAYWRIGHT_CORE_PATH=/path/to/playwright-core CHROMIUM_PATH=/path/chrome \
-//   node apps/visitor-web/scripts/auto-guide-browser-smoke.mjs http://localhost:3002
-import assert from 'node:assert/strict';
+//   node apps/visitor-web/scripts/auto-guide-browser-smoke.mjs http://localhost:3002 [http://localhost:3000]
+//
+// A: visitor far away (click rules, switch on/off). B: GPS near 25 (starts once after the stay,
+// never replays). C: GPS candidate waits for audio the visitor started, then plays once.
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 
 const base = process.argv[2] ?? 'http://localhost:3002';
+const apiBase = process.argv[3] ?? 'http://localhost:3000';
 const corePath = process.env.PLAYWRIGHT_CORE_PATH ?? 'playwright-core';
 const { chromium } = await import(
   corePath.startsWith('/')
     ? pathToFileURL(path.join(corePath, 'index.mjs')).href
     : corePath
 );
-
-const WHEEL = { latitude: 10.7642469, longitude: 106.636908 };
-const BUMPER = { latitude: 10.7634211, longitude: 106.6380587 };
-const metersNorth = (point, meters) => ({
-  ...point,
-  latitude: point.latitude + meters / 111_320,
-});
-const FAR = { latitude: 10.7668, longitude: 106.6349 };
-
+const pois = (await (await fetch(`${apiBase}/v1/pois`)).json()).items;
+const p25 = pois.find((p) => p.slug.startsWith('p25-'));
+const near25 = {
+  latitude: p25.location.latitude + 0.0004,
+  longitude: p25.location.longitude,
+  accuracy: 10,
+};
+const far = { latitude: 10.77, longitude: 106.63, accuracy: 10 };
 const browser = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH,
+  args: ['--autoplay-policy=no-user-gesture-required'],
 });
-try {
+let failed = 0;
+const check = (name, ok, extra = '') => {
+  if (!ok) failed++;
+  console.log(ok ? 'PASS' : 'FAIL', name, extra);
+};
+async function session(geo) {
   const context = await browser.newContext({
-    viewport: { width: 1280, height: 860 },
-    geolocation: { ...FAR, accuracy: 8 },
+    viewport: { width: 1400, height: 900 },
+    geolocation: geo,
     permissions: ['geolocation'],
   });
-  const page = await context.newPage();
-  page.setDefaultTimeout(10_000);
-  await page.addInitScript(() => {
-    window.__played = [];
-    const play = HTMLMediaElement.prototype.play;
-    HTMLMediaElement.prototype.play = function () {
-      window.__played.push(this.src.slice(0, 40));
-      return play.call(this).catch(() => {});
+  // The zone introductions use the browser voice, which headless Chromium lacks: a stand-in
+  // that "speaks" for 400 ms.
+  await context.addInitScript(() => {
+    Object.defineProperty(window, 'speechSynthesis', {
+      configurable: true,
+      value: {
+        getVoices: () => [{ lang: 'vi-VN', name: 'Linh', localService: true }],
+        addEventListener() {},
+        removeEventListener() {},
+        cancel() {},
+        speak(u) {
+          setTimeout(() => u.onstart && u.onstart(), 10);
+          setTimeout(() => u.onend && u.onend(), 400);
+        },
+      },
+    });
+    window.SpeechSynthesisUtterance = function (text) {
+      this.text = text;
     };
-    window.__spoken = [];
-    const speak = window.speechSynthesis?.speak?.bind(window.speechSynthesis);
-    if (speak) {
-      window.speechSynthesis.speak = (u) => {
-        window.__spoken.push(u.text);
-        return speak(u);
-      };
-    }
   });
+  await context.addInitScript(() => {
+    window.__log = [];
+    const o = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      if (!this.src.startsWith('data:'))
+        window.__log.push([
+          Math.round(performance.now() / 100) / 10,
+          this.src.split('/').pop().slice(0, 8),
+        ]);
+      return o.call(this);
+    };
+  });
+  const page = await context.newPage();
+  page.on('pageerror', (e) => console.log('pageerror', e.message));
+  const timer = setInterval(
+    () => context.setGeolocation(geo).catch(() => {}),
+    2000,
+  );
   await page.goto(base, { waitUntil: 'networkidle' });
-  await page.locator('.poi-card').first().waitFor();
-
-  // Fixed numbers: 01..50, in order, no extra place.
-  const numbers = await page.locator('.poi-card .poi-index').allTextContents();
-  assert.equal(numbers.length, 50, `expected 50 places, got ${numbers.length}`);
-  assert.deepEqual(
-    numbers,
-    Array.from({ length: 50 }, (_, i) => String(i + 1).padStart(2, '0')),
-  );
-  const names = (n) =>
-    page.locator('.poi-card').nth(n).locator('.poi-copy strong').textContent();
-  assert.equal(await names(24), 'Đu quay đứng');
-  assert.equal(await names(25), 'Xe điện đụng thế hệ mới');
-  console.log(
-    '✓ list is 01–50 in map order; 25 = Đu quay đứng, 26 = Xe điện đụng thế hệ mới',
-  );
-
-  // Opting in with a far-away fix: distances shown, nothing plays.
-  await page.getByRole('button', { name: /Bật tự động/ }).click();
-  await page.locator('.auto-guide li small').first().waitFor();
-  await page.waitForFunction(() =>
-    /m|km/.test(
-      document.querySelector('.auto-guide li small')?.textContent ?? '',
-    ),
-  );
-  const farRows = await page.locator('.auto-guide li').allTextContents();
-  console.log('✓ distances while far:', farRows.join(' | '));
-  // List numbers must not change once the position is known (distance sort).
-  const after = await page.locator('.poi-card .poi-index').allTextContents();
-  assert.deepEqual(after, numbers, 'numbers changed after GPS fix');
-  assert.equal(
-    (await page.evaluate(() => window.__played.length)) +
-      (await page.evaluate(() => window.__spoken.length)),
-    // the opt-in tap itself primes audio/speech once
-    2,
-    'something narrated while far from both places',
-  );
-  console.log('✓ numbers unchanged with GPS; no narration while far');
-
-  // Walk up to the Ferris wheel (8 m): narration starts without any tap.
-  await context.setGeolocation({ ...metersNorth(WHEEL, 8), accuracy: 8 });
-  await page.waitForFunction(
-    () => window.__played.length + window.__spoken.length > 2,
-    undefined,
-    { timeout: 20_000 },
-  );
-  const card = await page
-    .locator('.detail-card, .poi-detail')
-    .first()
-    .textContent()
-    .catch(() => '');
-  const played = await page.evaluate(() => window.__played.slice(1));
-  const spoken = await page.evaluate(() => window.__spoken.slice(1));
-  assert.ok(
-    played.some((src) => !src.startsWith('data:audio/wav')) ||
-      spoken.length > 0,
-    'only the silent primer played',
-  );
-  console.log('✓ auto narration #25 →', {
-    played,
-    spoken: spoken.map((s) => s.slice(0, 40)),
-  });
-  assert.ok(
-    (await page.locator('.auto-guide li.near').count()) >= 1,
-    'near badge missing',
-  );
-  assert.ok(card !== undefined);
-
-  // Same place again right away: no repeat.
-  const count = await page.evaluate(
-    () => window.__played.length + window.__spoken.length,
-  );
-  await context.setGeolocation({ ...metersNorth(WHEEL, 3), accuracy: 8 });
-  await page.waitForTimeout(2500);
-  assert.equal(
-    await page.evaluate(() => window.__played.length + window.__spoken.length),
-    count,
-    'narrated twice',
-  );
-  console.log('✓ no repeat while staying at #25');
-
-  // Poor accuracy at #26 must not trigger; a good fix then does.
-  await context.setGeolocation({ ...metersNorth(BUMPER, 5), accuracy: 150 });
-  await page.waitForTimeout(2500);
-  assert.equal(
-    await page.evaluate(() => window.__played.length + window.__spoken.length),
-    count,
-    'inaccurate fix triggered',
-  );
-  await context.setGeolocation({ ...metersNorth(BUMPER, 5), accuracy: 6 });
-  await page.waitForFunction(
-    (c) => window.__played.length + window.__spoken.length > c,
-    count,
-    { timeout: 20_000 },
-  );
-  console.log('✓ weak GPS ignored; #26 narrates on a good fix');
-  await page.screenshot({
-    path: process.env.SMOKE_SHOT ?? '/tmp/auto-guide.png',
-  });
-  console.log('PASS auto-guide-browser-smoke');
-} finally {
-  await browser.close();
+  await page.waitForTimeout(3500);
+  return {
+    context,
+    page,
+    stop: () => clearInterval(timer),
+    plays: () => page.evaluate(() => window.__log.length),
+    bar: () =>
+      page.evaluate(
+        () => document.querySelector('.audio-bar-title')?.textContent ?? null,
+      ),
+    pin: (n) =>
+      page.evaluate(
+        (n) =>
+          [...document.querySelectorAll('.map-pin')]
+            .find((e) => e.textContent.trim() === n)
+            ?.click(),
+        n,
+      ),
+  };
 }
+
+// Part A: visitor far from every place (GPS cannot interfere)
+{
+  const t = await session(far);
+  await t.page.getByRole('button', { name: 'Bật tự động' }).click();
+  await t.pin('25');
+  await t.page.waitForTimeout(1500);
+  check(
+    'A1 click (auto on) plays an unheard place',
+    (await t.plays()) === 1 && /Đu quay/.test((await t.bar()) ?? ''),
+    await t.bar(),
+  );
+  await t.pin('25');
+  await t.pin('25');
+  await t.page.waitForTimeout(800);
+  check(
+    'A2 clicking the playing place does not restart it',
+    (await t.plays()) === 1,
+  );
+  await t.pin('26');
+  await t.page.waitForTimeout(1500);
+  check(
+    'A3 click on another unheard place switches audio',
+    (await t.plays()) === 2 && /Xe điện/.test((await t.bar()) ?? ''),
+    await t.bar(),
+  );
+  // turn auto off: auto-origin audio stops
+  await t.page.getByRole('button', { name: 'Tắt tự động' }).click();
+  await t.page.waitForTimeout(500);
+  check('A4 auto off stops the click-started audio', (await t.bar()) === null);
+  await t.pin('25');
+  await t.page.waitForTimeout(1000);
+  check('A5 click with auto off only opens the card', (await t.plays()) === 2);
+  await t.page
+    .getByRole('button', { name: /^(Nghe thuyết minh|Nghe lại)$/ })
+    .click();
+  await t.page.waitForTimeout(1200);
+  await t.page.getByRole('button', { name: 'Bật tự động' }).click();
+  await t.page.waitForTimeout(300);
+  await t.page.getByRole('button', { name: 'Tắt tự động' }).click();
+  await t.page.waitForTimeout(300);
+  check(
+    'A6 manual audio survives toggling auto',
+    /Đu quay/.test((await t.bar()) ?? ''),
+    await t.bar(),
+  );
+  t.stop();
+  await t.context.close();
+}
+
+// Part B: GPS near place 25
+{
+  const t = await session(near25);
+  await t.page.getByRole('button', { name: 'Bật tự động' }).click();
+  await t.page.waitForTimeout(5500);
+  check(
+    'B1 standing near 25 starts it once after the stay',
+    (await t.plays()) === 1 && /Đu quay/.test((await t.bar()) ?? ''),
+    `plays=${await t.plays()} bar=${await t.bar()}`,
+  );
+  await t.page.waitForTimeout(18000);
+  check(
+    'B2 staying there never replays it',
+    (await t.plays()) === 1,
+    `plays=${await t.plays()}`,
+  );
+  t.stop();
+  await t.context.close();
+}
+
+// Part C: GPS candidate waits for audio the visitor started, then plays
+{
+  const t = await session(near25);
+  await t.pin('26');
+  await t.page.waitForTimeout(500);
+  await t.page.getByRole('button', { name: 'Nghe thuyết minh' }).click();
+  await t.page.waitForTimeout(800);
+  await t.page.getByRole('button', { name: 'Bật tự động' }).click();
+  await t.page.waitForTimeout(5000);
+  check(
+    'C1 GPS does not interrupt audio the visitor started',
+    /Xe điện/.test((await t.bar()) ?? ''),
+    `plays=${await t.plays()} bar=${await t.bar()}`,
+  );
+  await t.page.waitForTimeout(16000);
+  const log = await t.page.evaluate(() => window.__log.map((x) => x[1]));
+  check(
+    'C2 after it finishes the waiting place plays once',
+    log.filter((x) => x.startsWith('5909')).length === 1,
+    JSON.stringify(log),
+  );
+  t.stop();
+  await t.context.close();
+}
+await browser.close();
+console.log(failed === 0 ? 'ALL PASS' : `${failed} FAILED`);
+process.exit(failed === 0 ? 0 : 1);
