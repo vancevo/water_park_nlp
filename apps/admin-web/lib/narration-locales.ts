@@ -26,12 +26,6 @@ export const FIXTURE_NARRATION_LOCALE_CATALOG: NarrationLocaleCatalog = {
       speechTag: 'en-US',
       fallbackLocale: 'vi',
     },
-    {
-      code: 'fr',
-      nativeLabel: 'Français',
-      speechTag: 'fr-FR',
-      fallbackLocale: 'en',
-    },
   ],
 };
 

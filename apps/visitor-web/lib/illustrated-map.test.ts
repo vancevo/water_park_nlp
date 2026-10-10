@@ -10,9 +10,8 @@ const georef = JSON.parse(
   status: string;
   image: string;
   corners: [number, number][];
-  rotationDegrees: number;
-  meanDistanceMetres: number;
-  osmPathSamplesWithin3HalfPixels: number;
+  imageSizePx: [number, number];
+  bearingDegrees: number;
 };
 
 describe('illustrated map georeference', () => {
@@ -46,10 +45,11 @@ describe('illustrated map georeference', () => {
     expect(new Set(signs).size).toBe(1);
   });
 
-  it('is fitted to the OSM footpaths within about a metre, north-up', () => {
-    expect(georef.status).toBe('fitted-to-osm-paths'); // never "verified on site"
-    expect(georef.meanDistanceMetres).toBeLessThan(1.5);
-    expect(georef.osmPathSamplesWithin3HalfPixels).toBeGreaterThan(0.9);
-    expect(Math.abs(georef.rotationDegrees)).toBeLessThan(2);
+  it('is an estimate (never "verified on site") with the bearing that shows it upright', () => {
+    expect(georef.status).toBe('traced-and-fitted');
+    expect(georef.imageSizePx).toEqual([2048, 1315]);
+    // Gate 1 is at the bottom of the picture, so the map is turned about 90 degrees from north-up.
+    expect(georef.bearingDegrees).toBeGreaterThan(250);
+    expect(georef.bearingDegrees).toBeLessThan(280);
   });
 });

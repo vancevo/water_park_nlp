@@ -14,13 +14,6 @@
       "speechTag": "en-US",
       "enabled": true,
       "fallbackLocale": "vi"
-    },
-    {
-      "code": "fr",
-      "nativeLabel": "Français",
-      "speechTag": "fr-FR",
-      "enabled": true,
-      "fallbackLocale": "en"
     }
   ]
 }

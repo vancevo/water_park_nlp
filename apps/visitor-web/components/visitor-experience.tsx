@@ -16,9 +16,17 @@ import type {
   Marker,
   StyleSpecification,
 } from 'maplibre-gl';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { visitorApi } from '@/lib/api';
 import { ILLUSTRATED_LAYER, addIllustratedMap } from '@/lib/map-pictures';
+import { poiPinColor } from '@/lib/poi-pin-colors';
+import {
+  loadSubPlaces,
+  subPlaceName,
+  subPlacesFor,
+  type SubPlace,
+  type SubPlaces,
+} from '@/lib/sub-places';
 import { categoryLabel, formatDistance, formatDuration } from '@/lib/format';
 import {
   readUiLocalePreference,
@@ -29,6 +37,7 @@ import {
   type UiText,
 } from '@/lib/ui-text';
 import {
+  geoDistanceMeters,
   routeLengthMeters,
   routeProgressAt,
   simulationDistanceAtTime,
@@ -44,9 +53,24 @@ import {
   readVisitorSession,
   saveVisitorSession,
 } from '@/lib/session';
+import { formatPoiNumber, poiNumber, sortByPoiNumber } from '@/lib/poi-number';
+import {
+  AUTO_GUIDE_DEFAULTS,
+  AUTO_GUIDE_POI_NUMBERS,
+  EMPTY_GUIDE_STATE,
+  evaluateAutoGuide,
+  type GuideFix,
+  type GuideState,
+} from '@/lib/proximity-guide';
 import { NarrationSection, useVisitorNarration } from './narration-section';
 
-const FALLBACK_CENTER: [number, number] = [106.63853, 10.76433];
+/** Keeps the camera target clear of the detail card (on the right on wide screens). */
+function cameraPadding() {
+  const wide = !window.matchMedia('(max-width: 820px)').matches;
+  return { top: 90, left: 60, bottom: 60, right: wide ? 460 : 60 };
+}
+
+const FALLBACK_CENTER: [number, number] = [106.63864, 10.76443];
 type MapKind = 'old' | 'new';
 const MAP_TILE_URL = process.env.NEXT_PUBLIC_MAP_TILE_URL;
 const MAP_TILE_ATTRIBUTION =
@@ -203,6 +227,17 @@ const MAP_STYLE =
 
 type AuthMode = 'login' | 'register';
 
+/** ~8 ms of silence: played on the opt-in tap so later auto-play is allowed. */
+const SILENT_WAV =
+  'data:audio/wav;base64,UklGRmQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA';
+const SIMULATED_FIX_ACCURACY_METERS = 5;
+const GPS_MIN_MOVE_METERS = 15;
+interface GuideReading {
+  distances: Record<string, number>;
+  inaccurate: boolean;
+  accuracyMeters: number;
+}
+
 export function VisitorExperience() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapPanelRef = useRef<HTMLElement>(null);
@@ -215,7 +250,11 @@ export function VisitorExperience() {
   const narrationAudioRef = useRef<HTMLAudioElement | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapKind, setMapKind] = useState<MapKind>('new');
-  const [illustratedReady, setIllustratedReady] = useState(false);
+  // Bearing that shows the official map upright; null until the picture loaded.
+  const [illustratedBearing, setIllustratedBearing] = useState<number | null>(
+    null,
+  );
+  const illustratedReady = illustratedBearing !== null;
   const [locale, setLocaleState] = useState<UiLocale>('vi');
   const t = uiText(locale);
   const changeLocale = useCallback((next: UiLocale) => {
@@ -223,7 +262,21 @@ export function VisitorExperience() {
     saveUiLocalePreference(next);
   }, []);
   const [pois, setPois] = useState<PoiSummary[]>([]);
+  // Auto narration near fixed places (lib/proximity-guide.ts)
+  const [autoGuide, setAutoGuide] = useState(false);
+  const [autoTargets, setAutoTargets] = useState<PoiSummary[]>([]);
+  const [gpsFix, setGpsFix] = useState<GuideFix | null>(null);
+  const [guideDenied, setGuideDenied] = useState(false);
+  const [guideReading, setGuideReading] = useState<GuideReading | null>(null);
+  const [autoPlayPoiId, setAutoPlayPoiId] = useState<string | null>(null);
+  const guideStateRef = useRef<GuideState>(EMPTY_GUIDE_STATE);
   const [selected, setSelected] = useState<PoiSummary | null>(null);
+  // Attractions inside big places (children's area, ...); `activeChild` is the one tapped.
+  const [subPlaces, setSubPlaces] = useState<SubPlaces>({});
+  const [activeChild, setActiveChild] = useState<number | null>(null);
+  const subMarkersRef = useRef<Marker[]>([]);
+  const subPlacesRef = useRef<SubPlaces>({});
+  subPlacesRef.current = subPlaces;
   const [detail, setDetail] = useState<PoiDetail | null>(null);
   const [route, setRoute] = useState<RouteResponse | null>(null);
   const [position, setPosition] = useState<GeoPoint | null>(null);
@@ -282,6 +335,7 @@ export function VisitorExperience() {
       cancelSimulationAnimation();
       stopPlayback();
       setSelected(poi);
+      setActiveChild(null);
       setDetailCardOpen(true);
       // On phones the list is below the map: bring the detail card into view.
       if (window.matchMedia('(max-width: 820px)').matches) {
@@ -333,7 +387,9 @@ export function VisitorExperience() {
             locale: contentLocale(locale),
             ...locationQuery,
           });
-      setPois(response.items);
+      // Numbers are fixed per place: distance only decorates the list, it
+      // never reorders or renumbers it. Search keeps its relevance order.
+      setPois(query.trim() ? response.items : sortByPoiNumber(response.items));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : t.loadPlacesFailed);
     } finally {
@@ -369,10 +425,10 @@ export function VisitorExperience() {
       map.once('load', () => {
         map.addSource('damsen-osm-walkways', {
           type: 'geojson',
-          data: '/data/damsen-osm-walkways.geojson',
+          data: '/data/damsen-walkways.geojson',
           attribution: '© OpenStreetMap contributors',
         });
-        void addIllustratedMap(map).then(setIllustratedReady);
+        void addIllustratedMap(map).then(setIllustratedBearing);
         map.addLayer({
           id: 'damsen-osm-walkways-outline',
           type: 'line',
@@ -423,7 +479,7 @@ export function VisitorExperience() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [arrivalOpen, authMode, detailCardOpen, stopPlayback]);
 
-  // Old map = OSM base + walkways; new = the illustrated map under them.
+  // Old map = OSM base + walkways; new = the official map under them, turned upright.
   useEffect(() => {
     const map = mapRef.current;
     if (
@@ -438,7 +494,11 @@ export function VisitorExperience() {
       'visibility',
       mapKind === 'new' ? 'visible' : 'none',
     );
-  }, [illustratedReady, mapKind, mapReady]);
+    map.easeTo({
+      bearing: mapKind === 'new' ? (illustratedBearing ?? 0) : 0,
+      duration: 500,
+    });
+  }, [illustratedBearing, illustratedReady, mapKind, mapReady]);
 
   // Remembered interface language (read after mount so SSR markup stays 'vi').
   useEffect(() => {
@@ -487,14 +547,16 @@ export function VisitorExperience() {
     void import('maplibre-gl').then((maplibregl) => {
       if (cancelled) return;
       markersRef.current.forEach((marker) => marker.remove());
-      markersRef.current = pois.map((poi, index) => {
+      markersRef.current = pois.map((poi) => {
         const element = document.createElement('button');
-        element.className = `map-pin${selected?.id === poi.id ? ' selected' : ''}`;
+        const pinColor = poiPinColor(poi.slug);
+        element.className = `map-pin${pinColor ? ` pin-${pinColor}` : ''}${selected?.id === poi.id ? ' selected' : ''}`;
         element.type = 'button';
         element.ariaLabel = poi.name;
-        element.innerHTML = `<span>${index + 1}</span>`;
+        element.innerHTML = `<span>${formatPoiNumber(poi.slug)}</span>`;
         element.addEventListener('click', () => openPoi(poi));
-        return new maplibregl.Marker({ element })
+        // The pin's tip (not its centre) sits on the place, like the tips read off the map.
+        return new maplibregl.Marker({ element, offset: [0, -22] })
           .setLngLat([poi.location.longitude, poi.location.latitude])
           .addTo(map);
       });
@@ -503,6 +565,60 @@ export function VisitorExperience() {
       cancelled = true;
     };
   }, [mapReady, openPoi, pois, selected?.id]);
+
+  useEffect(() => {
+    void loadSubPlaces().then(setSubPlaces);
+  }, []);
+
+  const selectedChildren = useMemo(
+    () => (selected ? subPlacesFor(subPlaces, selected.slug) : []),
+    [selected, subPlaces],
+  );
+
+  // Small pins of the attractions inside the selected big place (11.1, 11.2, ...).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+    let cancelled = false;
+    void import('maplibre-gl').then((maplibregl) => {
+      if (cancelled) return;
+      subMarkersRef.current.forEach((marker) => marker.remove());
+      subMarkersRef.current = [];
+      selectedChildren.forEach((child, index) => {
+        if (!child.pin || child.latitude === undefined) return;
+        const element = document.createElement('button');
+        element.className = `map-pin sub pin-${child.color ?? 'white'}${activeChild === index ? ' selected' : ''}`;
+        element.type = 'button';
+        element.ariaLabel = subPlaceName(child, locale);
+        element.title = subPlaceName(child, locale);
+        element.innerHTML = `<span>${child.pin}</span>`;
+        element.addEventListener('click', () => setActiveChild(index));
+        subMarkersRef.current.push(
+          new maplibregl.Marker({ element, offset: [0, -16] })
+            .setLngLat([child.longitude!, child.latitude])
+            .addTo(map),
+        );
+      });
+    });
+    return () => {
+      cancelled = true;
+      subMarkersRef.current.forEach((marker) => marker.remove());
+      subMarkersRef.current = [];
+    };
+  }, [activeChild, locale, mapReady, selectedChildren]);
+
+  // Tapping an attraction with a pin brings it to the centre of the map.
+  useEffect(() => {
+    const map = mapRef.current;
+    const child = activeChild === null ? null : selectedChildren[activeChild];
+    if (!map || !mapReady || !child || child.latitude === undefined) return;
+    map.easeTo({
+      center: [child.longitude!, child.latitude],
+      zoom: Math.max(map.getZoom(), 18),
+      padding: cameraPadding(),
+      duration: 400,
+    });
+  }, [activeChild, mapReady, selectedChildren]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -569,10 +685,30 @@ export function VisitorExperience() {
     setArrivalOpen(false);
     cancelSimulationAnimation();
     stopPlayback();
-    mapRef.current?.flyTo({
-      center: [selected.location.longitude, selected.location.latitude],
-      zoom: 17.2,
-    });
+    const pinned = subPlacesFor(subPlacesRef.current, selected.slug).filter(
+      (child) => child.latitude !== undefined,
+    );
+    if (pinned.length > 0) {
+      // A big place: show all its sub-pins, clear of the detail card on the right.
+      const lngs = pinned.map((child) => child.longitude!);
+      const lats = pinned.map((child) => child.latitude!);
+      mapRef.current?.fitBounds(
+        [
+          [Math.min(...lngs), Math.min(...lats)],
+          [Math.max(...lngs), Math.max(...lats)],
+        ],
+        {
+          padding: cameraPadding(),
+          maxZoom: 18.5,
+          bearing: mapRef.current?.getBearing(),
+        },
+      );
+    } else {
+      mapRef.current?.flyTo({
+        center: [selected.location.longitude, selected.location.latitude],
+        zoom: 17.2,
+      });
+    }
     void visitorApi
       .getPoi(selected.id, contentLocale(locale))
       .then(setDetail)
@@ -610,9 +746,11 @@ export function VisitorExperience() {
     const first = coordinates.at(0);
     const last = coordinates.at(-1);
     if (first && last && !simulationPosition) {
+      // fitBounds resets the bearing to north unless told otherwise: keep the picture upright.
       map.fitBounds([first, last], {
         padding: 90,
         maxZoom: 18,
+        bearing: map.getBearing(),
       });
     }
   }, [mapReady, route, simulationPosition]);
@@ -727,6 +865,160 @@ export function VisitorExperience() {
     narrationSpeakerRef.current = speakNarration;
   }, [speakNarration]);
 
+  // The places that narrate by themselves, from the full list (not the search).
+  useEffect(() => {
+    let cancelled = false;
+    void visitorApi
+      .listPois({ locale: contentLocale(locale) })
+      .then((response) => {
+        if (cancelled) return;
+        setAutoTargets(
+          sortByPoiNumber(
+            response.items.filter((poi) =>
+              AUTO_GUIDE_POI_NUMBERS.includes(poiNumber(poi.slug) ?? -1),
+            ),
+          ),
+        );
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [locale]);
+
+  // Live GPS only while the visitor has opted in.
+  useEffect(() => {
+    if (!autoGuide) return;
+    if (!navigator.geolocation) {
+      setGuideDenied(true);
+      return;
+    }
+    const watchId = navigator.geolocation.watchPosition(
+      (result) => {
+        const point = {
+          latitude: result.coords.latitude,
+          longitude: result.coords.longitude,
+        };
+        setGuideDenied(false);
+        setGpsFix({ point, accuracyMeters: result.coords.accuracy });
+        setPosition((current) =>
+          current && geoDistanceMeters(current, point) < GPS_MIN_MOVE_METERS
+            ? current
+            : point,
+        );
+      },
+      () => setGuideDenied(true),
+      { enableHighAccuracy: true, maximumAge: 2000, timeout: 20000 },
+    );
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, [autoGuide]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!autoGuide || !map || !mapReady || !position || simulationPosition)
+      return;
+    let cancelled = false;
+    void import('maplibre-gl').then((maplibregl) => {
+      if (cancelled) return;
+      if (userMarkerRef.current) {
+        userMarkerRef.current.setLngLat([
+          position.longitude,
+          position.latitude,
+        ]);
+        return;
+      }
+      const element = document.createElement('div');
+      element.className = 'user-location';
+      userMarkerRef.current = new maplibregl.Marker({ element })
+        .setLngLat([position.longitude, position.latitude])
+        .addTo(map);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [autoGuide, mapReady, position, simulationPosition]);
+
+  // Measure visitor → place distance on every fix and narrate on arrival.
+  // The simulated walker counts as a fix, so the flow is testable indoors.
+  const guideFix: GuideFix | null = simulationPosition
+    ? {
+        point: simulationPosition,
+        accuracyMeters: SIMULATED_FIX_ACCURACY_METERS,
+      }
+    : gpsFix;
+  useEffect(() => {
+    if (!autoGuide || !guideFix || autoTargets.length === 0 || isWalking)
+      return;
+    const result = evaluateAutoGuide(
+      guideStateRef.current,
+      guideFix,
+      autoTargets.map((poi) => ({ id: poi.id, location: poi.location })),
+      Date.now(),
+    );
+    guideStateRef.current = result.state;
+    setGuideReading({
+      distances: result.distances,
+      inaccurate: result.inaccurate,
+      accuracyMeters: guideFix.accuracyMeters,
+    });
+    const arrived = autoTargets.find((poi) => poi.id === result.triggered?.id);
+    if (!arrived) return;
+    // A walked route already narrates on arrival; do not say it twice.
+    if (arrivalOpen && selected?.id === arrived.id) return;
+    setMessage(t.autoGuideArrived(arrived.name));
+    setAutoPlayPoiId(arrived.id);
+    if (selected?.id !== arrived.id) openPoi(arrived);
+  }, [
+    arrivalOpen,
+    autoGuide,
+    autoTargets,
+    guideFix,
+    isWalking,
+    openPoi,
+    selected?.id,
+    t,
+  ]);
+
+  // Plays once the arrived place's narration (or its description) is loaded.
+  useEffect(() => {
+    if (!autoPlayPoiId || selected?.id !== autoPlayPoiId) return;
+    if (detail?.id !== autoPlayPoiId) return;
+    const loaded =
+      narrationStatus === 'missing' ||
+      narrationStatus === 'error' ||
+      (narrationStatus === 'ready' && narration?.poiId === autoPlayPoiId);
+    if (!loaded) return;
+    setAutoPlayPoiId(null);
+    speakNarration();
+  }, [
+    autoPlayPoiId,
+    detail?.id,
+    narration?.poiId,
+    narrationStatus,
+    selected?.id,
+    speakNarration,
+  ]);
+
+  function toggleAutoGuide() {
+    if (autoGuide) {
+      setAutoGuide(false);
+      setGpsFix(null);
+      setGuideReading(null);
+      setGuideDenied(false);
+      setAutoPlayPoiId(null);
+      return;
+    }
+    // This tap is the user gesture that lets the browser play audio later.
+    const audio = narrationAudioRef.current ?? new Audio();
+    narrationAudioRef.current = audio;
+    audio.src = SILENT_WAV;
+    void audio.play().catch(() => {});
+    window.speechSynthesis?.speak(new SpeechSynthesisUtterance(''));
+    guideStateRef.current = EMPTY_GUIDE_STATE;
+    setGuideDenied(false);
+    setAutoGuide(true);
+  }
+
   function startAutomaticWalk(nextRoute: RouteResponse) {
     cancelSimulationAnimation();
     stopPlayback();
@@ -823,6 +1115,16 @@ export function VisitorExperience() {
               aria-label={t.searchLabel}
             />
           </label>
+          <AutoGuidePanel
+            t={t}
+            locale={locale}
+            enabled={autoGuide}
+            denied={guideDenied}
+            hasFix={guideFix !== null}
+            reading={guideReading}
+            targets={autoTargets}
+            onToggle={toggleAutoGuide}
+          />
           <div className="list-heading">
             <strong>{query ? t.searchResults : t.placesHeading}</strong>
             <span>{t.placeCount(pois.length)}</span>
@@ -834,15 +1136,13 @@ export function VisitorExperience() {
             {!loading && pois.length === 0 ? (
               <div className="empty-state">{t.noPlaces}</div>
             ) : null}
-            {pois.map((poi, index) => (
+            {pois.map((poi) => (
               <button
                 className={`poi-card${selected?.id === poi.id ? ' active' : ''}`}
                 key={poi.id}
                 onClick={() => openPoi(poi)}
               >
-                <span className="poi-index">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
+                <span className="poi-index">{formatPoiNumber(poi.slug)}</span>
                 <span className="poi-copy">
                   <strong>{poi.name}</strong>
                   <small>
@@ -918,6 +1218,9 @@ export function VisitorExperience() {
               t={t}
               locale={locale}
               detail={detail}
+              subPlaces={selectedChildren}
+              activeChild={activeChild}
+              onChildSelect={setActiveChild}
               narrationSection={
                 <NarrationSection
                   t={t}
@@ -976,6 +1279,75 @@ export function VisitorExperience() {
   );
 }
 
+function AutoGuidePanel({
+  t,
+  locale,
+  enabled,
+  denied,
+  hasFix,
+  reading,
+  targets,
+  onToggle,
+}: {
+  t: UiText;
+  locale: UiLocale;
+  enabled: boolean;
+  denied: boolean;
+  hasFix: boolean;
+  reading: GuideReading | null;
+  targets: PoiSummary[];
+  onToggle(): void;
+}) {
+  if (targets.length === 0) return null;
+  let status = '';
+  if (enabled) {
+    if (denied && !hasFix) status = t.autoGuideDenied;
+    else if (!hasFix || !reading) status = t.autoGuideWaiting;
+    else if (reading.inaccurate)
+      status = t.autoGuideInaccurate(Math.round(reading.accuracyMeters));
+  }
+  return (
+    <section className="auto-guide" aria-label={t.autoGuideTitle}>
+      <div className="auto-guide-head">
+        <strong>{t.autoGuideTitle}</strong>
+        <button
+          type="button"
+          className={`auto-guide-toggle${enabled ? ' on' : ''}`}
+          aria-pressed={enabled}
+          onClick={onToggle}
+        >
+          {enabled ? t.autoGuideDisable : t.autoGuideEnable}
+        </button>
+      </div>
+      {enabled ? null : <p>{t.autoGuideHint}</p>}
+      <ul>
+        {targets.map((poi) => {
+          const distance = reading?.distances[poi.id];
+          const near =
+            enabled &&
+            distance !== undefined &&
+            !reading?.inaccurate &&
+            distance <= AUTO_GUIDE_DEFAULTS.enterMeters;
+          return (
+            <li key={poi.id} className={near ? 'near' : ''}>
+              <span className="poi-index">{formatPoiNumber(poi.slug)}</span>
+              <span>{poi.name}</span>
+              <small>
+                {enabled && distance !== undefined
+                  ? near
+                    ? t.autoGuideNear
+                    : formatDistance(distance, locale)
+                  : ''}
+              </small>
+            </li>
+          );
+        })}
+      </ul>
+      {status ? <p role="status">{status}</p> : null}
+    </section>
+  );
+}
+
 function Header({
   t,
   locale,
@@ -1024,15 +1396,6 @@ function Header({
           >
             EN
           </button>
-          <button
-            type="button"
-            className={locale === 'fr' ? 'active' : ''}
-            aria-pressed={locale === 'fr'}
-            aria-label="Interface en français"
-            onClick={() => onLocaleChange('fr')}
-          >
-            FR
-          </button>
         </div>
         {session ? (
           <button className="account-button" onClick={onLogout}>
@@ -1052,6 +1415,9 @@ function PoiDetailCard({
   t,
   locale,
   detail,
+  subPlaces,
+  activeChild,
+  onChildSelect,
   narrationSection,
   route,
   selected,
@@ -1062,6 +1428,9 @@ function PoiDetailCard({
   t: UiText;
   locale: UiLocale;
   detail: PoiDetail | null;
+  subPlaces: SubPlace[];
+  activeChild: number | null;
+  onChildSelect(index: number): void;
   narrationSection: React.ReactNode;
   route: RouteResponse | null;
   selected: PoiSummary;
@@ -1077,6 +1446,35 @@ function PoiDetailCard({
       <p className="eyebrow">{categoryLabel(selected.category, locale)}</p>
       <h2>{detail?.name ?? selected.name}</h2>
       <p>{detail?.longDescription ?? selected.shortDescription}</p>
+      {subPlaces.length > 0 ? (
+        <section className="sub-places" aria-label={t.subPlacesHeading}>
+          <h3>
+            {t.subPlacesHeading}
+            <span>{t.subPlaceCount(subPlaces.length)}</span>
+          </h3>
+          <ul>
+            {subPlaces.map((child, index) => (
+              <li key={index}>
+                <button
+                  type="button"
+                  className={activeChild === index ? 'active' : ''}
+                  aria-pressed={activeChild === index}
+                  onClick={() => onChildSelect(index)}
+                >
+                  {child.pin ? (
+                    <span className={`sub-dot pin-${child.color ?? 'white'}`}>
+                      {child.pin}
+                    </span>
+                  ) : (
+                    <span className="sub-dot none" aria-hidden="true" />
+                  )}
+                  {subPlaceName(child, locale)}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       {narrationSection}
       {route ? (
         <div className="route-summary">

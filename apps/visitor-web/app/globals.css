@@ -480,10 +480,146 @@ button {
   transform: rotate(45deg);
 }
 
+/* Pin colours follow the official map legend (see lib/poi-pin-colors.ts). */
+.map-pin.pin-white {
+  color: #333;
+  background: white;
+  border-color: #8d948f;
+}
+
+.map-pin.pin-blue {
+  background: #2447a8;
+}
+
+.map-pin.pin-purple {
+  background: #7e57a8;
+}
+
+.map-pin.pin-pink {
+  background: #ec2a96;
+}
+
+.map-pin.pin-red {
+  background: #c4202c;
+}
+
+.map-pin.pin-yellow {
+  color: #333;
+  background: #f3e02a;
+}
+
 .map-pin.selected {
   width: 40px;
   height: 40px;
   background: var(--gold);
+  box-shadow:
+    0 0 0 4px var(--gold),
+    0 5px 15px #152a2088;
+}
+
+.map-pin.sub {
+  width: 26px;
+  height: 26px;
+  font-size: 8px;
+  border-width: 2px;
+}
+
+.map-pin.sub.selected {
+  width: 30px;
+  height: 30px;
+}
+
+.sub-places {
+  margin: 14px 0;
+}
+
+.sub-places h3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.sub-places h3 span {
+  color: #5d6f64;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sub-places ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 2px 12px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.sub-places li button {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  padding: 5px 6px;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+}
+
+.sub-places li button.active {
+  background: #f3e8c5;
+}
+
+.sub-dot {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 18px;
+  font-size: 9px;
+  font-weight: 800;
+  color: white;
+  border-radius: 9px;
+}
+
+.sub-dot.none {
+  width: 6px;
+  height: 6px;
+  background: #aab5ad;
+  border-radius: 50%;
+}
+
+.sub-dot.pin-white {
+  color: #333;
+  background: white;
+  border: 1px solid #8d948f;
+}
+
+.sub-dot.pin-blue {
+  background: #2447a8;
+}
+
+.sub-dot.pin-purple {
+  background: #7e57a8;
+}
+
+.sub-dot.pin-pink {
+  background: #ec2a96;
+}
+
+.sub-dot.pin-red {
+  background: #c4202c;
+}
+
+.sub-dot.pin-yellow {
+  color: #333;
+  background: #f3e02a;
 }
 
 .user-location {
@@ -1061,4 +1197,65 @@ audio:focus-visible {
 .map-kind button.active {
   color: white;
   background: var(--green);
+}
+
+.auto-guide {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  margin: 0 0 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+}
+
+.auto-guide p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted, inherit);
+}
+
+.auto-guide-head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auto-guide-toggle {
+  padding: 7px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+}
+
+.auto-guide-toggle.on {
+  color: #fff;
+  background: var(--gold);
+}
+
+.auto-guide ul {
+  display: grid;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.auto-guide li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.auto-guide li small {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.auto-guide li.near small {
+  font-weight: 700;
+  color: var(--gold);
 }

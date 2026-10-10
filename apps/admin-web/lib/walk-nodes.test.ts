@@ -50,13 +50,17 @@ describe('walk nodes', () => {
         'utf8',
       ),
     ) as WalkNode[];
-    expect(shipped.length).toBeGreaterThan(300);
-    for (const node of shipped) expect(node.ref).toMatch(/^osm-\d+$/);
-    // Every sample place from the seed script sits within snapping range.
-    const snap = nearestWalkNode(shipped, {
-      latitude: 10.76798,
-      longitude: 106.638092,
-    });
+    expect(shipped.length).toBeGreaterThan(200);
+    for (const node of shipped) expect(node.ref).toMatch(/^nw-\d+$/);
+    // Gate 1 (pin 1 of the official map) sits within snapping range of the paths.
+    const places = JSON.parse(
+      readFileSync(
+        join(__dirname, '../../../data/walkways-new/damsen-pois-new.json'),
+        'utf8',
+      ),
+    ) as { pois: { number: number; latitude: number; longitude: number }[] };
+    const gate1 = places.pois.find((place) => place.number === 1)!;
+    const snap = nearestWalkNode(shipped, gate1);
     expect(snap!.distanceMeters).toBeLessThan(MAX_SNAP_METERS);
   });
 });

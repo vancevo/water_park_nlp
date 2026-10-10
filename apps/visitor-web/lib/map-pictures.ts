@@ -1,10 +1,11 @@
 import type { Map as MapLibreMap } from 'maplibre-gl';
 
 /**
- * The illustrated park map, laid over the real map as a raster layer under the
- * OSM walkways, so real routes stay drawn on top. Its corners come from
- * `scripts/georeference-illustrated-map/fit_paths.py` (painted paths fitted to
- * the OSM footpaths, ~0.8 m mean distance; not verified on site).
+ * The official park map (gate 1 at the bottom), laid over the real map as a raster layer under the
+ * walkways, so routes stay drawn on top. Its corners and the `bearingDegrees` that turns the map
+ * so the picture is upright come from `data/walkways-new/build_graph.py` (footpaths traced on the
+ * picture and fitted to the earlier illustrated picture, itself fitted to the OSM footpaths;
+ * ~3-8 m, not verified on site).
  */
 export const ILLUSTRATED_MAP_URL = '/maps/damsen-map.jpg';
 export const ILLUSTRATED_MAP_GEOREF = '/maps/damsen-map.georef.json';
@@ -18,13 +19,19 @@ type Corners = [
   [number, number],
 ];
 
-/** Adds the picture as a hidden layer; resolves false (old map only) on failure. */
-export async function addIllustratedMap(map: MapLibreMap): Promise<boolean> {
+/**
+ * Adds the picture as a hidden layer; resolves the bearing that shows it upright,
+ * or null (old map only) on failure.
+ */
+export async function addIllustratedMap(
+  map: MapLibreMap,
+): Promise<number | null> {
   try {
     const georef = (await (await fetch(ILLUSTRATED_MAP_GEOREF)).json()) as {
       corners: Corners;
+      bearingDegrees?: number;
     };
-    if (!map.getStyle()) return false;
+    if (!map.getStyle()) return null;
     map.addSource(ILLUSTRATED_LAYER, {
       type: 'image',
       url: ILLUSTRATED_MAP_URL,
@@ -40,8 +47,8 @@ export async function addIllustratedMap(map: MapLibreMap): Promise<boolean> {
       },
       BEFORE_LAYER,
     );
-    return true;
+    return georef.bearingDegrees ?? 0;
   } catch {
-    return false;
+    return null;
   }
 }

@@ -1,6 +1,6 @@
+import type { NarrationLocaleCatalog } from '@damsen/shared-types';
 import { describe, expect, it, vi } from 'vitest';
 import {
-  FIXTURE_NARRATION_LOCALE_CATALOG as catalog,
   NARRATION_LOCALE_STORAGE_KEY,
   createFixtureNarrationLocalePort,
   createHttpNarrationLocalePort,
@@ -12,6 +12,26 @@ import {
   saveNarrationLocalePreference,
   speechTagFor,
 } from './narration-locales';
+
+// A three-locale catalog (as if an operator enabled one more language in the config).
+const catalog: NarrationLocaleCatalog = {
+  defaultLocale: 'vi',
+  locales: [
+    { code: 'vi', nativeLabel: 'Tiếng Việt', speechTag: 'vi-VN' },
+    {
+      code: 'en',
+      nativeLabel: 'English',
+      speechTag: 'en-US',
+      fallbackLocale: 'vi',
+    },
+    {
+      code: 'fr',
+      nativeLabel: 'Français',
+      speechTag: 'fr-FR',
+      fallbackLocale: 'en',
+    },
+  ],
+};
 
 function memoryStorage() {
   const values = new Map<string, string>();
@@ -30,12 +50,12 @@ const throwingStorage = {
 };
 
 describe('narration locale catalog for visitors', () => {
-  it('serves VI/EN/FR fixtures and normalises the HTTP catalog', async () => {
+  it('serves VI/EN fixtures and normalises the HTTP catalog', async () => {
     expect(
       (await createFixtureNarrationLocalePort().getCatalog()).locales.map(
         (item) => item.code,
       ),
-    ).toEqual(['vi', 'en', 'fr']);
+    ).toEqual(['vi', 'en']);
     const api = {
       getNarrationLocales: vi.fn(async () => ({
         defaultLocale: 'vi',

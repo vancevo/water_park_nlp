@@ -22,10 +22,6 @@ describe('aiAudioLabel', () => {
       lang: 'vi',
     });
     expect(aiAudioLabel('en', generatedBy)?.text).toBe('AI-generated voice');
-    expect(aiAudioLabel('fr-FR', generatedBy)).toMatchObject({
-      text: 'Voix générée par IA',
-      lang: 'fr',
-    });
   });
 
   it('falls back to English for locales without a translation', () => {

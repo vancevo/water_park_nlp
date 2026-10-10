@@ -2,15 +2,16 @@
 
 `damsen-pois.json`: 50 địa điểm theo sơ đồ có đánh số (số, tên VI/EN, loại, vị trí).
 
-- **Vị trí** = đầu nhọn của từng ghim số trên bản đồ minh họa (`apps/visitor-web/public/maps/damsen-map.jpg`),
-  đổi sang kinh/vĩ độ bằng georeference của bản đồ đó. Đây là **ước lượng** (sai số cỡ vài mét tới
-  ~10 m do vẽ ghim và độ khớp ảnh với OSM), **chưa kiểm chứng thực địa**. Dùng `/field` để đo lại.
+- **Vị trí** = đầu nhọn của từng ghim số trên bản đồ minh họa (`apps/visitor-web/public/maps/damsen-map.jpg`, bản đồ chính thức, cổng 1 ở dưới),
+  đổi sang kinh/vĩ độ bằng georeference của bản đồ đó (xem `data/walkways-new/`). Đây là **ước lượng**
+  (sai số vài mét tới hàng chục mét do bản đồ không đúng tỉ lệ), **chưa kiểm chứng thực địa**. Dùng `/field` để đo lại.
+  `pin` = màu ghim theo chú giải (trắng tự do, xanh mọi đối tượng, tím 1–1,2 m, hồng 1–1,4 m, đỏ >1,4 m, vàng cổng/vé).
 - **Tên và số** theo chú giải bản đồ do nhóm cung cấp; tên tiếng Anh do nhóm dự án dịch.
 - **Loại** chọn theo tên và màu ghim (đỏ = mạo hiểm, hồng = thiếu nhi, vàng = cổng/quầy vé…); sửa được trong admin.
 
 ```bash
 python3 data/pois/validate.py                       # kiểm tra file
-node scripts/import-osm-walkways.mjs               # một lần: đường đi bộ OSM vào đồ thị
+node scripts/import-redrawn-walkways.mjs         # một lần: đường đi vẽ lại + vị trí ghim vào DB
 ADMIN_PASSWORD=... node scripts/import-pois.mjs --dry-run
 ADMIN_PASSWORD=... node scripts/import-pois.mjs    # tạo + gửi duyệt + duyệt qua API admin
 ```

@@ -1,0 +1,704 @@
+{
+ "pois": [
+  {
+   "number": 1,
+   "color": "yellow",
+   "pinPx": [
+    1292.8,
+    1204.0
+   ],
+   "latitude": 10.7660639,
+   "longitude": 106.6416817,
+   "entranceNode": "nw-207",
+   "entranceLatitude": 10.7659779,
+   "entranceLongitude": 106.641685,
+   "entranceDistancePx": 15.9
+  },
+  {
+   "number": 2,
+   "color": "yellow",
+   "pinPx": [
+    1489.2,
+    1073.0
+   ],
+   "latitude": 10.767082,
+   "longitude": 106.6409092,
+   "entranceNode": "nw-165",
+   "entranceLatitude": 10.767063,
+   "entranceLongitude": 106.6409721,
+   "entranceDistancePx": 11.8
+  },
+  {
+   "number": 3,
+   "color": "yellow",
+   "pinPx": [
+    1375.2,
+    996.0
+   ],
+   "latitude": 10.7664396,
+   "longitude": 106.6404924,
+   "entranceNode": "nw-208",
+   "entranceLatitude": 10.7660993,
+   "entranceLongitude": 106.6405055,
+   "entranceDistancePx": 63.0
+  },
+  {
+   "number": 4,
+   "color": "red",
+   "pinPx": [
+    1335.2,
+    900.0
+   ],
+   "latitude": 10.7661911,
+   "longitude": 106.6399561,
+   "entranceNode": "nw-209",
+   "entranceLatitude": 10.7660627,
+   "entranceLongitude": 106.6399611,
+   "entranceDistancePx": 23.8
+  },
+  {
+   "number": 5,
+   "color": "blue",
+   "pinPx": [
+    1377.8,
+    834.0
+   ],
+   "latitude": 10.7663993,
+   "longitude": 106.639576,
+   "entranceNode": "nw-210",
+   "entranceLatitude": 10.7664006,
+   "entranceLongitude": 106.6395917,
+   "entranceDistancePx": 2.8
+  },
+  {
+   "number": 6,
+   "color": "white",
+   "pinPx": [
+    1350.8,
+    788.0
+   ],
+   "latitude": 10.7662379,
+   "longitude": 106.6393204,
+   "entranceNode": "nw-211",
+   "entranceLatitude": 10.7662545,
+   "entranceLongitude": 106.6395974,
+   "entranceDistancePx": 49.0
+  },
+  {
+   "number": 7,
+   "color": "blue",
+   "pinPx": [
+    1452.8,
+    783.0
+   ],
+   "latitude": 10.7667878,
+   "longitude": 106.6392755,
+   "entranceNode": "nw-212",
+   "entranceLatitude": 10.7669084,
+   "entranceLongitude": 106.6394686,
+   "entranceDistancePx": 40.1
+  },
+  {
+   "number": 8,
+   "color": "white",
+   "pinPx": [
+    1504.3,
+    917.0
+   ],
+   "latitude": 10.7671113,
+   "longitude": 106.6400248,
+   "entranceNode": "nw-153",
+   "entranceLatitude": 10.7671852,
+   "entranceLongitude": 106.6395638,
+   "entranceDistancePx": 83.1
+  },
+  {
+   "number": 9,
+   "color": "blue",
+   "pinPx": [
+    1550.8,
+    865.0
+   ],
+   "latitude": 10.7673453,
+   "longitude": 106.6397232,
+   "entranceNode": "nw-213",
+   "entranceLatitude": 10.7673651,
+   "entranceLongitude": 106.6396019,
+   "entranceDistancePx": 21.9
+  },
+  {
+   "number": 10,
+   "color": "blue",
+   "pinPx": [
+    1659.2,
+    775.0
+   ],
+   "latitude": 10.7679013,
+   "longitude": 106.6391968,
+   "entranceNode": "nw-214",
+   "entranceLatitude": 10.7679129,
+   "entranceLongitude": 106.639208,
+   "entranceDistancePx": 2.9
+  },
+  {
+   "number": 11,
+   "color": "pink",
+   "pinPx": [
+    1614.7,
+    676.8
+   ],
+   "latitude": 10.7676277,
+   "longitude": 106.6386488,
+   "entranceNode": "nw-215",
+   "entranceLatitude": 10.7672603,
+   "entranceLongitude": 106.6384894,
+   "entranceDistancePx": 72.6
+  },
+  {
+   "number": 12,
+   "color": "blue",
+   "pinPx": [
+    1749.8,
+    576.0
+   ],
+   "latitude": 10.7683245,
+   "longitude": 106.638057,
+   "entranceNode": "nw-216",
+   "entranceLatitude": 10.768502,
+   "entranceLongitude": 106.6381106,
+   "entranceDistancePx": 33.8
+  },
+  {
+   "number": 13,
+   "color": "pink",
+   "pinPx": [
+    1617.2,
+    582.0
+   ],
+   "latitude": 10.7676094,
+   "longitude": 106.6381125,
+   "entranceNode": "nw-217",
+   "entranceLatitude": 10.7675728,
+   "entranceLongitude": 106.6380651,
+   "entranceDistancePx": 10.6
+  },
+  {
+   "number": 14,
+   "color": "blue",
+   "pinPx": [
+    1657.8,
+    555.0
+   ],
+   "latitude": 10.7678199,
+   "longitude": 106.6379532,
+   "entranceNode": "nw-40",
+   "entranceLatitude": 10.7677869,
+   "entranceLongitude": 106.6379084,
+   "entranceDistancePx": 9.8
+  },
+  {
+   "number": 15,
+   "color": "blue",
+   "pinPx": [
+    1761.5,
+    529.0
+   ],
+   "latitude": 10.768372,
+   "longitude": 106.6377894,
+   "entranceNode": "nw-218",
+   "entranceLatitude": 10.7685466,
+   "entranceLongitude": 106.6378041,
+   "entranceDistancePx": 32.3
+  },
+  {
+   "number": 16,
+   "color": "yellow",
+   "pinPx": [
+    1835.8,
+    410.0
+   ],
+   "latitude": 10.7687338,
+   "longitude": 106.6371045,
+   "entranceNode": "nw-140",
+   "entranceLatitude": 10.7687463,
+   "entranceLongitude": 106.6373874,
+   "entranceDistancePx": 50.0
+  },
+  {
+   "number": 17,
+   "color": "yellow",
+   "pinPx": [
+    1763.2,
+    476.0
+   ],
+   "latitude": 10.7683634,
+   "longitude": 106.6374895,
+   "entranceNode": "nw-219",
+   "entranceLatitude": 10.7683569,
+   "entranceLongitude": 106.6374075,
+   "entranceDistancePx": 14.5
+  },
+  {
+   "number": 18,
+   "color": "white",
+   "pinPx": [
+    1800.8,
+    270.0
+   ],
+   "latitude": 10.7684976,
+   "longitude": 106.6363187,
+   "entranceNode": "nw-33",
+   "entranceLatitude": 10.768017,
+   "entranceLongitude": 106.6370272,
+   "entranceDistancePx": 156.0
+  },
+  {
+   "number": 19,
+   "color": "white",
+   "pinPx": [
+    1458.8,
+    232.0
+   ],
+   "latitude": 10.7666353,
+   "longitude": 106.6361594,
+   "entranceNode": "nw-27",
+   "entranceLatitude": 10.7670367,
+   "entranceLongitude": 106.637065,
+   "entranceDistancePx": 174.3
+  },
+  {
+   "number": 20,
+   "color": "white",
+   "pinPx": [
+    1447.8,
+    175.0
+   ],
+   "latitude": 10.7665567,
+   "longitude": 106.6358389,
+   "entranceNode": "nw-220",
+   "entranceLatitude": 10.767074,
+   "entranceLongitude": 106.6370487,
+   "entranceDistancePx": 231.4
+  },
+  {
+   "number": 21,
+   "color": "red",
+   "pinPx": [
+    1244.3,
+    373.5
+   ],
+   "latitude": 10.7655228,
+   "longitude": 106.6369942,
+   "entranceNode": "nw-17",
+   "entranceLatitude": 10.7656579,
+   "entranceLongitude": 106.6373433,
+   "entranceDistancePx": 65.8
+  },
+  {
+   "number": 22,
+   "color": "red",
+   "pinPx": [
+    1253.4,
+    312.0
+   ],
+   "latitude": 10.7655514,
+   "longitude": 106.636645,
+   "entranceNode": "nw-18",
+   "entranceLatitude": 10.7657471,
+   "entranceLongitude": 106.6373159,
+   "entranceDistancePx": 122.9
+  },
+  {
+   "number": 23,
+   "color": "red",
+   "pinPx": [
+    1262.2,
+    261.0
+   ],
+   "latitude": 10.7655818,
+   "longitude": 106.6363552,
+   "entranceNode": "nw-19",
+   "entranceLatitude": 10.7657938,
+   "entranceLongitude": 106.6373039,
+   "entranceDistancePx": 171.0
+  },
+  {
+   "number": 24,
+   "color": "red",
+   "pinPx": [
+    1172.2,
+    233.0
+   ],
+   "latitude": 10.7650857,
+   "longitude": 106.6362115,
+   "entranceNode": "nw-221",
+   "entranceLatitude": 10.7655565,
+   "entranceLongitude": 106.6373814,
+   "entranceDistancePx": 221.8
+  },
+  {
+   "number": 25,
+   "color": "blue",
+   "pinPx": [
+    1087.8,
+    361.0
+   ],
+   "latitude": 10.7646723,
+   "longitude": 106.6369489,
+   "entranceNode": "nw-204",
+   "entranceLatitude": 10.7647914,
+   "entranceLongitude": 106.6375684,
+   "entranceDistancePx": 111.0
+  },
+  {
+   "number": 26,
+   "color": "blue",
+   "pinPx": [
+    895.2,
+    496.0
+   ],
+   "latitude": 10.763676,
+   "longitude": 106.6377434,
+   "entranceNode": "nw-222",
+   "entranceLatitude": 10.7638568,
+   "entranceLongitude": 106.6381613,
+   "entranceDistancePx": 80.1
+  },
+  {
+   "number": 27,
+   "color": "blue",
+   "pinPx": [
+    829.2,
+    478.0
+   ],
+   "latitude": 10.763313,
+   "longitude": 106.6376524,
+   "entranceNode": "nw-223",
+   "entranceLatitude": 10.7636291,
+   "entranceLongitude": 106.6382685,
+   "entranceDistancePx": 121.9
+  },
+  {
+   "number": 28,
+   "color": "white",
+   "pinPx": [
+    744.2,
+    491.0
+   ],
+   "latitude": 10.7628577,
+   "longitude": 106.6377397,
+   "entranceNode": "nw-135",
+   "entranceLatitude": 10.7626307,
+   "entranceLongitude": 106.637401,
+   "entranceDistancePx": 72.0
+  },
+  {
+   "number": 29,
+   "color": "white",
+   "pinPx": [
+    831.2,
+    562.0
+   ],
+   "latitude": 10.7633521,
+   "longitude": 106.638127,
+   "entranceNode": "nw-2",
+   "entranceLatitude": 10.763491,
+   "entranceLongitude": 106.6383529,
+   "entranceDistancePx": 46.8
+  },
+  {
+   "number": 30,
+   "color": "white",
+   "pinPx": [
+    858.8,
+    551.0
+   ],
+   "latitude": 10.7634976,
+   "longitude": 106.6380603,
+   "entranceNode": "nw-4",
+   "entranceLatitude": 10.763605,
+   "entranceLongitude": 106.6382814,
+   "entranceDistancePx": 43.3
+  },
+  {
+   "number": 31,
+   "color": "blue",
+   "pinPx": [
+    871.2,
+    629.0
+   ],
+   "latitude": 10.7635909,
+   "longitude": 106.6384993,
+   "entranceNode": "nw-54",
+   "entranceLatitude": 10.7635912,
+   "entranceLongitude": 106.6384313,
+   "entranceDistancePx": 12.0
+  },
+  {
+   "number": 32,
+   "color": "red",
+   "pinPx": [
+    847.3,
+    634.0
+   ],
+   "latitude": 10.7634633,
+   "longitude": 106.6385314,
+   "entranceNode": "nw-224",
+   "entranceLatitude": 10.7633806,
+   "entranceLongitude": 106.6384519,
+   "entranceDistancePx": 20.4
+  },
+  {
+   "number": 33,
+   "color": "white",
+   "pinPx": [
+    746.8,
+    617.0
+   ],
+   "latitude": 10.7629141,
+   "longitude": 106.6384516,
+   "entranceNode": "nw-225",
+   "entranceLatitude": 10.7630073,
+   "entranceLongitude": 106.6382948,
+   "entranceDistancePx": 33.1
+  },
+  {
+   "number": 34,
+   "color": "white",
+   "pinPx": [
+    945.8,
+    846.0
+   ],
+   "latitude": 10.7640671,
+   "longitude": 106.639714,
+   "entranceNode": "nw-226",
+   "entranceLatitude": 10.7641026,
+   "entranceLongitude": 106.6395398,
+   "entranceDistancePx": 31.7
+  },
+  {
+   "number": 35,
+   "color": "white",
+   "pinPx": [
+    1083.2,
+    873.0
+   ],
+   "latitude": 10.7648192,
+   "longitude": 106.6398443,
+   "entranceNode": "nw-227",
+   "entranceLatitude": 10.7650007,
+   "entranceLongitude": 106.6398403,
+   "entranceDistancePx": 33.5
+  },
+  {
+   "number": 36,
+   "color": "blue",
+   "pinPx": [
+    1060.0,
+    916.0
+   ],
+   "latitude": 10.7647082,
+   "longitude": 106.6400912,
+   "entranceNode": "nw-228",
+   "entranceLatitude": 10.7645187,
+   "entranceLongitude": 106.6401155,
+   "entranceDistancePx": 35.4
+  },
+  {
+   "number": 37,
+   "color": "white",
+   "pinPx": [
+    1065.8,
+    1006.0
+   ],
+   "latitude": 10.7647698,
+   "longitude": 106.6405991,
+   "entranceNode": "nw-229",
+   "entranceLatitude": 10.7647973,
+   "entranceLongitude": 106.6405571,
+   "entranceDistancePx": 9.1
+  },
+  {
+   "number": 38,
+   "color": "white",
+   "pinPx": [
+    1188.8,
+    887.0
+   ],
+   "latitude": 10.765395,
+   "longitude": 106.6399064,
+   "entranceNode": "nw-230",
+   "entranceLatitude": 10.7653935,
+   "entranceLongitude": 106.6396712,
+   "entranceDistancePx": 41.6
+  },
+  {
+   "number": 39,
+   "color": "white",
+   "pinPx": [
+    1155.2,
+    792.0
+   ],
+   "latitude": 10.7651814,
+   "longitude": 106.6393747,
+   "entranceNode": "nw-231",
+   "entranceLatitude": 10.765238,
+   "entranceLongitude": 106.6393746,
+   "entranceDistancePx": 10.5
+  },
+  {
+   "number": 40,
+   "color": "white",
+   "pinPx": [
+    1291.8,
+    807.0
+   ],
+   "latitude": 10.7659252,
+   "longitude": 106.6394374,
+   "entranceNode": "nw-232",
+   "entranceLatitude": 10.7659161,
+   "entranceLongitude": 106.6395768,
+   "entranceDistancePx": 24.8
+  },
+  {
+   "number": 41,
+   "color": "white",
+   "pinPx": [
+    1293.2,
+    616.0
+   ],
+   "latitude": 10.7658686,
+   "longitude": 106.6383573,
+   "entranceNode": "nw-188",
+   "entranceLatitude": 10.7656832,
+   "entranceLongitude": 106.6388103,
+   "entranceDistancePx": 88.2
+  },
+  {
+   "number": 42,
+   "color": "white",
+   "pinPx": [
+    1393.8,
+    554.0
+   ],
+   "latitude": 10.7663919,
+   "longitude": 106.6379904,
+   "entranceNode": "nw-233",
+   "entranceLatitude": 10.7663441,
+   "entranceLongitude": 106.6373846,
+   "entranceDistancePx": 107.2
+  },
+  {
+   "number": 43,
+   "color": "white",
+   "pinPx": [
+    1084.3,
+    697.0
+   ],
+   "latitude": 10.7647661,
+   "longitude": 106.6388491,
+   "entranceNode": "nw-234",
+   "entranceLatitude": 10.7647737,
+   "entranceLongitude": 106.6388711,
+   "entranceDistancePx": 4.1
+  },
+  {
+   "number": 44,
+   "color": "white",
+   "pinPx": [
+    550.8,
+    426.0
+   ],
+   "latitude": 10.76179,
+   "longitude": 106.6374036,
+   "entranceNode": "nw-235",
+   "entranceLatitude": 10.7618282,
+   "entranceLongitude": 106.6373878,
+   "entranceDistancePx": 7.7
+  },
+  {
+   "number": 45,
+   "color": "blue",
+   "pinPx": [
+    458.2,
+    286.0
+   ],
+   "latitude": 10.7612422,
+   "longitude": 106.6366271,
+   "entranceNode": "nw-236",
+   "entranceLatitude": 10.7617279,
+   "entranceLongitude": 106.6366125,
+   "entranceDistancePx": 89.8
+  },
+  {
+   "number": 46,
+   "color": "red",
+   "pinPx": [
+    334.7,
+    281.0
+   ],
+   "latitude": 10.7605727,
+   "longitude": 106.6366188,
+   "entranceNode": "nw-237",
+   "entranceLatitude": 10.760333,
+   "entranceLongitude": 106.6369717,
+   "entranceDistancePx": 77.7
+  },
+  {
+   "number": 47,
+   "color": "red",
+   "pinPx": [
+    275.6,
+    181.0
+   ],
+   "latitude": 10.7602195,
+   "longitude": 106.6360631,
+   "entranceNode": "nw-238",
+   "entranceLatitude": 10.7598814,
+   "entranceLongitude": 106.6360708,
+   "entranceDistancePx": 62.5
+  },
+  {
+   "number": 48,
+   "color": "white",
+   "pinPx": [
+    209.8,
+    64.0
+   ],
+   "latitude": 10.7598244,
+   "longitude": 106.6354123,
+   "entranceNode": "nw-121",
+   "entranceLatitude": 10.7600338,
+   "entranceLongitude": 106.6357059,
+   "entranceDistancePx": 63.7
+  },
+  {
+   "number": 49,
+   "color": "white",
+   "pinPx": [
+    788.2,
+    109.0
+   ],
+   "latitude": 10.7629674,
+   "longitude": 106.6355728,
+   "entranceNode": "nw-129",
+   "entranceLatitude": 10.7622779,
+   "entranceLongitude": 106.6363864,
+   "entranceDistancePx": 195.3
+  },
+  {
+   "number": 50,
+   "color": "white",
+   "pinPx": [
+    739.8,
+    246.0
+   ],
+   "latitude": 10.7627517,
+   "longitude": 106.6363552,
+   "entranceNode": "nw-239",
+   "entranceLatitude": 10.762318,
+   "entranceLongitude": 106.6365024,
+   "entranceDistancePx": 85.0
+  }
+ ]
+}

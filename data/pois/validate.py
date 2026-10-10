@@ -14,6 +14,7 @@ CATEGORIES = {
     "gate", "ride", "thrill_ride", "children", "interactive", "show", "exhibit",
     "garden", "indoor", "landmark", "food", "restroom", "parking", "first_aid",
 }
+PIN_COLORS = {"white", "blue", "purple", "pink", "red", "yellow"}  # legend of the official map
 # Generous box around the park (OSM boundary 106.6352–106.6418 E, 10.7597–10.769 N).
 LAT_RANGE = (10.7585, 10.7700)
 LON_RANGE = (106.6340, 106.6430)
@@ -35,6 +36,8 @@ def main() -> int:
             errors.append(f"{label}: bad slug {p['slug']!r}")
         if p["category"] not in CATEGORIES:
             errors.append(f"{label}: unknown category {p['category']!r}")
+        if p.get("pin") not in PIN_COLORS:
+            errors.append(f"{label}: pin must be one of {sorted(PIN_COLORS)}")
         for key in ("nameVi", "nameEn"):
             if not p[key].strip() or len(p[key]) > 200:
                 errors.append(f"{label}: bad {key}")
