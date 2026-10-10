@@ -239,6 +239,11 @@ const vi: UiText = {
     ride: 'Trò chơi',
     show: 'Biểu diễn',
     thrill_ride: 'Cảm giác mạnh',
+    gate: 'Cổng',
+    food: 'Ăn uống',
+    restroom: 'Nhà vệ sinh',
+    parking: 'Bãi đậu xe',
+    first_aid: 'Y tế',
   },
 };
 
@@ -354,6 +359,11 @@ const en: UiText = {
     ride: 'Ride',
     show: 'Show',
     thrill_ride: 'Thrill ride',
+    gate: 'Gate',
+    food: 'Food & drink',
+    restroom: 'Restroom',
+    parking: 'Parking',
+    first_aid: 'First aid',
   },
 };
 
@@ -473,6 +483,11 @@ const fr: UiText = {
     ride: 'Attraction',
     show: 'Spectacle',
     thrill_ride: 'Sensations fortes',
+    gate: 'Entrée',
+    food: 'Restauration',
+    restroom: 'Toilettes',
+    parking: 'Parking',
+    first_aid: 'Premiers secours',
   },
 };
 

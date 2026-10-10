@@ -23,3 +23,17 @@ The adapter reflects the current backend:
 - `NEXT_PUBLIC_TTS_GENERATION_MODE=off|demo|api` (default `off`; only an explicit `api`/`demo` shows it — a missing or unknown value fails closed) shows the AI audio generation panel (`TtsGenerationPort`): simulated job lifecycle in `demo`, the real endpoints (contract v1.1, ADR 0014) in `api`. The worker attaches the audio to the draft; the editor plays it through the admin playback URL (`NarrationAudioPreview`) with AI-generated provenance, tracking resumes after a reload via the latest-job endpoint, and nothing is ever published without a reviewer. The real flow passed I03 end to end (real worker, but a fake tone provider and an S3 emulator), so a build with `api` is ready for staging. The default stays `off` until the I04 release gate turns it on with a real voice and real storage (B03): the backend kill switch `TTS_GENERATION_ENABLED` defaults to enabled and no production voice exists yet, so a default-on build would offer a button whose jobs can only fail. `off` is also the rollback; `TTS_GENERATION_ENABLED=false` stops generation server-side without a rebuild (the panel then answers 503 with a Vietnamese kill-switch message). Acceptance evidence: `docs/runbooks/frontend-i03-acceptance-report.md`; operations: `docs/runbooks/frontend-narration-locales-tts.md`.
 
 Remaining contract limitation: fetching one admin POI costs a full list request until the backend provides `GET /v1/admin/pois/:id`.
+
+## Đặt vị trí POI (tại hiện trường)
+
+Form POI có nút **📍 Dùng vị trí hiện tại** (lấy GPS của máy đang mở admin, kèm sai số) cho
+vị trí POI và cho từng cổng vào, một **bản đồ nhỏ** (ảnh minh họa + đường đi bộ OSM; bấm lên
+bản đồ để đặt vị trí; chấm xanh = POI, chấm vàng = cổng), nút **Gắn vào đường gần nhất** (tự
+điền graph node từ `public/data/osm-walk-nodes.json`, cảnh báo nếu cách > 75 m) và ô chọn
+**loại địa điểm** (cổng, trò chơi, sân khấu, ăn uống, nhà vệ sinh, …).
+
+- Điện thoại chỉ cho lấy vị trí trên **HTTPS** (hoặc localhost): mở admin qua tunnel HTTPS.
+- Dữ liệu node tạo bằng `node apps/admin-web/scripts/export-walk-nodes.mjs` (sau
+  `npm run build --workspace @damsen/api`) và phải khớp với đồ thị đã nhập vào DB
+  (`scripts/import-osm-walkways.mjs`).
+- Các loại địa điểm mới là migration `013_more_poi_categories`.

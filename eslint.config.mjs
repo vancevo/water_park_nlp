@@ -11,6 +11,7 @@ export default tseslint.config(
       '**/.expo/**',
       '**/next-env.d.ts',
       'apps/visitor-web/public/maplibre/**',
+      'apps/admin-web/public/maplibre/**',
       // Local demo state (venv, models, logs) — generated, never linted.
       '.demo/**',
     ],

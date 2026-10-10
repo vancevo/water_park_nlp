@@ -103,3 +103,4 @@ Không ghi chi tiết implementation dài tại đây. Link tới README, OpenAP
 - [ ] Consumer biết cách import/gọi, không phải đọc implementation.
 - [ ] Breaking/deprecation có migration note.
 - [ ] Task/handoff liên quan đã tham chiếu entry ID.
+| POI-FIELD-CAPTURE | in_progress | Admin POI form: use device location, small map (click to place), snap an entrance to the nearest OSM path node, category select (gate/ride/show/food/…) | `apps/admin-web/components/poi-form.tsx`, `poi-location-map.tsx`, `lib/{geolocate,walk-nodes,poi-categories}.ts`, `infra/migrations/013_*` | 15 lib tests + browser smoke `poi-geolocate-browser-smoke.mjs` (geolocation faked) | Tú (agent) | Needs HTTPS on phones; node list must match the DB graph; positions are not field verified |

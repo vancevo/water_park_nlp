@@ -12,7 +12,15 @@ import {
 } from '@/lib/poi-contract';
 import { validatePoi } from '@/lib/poi-validation';
 import { useUnsavedGuard } from '@/hooks/use-unsaved-guard';
+import { getDevicePosition } from '@/lib/geolocate';
+import { categoryOptions } from '@/lib/poi-categories';
+import {
+  MAX_SNAP_METERS,
+  loadWalkNodes,
+  nearestWalkNode,
+} from '@/lib/walk-nodes';
 import { StatusBadge } from './status-badge';
+import { PoiLocationMap } from './poi-location-map';
 import { NarrationPanel } from './narration-panel';
 
 const clientPromise = getPoiClient();
@@ -33,6 +41,8 @@ export function PoiForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  const [locating, setLocating] = useState(false);
+  const [locationNote, setLocationNote] = useState('');
   const dirty = useMemo(
     () => JSON.stringify(draft) !== baseline,
     [draft, baseline],
@@ -53,6 +63,30 @@ export function PoiForm({
         item.locale === locale ? { ...item, [field]: value } : item,
       ),
     }));
+
+  async function useMyLocation() {
+    setLocating(true);
+    setLocationNote('');
+    try {
+      const fix = await getDevicePosition();
+      setDraft((before) => ({
+        ...before,
+        location: {
+          latitude: Number(fix.latitude.toFixed(7)),
+          longitude: Number(fix.longitude.toFixed(7)),
+        },
+      }));
+      setLocationNote(
+        `Đã lấy vị trí hiện tại (sai số khoảng ${Math.round(fix.accuracyMeters)} m).`,
+      );
+    } catch (cause) {
+      setLocationNote(
+        cause instanceof Error ? cause.message : 'Không lấy được vị trí.',
+      );
+    } finally {
+      setLocating(false);
+    }
+  }
 
   async function save() {
     const validation = validatePoi(draft);
@@ -234,6 +268,37 @@ export function PoiForm({
                 {fieldError('longitude')}
               </label>
             </div>
+            <div className="geo-actions">
+              <button
+                type="button"
+                className="button ghost small"
+                disabled={locating || poi?.status === 'pending_review'}
+                onClick={() => void useMyLocation()}
+              >
+                {locating ? 'Đang lấy vị trí…' : '📍 Dùng vị trí hiện tại'}
+              </button>
+              {locationNote && (
+                <small className="geo-note" role="status">
+                  {locationNote}
+                </small>
+              )}
+            </div>
+            <PoiLocationMap
+              poi={draft.location}
+              entrances={draft.entrances.map((item) => ({
+                ...item.location,
+                isPrimary: item.isPrimary,
+              }))}
+              onPick={
+                poi?.status === 'pending_review'
+                  ? undefined
+                  : (point) => setDraft({ ...draft, location: point })
+              }
+            />
+            <small className="helper">
+              Bấm lên bản đồ để đặt vị trí. Chấm xanh = POI, chấm vàng = cổng
+              dẫn đường.
+            </small>
           </div>
           <EntranceEditor draft={draft} setDraft={setDraft} errors={errors} />
           <HoursEditor draft={draft} setDraft={setDraft} errors={errors} />
@@ -274,14 +339,20 @@ export function PoiForm({
               {fieldError('slug')}
             </label>
             <label>
-              Category slug
-              <input
-                placeholder="attraction"
+              Loại địa điểm
+              <select
                 value={draft.category}
                 onChange={(e) =>
                   setDraft({ ...draft, category: e.target.value })
                 }
-              />
+              >
+                {!draft.category && <option value="">Chọn loại…</option>}
+                {categoryOptions(draft.category).map((item) => (
+                  <option key={item.slug} value={item.slug}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
               {fieldError('category')}
             </label>
           </div>
@@ -314,7 +385,7 @@ export function PoiForm({
             >
               Cổng chính + graph node
             </p>
-            <p>Media: chờ backend T24</p>
+            <p>Thuyết minh: thêm ở mục thuyết minh sau khi lưu POI</p>
           </div>
         </aside>
       </div>
@@ -383,6 +454,8 @@ function EntranceEditor({
   setDraft: (value: PoiDraft) => void;
   errors: Record<string, string>;
 }) {
+  const [notes, setNotes] = useState<Record<number, string>>({});
+  const [busyIndex, setBusyIndex] = useState<number | null>(null);
   const update = (
     index: number,
     patch: Partial<PoiDraft['entrances'][number]>,
@@ -393,6 +466,62 @@ function EntranceEditor({
         i === index ? { ...item, ...patch } : item,
       ),
     });
+  const note = (index: number, text: string) =>
+    setNotes((before) => ({ ...before, [index]: text }));
+
+  async function entranceFromDevice(index: number) {
+    setBusyIndex(index);
+    note(index, '');
+    try {
+      const fix = await getDevicePosition();
+      update(index, {
+        location: {
+          latitude: Number(fix.latitude.toFixed(7)),
+          longitude: Number(fix.longitude.toFixed(7)),
+        },
+      });
+      note(
+        index,
+        `Đã lấy vị trí hiện tại (sai số khoảng ${Math.round(fix.accuracyMeters)} m). Bấm "Gắn vào đường gần nhất" để chọn graph node.`,
+      );
+    } catch (cause) {
+      note(
+        index,
+        cause instanceof Error ? cause.message : 'Không lấy được vị trí.',
+      );
+    } finally {
+      setBusyIndex(null);
+    }
+  }
+
+  async function snapEntrance(index: number) {
+    const entrance = draft.entrances[index];
+    if (!entrance) return;
+    setBusyIndex(index);
+    note(index, '');
+    try {
+      const snap = nearestWalkNode(await loadWalkNodes(), entrance.location);
+      if (!snap) {
+        note(index, 'Chưa có dữ liệu đường đi để gắn.');
+        return;
+      }
+      update(index, {
+        graphNodeRef: snap.node.ref,
+        location: { latitude: snap.node.lat, longitude: snap.node.lon },
+      });
+      const metres = Math.round(snap.distanceMeters);
+      note(
+        index,
+        metres > MAX_SNAP_METERS
+          ? `Đã gắn vào ${snap.node.ref}, nhưng cách ${metres} m: khá xa đường đi bộ, hãy kiểm tra lại vị trí.`
+          : `Đã gắn vào ${snap.node.ref} (cách vị trí đã chọn ${metres} m).`,
+      );
+    } catch {
+      note(index, 'Không tải được dữ liệu đường đi. Thử lại sau.');
+    } finally {
+      setBusyIndex(null);
+    }
+  }
   return (
     <div className="panel card">
       <div className="section-heading">
@@ -521,6 +650,29 @@ function EntranceEditor({
                 </small>
               )}
             </label>
+          </div>
+          <div className="geo-actions">
+            <button
+              type="button"
+              className="button ghost small"
+              disabled={busyIndex === index}
+              onClick={() => void entranceFromDevice(index)}
+            >
+              📍 Dùng vị trí hiện tại
+            </button>
+            <button
+              type="button"
+              className="button ghost small"
+              disabled={busyIndex === index}
+              onClick={() => void snapEntrance(index)}
+            >
+              Gắn vào đường gần nhất
+            </button>
+            {notes[index] && (
+              <small className="geo-note" role="status">
+                {notes[index]}
+              </small>
+            )}
           </div>
           <div className="entrance-options">
             <label>
