@@ -45,10 +45,10 @@ describe('auto guide geofence', () => {
 
   it('triggers once on entering the radius, not while far away', () => {
     let state = EMPTY_GUIDE_STATE;
-    const far = evaluateAutoGuide(state, north(wheel, 60), [wheel], 0);
+    const far = evaluateAutoGuide(state, north(wheel, 80), [wheel], 0);
     expect(far.triggered).toBeNull();
     state = far.state;
-    const near = evaluateAutoGuide(state, north(wheel, 20), [wheel], 1000);
+    const near = evaluateAutoGuide(state, north(wheel, 45), [wheel], 1000);
     expect(near.triggered?.id).toBe('wheel');
     const still = evaluateAutoGuide(
       near.state,
@@ -66,10 +66,10 @@ describe('auto guide geofence', () => {
       [wheel],
       0,
     );
-    // jitter between enter (25) and exit (40) keeps the place "inside"
+    // jitter between enter (50) and exit (70) keeps the place "inside"
     const jitter = evaluateAutoGuide(
       entered.state,
-      north(wheel, 33),
+      north(wheel, 60),
       [wheel],
       1000,
     );
@@ -81,7 +81,12 @@ describe('auto guide geofence', () => {
     );
     expect(back.triggered).toBeNull();
     // leave, come back within the cooldown → quiet
-    const left = evaluateAutoGuide(back.state, north(wheel, 80), [wheel], 3000);
+    const left = evaluateAutoGuide(
+      back.state,
+      north(wheel, 120),
+      [wheel],
+      3000,
+    );
     const again = evaluateAutoGuide(
       left.state,
       north(wheel, 10),

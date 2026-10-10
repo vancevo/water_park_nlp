@@ -9,9 +9,9 @@ export const AUTO_GUIDE_POI_NUMBERS: readonly number[] = [25, 26];
 
 export const AUTO_GUIDE_DEFAULTS = {
   /** Start narrating inside this distance… */
-  enterMeters: 25,
+  enterMeters: 50,
   /** …and only re-arm after leaving this one (hysteresis against GPS jitter). */
-  exitMeters: 40,
+  exitMeters: 70,
   /** Fixes less accurate than this (metres) are shown but never trigger. */
   maxAccuracyMeters: 40,
   /** A place that just narrated stays quiet for this long after re-entry. */
