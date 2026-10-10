@@ -1,6 +1,7 @@
 import { DamSenApiClient } from '@damsen/api-client';
 import type {
   AdminPoi,
+  AdminPoiInput,
   FieldCheck,
   FieldCheckApplyInput,
   FieldCheckInput,
@@ -27,6 +28,18 @@ export const fieldApi = {
     input: FieldCheckInput,
   ): Promise<FieldCheck> {
     return sdk.createFieldCheck(poiId, input, await token());
+  },
+  async createPoi(input: AdminPoiInput): Promise<AdminPoi> {
+    return sdk.createAdminPoi(input, await token());
+  },
+  async submitPoi(id: string): Promise<AdminPoi> {
+    return sdk.submitAdminPoi(id, await token());
+  },
+  async approveVersion(versionId: string): Promise<AdminPoi> {
+    return sdk.approveContent(versionId, await token());
+  },
+  async rejectVersion(versionId: string, reason: string): Promise<AdminPoi> {
+    return sdk.rejectContent(versionId, { reason }, await token());
   },
   async applyCheck(
     checkId: string,

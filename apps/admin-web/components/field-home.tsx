@@ -77,9 +77,14 @@ export function FieldHome() {
     <FieldShell
       title="Xác minh vị trí"
       actions={
-        <Link href="/field/review" className="field-link">
-          Duyệt kết quả đo
-        </Link>
+        <span className="field-links">
+          <Link href="/field/new" className="field-link">
+            ＋ Thêm địa điểm tại đây
+          </Link>
+          <Link href="/field/review" className="field-link">
+            Duyệt kết quả đo
+          </Link>
+        </span>
       }
     >
       <section className="field-status" aria-label="Trạng thái">

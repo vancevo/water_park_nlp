@@ -28,3 +28,8 @@ export function categoryOptions(
     ? [{ slug: current, label: `${current} (loại cũ)` }, ...POI_CATEGORIES]
     : [...POI_CATEGORIES];
 }
+
+/** Vietnamese label for a category slug (the slug itself when unknown). */
+export function categoryLabel(slug: string): string {
+  return POI_CATEGORIES.find((item) => item.slug === slug)?.label ?? slug;
+}
