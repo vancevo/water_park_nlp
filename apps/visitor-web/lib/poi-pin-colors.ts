@@ -71,7 +71,7 @@ export const NEW_PLACE_COLORS: Readonly<Record<string, PoiPinColor>> = {
   'new-truot-phao-tren-tham': 'red',
   'new-cafe-windy': 'white',
   'new-diem-thu': 'blue',
-  'new-dao-than-ky': 'white',
+  'new-dao-than-tai': 'white',
   'new-cong-lien-thong': 'yellow',
 };
 
