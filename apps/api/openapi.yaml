@@ -164,6 +164,92 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/AdminPoi' }
+  /v1/admin/pois/{poiId}/field-checks:
+    post:
+      operationId: createFieldCheck
+      summary: Record what was measured on site (does not edit the POI)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: poiId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FieldCheckInput' }
+      responses:
+        '201':
+          description: Stored
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FieldCheck' }
+        '200':
+          description: The same clientId was already uploaded; the stored check is returned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FieldCheck' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422':
+          description: GPS accuracy worse than 50 m (`FIELD_CHECK_ACCURACY_TOO_LOW`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+  /v1/admin/field-checks:
+    get:
+      operationId: listFieldChecks
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: poiId
+          in: query
+          required: false
+          schema: { type: string, format: uuid }
+        - name: applied
+          in: query
+          required: false
+          description: '`false` returns only checks nobody applied yet'
+          schema: { type: string, enum: ['false'] }
+      responses:
+        '200':
+          description: Newest first, at most 500
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FieldCheck' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /v1/admin/field-checks/{checkId}/apply:
+    post:
+      operationId: applyFieldCheck
+      summary: Move the POI/entrance to the measured spot (REVIEWER/ADMIN); status is unchanged
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: checkId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FieldCheckApplyInput' }
+      responses:
+        '200':
+          description: The updated POI
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminPoi' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
   /v1/admin/content/{versionId}/approve:
     post:
       operationId: approveContent
@@ -764,6 +850,42 @@ components:
         application/json:
           schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
   schemas:
+    FieldCheckInput:
+      type: object
+      required:
+        [clientId, target, location, accuracyMeters, sampleCount, outcome]
+      properties:
+        clientId: { type: string, format: uuid }
+        target: { type: string, enum: [poi, entrance] }
+        entranceId: { type: string, format: uuid }
+        location:
+          type: object
+          required: [latitude, longitude]
+          properties:
+            latitude: { type: number }
+            longitude: { type: number }
+        accuracyMeters: { type: number, minimum: 0.1, maximum: 1000 }
+        sampleCount: { type: integer, minimum: 1 }
+        outcome: { type: string, enum: [confirmed, corrected, problem] }
+        pathOk: { type: boolean }
+        note: { type: string, maxLength: 500 }
+    FieldCheck:
+      allOf:
+        - $ref: '#/components/schemas/FieldCheckInput'
+        - type: object
+          required: [id, poiId, distanceFromCurrentMeters, createdBy, createdAt]
+          properties:
+            id: { type: string, format: uuid }
+            poiId: { type: string, format: uuid }
+            distanceFromCurrentMeters: { type: number }
+            createdBy: { type: string, format: uuid }
+            createdAt: { type: string, format: date-time }
+            appliedAt: { type: string, format: date-time }
+            appliedBy: { type: string, format: uuid }
+    FieldCheckApplyInput:
+      type: object
+      properties:
+        graphNodeRef: { type: string, pattern: '^[A-Za-z0-9_-]{1,100}$' }
     UserRole:
       type: string
       enum: [VISITOR, EDITOR, REVIEWER, ADMIN]

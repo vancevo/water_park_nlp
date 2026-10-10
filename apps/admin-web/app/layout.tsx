@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
-import { AppShell } from '@/components/app-shell';
+import { SessionKeeper } from '@/components/session-keeper';
+import { ShellSwitch } from '@/components/shell-switch';
 import './globals.css';
+
+export const viewport = { width: 'device-width', initialScale: 1 };
 
 export const metadata: Metadata = {
   title: 'Đầm Sen Admin',
@@ -13,7 +16,8 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body>
-        <AppShell>{children}</AppShell>
+        <SessionKeeper />
+        <ShellSwitch>{children}</ShellSwitch>
       </body>
     </html>
   );

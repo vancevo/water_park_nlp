@@ -450,3 +450,40 @@ export interface CreateTtsJobRequest {
 }
 
 // Contract v1 locked — see docs/plans/CONG_TU_WORK_SPLIT.md
+
+/** What a person measured on site (contract v1.3, additive). */
+export type FieldCheckTarget = 'poi' | 'entrance';
+/** `confirmed`: the place is where the map says; `corrected`: measured elsewhere; `problem`: cannot use / unsafe. */
+export type FieldCheckOutcome = 'confirmed' | 'corrected' | 'problem';
+
+export interface FieldCheckInput {
+  /** UUID made on the device so a retried upload never duplicates. */
+  clientId: string;
+  target: FieldCheckTarget;
+  /** Required when `target` is `entrance`. */
+  entranceId?: string;
+  location: { latitude: number; longitude: number };
+  /** Horizontal accuracy of the (averaged) fix, metres; the API refuses > 50. */
+  accuracyMeters: number;
+  sampleCount: number;
+  outcome: FieldCheckOutcome;
+  /** Can people actually walk the route to this point? */
+  pathOk?: boolean;
+  note?: string;
+}
+
+export interface FieldCheck extends FieldCheckInput {
+  id: string;
+  poiId: string;
+  /** Observed point vs the POI / entrance position when the check was made. */
+  distanceFromCurrentMeters: number;
+  createdBy: string;
+  createdAt: string;
+  appliedAt?: string;
+  appliedBy?: string;
+}
+
+export interface FieldCheckApplyInput {
+  /** Required for an entrance: the path node the entrance now snaps to. */
+  graphNodeRef?: string;
+}

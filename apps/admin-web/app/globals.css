@@ -895,3 +895,284 @@ a:focus-visible,
   width: 18px;
   height: 18px;
 }
+
+/* ---- Field verification (phone first) ---- */
+.field-shell {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 12px 14px 60px;
+}
+.field-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.field-header h1 {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 22px;
+}
+.field-brand,
+.field-back,
+.field-link {
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.field-back {
+  padding: 8px 0;
+  font-size: 15px;
+}
+.field-status {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.field-progress {
+  font-size: 14px;
+}
+.field-bar {
+  height: 8px;
+  margin-top: 6px;
+  overflow: hidden;
+  background: var(--line);
+  border-radius: 99px;
+}
+.field-bar span {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+  transition: width 0.3s;
+}
+.field-gps {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 99px;
+  background: #eef1ee;
+}
+.field-gps.good {
+  background: #dff3e8;
+  color: #0b6b43;
+}
+.field-gps.ok {
+  background: #fdf2d0;
+  color: #7a5b05;
+}
+.field-gps.poor {
+  background: #f9dcdc;
+  color: var(--danger);
+}
+.field-sync {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+}
+.field-filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  overflow-x: auto;
+}
+.field-filters button {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 14px;
+  font-weight: 700;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+}
+.field-filters button.selected,
+.field-choices button.selected {
+  color: #fff;
+  background: var(--brand);
+  border-color: var(--brand);
+}
+.field-search {
+  width: 100%;
+  min-height: 44px;
+  margin-bottom: 10px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.field-list {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+.field-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 10px 12px;
+  color: inherit;
+  text-decoration: none;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.field-row-main,
+.field-row-side {
+  display: grid;
+  gap: 2px;
+}
+.field-row-side {
+  justify-items: end;
+  text-align: right;
+}
+.field-row small,
+.field-card small {
+  color: var(--muted);
+}
+.chip {
+  display: inline-block;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 99px;
+  background: #eef1ee;
+  white-space: nowrap;
+}
+.chip.confirmed,
+.chip.applied {
+  background: #dff3e8;
+  color: #0b6b43;
+}
+.chip.corrected {
+  background: #e4eefc;
+  color: #1d5bb5;
+}
+.chip.problem {
+  background: #f9dcdc;
+  color: var(--danger);
+}
+.chip.pending {
+  background: #fdf2d0;
+  color: #7a5b05;
+}
+.field-map {
+  height: 300px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.field-map.small {
+  height: 220px;
+  margin: 8px 0 0;
+}
+.field-card {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.field-card h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.field-where {
+  display: grid;
+}
+.field-where b {
+  font-size: 18px;
+}
+.field-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.field-actions {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.button.big {
+  min-height: 52px;
+  font-size: 15px;
+}
+.button.warn {
+  color: var(--danger);
+}
+.field-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.field-choices legend {
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.field-choices button {
+  min-height: 44px;
+  padding: 0 14px;
+  font-weight: 700;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.field-card textarea {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.field-history,
+.field-review {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+.field-review li {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.field-review-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+.field-login {
+  max-width: 360px;
+}
+.map-pin.me {
+  width: 16px;
+  height: 16px;
+  background: #2f7df6;
+  box-shadow: 0 0 0 5px #2f7df644;
+}
+.map-pin.measured {
+  width: 16px;
+  height: 16px;
+  background: #d83a3a;
+}
+.map-pin.entrance {
+  background: #e89831;
+}

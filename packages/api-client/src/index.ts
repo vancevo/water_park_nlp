@@ -79,6 +79,9 @@ import type {
   CreateTtsJobRequest,
   NarrationAudioPlayback,
   LatestTtsJobResponse,
+  FieldCheck,
+  FieldCheckApplyInput,
+  FieldCheckInput,
 } from '@damsen/shared-types';
 
 export interface ApiClientOptions {
@@ -345,6 +348,41 @@ export class DamSenApiClient {
       method: 'POST',
       accessToken,
     });
+  }
+
+  /** Records what was measured on site; the same `clientId` is accepted again (200) without duplicating. */
+  createFieldCheck(
+    poiId: string,
+    input: FieldCheckInput,
+    accessToken: string,
+  ): Promise<FieldCheck> {
+    return this.request(
+      `/v1/admin/pois/${encodeURIComponent(poiId)}/field-checks`,
+      { method: 'POST', body: input, accessToken },
+    );
+  }
+
+  listFieldChecks(
+    accessToken: string,
+    query: { poiId?: string; unappliedOnly?: boolean } = {},
+  ): Promise<FieldCheck[]> {
+    const params = new URLSearchParams();
+    if (query.poiId) params.set('poiId', query.poiId);
+    if (query.unappliedOnly) params.set('applied', 'false');
+    const suffix = params.size > 0 ? `?${params.toString()}` : '';
+    return this.request(`/v1/admin/field-checks${suffix}`, { accessToken });
+  }
+
+  /** Reviewer/admin: moves the POI (or entrance) to the measured spot, status unchanged. */
+  applyFieldCheck(
+    checkId: string,
+    input: FieldCheckApplyInput,
+    accessToken: string,
+  ): Promise<AdminPoi> {
+    return this.request(
+      `/v1/admin/field-checks/${encodeURIComponent(checkId)}/apply`,
+      { method: 'POST', body: input, accessToken },
+    );
   }
 
   approveContent(versionId: string, accessToken: string): Promise<AdminPoi> {

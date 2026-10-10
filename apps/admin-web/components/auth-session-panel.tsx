@@ -30,6 +30,8 @@ export function AuthSessionPanel() {
       const response = await authApi.login({ email, password });
       saveAuthSession({
         accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+        accessTokenExpiresAt: Date.now() + response.accessTokenExpiresIn * 1000,
         user: response.user,
       });
       setPassword('');

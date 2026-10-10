@@ -14,6 +14,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link href="/pois" className="active">
             Điểm khám phá
           </Link>
+          <Link href="/field">Hiện trường</Link>
           <span>
             Kiểm duyệt <small>Sắp có</small>
           </span>

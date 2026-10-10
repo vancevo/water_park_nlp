@@ -12,7 +12,7 @@ export type GeolocationFailure =
   | 'unavailable'
   | 'timeout';
 
-const MESSAGES: Record<GeolocationFailure, string> = {
+export const GEOLOCATION_MESSAGES: Record<GeolocationFailure, string> = {
   insecure:
     'Trình duyệt chỉ cho lấy vị trí trên HTTPS (hoặc localhost). Hãy mở trang admin qua HTTPS.',
   unsupported: 'Thiết bị này không hỗ trợ lấy vị trí.',
@@ -24,7 +24,7 @@ const MESSAGES: Record<GeolocationFailure, string> = {
 
 export class GeolocationError extends Error {
   constructor(readonly reason: GeolocationFailure) {
-    super(MESSAGES[reason]);
+    super(GEOLOCATION_MESSAGES[reason]);
     this.name = 'GeolocationError';
   }
 }
@@ -80,4 +80,9 @@ export function getDevicePosition(
       options,
     );
   });
+}
+
+/** Maps a browser PositionError code to our failure reason. */
+export function failureForCode(code: number): GeolocationFailure {
+  return code === 1 ? 'denied' : code === 3 ? 'timeout' : 'unavailable';
 }
