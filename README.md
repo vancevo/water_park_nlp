@@ -40,8 +40,15 @@ source .env
 set +a
 npm run db:migrate
 npm run dev:api
+# terminal khác, khi API đã chạy: nạp đồ thị đường đi + 50 địa điểm của bản đồ (xem dưới)
+ADMIN_PASSWORD="$DEV_ADMIN_PASSWORD" npm run seed:park
 npm run dev:visitor
 ```
+
+**Quan trọng:** migration chỉ nạp 5 địa điểm giả để test. 50 địa điểm của bản đồ và đồ thị đường đi
+nằm trong database, không nằm trong repo, nên sau khi kéo code phải chạy `npm run seed:park`
+(cần API đang chạy và tài khoản admin; chạy lại nhiều lần vẫn an toàn). Chạy demo một chạm
+(`demo.mjs start`) đã tự gọi bước này. Không có `DATABASE_URL` thì API dùng bộ nhớ tạm chỉ có 5 địa điểm giả.
 
 Nạp biến từ `.env` theo cách phù hợp với shell/process manager trước khi chạy
 API với database. Visitor web mặc định ở `http://localhost:3002` và admin ở

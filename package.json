@@ -18,6 +18,7 @@
     "dev:visitor": "npm run dev --workspace @damsen/visitor-web",
     "dev:worker": "npm run dev --workspace @damsen/worker",
     "db:migrate": "node scripts/migrate.mjs",
+    "seed:park": "node scripts/seed-park.mjs",
     "data:research:generate": "python3 data/research-damsen/generate.py",
     "data:research:validate": "python3 data/research-damsen/validate.py",
     "smoke:media": "node scripts/smoke-media.mjs",

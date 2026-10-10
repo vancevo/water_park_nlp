@@ -476,7 +476,25 @@ async function start() {
   );
   ok('API và worker sẵn sàng');
 
-  step(4, 6, 'Chuẩn bị nội dung demo (audio AI cho các địa điểm)');
+  step(4, 6, 'Chuẩn bị nội dung demo (50 địa điểm + audio AI)');
+  // Migrations only seed 5 fixture places: load the park's graph and 50 numbered places first.
+  await node(['scripts/seed-park.mjs'], {
+    env: {
+      ...env,
+      API_URL: URLS.api,
+      ADMIN_EMAIL,
+      ADMIN_PASSWORD,
+    },
+    quiet: true,
+    label: 'seed:park',
+  });
+  ok('đã nạp đồ thị đường đi và 50 địa điểm');
+  // The places did not exist when the index was built in step 2.
+  await node(['apps/worker/dist/embedding/index-main.js'], {
+    env: { ...env, EMBEDDING_URL: URLS.embedding },
+    quiet: true,
+    label: 'embeddings:index',
+  });
   const seeded = await seedNarrations({
     apiUrl: URLS.api,
     email: ADMIN_EMAIL,

@@ -11,7 +11,7 @@
 
 ```bash
 python3 data/pois/validate.py                       # kiểm tra file
-node scripts/import-redrawn-walkways.mjs         # một lần: đường đi vẽ lại + vị trí ghim vào DB
+npm run seed:park                                  # đồ thị đường đi + 50 địa điểm (cần API chạy, ADMIN_PASSWORD)
 ADMIN_PASSWORD=... node scripts/import-pois.mjs --dry-run
 ADMIN_PASSWORD=... node scripts/import-pois.mjs    # tạo + gửi duyệt + duyệt qua API admin
 ```
