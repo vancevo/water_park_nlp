@@ -186,6 +186,7 @@ export class FfmpegAudioEncoder implements AudioEncoder {
       const child = spawn(this.config.ffmpegPath, args, {
         stdio: ['pipe', 'ignore', 'pipe'],
         detached: process.platform !== 'win32',
+        windowsHide: true,
       });
       const stop = () => killProcessTree(child);
       signal?.addEventListener('abort', stop, { once: true });

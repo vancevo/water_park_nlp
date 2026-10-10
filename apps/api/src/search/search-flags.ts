@@ -14,6 +14,23 @@ export interface SearchFlags {
   /** How many lexical candidates to re-rank with the vector signal. */
   poolSize: number;
   weights: FusionWeights;
+  /**
+   * Vector-only recall expansion (C06, ADR 0012 amendment): POIs the lexical
+   * query missed are added when their cosine similarity to the query is at
+   * least `minSimilarity` — at most `limit` of them.
+   */
+  expand?: { enabled: boolean; minSimilarity: number; limit: number };
+}
+
+function unitEnv(value: string | undefined, fallback: number): number {
+  const n = Number(value);
+  return value !== undefined &&
+    value !== '' &&
+    Number.isFinite(n) &&
+    n >= 0 &&
+    n <= 1
+    ? n
+    : fallback;
 }
 
 function intEnv(value: string | undefined, fallback: number): number {
@@ -42,6 +59,11 @@ export function loadSearchFlags(
         env.SEARCH_HYBRID_VEC_WEIGHT,
         DEFAULT_FUSION_WEIGHTS.vecWeight,
       ),
+    },
+    expand: {
+      enabled: env.SEARCH_HYBRID_EXPAND !== 'false',
+      minSimilarity: unitEnv(env.SEARCH_HYBRID_MIN_SIMILARITY, 0.5),
+      limit: intEnv(env.SEARCH_HYBRID_EXPAND_LIMIT, 3),
     },
   };
 }

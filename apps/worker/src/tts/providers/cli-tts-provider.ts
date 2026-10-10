@@ -86,7 +86,8 @@ export const spawnCliRunner: CliRunner = async (input) => {
   await new Promise<void>((resolveRun, reject) => {
     const child = spawn(input.command, [...input.args], {
       stdio: ['pipe', 'ignore', 'pipe'],
-      detached: true,
+      detached: process.platform !== 'win32',
+      windowsHide: true,
     });
     const stop = () => {
       killProcessTree(child);

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildPiperProvider,
+  loadPiperVoiceManifest,
   parsePiperVoiceManifest,
   toTtsModelRegistry,
 } from '../src/tts/piper/piper-voices.js';
@@ -70,5 +71,24 @@ describe('parsePiperVoiceManifest', () => {
     expect(provider.provider).toBe('piper');
     expect(provider.voiceId).toBe('vi_VN-vais1000-medium');
     expect(provider.supportsLocale('vi')).toBe(true);
+  });
+});
+
+describe('loadPiperVoiceManifest', () => {
+  const readFile = () => JSON.stringify(manifest());
+
+  it('keeps the manifest binaryPath by default', () => {
+    expect(loadPiperVoiceManifest({ env: {}, readFile }).binaryPath).toBe(
+      'piper',
+    );
+  });
+
+  it('lets TTS_PIPER_BINARY point at a machine-specific piper (e.g. a venv)', () => {
+    const loaded = loadPiperVoiceManifest({
+      env: { TTS_PIPER_BINARY: 'C:\\demo\\venv\\Scripts\\piper.exe' },
+      readFile,
+    });
+    expect(loaded.binaryPath).toBe('C:\\demo\\venv\\Scripts\\piper.exe');
+    expect(loaded.voices).toHaveLength(1);
   });
 });

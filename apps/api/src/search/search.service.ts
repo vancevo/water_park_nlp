@@ -22,6 +22,7 @@ import {
   type SearchCandidate,
   type SearchRepository,
   type SearchRepositoryQuery,
+  type VectorHit,
 } from './search.models.js';
 import { normalizeSearchText } from './search-text.js';
 import { fuseRankings } from './hybrid-ranking.js';
@@ -34,8 +35,8 @@ import {
 } from './search-geo-intent.js';
 
 /**
- * Upper bound on POIs considered for a direction intent. A park catalogue is
- * far below this; it only bounds the in-memory ordering.
+ * Upper bound on POIs considered for a direction intent or a vector
+ * expansion. A park catalogue is far below this; it only bounds the work.
  */
 const DIRECTION_CANDIDATE_LIMIT = 500;
 
@@ -170,11 +171,13 @@ export class SearchService {
   }
 
   /**
-   * Hybrid: re-rank the top lexical pool by fusing lexical order with the
-   * semantic (vector) order, then paginate. Fails closed — any missing vector,
-   * empty pool, deep page or error returns null so the caller uses lexical.
-   * The candidate SET is unchanged (re-ranking only), so total/pagination stay
-   * consistent with the lexical baseline.
+   * Hybrid (ADR 0012 + amendment 2026-10-10): fuse the top lexical pool with
+   * the semantic (vector) order, and — when `expand.enabled` — add up to
+   * `expand.limit` POIs the lexical query missed whose cosine similarity is at
+   * least `expand.minSimilarity` (e.g. "music performance" → a stage whose
+   * text never says "music"). Added POIs still pass the category/radius/
+   * open-now filters. Fails closed: no vector, a deep page, nothing found or
+   * any error returns null so the caller uses lexical.
    */
   private async tryHybrid(
     query: SearchQueryDto,
@@ -191,24 +194,30 @@ export class SearchService {
       const pool = await this.repository.search(
         this.repositoryQuery(query, at, { limit: poolSize, offset: 0 }),
       );
-      if (pool.length === 0) return null;
-      const total = pool[0]?.total ?? pool.length;
+      const lexicalTotal = pool[0]?.total ?? pool.length;
       const poolIds = pool.map((candidate) => candidate.record.id);
-
-      const vectorHits = await hybrid.vectorSource.search({
-        vector,
-        locale: query.locale,
-        limit: poolSize,
-        poiIds: poolIds,
-      });
-      const vectorRanked = new Set(vectorHits.map((hit) => hit.poiId));
-
-      const fused = fuseRankings(
-        poolIds,
-        vectorHits.map((hit) => hit.poiId),
-        hybrid.flags.weights,
-      );
       const byId = new Map(pool.map((c) => [c.record.id, c]));
+
+      const poolHits: VectorHit[] =
+        pool.length > 0
+          ? await hybrid.vectorSource.search({
+              vector,
+              locale: query.locale,
+              limit: poolSize,
+              poiIds: poolIds,
+            })
+          : [];
+      const added = await this.vectorExpansion(query, at, hybrid, vector, byId);
+      if (pool.length === 0 && added.length === 0) return null;
+
+      const vectorOrder = [...poolHits, ...added]
+        .sort(
+          (a, b) =>
+            b.similarity - a.similarity || a.poiId.localeCompare(b.poiId),
+        )
+        .map((hit) => hit.poiId);
+      const vectorRanked = new Set(vectorOrder);
+      const fused = fuseRankings(poolIds, vectorOrder, hybrid.flags.weights);
       const ordered = fused
         .map((entry) => byId.get(entry.id))
         .filter((c): c is SearchCandidate => c !== undefined);
@@ -217,10 +226,54 @@ export class SearchService {
       const items = page.map((candidate) =>
         this.result(candidate, query, at, vectorRanked),
       );
-      return this.paginate(items, total, query);
+      return this.paginate(items, lexicalTotal + added.length, query);
     } catch {
       return null; // Fail closed to lexical search.
     }
+  }
+
+  /**
+   * Semantic neighbours that the lexical pool missed, above the similarity
+   * floor and allowed by the request filters. Adds their candidates to `byId`.
+   */
+  private async vectorExpansion(
+    query: SearchQueryDto,
+    at: ClockParts,
+    hybrid: HybridSearchDeps,
+    vector: readonly number[],
+    byId: Map<string, SearchCandidate>,
+  ): Promise<VectorHit[]> {
+    const { expand, poolSize } = hybrid.flags;
+    if (!expand?.enabled) return [];
+    const neighbours = await hybrid.vectorSource.search({
+      vector,
+      locale: query.locale,
+      limit: poolSize,
+    });
+    const fresh = neighbours.filter(
+      (hit) => hit.similarity >= expand.minSimilarity && !byId.has(hit.poiId),
+    );
+    if (fresh.length === 0) return [];
+    const allowed = new Map(
+      (
+        await this.repository.search({
+          ...this.repositoryQuery(query, at, {
+            limit: DIRECTION_CANDIDATE_LIMIT,
+            offset: 0,
+          }),
+          matchAll: true,
+        })
+      ).map((c) => [c.record.id, c]),
+    );
+    const added: VectorHit[] = [];
+    for (const hit of fresh) {
+      const candidate = allowed.get(hit.poiId);
+      if (!candidate) continue;
+      byId.set(hit.poiId, candidate);
+      added.push(hit);
+      if (added.length >= expand.limit) break;
+    }
+    return added;
   }
 
   private repositoryQuery(

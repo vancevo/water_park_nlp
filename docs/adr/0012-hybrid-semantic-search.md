@@ -61,3 +61,37 @@ ranking layer must be fully testable and safe without any of them.
 - No migration or worker change; `semantic_embeddings` (005) is reused as-is.
 - Hybrid is a strict re-rank, so turning it on cannot change which results appear
   or the totals — only their order — which bounds the risk of enabling it.
+
+## Amendment 2026-10-10 (C06) — free local embeddings + vector recall expansion
+
+1. **Embedding provider: BAAI/bge-m3, run locally for free.** MIT licence,
+   multilingual (incl. Vietnamese), 1024 dims (matches migration 005), served by
+   `tools/embedding-runtime/server.mjs` (transformers.js + onnxruntime on CPU,
+   `Xenova/bge-m3` int8 ONNX ≈ 570 MB, downloaded once). No API key or paid
+   service. The HTTP protocol (`apps/worker/src/embedding/embedding-server.ts`)
+   is model-agnostic: `POST /embed` (API query embedder), `POST /embed/batch`
+   (indexer), `GET /healthz`; requests naming another model/version get 409.
+   The runtime lives outside the npm workspaces so CI never installs it.
+2. **Indexing.** `npm run embeddings:index --workspace @damsen/worker` embeds
+   every published POI translation through the service; model/version are read
+   from `/healthz`, so stored vectors and queries always match. Idempotent by
+   content hash; `--force` re-embeds.
+3. **Vector-only recall expansion (was deferred).** With hybrid on, POIs the
+   lexical query missed are added when cosine similarity ≥
+   `SEARCH_HYBRID_MIN_SIMILARITY` (default 0.5), at most
+   `SEARCH_HYBRID_EXPAND_LIMIT` (3), still passing category/radius/open-now
+   filters; `SEARCH_HYBRID_EXPAND=false` restores strict re-ranking. The pool
+   order is fused by RRF as before, so lexical hits keep priority; added POIs
+   carry the `semantic` reason. `total` = lexical total + added. Fail-closed
+   behaviour is unchanged.
+4. **Calibration.** The similarity floor depends on the model. The demo setup
+   calibrates it on the model actually installed: the floor is set just above
+   the highest similarity any of the 5 expected-zero ("nonsense") queries
+   reaches, so expansion never invents results for them
+   (`scripts/demo/calibrate-search.mjs`). This tunes on the evaluation set —
+   acceptable for the demo, not a substitute for a held-out set.
+
+Verified 2026-10-10 on Postgres 16 + pgvector with a stand-in tiny model (the
+real weights are not reachable from the build environment): indexing 10/10,
+idempotent re-run 0/10, API hybrid + expansion end-to-end, and the toy model's
+uncalibrated floor admitting nonsense queries — which is why step 4 exists.

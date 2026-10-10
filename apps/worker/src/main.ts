@@ -14,6 +14,16 @@ export {
   hashEmbeddingContent,
 } from './embedding/poi-document.js';
 export { PostgresEmbeddingRepository } from './embedding/postgres-embedding.repository.js';
+export {
+  HttpEmbeddingProvider,
+  EmbeddingServiceError,
+} from './embedding/http-embedding-provider.js';
+export { createEmbeddingServer } from './embedding/embedding-server.js';
+export type {
+  TextEmbeddingModel,
+  EmbeddingServerOptions,
+  EmbeddingServerHandle,
+} from './embedding/embedding-server.js';
 export type {
   EmbeddingDocument,
   EmbeddingProvider,

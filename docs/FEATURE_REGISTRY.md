@@ -82,7 +82,7 @@ Không ghi chi tiết implementation dài tại đây. Link tới README, OpenAP
 | SEARCH-LEXICAL | ready | `GET /v1/search`, `DamSenApiClient.search()` | `apps/api/src/search/`, `infra/migrations/007_*` | 8 tests + `search-geo-intent.test.ts` + real DB + 50-query HTTP eval | T40/C06 | Accent/typo strong; L3 OR/min-match + L4 cardinal-direction intent (`search-geo-intent.ts`): live Recall@10 0.956 ≥ ADR 0012 gate; semantic synonyms still need embeddings |
 | SEARCH-EVAL | ready | 50-query judgments + metrics | `data/search-evaluation/` | validator + 3 regression tests | T41 | Recall@10/MRR/nDCG@10 + zero-result accuracy |
 | SEARCH-EMBED | in_progress | `EmbeddingService` + repository/provider ports | `apps/worker/src/embedding/`, `infra/migrations/005_*` | 5 unit tests + real schema migration | T42 | Hash-idempotent 1024d versioned storage; production model/provider benchmark remains |
-| SEARCH-HYBRID | in_progress | RRF hybrid re-ranking behind a feature flag + lexical fallback | `apps/api/src/search/hybrid-ranking.ts`, `search-flags.ts`, `query-embedder.ts`, `{in-memory,postgres}-vector.source.ts`, `search.service.ts`, ADR 0012 | 25 unit tests (fusion/flags/embedder/hybrid+fallback) | T43 (AI07) | `SEARCH_HYBRID_ENABLED` off by default; strict re-rank of lexical pool (set/total unchanged); fail-closed to lexical; `semantic` reason added; prod embedding endpoint + 50-query eval at I03 |
+| SEARCH-HYBRID | ready (demo) | RRF hybrid re-ranking + vector-only recall expansion behind flags + lexical fallback; free local embedding service | `apps/api/src/search/{hybrid-ranking,search-flags,query-embedder,search.service}.ts`, `{in-memory,postgres}-vector.source.ts`, `apps/worker/src/embedding/{embedding-server,http-embedding-provider,index-main}.ts`, `tools/embedding-runtime/server.mjs`, ADR 0012 (+ amendment) | hybrid/expansion/flags unit tests + embedding server/provider tests + pgvector E2E (stand-in model) | T43 (AI07) / C06 | BAAI/bge-m3 (MIT, 1024-d) via transformers.js on CPU; `SEARCH_HYBRID_EXPAND`/`MIN_SIMILARITY` (demo calibrates per model); `embeddings:index` is idempotent |
 
 ## Offline, analytics and operations
 
@@ -93,6 +93,7 @@ Không ghi chi tiết implementation dài tại đây. Link tới README, OpenAP
 | AUDIT-LOG | ready | Admin audit query | API admin POI module + migration 003 | HTTP | T23 | All admin mutations record before/after |
 | OBSERVABILITY | planned | Trace/log/error conventions | infra + apps | smoke | T52 | requestId end-to-end |
 | CI-PIPELINE | ready | lint/typecheck/test/build + fixture validators | `.github/workflows/ci.yml` | local equivalent quality gate | T05 | Node 24 and Python contract jobs |
+| LOCAL-DEMO | ready | `node scripts/demo/demo.mjs setup|start|stop|status`; Windows double-click `demo/*.cmd` | `scripts/demo/{demo,lib,seed-narrations,calibrate-search}.mjs`, `demo/HUONG-DAN-DEMO.md` | full setup→start→seed→stop run on Linux with external Postgres/S3 + stand-in voice/model; Chromium checks of visitor/admin | C04–C07 demo | Docker (Postgres/MinIO) + venv Piper + bge-m3; seeds AI narrations via the admin API; non-commercial classroom demo (ADR 0015 §6a) |
 
 ## Registry maintenance checklist
 

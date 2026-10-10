@@ -79,7 +79,13 @@ export const spawnPiperRunner: PiperRunner = async (input) => {
           outPath,
           ...input.extraArgs,
         ],
-        { stdio: ['pipe', 'ignore', 'pipe'], detached: true },
+        {
+          stdio: ['pipe', 'ignore', 'pipe'],
+          // Own process group on POSIX (kill the whole tree); on Windows a
+          // detached child would open a console window per synthesis.
+          detached: process.platform !== 'win32',
+          windowsHide: true,
+        },
       );
       const stop = () => {
         killProcessTree(child);

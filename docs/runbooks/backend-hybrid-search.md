@@ -146,3 +146,19 @@ before enabling hybrid.
   model/version → check the endpoint and the stored model/version match.
 - Deep pages (`offset ≥ pool size`) are served by the lexical ordering by design.
 - Never log the query text, the vector, or raw GPS. Only ids/metrics.
+
+## After L5 — free embeddings + vector expansion (2026-10-10, C06)
+
+- Embedding service: `node tools/embedding-runtime/server.mjs` (BAAI/bge-m3,
+  MIT, CPU, ~570 MB once; install with `npm ci --prefix tools/embedding-runtime`,
+  `ONNXRUNTIME_NODE_INSTALL=skip`). Health: `GET :8091/healthz`.
+- Index: `DATABASE_URL=… EMBEDDING_URL=http://127.0.0.1:8091 npm run
+  embeddings:index --workspace @damsen/worker` (idempotent).
+- API: `SEARCH_HYBRID_ENABLED=true`, `SEARCH_EMBEDDING_URL=…/embed`,
+  `SEARCH_EMBEDDING_MODEL=BAAI/bge-m3`,
+  `SEARCH_EMBEDDING_MODEL_VERSION=Xenova/bge-m3@q8`, and the expansion floor
+  `SEARCH_HYBRID_MIN_SIMILARITY` (calibrated by `scripts/demo/calibrate-search.mjs`;
+  the demo writes it to `.demo/demo.env`). Details: ADR 0012 amendment.
+- The real bge-m3 numbers are produced on the machine that runs the demo
+  (setup step 8 prints the floor and how many semantic queries it reaches;
+  start step 6 prints live Recall@10/MRR/expected-zero accuracy).

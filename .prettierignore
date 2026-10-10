@@ -14,3 +14,5 @@ data
 infra
 PROJECT_PLAN.md
 AGENTS.md
+.demo
+config/piper-voices

@@ -1,7 +1,8 @@
 # ADR 0015 — AI governance: licensing, voice consent, AI labelling and release gates (AI00)
 
-- Status: **Proposed** — needs sign-off by the coordinator (Vinh) and the team
-  before AI TTS go-live; §7 lists the decisions only they can make
+- Status: **Accepted for the non-commercial educational demo** (Công,
+  2026-10-10). The demo tier (§6a) applies now; the full public-release gate
+  (§6b) still needs the team/coordinator before any public or commercial use
 - Date: 2026-10-10
 - Deciders: Công (backend, author), coordinator, Tú (UX/evaluation)
 - Related: `docs/plans/AI_TTS_AND_TRAINING_ROADMAP.md` (AI00, §3), ADR 0004
@@ -86,11 +87,11 @@ A voice with an unset, placeholder or non-commercial licence stays
 - Public API: `audio.generatedBy` is exposed on published narrations
   (contract v1.2) without internal ids.
 - Visitor: AI audio carries a visible label ("Giọng đọc do AI tạo" / "AI-generated
-  voice") — done in visitor-web. **Open (owner Tú):** voices whose licence
-  requires attribution (CC-BY) must also show a credit line, e.g. "Giọng đọc:
-  Piper `vi_VN-vais1000` (VAIS-1000, CC BY 4.0)", next to the player or in an
-  "About audio" panel. Until it ships, CC-BY voices must not be enabled for
-  public audio.
+  voice") — done in visitor-web. **Before publication (owner Tú):** voices
+  whose licence requires attribution (CC-BY) must also show a credit line,
+  e.g. "Giọng đọc: Piper `vi_VN-vais1000` (VAIS-1000, CC BY 4.0)", next to the
+  player or in an "About audio" panel. Deferred for the classroom demo (§6a),
+  which is not a publication; required before the app is published.
 
 ### 5. Privacy and threat review (summary)
 
@@ -103,7 +104,22 @@ A voice with an unset, placeholder or non-commercial licence stays
 | Resource abuse | Quotas + kill switches (ADR 0013/0014) |
 | Licence breach on redistribution | §2 table + §4 attribution before enabling |
 
-### 6. Model release checklist (gate for enabling a voice/model publicly)
+### 6a. Demo tier — non-commercial educational demo (accepted 2026-10-10)
+
+The project is currently a course project shown to teachers for grading, run
+locally and not published. For this tier:
+
+- **Required (unchanged):** AI output stays a draft until a human approves
+  (§1); the AI-generated label is shown; no voice cloning or imitation of a
+  real person (§3); voices pinned by version + checksum; transcripts never
+  logged.
+- **Waived for the demo:** the CC-BY credit line (§4), the ≥ 3-native-rater
+  blind review (provider chosen on automated + operational evidence — ADR 0011
+  amendment 2026-10-10), and coordinator sign-off per voice.
+- **Ends when:** the app is deployed for anyone outside the class, used
+  commercially, or published — then §6b applies in full.
+
+### 6b. Public release checklist (gate for enabling a voice/model publicly)
 
 A voice/model version may be enabled for public audio only when all hold:
 
@@ -120,17 +136,17 @@ A voice/model version may be enabled for public audio only when all hold:
 - [ ] No consent record needed (stock voice) **or** a valid consent record (§3).
 - [ ] Coordinator sign-off recorded in `docs/STATUS.md`.
 
-## 7. Decisions left to the coordinator/team
+## 7. Decisions left to the coordinator/team (before public release)
 
 1. Who signs consent records and where they are kept.
 2. Final wording/placement of the CC-BY attribution in the visitor UI (Tú).
-3. Whether the park's commercial context needs a legal review beyond the
-   licence text (B01 covers content/map rights; this covers voices).
-4. Acceptance of this ADR (status → Accepted).
+3. Whether a commercial context needs a legal review beyond the licence text
+   (B01 covers content/map rights; this covers voices).
+4. Sign-off of §6b for each voice before publication.
 
 ## Consequences
 
-- AI TTS go-live has a written, checkable gate; the I04 "AI00 missing" blocker
-  becomes a sign-off task instead of an unknown.
+- AI TTS is enabled for the classroom demo under §6a; public go-live keeps a
+  written, checkable gate (§6b).
 - Enabling a new voice is a reviewed change with a recorded licence review.
 - Some UI work (attribution) is now a precondition for CC-BY voices.

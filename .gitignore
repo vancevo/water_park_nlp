@@ -19,3 +19,4 @@ config/tts-provider-benchmark-report.json
 __pycache__/
 *.pyc
 
+.demo/

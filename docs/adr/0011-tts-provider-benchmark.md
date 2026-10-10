@@ -79,3 +79,31 @@ measured comparison + blind review at I03 confirm or change this.
 - The generated report (`config/tts-provider-benchmark-report.json`) and local
   engine weights are gitignored; only manifests, thresholds and checksums are
   committed.
+
+## Amendment 2026-10-10 — provider decision for the educational demo
+
+Decided by Công for the non-commercial classroom demo (ADR 0015 §6a); human
+blind review is waived for this tier only.
+
+**Decision: Piper (CPU) for all three locales — `vi_VN-vais1000-medium` (VI,
+the primary visitor language), `en_US-ljspeech-medium` (EN),
+`fr_FR-siwis-medium` (FR)**, the voices already pinned with checksums in
+`config/tts-voices.json`.
+
+Evidence (I03 real-Piper run over the full 64-sentence T06 corpus,
+`data/tts-evaluation/reports/fixtures/i03-real-piper-report.json`):
+
+| Locale | Voice | OK | p95 generation | Mean RTF |
+|---|---|---:|---:|---:|
+| vi | vi_VN-vais1000-medium | 24/24 | 883 ms | 0.24 |
+| en | en_US-ljspeech-medium | 21/21 | 936 ms | 0.19 |
+| fr | fr_FR-siwis-medium | 19/19 | 898 ms | 0.19 |
+
+All three pass every automated and operational gate (0 failures, p95 well
+under 15 s, real-time factor < 1, i.e. faster than playback); the only failing
+item is `missing-human-ratings`, waived for the demo. Why not the others:
+`vais1000-medium` is the only *medium*-quality Vietnamese Piper voice (the
+alternatives are `low`/`x_low`); ZeroTTS and MOSS-TTS were not run (weights
+not reachable from the build environment; MOSS needs a GPU), so by rule 7 the
+current passing baseline is kept. Before publication the §6b gate of ADR 0015
+(blind review ≥ 3 native raters per locale) applies and may change this.

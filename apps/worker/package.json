@@ -11,7 +11,8 @@
     "benchmark:providers": "tsx src/tts/providers/run-provider-benchmark.ts",
     "start": "node dist/worker.js",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "embeddings:index": "node dist/embedding/index-main.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1140.0",

@@ -20,6 +20,13 @@ Expo/React Native, worker cho embedding, PostgreSQL với
 PostGIS/pgRouting/pgvector, Redis và MinIO. Visitor web là client chính theo
 ADR-0006; mobile native chỉ còn là prototype tham khảo.
 
+## Chạy demo một chạm (Windows)
+
+Xem [`demo/HUONG-DAN-DEMO.md`](demo/HUONG-DAN-DEMO.md): cài Node.js 24 +
+Docker Desktop + Python, rồi bấm đúp `demo/1-CAI-DAT-LAN-DAU.cmd` (một lần) và
+`demo/2-CHAY-DEMO.cmd`. Lệnh tương đương: `node scripts/demo/demo.mjs
+setup|start|stop|status`.
+
 ## Khởi động local
 
 ```bash
