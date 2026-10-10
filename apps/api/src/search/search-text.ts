@@ -113,7 +113,17 @@ const STOPWORDS = new Set([
   'categories',
   'poi',
   'pois',
+  'fixture',
+  'fixtures',
+  'synthetic',
 ]);
+
+/** Query tokens that are not stopwords (may be empty, unlike searchTerms). */
+export function significantTerms(query: string): string[] {
+  return [...new Set(normalizeSearchText(query).split(' '))].filter(
+    (token) => token && !STOPWORDS.has(token),
+  );
+}
 
 /**
  * Significant query terms for OR-style matching. A record matches when it

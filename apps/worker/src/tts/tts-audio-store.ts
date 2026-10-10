@@ -9,14 +9,14 @@ import {
 
 /**
  * Where the worker puts synthesized audio (I02, ADR 0004/0014). Objects are
- * private, immutable and content-addressed (`poi/{poiId}/{locale}/{sha256}.wav`)
+ * private, immutable and content-addressed (`poi/{poiId}/{locale}/{sha256}.{wav|mp3|m4a}`)
  * so the API's existing `verifyAudioObject` (size, MIME, sha256 metadata and
  * S3 checksum) accepts them at narration submit.
  */
 export interface TtsAudioPut {
   objectKey: string;
   body: Uint8Array;
-  mimeType: 'audio/wav';
+  mimeType: 'audio/wav' | 'audio/mpeg' | 'audio/mp4';
   sha256: string;
 }
 

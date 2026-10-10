@@ -24,6 +24,27 @@ TTS_WORKER_ENGINE=piper|cli TTS_VOICES_MANIFEST_PATH=<same file as the API> \
 - Log lines carry job ids, statuses and codes only.
 - Tuning: `TTS_WORKER_POLL_MS`, `TTS_JOB_TIMEOUT_MS`, `TTS_JOB_BACKOFF_MS`,
   `TTS_QUOTA_MAX_CONCURRENT`, `TTS_AUDIO_RIGHTS_OWNER`.
+- Metrics: `GET http://127.0.0.1:9464/metrics` (+ `/healthz`);
+  `WORKER_METRICS_{ENABLED,HOST,PORT}` — see `infra/observability/README.md`.
+
+## Release format: WAV, mp3 or m4a (C04)
+
+Providers always return a WAV intermediate, which is validated first
+(duration/silence/clipping). `TTS_AUDIO_RELEASE_FORMAT=mp3|m4a` then encodes it
+with ffmpeg (`TTS_FFMPEG_PATH`, `TTS_AUDIO_BITRATE`, default `64k` mono) inside
+the same per-attempt timeout, and the **encoded** file is what is uploaded
+(`poi/{poi}/{locale}/{sha256}.mp3|.m4a`), attached to the draft and described by
+the job artifact (contract v1.3). m4a is written with `+faststart`. Default
+`wav` keeps the previous behaviour.
+
+- Needs `ffmpeg` with `libmp3lame` (mp3) / the native `aac` encoder (m4a) on
+  the worker host: `ffmpeg -hide_banner -encoders | grep -E "libmp3lame|aac"`.
+- A 2 s narration drops from ~88 KB (WAV) to ~16 KB (mp3/m4a @64k).
+- Encoder failure → attempt fails with `TTS_AUDIO_INVALID`, retried, then
+  dead-lettered; nothing is attached.
+- Verified 2026-10-10: `scripts/e2e-tts-real-storage.mjs` PASS end-to-end
+  (draft → submit (S3 verification) → approve → public bytes) with mp3 (vi)
+  and m4a (en) on Postgres + S3 emulator + fake tone provider.
 
 ## Where it lives
 

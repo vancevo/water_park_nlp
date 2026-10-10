@@ -32,7 +32,11 @@ must be installable on a developer machine with little free disk (~3 GB).
    vary).
 4. **WAV intermediate.** The provider returns the WAV Piper produces and derives
    duration/sample rate from the container. Encoding to a smaller release format
-   (mp3/m4a) is deferred (P1).
+   (mp3/m4a) is deferred (P1). **Amended 2026-10-10 (C04):** the worker can
+   encode the validated WAV to mp3/m4a with ffmpeg
+   (`TTS_AUDIO_RELEASE_FORMAT`, default `wav`) inside the same per-attempt
+   timeout; the stored/attached file, its sha256 and the job artifact describe
+   the encoded bytes (contract v1.3, ADR 0014 amendment).
 5. **CPU benchmark.** `runTtsBenchmark` measures real-time factor, p50/p95
    generation time and output size over a small backend-owned sentence fixture
    (`config/tts-benchmark-sentences.json`); the full corpus is Tú's AI01. The

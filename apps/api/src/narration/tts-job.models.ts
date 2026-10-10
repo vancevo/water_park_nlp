@@ -47,7 +47,8 @@ export interface TtsJobArtifactRecord {
   sizeBytes: number;
   durationSeconds: number;
   sampleRateHz: number;
-  mimeType: 'audio/wav';
+  /** WAV, or the worker's release encoding (contract v1.3, additive). */
+  mimeType: 'audio/wav' | 'audio/mpeg' | 'audio/mp4';
 }
 
 /**

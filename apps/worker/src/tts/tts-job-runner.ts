@@ -1,6 +1,7 @@
 import type { AiFeatureFlags } from '../ops/ai-feature-flags.js';
 import type { QuotaDecision, QuotaGuard } from '../ops/quota.js';
 import type { TtsMetrics } from '../ops/tts-metrics.js';
+import type { AudioEncoder } from './audio-encoder.js';
 import {
   DEFAULT_TTS_AUDIO_LIMITS,
   validateSynthesizedAudio,
@@ -12,7 +13,7 @@ import {
   errorCodeOf,
   runWithTimeout,
 } from './tts-generation-service.js';
-import { transcriptHash } from './tts-hash.js';
+import { sha256Hex, transcriptHash } from './tts-hash.js';
 import type {
   ClaimedTtsJob,
   DraftAudioAttachment,
@@ -45,6 +46,12 @@ export interface TtsJobRunnerDeps {
   audioLimits?: TtsAudioLimits;
   metrics?: TtsMetrics;
   log?: (line: string) => void;
+  /**
+   * Release encoder (C04). When set, the validated WAV is encoded (mp3/m4a)
+   * inside the same per-attempt timeout and the ENCODED file is what is
+   * stored, hashed and attached. Absent → the WAV itself is released.
+   */
+  encoder?: AudioEncoder | null;
 }
 
 /**
@@ -75,6 +82,7 @@ export class TtsJobRunner {
   private readonly audioLimits: TtsAudioLimits;
   private readonly metrics?: TtsMetrics;
   private readonly log: (line: string) => void;
+  private readonly encoder: AudioEncoder | null;
 
   constructor(
     private readonly queue: TtsJobQueue,
@@ -90,6 +98,7 @@ export class TtsJobRunner {
     this.audioLimits = deps.audioLimits ?? DEFAULT_TTS_AUDIO_LIMITS;
     this.metrics = deps.metrics;
     this.log = deps.log ?? (() => undefined);
+    this.encoder = deps.encoder ?? null;
   }
 
   async process(claimed: ClaimedTtsJob): Promise<TtsJobRecord> {
@@ -145,27 +154,44 @@ export class TtsJobRunner {
       let attachment: DraftAudioAttachment;
       let done: TtsJobRecord;
       try {
-        const result = await runWithTimeout(
-          (signal) =>
-            binding.provider.synthesize({
-              transcript: narration.transcript,
-              locale: narration.locale,
-              voiceId: binding.entry.voiceId,
-              config: {},
-              seed: null,
-              signal,
-            }),
-          this.config.timeoutMs,
-        );
-        validateSynthesizedAudio(result, this.audioLimits);
-        const artifact = buildTtsArtifact(
+        // Synthesis, WAV validation and the optional release encode share one
+        // per-attempt budget, so the stale-running window still covers them.
+        const { result, release } = await runWithTimeout(async (signal) => {
+          const synthesized = await binding.provider.synthesize({
+            transcript: narration.transcript,
+            locale: narration.locale,
+            voiceId: binding.entry.voiceId,
+            config: {},
+            seed: null,
+            signal,
+          });
+          validateSynthesizedAudio(synthesized, this.audioLimits);
+          const encoded = this.encoder
+            ? await this.encoder.encode(synthesized.audio, signal)
+            : null;
+          return { result: synthesized, release: encoded };
+        }, this.config.timeoutMs);
+        const wavArtifact = buildTtsArtifact(
           binding.entry,
           result,
           {},
           tHash,
           null,
         );
-        const objectKey = `poi/${narration.poiId}/${narration.locale}/${artifact.audioSha256}.wav`;
+        // The artifact describes the bytes actually stored and attached, so
+        // the API's "draft still carries this job's audio" check (sha256)
+        // keeps working for encoded audio.
+        const artifact = release
+          ? {
+              ...wavArtifact,
+              audioSha256: sha256Hex(release.audio),
+              sizeBytes: release.audio.length,
+              mimeType: release.mimeType,
+            }
+          : wavArtifact;
+        const body = release ? release.audio : result.audio;
+        const extension = release ? release.extension : 'wav';
+        const objectKey = `poi/${narration.poiId}/${narration.locale}/${artifact.audioSha256}.${extension}`;
 
         // Heartbeat + cancel checkpoint before spending an upload.
         job.updatedAt = this.clock();
@@ -173,8 +199,8 @@ export class TtsJobRunner {
 
         await this.audioStore.put({
           objectKey,
-          body: result.audio,
-          mimeType: 'audio/wav',
+          body,
+          mimeType: artifact.mimeType,
           sha256: artifact.audioSha256,
         });
         const at = this.clock();
@@ -188,7 +214,7 @@ export class TtsJobRunner {
         };
         attachment = {
           objectKey,
-          mimeType: 'audio/wav',
+          mimeType: artifact.mimeType,
           sizeBytes: artifact.sizeBytes,
           sha256: artifact.audioSha256,
           durationSeconds: artifact.durationSeconds,

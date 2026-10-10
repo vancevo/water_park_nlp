@@ -65,7 +65,8 @@ export class PostgresSearchRepository implements SearchRepository {
     const { terms, minMatch } = searchTerms(query.query);
     const termsParam = bind(terms);
     const termsLength = terms.length;
-    const minMatchParam = bind(minMatch);
+    // Bound only when used: an unreferenced parameter has no inferable type.
+    const minMatchParam = query.matchAll ? null : bind(minMatch);
     const orQueryParam = bind(terms.join(' | '));
     // Matches when at least `minMatch` significant terms occur in the name,
     // descriptions or category slug (OR semantics, not every word required);
@@ -75,11 +76,11 @@ export class PostgresSearchRepository implements SearchRepository {
       WHERE ${DOCUMENT_TSV} @@ plainto_tsquery('simple', term.word)
          OR search_normalize(c.slug) = term.word
     )`;
-    const filters = [
-      `p.status = 'published'`,
-      `(${termsMatched} >= ${minMatchParam}
-        OR search_normalize(t.name) % search_normalize($1))`,
-    ];
+    const filters = [`p.status = 'published'`];
+    if (minMatchParam !== null) {
+      filters.push(`(${termsMatched} >= ${minMatchParam}
+        OR search_normalize(t.name) % search_normalize($1))`);
+    }
     if (query.category) filters.push(`c.slug = ${bind(query.category)}`);
 
     let distanceExpression = 'NULL::double precision';

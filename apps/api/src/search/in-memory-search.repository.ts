@@ -64,7 +64,11 @@ export class InMemorySearchRepository implements SearchRepository {
           return null;
         }
         // Do not return unrelated records merely because the catalogue is small.
-        if (normalizedQuery.length === 0 || score.textScore < 0.55) return null;
+        if (
+          !query.matchAll &&
+          (normalizedQuery.length === 0 || score.textScore < 0.55)
+        )
+          return null;
         return {
           record,
           ...score,

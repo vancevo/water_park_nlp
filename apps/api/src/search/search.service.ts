@@ -25,6 +25,19 @@ import {
 } from './search.models.js';
 import { normalizeSearchText } from './search-text.js';
 import { fuseRankings } from './hybrid-ranking.js';
+import {
+  parseDirectionIntent,
+  residualText,
+  selectDirectionalBand,
+  sortByDirection,
+  type DirectionIntent,
+} from './search-geo-intent.js';
+
+/**
+ * Upper bound on POIs considered for a direction intent. A park catalogue is
+ * far below this; it only bounds the in-memory ordering.
+ */
+const DIRECTION_CANDIDATE_LIMIT = 500;
 
 const VIETNAM_UTC_OFFSET_MS = 7 * 60 * 60 * 1000;
 
@@ -66,6 +79,13 @@ export class SearchService {
     this.validateQuery(query);
     const at = vietnamTime(this.now());
 
+    // "westernmost …", "xa nhất về phía đông": position decides, not text.
+    const intent = parseDirectionIntent(query.q);
+    if (intent) {
+      const directional = await this.directional(query, at, intent);
+      if (directional) return directional;
+    }
+
     if (this.hybrid?.flags.hybridEnabled) {
       const fused = await this.tryHybrid(query, at, this.hybrid);
       if (fused) return fused;
@@ -89,6 +109,64 @@ export class SearchService {
       this.result(candidate, query, at, new Set()),
     );
     return this.paginate(items, total, query);
+  }
+
+  /**
+   * Direction intent (C06). Candidate set, farthest-first along the axis:
+   * 1. the POIs matching the residual text that lie at that edge, else
+   * 2. the POIs matching the residual text, ordered toward that edge, else
+   * 3. (no residual text, or nothing matched it) the POIs at that edge.
+   * Returns null when the query names a POI outright ("West Gate"), so a
+   * name that happens to contain a direction keeps the lexical answer.
+   */
+  private async directional(
+    query: SearchQueryDto,
+    at: ClockParts,
+    intent: DirectionIntent,
+  ): Promise<SearchResponse | null> {
+    const page = { limit: DIRECTION_CANDIDATE_LIMIT, offset: 0 };
+    const plain = await this.repository.search(
+      this.repositoryQuery(query, at, { limit: 1, offset: 0 }),
+    );
+    if (plain[0]?.exactName || plain[0]?.normalizedName) return null;
+
+    const position = (candidate: SearchCandidate) => candidate.record;
+    let ordered: SearchCandidate[] = [];
+    const text = residualText(intent.residual);
+    if (text) {
+      const matched = await this.repository.search({
+        ...this.repositoryQuery(query, at, page),
+        query: text,
+      });
+      if (matched.length > 0) {
+        const universe = await this.repository.search({
+          ...this.repositoryQuery(query, at, page),
+          matchAll: true,
+        });
+        const edge = new Set(
+          selectDirectionalBand(universe, intent.direction, position).map(
+            (candidate) => candidate.record.id,
+          ),
+        );
+        const atEdge = matched.filter((c) => edge.has(c.record.id));
+        ordered = sortByDirection(
+          atEdge.length > 0 ? atEdge : matched,
+          intent.direction,
+          position,
+        );
+      }
+    }
+    if (ordered.length === 0) {
+      const universe = await this.repository.search({
+        ...this.repositoryQuery(query, at, page),
+        matchAll: true,
+      });
+      ordered = selectDirectionalBand(universe, intent.direction, position);
+    }
+    const items = ordered
+      .slice(query.offset, query.offset + query.limit)
+      .map((candidate) => this.result(candidate, query, at, new Set()));
+    return this.paginate(items, ordered.length, query);
   }
 
   /**

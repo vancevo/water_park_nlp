@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -11,10 +12,23 @@ import {
   runWithTimeout,
 } from '../src/tts/tts-generation-service.js';
 
+/**
+ * A killed process can linger as a zombie (state `Z`) until its parent reaps
+ * it. In containers whose PID 1 does not reap orphans, `kill(pid, 0)` still
+ * succeeds for such a zombie, so on Linux we read the process state and treat
+ * a zombie as dead.
+ */
 const alive = (pid: number) => {
   try {
     process.kill(pid, 0);
-    return true;
+  } catch {
+    return false;
+  }
+  if (process.platform !== 'linux') return true;
+  try {
+    const stat = readFileSync(`/proc/${pid}/stat`, 'utf8');
+    const state = stat.slice(stat.lastIndexOf(')') + 2).charAt(0);
+    return state !== 'Z' && state !== 'X';
   } catch {
     return false;
   }

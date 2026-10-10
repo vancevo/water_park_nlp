@@ -148,3 +148,18 @@ columns stay; the I02 worker must be rolled back with it).
   ids keep the v4 check. Values are always bound as SQL parameters.
 - Visitor UI does not render the label yet (frontend follow-up for Tú); v1
   and v1.1 consumers are unaffected.
+
+## Amendment 2026-10-10 (C04) — contract v1.3, additive
+
+- `TtsJobArtifactSummary.mimeType` (job `artifact`) widens from `audio/wav` to
+  `audio/wav | audio/mpeg | audio/mp4`. With `TTS_AUDIO_RELEASE_FORMAT=mp3|m4a`
+  the worker encodes the validated WAV (ADR 0009 §4) and the artifact's
+  `audioSha256`/`sizeBytes`/`mimeType` describe the **stored, attached** file,
+  so the "draft still carries this job's audio" check (sha256 + jobId) keeps
+  working. `durationSeconds`/`sampleRateHz` come from the WAV intermediate.
+  Objects are `poi/{poiId}/{locale}/{sha256}.{wav|mp3|m4a}`, matching the
+  API's MIME → extension map; draft audio MIME types were already allowed by
+  migration 006. An encoder failure is reported as the existing
+  `TTS_AUDIO_INVALID` (no new error code). `info.version` 0.1.2 → 0.1.3.
+- Default `wav` changes nothing for existing deployments or consumers that only
+  ever saw `audio/wav`.

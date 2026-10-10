@@ -91,7 +91,11 @@ export interface TtsArtifact {
   sizeBytes: number;
   durationSeconds: number;
   sampleRateHz: number;
-  mimeType: 'audio/wav';
+  /**
+   * Format of the stored audio the hashes describe: the WAV intermediate, or
+   * the release encoding when `TTS_AUDIO_RELEASE_FORMAT` is mp3/m4a (C04).
+   */
+  mimeType: 'audio/wav' | 'audio/mpeg' | 'audio/mp4';
   /**
    * Private object-storage key of the stored audio (I02). Set only by the queue
    * consumer, which uploads the bytes and attaches them to the draft narration.

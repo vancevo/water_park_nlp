@@ -49,7 +49,7 @@ export interface TtsAudioProvenance {
 /** Audio metadata written to the draft narration (`poi_narrations.audio_*`). */
 export interface DraftAudioAttachment {
   objectKey: string;
-  mimeType: 'audio/wav';
+  mimeType: 'audio/wav' | 'audio/mpeg' | 'audio/mp4';
   sizeBytes: number;
   sha256: string;
   durationSeconds: number;

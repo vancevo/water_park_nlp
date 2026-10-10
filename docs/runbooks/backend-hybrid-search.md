@@ -112,6 +112,33 @@ they stay with the hybrid path (needs a production embedding endpoint). The
 baseline's higher zero-result *accuracy loss* (0.60) comes from returning
 noise for the 5 nonsense queries; the API returns nothing for all 5.
 
+## After L4 — direction intent (2026-10-10, C06)
+
+`search-geo-intent.ts` recognises one cardinal direction in the query
+(EN: `north/northern/northernmost…`; VI only after a marker: `phía/hướng/miền/cực
++ bắc/nam/đông/tây`, because the bare words are common) and answers it from
+coordinates: the POIs at that edge of the filtered catalogue (within 15 % of
+its extent, min ~5 m), farthest first. Remaining words still filter: matching
+POIs at the edge win; if none is at the edge they are ordered toward it; if no
+word matches, the edge set is returned. Diagonals ("đông bắc", "north east")
+and exact POI names (e.g. a "West Gate") stay on the lexical path. Runs before
+hybrid; no migration; category/radius/open-now filters still apply. Also added
+`fixture`, `fixtures`, `synthetic` to the catalogue meta-word list.
+
+| Metric (live API, 50 queries) | After L3 | After L4 (flag off) | After L4 (flag on, no embedder) | ADR 0012 gate |
+|---|---:|---:|---:|---:|
+| Recall@10 / MRR / nDCG@10 | 0.900 / 0.894 / 0.890 | **0.956 / 0.956 / 0.956** | 0.956 / 0.956 / 0.956 | 0.911 / 0.906 / 0.900 |
+| Zero-result rate | 0.18 | 0.14 | 0.14 | — |
+| Expected-zero accuracy | 1.00 | 1.00 | 1.00 | — |
+| category_location / semantic_intent | 0.72 / 0.8 | **1.0** / 0.8 | 1.0 / 0.8 | — |
+
+Only the four direction queries changed (q042–q045); no other ranking moved.
+The ADR 0012 lexical gate now passes. Caveat: the 50 queries are also the
+development set — keep a held-out set once real judgments exist (README of
+`data/search-evaluation`). Still open: `q021`/`q026` ("music performance" →
+"Wind Stage") need synonyms/embeddings, i.e. a production embedding endpoint
+before enabling hybrid.
+
 ## Troubleshooting
 
 - Results identical to lexical with the flag on: embedder returned null

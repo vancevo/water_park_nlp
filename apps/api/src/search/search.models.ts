@@ -11,6 +11,12 @@ export interface SearchRepositoryQuery {
   openAt?: { dayOfWeek: number; minutes: number };
   limit: number;
   offset: number;
+  /**
+   * Skip the text filter and return every published POI that passes the
+   * other filters (category/radius/open now), still scored against `query`.
+   * Used for direction intents, where position — not text — decides.
+   */
+  matchAll?: boolean;
 }
 
 export interface SearchCandidate {

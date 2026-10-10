@@ -3,6 +3,11 @@ import { describe, expect, it } from 'vitest';
 import { MetricsRegistry } from '../src/ops/metrics.js';
 import { QuotaGuard } from '../src/ops/quota.js';
 import { TtsMetrics } from '../src/ops/tts-metrics.js';
+import {
+  TtsEncodeError,
+  type AudioEncoder,
+  type EncodedAudio,
+} from '../src/tts/audio-encoder.js';
 import { InMemoryTtsJobQueue } from '../src/tts/in-memory-tts-job-queue.js';
 import { InMemoryTtsAudioStore } from '../src/tts/tts-audio-store.js';
 import { idempotencyKey, transcriptHash } from '../src/tts/tts-hash.js';
@@ -117,6 +122,7 @@ function setup(
     narration?: Partial<TtsNarrationSnapshot>;
     binding?: TtsVoiceBinding | null;
     sleep?: (ms: number) => Promise<void>;
+    encoder?: AudioEncoder;
   } = {},
 ) {
   const queue = new InMemoryTtsJobQueue(
@@ -142,6 +148,7 @@ function setup(
       clock: () => AT,
       sleep: options.sleep ?? (async () => {}),
       metrics: new TtsMetrics(registry),
+      encoder: options.encoder,
     },
   );
   return { queue, store, provider, runner, registry };
@@ -152,6 +159,61 @@ async function runOne(ctx: ReturnType<typeof setup>): Promise<TtsJobRecord> {
   expect(claimed).not.toBeNull();
   return ctx.runner.process(claimed!);
 }
+
+/** Fake mp3 encoder: a fixed ID3-tagged payload, or a scripted failure. */
+class FakeMp3Encoder implements AudioEncoder {
+  readonly format = 'mp3' as const;
+  calls = 0;
+  constructor(private readonly fail = false) {}
+  async encode(): Promise<EncodedAudio> {
+    this.calls += 1;
+    if (this.fail) throw new TtsEncodeError('ffmpeg exited with 1');
+    const audio = new Uint8Array(200).fill(7);
+    audio.set([0x49, 0x44, 0x33], 0);
+    return { audio, mimeType: 'audio/mpeg', extension: 'mp3' };
+  }
+}
+
+describe('TtsJobRunner release encoding (C04)', () => {
+  it('stores, hashes and attaches the ENCODED audio when an encoder is set', async () => {
+    const encoder = new FakeMp3Encoder();
+    const ctx = setup({ encoder });
+    const job = await runOne(ctx);
+
+    expect(job.status).toBe('succeeded');
+    expect(encoder.calls).toBe(1);
+    const artifact = job.artifact!;
+    expect(artifact.mimeType).toBe('audio/mpeg');
+    expect(artifact.sizeBytes).toBe(200);
+    // Duration/sample rate still come from the validated WAV intermediate.
+    expect(artifact.durationSeconds).toBe(2);
+    expect(artifact.sampleRateHz).toBe(22_050);
+    const key = `poi/${POI_ID}/vi/${artifact.audioSha256}.mp3`;
+    expect(artifact.objectKey).toBe(key);
+    const stored = ctx.store.objects.get(key)!;
+    expect(stored.mimeType).toBe('audio/mpeg');
+    expect(stored.body.length).toBe(200);
+    // The draft carries the same sha the job reports (API idempotency check).
+    expect(ctx.queue.attachedAudio(NARRATION_ID)).toMatchObject({
+      objectKey: key,
+      mimeType: 'audio/mpeg',
+      sha256: artifact.audioSha256,
+      sizeBytes: 200,
+    });
+  });
+
+  it('an encoder failure retries, then fails TTS_AUDIO_INVALID with nothing attached', async () => {
+    const encoder = new FakeMp3Encoder(true);
+    const ctx = setup({ encoder });
+    const job = await runOne(ctx);
+
+    expect(job.status).toBe('failed');
+    expect(job.errorCode).toBe('TTS_AUDIO_INVALID');
+    expect(encoder.calls).toBe(3);
+    expect(ctx.store.objects.size).toBe(0);
+    expect(ctx.queue.attachedAudio(NARRATION_ID)).toBeNull();
+  });
+});
 
 describe('TtsJobRunner (I02 queue consumer)', () => {
   it('runs an API-created queued job, stores audio and attaches it to the draft with provenance', async () => {
