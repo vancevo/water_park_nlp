@@ -9,7 +9,13 @@ export function poiNumber(slug: string): number | null {
   return match ? Number(match[1]) : null;
 }
 
+/** Places added after the numbered map have a `new-` slug and a pin that says "New". */
+export function isNewPlace(slug: string): boolean {
+  return slug.startsWith('new-');
+}
+
 export function formatPoiNumber(slug: string): string {
+  if (isNewPlace(slug)) return 'New';
   const number = poiNumber(slug);
   return number === null ? '·' : String(number).padStart(2, '0');
 }

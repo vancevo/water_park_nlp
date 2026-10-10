@@ -1,6 +1,6 @@
 /**
  * Place types an editor can choose. Slugs must exist in `poi_categories`
- * (seed 002 + migration 013); the visitor app translates them.
+ * (seed 002 + migrations 013, 015); the visitor app translates them.
  */
 export const POI_CATEGORIES: readonly { slug: string; label: string }[] = [
   { slug: 'gate', label: 'Cổng' },
@@ -17,6 +17,7 @@ export const POI_CATEGORIES: readonly { slug: string; label: string }[] = [
   { slug: 'restroom', label: 'Nhà vệ sinh' },
   { slug: 'parking', label: 'Bãi đậu xe' },
   { slug: 'first_aid', label: 'Y tế' },
+  { slug: 'security', label: 'Bảo vệ' },
 ];
 
 /** Options for a select; keeps an unknown current slug selectable instead of dropping it. */

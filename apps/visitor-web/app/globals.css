@@ -517,6 +517,49 @@ button {
     0 5px 15px #152a2088;
 }
 
+.amenity-pin {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  cursor: pointer;
+  background: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1px #1b4b3a55,
+    0 3px 8px #152a2099;
+}
+
+.amenity-pin img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.amenity-pin.selected {
+  width: 36px;
+  height: 36px;
+  border-color: var(--gold);
+}
+
+.amenity-pin.selected img {
+  width: 28px;
+  height: 28px;
+}
+
+.poi-index.icon img {
+  display: block;
+  object-fit: contain;
+}
+
+.map-pin.new span {
+  font-size: 9px;
+  letter-spacing: -0.02em;
+}
+
 .map-pin.sub {
   width: 26px;
   height: 26px;

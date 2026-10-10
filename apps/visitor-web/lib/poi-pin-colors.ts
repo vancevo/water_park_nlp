@@ -1,4 +1,4 @@
-import { poiNumber } from './poi-number';
+import { isNewPlace, poiNumber } from './poi-number';
 
 /**
  * Colour of each numbered pin on the official park map legend: white = free to visit, blue =
@@ -66,8 +66,15 @@ export const POI_PIN_COLORS: Readonly<Record<number, PoiPinColor>> = {
   50: 'white',
 };
 
+/** Colour of the places added after the numbered map (data/pois/new-places.json). */
+export const NEW_PLACE_COLORS: Readonly<Record<string, PoiPinColor>> = {
+  'new-truot-phao-tren-tham': 'red',
+  'new-cafe-windy': 'white',
+};
+
 /** Pin colour of a place from its `pNN-` slug; places without a number keep the default pin. */
 export function poiPinColor(slug: string): PoiPinColor | null {
+  if (isNewPlace(slug)) return NEW_PLACE_COLORS[slug] ?? null;
   const number = poiNumber(slug);
   return number === null ? null : (POI_PIN_COLORS[number] ?? null);
 }

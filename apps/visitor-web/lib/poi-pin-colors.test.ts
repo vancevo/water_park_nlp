@@ -1,7 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { POI_PIN_COLORS, poiPinColor } from './poi-pin-colors';
+import {
+  NEW_PLACE_COLORS,
+  POI_PIN_COLORS,
+  poiPinColor,
+} from './poi-pin-colors';
 
 describe('poiPinColor', () => {
   it('reads the colour from the pNN- slug prefix', () => {
@@ -22,6 +26,24 @@ describe('poiPinColor', () => {
     expect(numbered).toHaveLength(50);
     for (const pin of numbered) {
       expect(POI_PIN_COLORS[Number(pin.number)], pin.number).toBe(pin.color);
+    }
+  });
+
+  it('colours the new places like the data file says', () => {
+    expect(poiPinColor('new-truot-phao-tren-tham')).toBe('red');
+    expect(poiPinColor('new-cafe-windy')).toBe('white');
+    expect(poiPinColor('new-unknown')).toBeNull();
+    const file = JSON.parse(
+      readFileSync(
+        join(__dirname, '../../../data/pois/new-places.json'),
+        'utf8',
+      ),
+    ) as { places: { slug: string; pin: string }[] };
+    expect(Object.keys(NEW_PLACE_COLORS).sort()).toEqual(
+      file.places.map((place) => place.slug).sort(),
+    );
+    for (const place of file.places) {
+      expect(NEW_PLACE_COLORS[place.slug], place.slug).toBe(place.pin);
     }
   });
 });

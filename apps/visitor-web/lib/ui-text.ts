@@ -267,6 +267,7 @@ const vi: UiText = {
     restroom: 'Nhà vệ sinh',
     parking: 'Bãi đậu xe',
     first_aid: 'Y tế',
+    security: 'Bảo vệ',
   },
 };
 
@@ -403,6 +404,7 @@ const en: UiText = {
     restroom: 'Restroom',
     parking: 'Parking',
     first_aid: 'First aid',
+    security: 'Security',
   },
 };
 

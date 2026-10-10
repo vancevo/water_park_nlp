@@ -19,6 +19,7 @@ import type {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { visitorApi } from '@/lib/api';
 import { ILLUSTRATED_LAYER, addIllustratedMap } from '@/lib/map-pictures';
+import { amenityIconUrl, amenityKind } from '@/lib/amenities';
 import { poiPinColor } from '@/lib/poi-pin-colors';
 import {
   loadSubPlaces,
@@ -53,7 +54,12 @@ import {
   readVisitorSession,
   saveVisitorSession,
 } from '@/lib/session';
-import { formatPoiNumber, poiNumber, sortByPoiNumber } from '@/lib/poi-number';
+import {
+  formatPoiNumber,
+  isNewPlace,
+  poiNumber,
+  sortByPoiNumber,
+} from '@/lib/poi-number';
 import {
   AUTO_GUIDE_DEFAULTS,
   AUTO_GUIDE_POI_NUMBERS,
@@ -548,9 +554,23 @@ export function VisitorExperience() {
       if (cancelled) return;
       markersRef.current.forEach((marker) => marker.remove());
       markersRef.current = pois.map((poi) => {
+        const kind = amenityKind(poi.slug);
+        if (kind) {
+          // Service point: the icon of the official map, small but with a white ring.
+          const icon = document.createElement('button');
+          icon.className = `amenity-pin${selected?.id === poi.id ? ' selected' : ''}`;
+          icon.type = 'button';
+          icon.ariaLabel = poi.name;
+          icon.title = poi.name;
+          icon.innerHTML = `<img src="${amenityIconUrl(kind)}" alt="" draggable="false" />`;
+          icon.addEventListener('click', () => openPoi(poi));
+          return new maplibregl.Marker({ element: icon })
+            .setLngLat([poi.location.longitude, poi.location.latitude])
+            .addTo(map);
+        }
         const element = document.createElement('button');
         const pinColor = poiPinColor(poi.slug);
-        element.className = `map-pin${pinColor ? ` pin-${pinColor}` : ''}${selected?.id === poi.id ? ' selected' : ''}`;
+        element.className = `map-pin${pinColor ? ` pin-${pinColor}` : ''}${isNewPlace(poi.slug) ? ' new' : ''}${selected?.id === poi.id ? ' selected' : ''}`;
         element.type = 'button';
         element.ariaLabel = poi.name;
         element.innerHTML = `<span>${formatPoiNumber(poi.slug)}</span>`;
@@ -1142,7 +1162,7 @@ export function VisitorExperience() {
                 key={poi.id}
                 onClick={() => openPoi(poi)}
               >
-                <span className="poi-index">{formatPoiNumber(poi.slug)}</span>
+                <PoiIndex slug={poi.slug} />
                 <span className="poi-copy">
                   <strong>{poi.name}</strong>
                   <small>
@@ -1330,7 +1350,7 @@ function AutoGuidePanel({
             distance <= AUTO_GUIDE_DEFAULTS.enterMeters;
           return (
             <li key={poi.id} className={near ? 'near' : ''}>
-              <span className="poi-index">{formatPoiNumber(poi.slug)}</span>
+              <PoiIndex slug={poi.slug} />
               <span>{poi.name}</span>
               <small>
                 {enabled && distance !== undefined
@@ -1408,6 +1428,18 @@ function Header({
         )}
       </div>
     </header>
+  );
+}
+
+/** Number of a place in the lists; the icon for a service point. */
+function PoiIndex({ slug }: { slug: string }) {
+  const kind = amenityKind(slug);
+  return kind ? (
+    <span className="poi-index icon">
+      <img src={amenityIconUrl(kind)} alt="" width={26} height={26} />
+    </span>
+  ) : (
+    <span className="poi-index">{formatPoiNumber(slug)}</span>
   );
 }
 
