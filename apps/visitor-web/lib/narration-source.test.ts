@@ -20,11 +20,6 @@ describe('fixture narration source', () => {
   });
 
   it('follows the catalog fallback chain for a locale without content', async () => {
-    expect(await source.getNarration('p1', 'fr')).toMatchObject({
-      requestedLocale: 'fr',
-      resolvedLocale: 'en',
-      fallbackUsed: true,
-    });
     expect(await source.getNarration('p1', 'de')).toMatchObject({
       requestedLocale: 'de',
       resolvedLocale: 'vi',

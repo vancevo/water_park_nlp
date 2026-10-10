@@ -1,0 +1,449 @@
+{
+ "note": "Pin tips of the official park map (data/walkways-new/dam-sen-map.jpg) in its 2048x1315 frame (= the SVG frame). Colours follow the map legend. 11.1-11.4 are sub-pins of #11 (children area), not imported as places yet.",
+ "frame": [
+  2048,
+  1315
+ ],
+ "legend": {
+  "white": "tham quan tự do",
+  "blue": "phù hợp mọi đối tượng",
+  "purple": "từ 1 m – 1,2 m",
+  "pink": "từ 1 m – 1,4 m",
+  "red": "trên 1,4 m",
+  "yellow": "cổng / quầy vé"
+ },
+ "pins": [
+  {
+   "number": "1",
+   "color": "yellow",
+   "tipPx": [
+    1292.8,
+    1204.0
+   ]
+  },
+  {
+   "number": "2",
+   "color": "yellow",
+   "tipPx": [
+    1489.2,
+    1073.0
+   ]
+  },
+  {
+   "number": "3",
+   "color": "yellow",
+   "tipPx": [
+    1375.2,
+    996.0
+   ]
+  },
+  {
+   "number": "4",
+   "color": "red",
+   "tipPx": [
+    1335.2,
+    900.0
+   ]
+  },
+  {
+   "number": "5",
+   "color": "blue",
+   "tipPx": [
+    1377.8,
+    834.0
+   ]
+  },
+  {
+   "number": "6",
+   "color": "white",
+   "tipPx": [
+    1350.8,
+    788.0
+   ]
+  },
+  {
+   "number": "7",
+   "color": "blue",
+   "tipPx": [
+    1452.8,
+    783.0
+   ]
+  },
+  {
+   "number": "8",
+   "color": "white",
+   "tipPx": [
+    1504.3,
+    917.0
+   ]
+  },
+  {
+   "number": "9",
+   "color": "blue",
+   "tipPx": [
+    1550.8,
+    865.0
+   ]
+  },
+  {
+   "number": "10",
+   "color": "blue",
+   "tipPx": [
+    1659.2,
+    775.0
+   ]
+  },
+  {
+   "number": "11",
+   "color": "pink",
+   "tipPx": [
+    1714.2,
+    591.0
+   ]
+  },
+  {
+   "number": "11.1",
+   "color": "red",
+   "tipPx": [
+    1630.2,
+    695.0
+   ]
+  },
+  {
+   "number": "11.2",
+   "color": "red",
+   "tipPx": [
+    1653.2,
+    656.0
+   ]
+  },
+  {
+   "number": "11.3",
+   "color": "purple",
+   "tipPx": [
+    1573.2,
+    693.0
+   ]
+  },
+  {
+   "number": "11.4",
+   "color": "blue",
+   "tipPx": [
+    1602.2,
+    663.0
+   ]
+  },
+  {
+   "number": "12",
+   "color": "blue",
+   "tipPx": [
+    1749.8,
+    576.0
+   ]
+  },
+  {
+   "number": "13",
+   "color": "pink",
+   "tipPx": [
+    1617.2,
+    582.0
+   ]
+  },
+  {
+   "number": "14",
+   "color": "blue",
+   "tipPx": [
+    1657.8,
+    555.0
+   ]
+  },
+  {
+   "number": "15",
+   "color": "blue",
+   "tipPx": [
+    1761.5,
+    529.0
+   ]
+  },
+  {
+   "number": "16",
+   "color": "yellow",
+   "tipPx": [
+    1835.8,
+    410.0
+   ]
+  },
+  {
+   "number": "17",
+   "color": "yellow",
+   "tipPx": [
+    1763.2,
+    476.0
+   ]
+  },
+  {
+   "number": "18",
+   "color": "white",
+   "tipPx": [
+    1800.8,
+    270.0
+   ]
+  },
+  {
+   "number": "19",
+   "color": "white",
+   "tipPx": [
+    1458.8,
+    232.0
+   ]
+  },
+  {
+   "number": "20",
+   "color": "white",
+   "tipPx": [
+    1447.8,
+    175.0
+   ]
+  },
+  {
+   "number": "21",
+   "color": "red",
+   "tipPx": [
+    1244.3,
+    373.5
+   ]
+  },
+  {
+   "number": "22",
+   "color": "red",
+   "tipPx": [
+    1253.4,
+    312.0
+   ]
+  },
+  {
+   "number": "23",
+   "color": "red",
+   "tipPx": [
+    1262.2,
+    261.0
+   ]
+  },
+  {
+   "number": "24",
+   "color": "red",
+   "tipPx": [
+    1172.2,
+    233.0
+   ]
+  },
+  {
+   "number": "25",
+   "color": "blue",
+   "tipPx": [
+    1087.8,
+    361.0
+   ]
+  },
+  {
+   "number": "26",
+   "color": "blue",
+   "tipPx": [
+    895.2,
+    496.0
+   ]
+  },
+  {
+   "number": "27",
+   "color": "blue",
+   "tipPx": [
+    829.2,
+    478.0
+   ]
+  },
+  {
+   "number": "28",
+   "color": "white",
+   "tipPx": [
+    744.2,
+    491.0
+   ]
+  },
+  {
+   "number": "29",
+   "color": "white",
+   "tipPx": [
+    831.2,
+    562.0
+   ]
+  },
+  {
+   "number": "30",
+   "color": "white",
+   "tipPx": [
+    858.8,
+    551.0
+   ]
+  },
+  {
+   "number": "31",
+   "color": "blue",
+   "tipPx": [
+    871.2,
+    629.0
+   ]
+  },
+  {
+   "number": "32",
+   "color": "red",
+   "tipPx": [
+    847.3,
+    634.0
+   ]
+  },
+  {
+   "number": "33",
+   "color": "white",
+   "tipPx": [
+    746.8,
+    617.0
+   ]
+  },
+  {
+   "number": "34",
+   "color": "white",
+   "tipPx": [
+    945.8,
+    846.0
+   ]
+  },
+  {
+   "number": "35",
+   "color": "white",
+   "tipPx": [
+    1083.2,
+    873.0
+   ]
+  },
+  {
+   "number": "36",
+   "color": "blue",
+   "tipPx": [
+    1060.0,
+    916.0
+   ]
+  },
+  {
+   "number": "37",
+   "color": "white",
+   "tipPx": [
+    1065.8,
+    1006.0
+   ]
+  },
+  {
+   "number": "38",
+   "color": "white",
+   "tipPx": [
+    1188.8,
+    887.0
+   ]
+  },
+  {
+   "number": "39",
+   "color": "white",
+   "tipPx": [
+    1155.2,
+    792.0
+   ]
+  },
+  {
+   "number": "40",
+   "color": "white",
+   "tipPx": [
+    1291.8,
+    807.0
+   ]
+  },
+  {
+   "number": "41",
+   "color": "white",
+   "tipPx": [
+    1293.2,
+    616.0
+   ]
+  },
+  {
+   "number": "42",
+   "color": "white",
+   "tipPx": [
+    1393.8,
+    554.0
+   ]
+  },
+  {
+   "number": "43",
+   "color": "white",
+   "tipPx": [
+    1084.3,
+    697.0
+   ]
+  },
+  {
+   "number": "44",
+   "color": "white",
+   "tipPx": [
+    550.8,
+    426.0
+   ]
+  },
+  {
+   "number": "45",
+   "color": "blue",
+   "tipPx": [
+    458.2,
+    286.0
+   ]
+  },
+  {
+   "number": "46",
+   "color": "red",
+   "tipPx": [
+    334.7,
+    281.0
+   ]
+  },
+  {
+   "number": "47",
+   "color": "red",
+   "tipPx": [
+    275.6,
+    181.0
+   ]
+  },
+  {
+   "number": "48",
+   "color": "white",
+   "tipPx": [
+    209.8,
+    64.0
+   ]
+  },
+  {
+   "number": "49",
+   "color": "white",
+   "tipPx": [
+    788.2,
+    109.0
+   ]
+  },
+  {
+   "number": "50",
+   "color": "white",
+   "tipPx": [
+    739.8,
+    246.0
+   ]
+  }
+ ]
+}

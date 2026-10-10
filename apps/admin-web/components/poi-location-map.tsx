@@ -122,7 +122,10 @@ export function PoiLocationMap({
               [number, number],
               [number, number],
             ];
+            bearingDegrees?: number;
           };
+          // Turn the map so the official picture is upright (gate 1 at the bottom).
+          map.setBearing(georef.bearingDegrees ?? 0);
           map.addSource('park-picture', {
             type: 'image',
             url: MAP_IMAGE,
@@ -139,7 +142,7 @@ export function PoiLocationMap({
         }
         map.addSource('walkways', {
           type: 'geojson',
-          data: '/data/damsen-osm-walkways.geojson',
+          data: '/data/damsen-walkways.geojson',
         });
         map.addLayer({
           id: 'walkways-outline',

@@ -8,7 +8,7 @@
 - Integration status: `SEARCH_ANALYTICS_POSTGIS_PASS`
 - Active blockers: B01 blocks public map/content release; AI TTS is enabled for the **non-commercial classroom demo** (ADR 0015 §6a) — public go-live still needs T06 blind review + ADR 0015 §6b; B03 resolved locally (pinned MinIO, I04 §9) — AWS S3/staging is T60
 - Last updated: 2026-10-10
-- Updated by: Công (C01 ADR draft, C04 mp3/m4a, C06 L4, C07 metrics/restore/load — executed by agent)
+- Updated by: Tú (agent) — redrawn walkways on the official map (REDRAWN-WALKWAYS in the registry), French locale removed; earlier: Công (C01 ADR draft, C04 mp3/m4a, C06 L4, C07 metrics/restore/load — executed by agent)
 
 ## Task board
 

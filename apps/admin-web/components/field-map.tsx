@@ -94,7 +94,12 @@ export function FieldMap({
       if (items.length === 1) {
         map.easeTo({ center: bounds.getCenter(), zoom: 18.5, duration: 300 });
       } else {
-        map.fitBounds(bounds, { padding: 60, maxZoom: 19, duration: 300 });
+        map.fitBounds(bounds, {
+          padding: 60,
+          maxZoom: 19,
+          duration: 300,
+          bearing: map.getBearing(),
+        });
       }
     }
   };
@@ -140,7 +145,10 @@ export function FieldMap({
               [number, number],
               [number, number],
             ];
+            bearingDegrees?: number;
           };
+          // Turn the map so the official picture is upright (gate 1 at the bottom).
+          map.setBearing(georef.bearingDegrees ?? 0);
           map.addSource('park-picture', {
             type: 'image',
             url: MAP_IMAGE,
@@ -157,7 +165,7 @@ export function FieldMap({
         }
         map.addSource('walkways', {
           type: 'geojson',
-          data: '/data/damsen-osm-walkways.geojson',
+          data: '/data/damsen-walkways.geojson',
         });
         map.addLayer({
           id: 'walkways-outline',

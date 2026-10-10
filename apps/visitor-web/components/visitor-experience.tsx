@@ -16,9 +16,17 @@ import type {
   Marker,
   StyleSpecification,
 } from 'maplibre-gl';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { visitorApi } from '@/lib/api';
 import { ILLUSTRATED_LAYER, addIllustratedMap } from '@/lib/map-pictures';
+import { poiPinColor } from '@/lib/poi-pin-colors';
+import {
+  loadSubPlaces,
+  subPlaceName,
+  subPlacesFor,
+  type SubPlace,
+  type SubPlaces,
+} from '@/lib/sub-places';
 import { categoryLabel, formatDistance, formatDuration } from '@/lib/format';
 import {
   readUiLocalePreference,
@@ -56,7 +64,13 @@ import {
 } from '@/lib/proximity-guide';
 import { NarrationSection, useVisitorNarration } from './narration-section';
 
-const FALLBACK_CENTER: [number, number] = [106.63853, 10.76433];
+/** Keeps the camera target clear of the detail card (on the right on wide screens). */
+function cameraPadding() {
+  const wide = !window.matchMedia('(max-width: 820px)').matches;
+  return { top: 90, left: 60, bottom: 60, right: wide ? 460 : 60 };
+}
+
+const FALLBACK_CENTER: [number, number] = [106.63864, 10.76443];
 type MapKind = 'old' | 'new';
 const MAP_TILE_URL = process.env.NEXT_PUBLIC_MAP_TILE_URL;
 const MAP_TILE_ATTRIBUTION =
@@ -236,7 +250,11 @@ export function VisitorExperience() {
   const narrationAudioRef = useRef<HTMLAudioElement | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapKind, setMapKind] = useState<MapKind>('new');
-  const [illustratedReady, setIllustratedReady] = useState(false);
+  // Bearing that shows the official map upright; null until the picture loaded.
+  const [illustratedBearing, setIllustratedBearing] = useState<number | null>(
+    null,
+  );
+  const illustratedReady = illustratedBearing !== null;
   const [locale, setLocaleState] = useState<UiLocale>('vi');
   const t = uiText(locale);
   const changeLocale = useCallback((next: UiLocale) => {
@@ -253,6 +271,12 @@ export function VisitorExperience() {
   const [autoPlayPoiId, setAutoPlayPoiId] = useState<string | null>(null);
   const guideStateRef = useRef<GuideState>(EMPTY_GUIDE_STATE);
   const [selected, setSelected] = useState<PoiSummary | null>(null);
+  // Attractions inside big places (children's area, ...); `activeChild` is the one tapped.
+  const [subPlaces, setSubPlaces] = useState<SubPlaces>({});
+  const [activeChild, setActiveChild] = useState<number | null>(null);
+  const subMarkersRef = useRef<Marker[]>([]);
+  const subPlacesRef = useRef<SubPlaces>({});
+  subPlacesRef.current = subPlaces;
   const [detail, setDetail] = useState<PoiDetail | null>(null);
   const [route, setRoute] = useState<RouteResponse | null>(null);
   const [position, setPosition] = useState<GeoPoint | null>(null);
@@ -311,6 +335,7 @@ export function VisitorExperience() {
       cancelSimulationAnimation();
       stopPlayback();
       setSelected(poi);
+      setActiveChild(null);
       setDetailCardOpen(true);
       // On phones the list is below the map: bring the detail card into view.
       if (window.matchMedia('(max-width: 820px)').matches) {
@@ -400,10 +425,10 @@ export function VisitorExperience() {
       map.once('load', () => {
         map.addSource('damsen-osm-walkways', {
           type: 'geojson',
-          data: '/data/damsen-osm-walkways.geojson',
+          data: '/data/damsen-walkways.geojson',
           attribution: '© OpenStreetMap contributors',
         });
-        void addIllustratedMap(map).then(setIllustratedReady);
+        void addIllustratedMap(map).then(setIllustratedBearing);
         map.addLayer({
           id: 'damsen-osm-walkways-outline',
           type: 'line',
@@ -454,7 +479,7 @@ export function VisitorExperience() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [arrivalOpen, authMode, detailCardOpen, stopPlayback]);
 
-  // Old map = OSM base + walkways; new = the illustrated map under them.
+  // Old map = OSM base + walkways; new = the official map under them, turned upright.
   useEffect(() => {
     const map = mapRef.current;
     if (
@@ -469,7 +494,11 @@ export function VisitorExperience() {
       'visibility',
       mapKind === 'new' ? 'visible' : 'none',
     );
-  }, [illustratedReady, mapKind, mapReady]);
+    map.easeTo({
+      bearing: mapKind === 'new' ? (illustratedBearing ?? 0) : 0,
+      duration: 500,
+    });
+  }, [illustratedBearing, illustratedReady, mapKind, mapReady]);
 
   // Remembered interface language (read after mount so SSR markup stays 'vi').
   useEffect(() => {
@@ -520,12 +549,14 @@ export function VisitorExperience() {
       markersRef.current.forEach((marker) => marker.remove());
       markersRef.current = pois.map((poi) => {
         const element = document.createElement('button');
-        element.className = `map-pin${selected?.id === poi.id ? ' selected' : ''}`;
+        const pinColor = poiPinColor(poi.slug);
+        element.className = `map-pin${pinColor ? ` pin-${pinColor}` : ''}${selected?.id === poi.id ? ' selected' : ''}`;
         element.type = 'button';
         element.ariaLabel = poi.name;
         element.innerHTML = `<span>${formatPoiNumber(poi.slug)}</span>`;
         element.addEventListener('click', () => openPoi(poi));
-        return new maplibregl.Marker({ element })
+        // The pin's tip (not its centre) sits on the place, like the tips read off the map.
+        return new maplibregl.Marker({ element, offset: [0, -22] })
           .setLngLat([poi.location.longitude, poi.location.latitude])
           .addTo(map);
       });
@@ -534,6 +565,60 @@ export function VisitorExperience() {
       cancelled = true;
     };
   }, [mapReady, openPoi, pois, selected?.id]);
+
+  useEffect(() => {
+    void loadSubPlaces().then(setSubPlaces);
+  }, []);
+
+  const selectedChildren = useMemo(
+    () => (selected ? subPlacesFor(subPlaces, selected.slug) : []),
+    [selected, subPlaces],
+  );
+
+  // Small pins of the attractions inside the selected big place (11.1, 11.2, ...).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+    let cancelled = false;
+    void import('maplibre-gl').then((maplibregl) => {
+      if (cancelled) return;
+      subMarkersRef.current.forEach((marker) => marker.remove());
+      subMarkersRef.current = [];
+      selectedChildren.forEach((child, index) => {
+        if (!child.pin || child.latitude === undefined) return;
+        const element = document.createElement('button');
+        element.className = `map-pin sub pin-${child.color ?? 'white'}${activeChild === index ? ' selected' : ''}`;
+        element.type = 'button';
+        element.ariaLabel = subPlaceName(child, locale);
+        element.title = subPlaceName(child, locale);
+        element.innerHTML = `<span>${child.pin}</span>`;
+        element.addEventListener('click', () => setActiveChild(index));
+        subMarkersRef.current.push(
+          new maplibregl.Marker({ element, offset: [0, -16] })
+            .setLngLat([child.longitude!, child.latitude])
+            .addTo(map),
+        );
+      });
+    });
+    return () => {
+      cancelled = true;
+      subMarkersRef.current.forEach((marker) => marker.remove());
+      subMarkersRef.current = [];
+    };
+  }, [activeChild, locale, mapReady, selectedChildren]);
+
+  // Tapping an attraction with a pin brings it to the centre of the map.
+  useEffect(() => {
+    const map = mapRef.current;
+    const child = activeChild === null ? null : selectedChildren[activeChild];
+    if (!map || !mapReady || !child || child.latitude === undefined) return;
+    map.easeTo({
+      center: [child.longitude!, child.latitude],
+      zoom: Math.max(map.getZoom(), 18),
+      padding: cameraPadding(),
+      duration: 400,
+    });
+  }, [activeChild, mapReady, selectedChildren]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -600,10 +685,30 @@ export function VisitorExperience() {
     setArrivalOpen(false);
     cancelSimulationAnimation();
     stopPlayback();
-    mapRef.current?.flyTo({
-      center: [selected.location.longitude, selected.location.latitude],
-      zoom: 17.2,
-    });
+    const pinned = subPlacesFor(subPlacesRef.current, selected.slug).filter(
+      (child) => child.latitude !== undefined,
+    );
+    if (pinned.length > 0) {
+      // A big place: show all its sub-pins, clear of the detail card on the right.
+      const lngs = pinned.map((child) => child.longitude!);
+      const lats = pinned.map((child) => child.latitude!);
+      mapRef.current?.fitBounds(
+        [
+          [Math.min(...lngs), Math.min(...lats)],
+          [Math.max(...lngs), Math.max(...lats)],
+        ],
+        {
+          padding: cameraPadding(),
+          maxZoom: 18.5,
+          bearing: mapRef.current?.getBearing(),
+        },
+      );
+    } else {
+      mapRef.current?.flyTo({
+        center: [selected.location.longitude, selected.location.latitude],
+        zoom: 17.2,
+      });
+    }
     void visitorApi
       .getPoi(selected.id, contentLocale(locale))
       .then(setDetail)
@@ -641,9 +746,11 @@ export function VisitorExperience() {
     const first = coordinates.at(0);
     const last = coordinates.at(-1);
     if (first && last && !simulationPosition) {
+      // fitBounds resets the bearing to north unless told otherwise: keep the picture upright.
       map.fitBounds([first, last], {
         padding: 90,
         maxZoom: 18,
+        bearing: map.getBearing(),
       });
     }
   }, [mapReady, route, simulationPosition]);
@@ -1111,6 +1218,9 @@ export function VisitorExperience() {
               t={t}
               locale={locale}
               detail={detail}
+              subPlaces={selectedChildren}
+              activeChild={activeChild}
+              onChildSelect={setActiveChild}
               narrationSection={
                 <NarrationSection
                   t={t}
@@ -1286,15 +1396,6 @@ function Header({
           >
             EN
           </button>
-          <button
-            type="button"
-            className={locale === 'fr' ? 'active' : ''}
-            aria-pressed={locale === 'fr'}
-            aria-label="Interface en français"
-            onClick={() => onLocaleChange('fr')}
-          >
-            FR
-          </button>
         </div>
         {session ? (
           <button className="account-button" onClick={onLogout}>
@@ -1314,6 +1415,9 @@ function PoiDetailCard({
   t,
   locale,
   detail,
+  subPlaces,
+  activeChild,
+  onChildSelect,
   narrationSection,
   route,
   selected,
@@ -1324,6 +1428,9 @@ function PoiDetailCard({
   t: UiText;
   locale: UiLocale;
   detail: PoiDetail | null;
+  subPlaces: SubPlace[];
+  activeChild: number | null;
+  onChildSelect(index: number): void;
   narrationSection: React.ReactNode;
   route: RouteResponse | null;
   selected: PoiSummary;
@@ -1339,6 +1446,35 @@ function PoiDetailCard({
       <p className="eyebrow">{categoryLabel(selected.category, locale)}</p>
       <h2>{detail?.name ?? selected.name}</h2>
       <p>{detail?.longDescription ?? selected.shortDescription}</p>
+      {subPlaces.length > 0 ? (
+        <section className="sub-places" aria-label={t.subPlacesHeading}>
+          <h3>
+            {t.subPlacesHeading}
+            <span>{t.subPlaceCount(subPlaces.length)}</span>
+          </h3>
+          <ul>
+            {subPlaces.map((child, index) => (
+              <li key={index}>
+                <button
+                  type="button"
+                  className={activeChild === index ? 'active' : ''}
+                  aria-pressed={activeChild === index}
+                  onClick={() => onChildSelect(index)}
+                >
+                  {child.pin ? (
+                    <span className={`sub-dot pin-${child.color ?? 'white'}`}>
+                      {child.pin}
+                    </span>
+                  ) : (
+                    <span className="sub-dot none" aria-hidden="true" />
+                  )}
+                  {subPlaceName(child, locale)}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       {narrationSection}
       {route ? (
         <div className="route-summary">

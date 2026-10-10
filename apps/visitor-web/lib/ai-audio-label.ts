@@ -6,7 +6,6 @@ import type {
 const AI_AUDIO_LABELS: Record<string, string> = {
   vi: 'Giọng đọc do AI tạo',
   en: 'AI-generated voice',
-  fr: 'Voix générée par IA',
 };
 
 /**

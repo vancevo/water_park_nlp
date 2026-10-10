@@ -1,9 +1,9 @@
 /* global fetch */
 // Imports the places in data/pois/damsen-pois.json through the admin API
 // (create → submit → approve, so everything is audited), snapping each place's primary
-// entrance to the nearest imported OSM path node.
+// entrance to the nearest node of the redrawn path graph.
 //
-//   npm run build --workspace @damsen/api && node scripts/import-osm-walkways.mjs   # once
+//   node scripts/import-redrawn-walkways.mjs   # once (the footpath graph + pin positions)
 //   ADMIN_PASSWORD=... node scripts/import-pois.mjs [--dry-run] [--no-publish]
 //
 // Re-running skips slugs that already exist. Positions are ESTIMATES read off the
@@ -77,14 +77,14 @@ try {
     const near = await pool.query(
       `SELECT external_id, ST_Y(location::geometry) AS lat, ST_X(location::geometry) AS lon,
               ST_Distance(location::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) AS metres
-       FROM walk_nodes WHERE source LIKE 'openstreetmap%'
+       FROM walk_nodes WHERE source LIKE 'redrawn%'
        ORDER BY location <-> ST_SetSRID(ST_MakePoint($1, $2), 4326) LIMIT 1`,
       [place.longitude, place.latitude],
     );
     const node = near.rows[0];
     if (!node)
       throw new Error(
-        'no OSM path nodes: run scripts/import-osm-walkways.mjs first',
+        'no path nodes: run scripts/import-redrawn-walkways.mjs first',
       );
     const metres = Math.round(node.metres);
     if (metres > MAX_SNAP_METERS)

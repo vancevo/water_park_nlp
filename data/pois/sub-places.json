@@ -1,0 +1,40 @@
+{
+  "note": "Attractions inside a big place, from the legend of the official park map. Keyed by the place number. A child with `pin` has its own small pin on the map (position and colour in data/walkways-new/pins.json); the parent pin is drawn at the centre of its sub-pins. English names are the project team's translation.",
+  "places": {
+    "4": [
+      { "nameVi": "Phượng hoàng bay", "nameEn": "Flying Phoenix" },
+      { "nameVi": "Cá chép nhào lộn", "nameEn": "Tumbling Carp" },
+      { "nameVi": "Xe bay ảo tưởng", "nameEn": "Fantasy Flyer" },
+      { "nameVi": "Nhà hơi liên hoàn", "nameEn": "Linked Bounce Houses" }
+    ],
+    "5": [
+      { "nameVi": "Đoàn tàu cổ tích", "nameEn": "Fairy-tale Train" },
+      { "nameVi": "Xe điện tham quan", "nameEn": "Sightseeing Electric Car" }
+    ],
+    "11": [
+      { "pin": "11.1", "nameVi": "Tháp xoay", "nameEn": "Spinning Tower" },
+      { "pin": "11.2", "nameVi": "Thảm bay", "nameEn": "Flying Carpet" },
+      {
+        "pin": "11.3",
+        "nameVi": "Hải cầu vượt thác",
+        "nameEn": "Waterfall Sea Bridge"
+      },
+      {
+        "pin": "11.4",
+        "nameVi": "Điểm 11.4",
+        "nameEn": "Spot 11.4",
+        "needsName": true
+      },
+      { "nameVi": "Ếch nhảy", "nameEn": "Jumping Frog" },
+      { "nameVi": "Điệu nhảy thiên thần", "nameEn": "Angel Dance" },
+      { "nameVi": "Siêu nhân Robot", "nameEn": "Super Robot" },
+      { "nameVi": "Xe lửa mini", "nameEn": "Mini Train" },
+      { "nameVi": "Rồng lượn", "nameEn": "Dragon Coaster" },
+      { "nameVi": "Tháp xoay", "nameEn": "Spinning Tower" },
+      { "nameVi": "Thảm bay", "nameEn": "Flying Carpet" },
+      { "nameVi": "Điệu nhảy thiên thần", "nameEn": "Angel Dance" },
+      { "nameVi": "Khủng long bay", "nameEn": "Flying Dinosaur" },
+      { "nameVi": "Masage cá", "nameEn": "Fish Massage" }
+    ]
+  }
+}

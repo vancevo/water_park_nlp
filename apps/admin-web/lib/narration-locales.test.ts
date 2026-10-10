@@ -12,13 +12,13 @@ import {
 } from './narration-locales';
 
 describe('narration locale catalog port', () => {
-  it('serves a VI/EN/FR fixture in configured order without sharing state', async () => {
+  it('serves a VI/EN fixture in configured order without sharing state', async () => {
     const port = createFixtureNarrationLocalePort();
     const first = await port.getCatalog();
     expect(first.defaultLocale).toBe('vi');
-    expect(first.locales.map((item) => item.code)).toEqual(['vi', 'en', 'fr']);
+    expect(first.locales.map((item) => item.code)).toEqual(['vi', 'en']);
     first.locales.pop();
-    expect((await port.getCatalog()).locales).toHaveLength(3);
+    expect((await port.getCatalog()).locales).toHaveLength(2);
   });
 
   it('reads the HTTP catalog through the typed client and normalises it', async () => {
@@ -88,9 +88,9 @@ describe('narration locale catalog port', () => {
 
   it('resolves labels, fallback chains and disabled stored locales', () => {
     const catalog = FIXTURE_NARRATION_LOCALE_CATALOG;
-    expect(localeLabel(catalog, 'fr')).toBe('Français');
+    expect(localeLabel(catalog, 'en')).toBe('English');
     expect(localeLabel(catalog, 'de')).toBe('DE');
-    expect(fallbackChain(catalog, 'fr')).toEqual(['fr', 'en', 'vi']);
+    expect(fallbackChain(catalog, 'en')).toEqual(['en', 'vi']);
     expect(fallbackChain(catalog, 'de')).toEqual([]);
     const cyclic = {
       defaultLocale: 'a',

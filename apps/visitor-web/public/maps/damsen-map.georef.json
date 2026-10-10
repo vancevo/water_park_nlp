@@ -1,22 +1,15 @@
 {
-  "status": "fitted-to-osm-paths",
-  "method": "affine fit of the OSM footpaths onto the cream paths painted in the picture (path colour given: 248,216,184, tolerance 32; started from a bounding-box guess, not from another picture)",
+  "status": "traced-and-fitted",
+  "method": "svg_to_geojson.py: footpaths traced on this picture, fitted (trimmed ICP) onto the paths painted in the earlier illustrated picture, whose corners were fitted to the OSM footpaths",
   "image": "damsen-map.jpg",
-  "imageSizePx": [1157, 1360],
-  "rotationDegrees": -0.38,
-  "metresPerPixel": [0.777, 0.761],
-  "meanDistanceMetres": 0.76,
-  "osmPathSamplesWithin3HalfPixels": 0.939,
-  "startingGuessWithin3HalfPixels": 0.829,
-  "independentCheck": {
-    "osmLakeCoveredByPaintedWater": 0.383,
-    "osmLakeVsPaintedWaterIoU": 0.324
-  },
-  "note": "Paths were fitted; the lake check is independent. The picture's paths are not surveyed: verify on site.",
+  "imageSizePx": [2048, 1315],
+  "bearingDegrees": 266.56,
+  "centre": [106.6386356, 10.7644268],
+  "note": "Estimate, not surveyed (~3-8 m). Rotate the map to bearingDegrees to see the picture upright (gate 1 at the bottom).",
   "corners": [
-    [106.6347502, 10.7685921],
-    [106.6429651, 10.7686456],
-    [106.6430415, 10.7592802],
-    [106.6348267, 10.7592267]
+    [106.6350845, 10.7586683],
+    [106.6347521, 10.7697438],
+    [106.6421867, 10.7701852],
+    [106.6425191, 10.7591098]
   ]
 }
