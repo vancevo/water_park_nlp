@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { AuthSessionPanel } from './auth-session-panel';
+import { ReviewNavLink } from './review-nav-link';
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -15,9 +16,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             Điểm khám phá
           </Link>
           <Link href="/field">Hiện trường</Link>
-          <span>
-            Kiểm duyệt <small>Sắp có</small>
-          </span>
+          <ReviewNavLink />
           <span>
             Media <small>Sắp có</small>
           </span>

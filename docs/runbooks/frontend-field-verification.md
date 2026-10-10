@@ -50,3 +50,20 @@ lại. Field check là *bằng chứng* tách riêng; "áp dụng" chỉ đổi 
   > 20 m. Hãy đứng chỗ thoáng, đợi vòng sai số nhỏ lại, đo lại nếu nghi ngờ. Vị trí là ước lượng
   một lần đo, chưa phải khảo sát trắc địa; với điểm quan trọng nên đo ở 2 lần khác nhau.
 - Kiểm thử: `field-browser-smoke.mjs` (đo → áp dụng → offline → duyệt, trên API + DB thật, GPS giả).
+
+## Thêm địa điểm mới tại hiện trường — `/field/new`
+
+Khi gặp một chỗ chưa có trong danh sách: **＋ Thêm địa điểm tại đây** (đầu trang `/field`). Đứng ngay giữa
+địa điểm → **📍 Đo vị trí tại đây** (cùng cách đo nhiều mẫu như trên) → nhập tên (Việt bắt buộc, Anh để
+trống thì dùng tên Việt), chọn loại (cổng, trò chơi, sân khấu, ăn uống, nhà vệ sinh…) → lưu. Lối vào chính
+tự gắn vào điểm đường đi bộ gần nhất. Ba cách lưu: **Chỉ lưu nháp**, **Lưu và gửi duyệt**, và với
+Reviewer/Admin **Lưu và xuất bản luôn**. Thêm địa điểm mới **cần có mạng** (khác với kết quả đo có hàng đợi
+offline).
+
+## Kiểm duyệt — `/review` (mục "Kiểm duyệt" ở thanh bên)
+
+Hàng đợi có số địa điểm đang chờ ngay trên thanh bên. Ba tab: **Chờ duyệt** (Duyệt / Từ chối kèm lý do ≥ 3
+ký tự / **Duyệt tất cả**), **Bản nháp** và **Bị từ chối** (hiện lý do; **Gửi duyệt** khi đủ tên Việt, tên
+Anh và một cổng chính). Mỗi thẻ có bản đồ nhỏ và nút mở form sửa. Chỉ Reviewer/Admin duyệt hoặc từ chối;
+Editor chỉ gửi duyệt. Kiểm thử: `review-browser-smoke.mjs` (thêm tại chỗ → duyệt → nháp → gửi → từ chối).
+
