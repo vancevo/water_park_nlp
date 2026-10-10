@@ -27,6 +27,8 @@ interface PoiRow {
   translations: PoiRecord['translations'] | string;
   entrances: PoiRecord['entrances'] | string;
   operating_hours: PoiRecord['operatingHours'] | string;
+  pending_version_id?: string | null;
+  rejection_reason?: string | null;
 }
 
 function jsonValue<T>(value: T | string): T {
@@ -44,6 +46,14 @@ function toRecord(row: PoiRow): PoiRecord {
     translations: jsonValue(row.translations),
     entrances: jsonValue(row.entrances),
     operatingHours: jsonValue(row.operating_hours),
+    // The workflow pointers live on the version rows; without them a pending
+    // POI could never be approved or rejected against Postgres.
+    ...(row.status === 'pending_review' && row.pending_version_id
+      ? { pendingVersionId: row.pending_version_id }
+      : {}),
+    ...(row.status === 'rejected' && row.rejection_reason
+      ? { rejectionReason: row.rejection_reason }
+      : {}),
   };
 }
 
@@ -81,7 +91,13 @@ const SELECT_POI = `
         'closesAt', to_char(h.closes_at, 'HH24:MI')
       ) ORDER BY h.day_of_week)
       FROM poi_operating_hours h WHERE h.poi_id = p.id
-    ), '[]'::jsonb) AS operating_hours
+    ), '[]'::jsonb) AS operating_hours,
+    (SELECT v.id FROM poi_content_versions v
+      WHERE v.poi_id = p.id AND v.workflow_status = 'pending_review'
+      ORDER BY v.version DESC LIMIT 1) AS pending_version_id,
+    (SELECT v.reason FROM poi_content_versions v
+      WHERE v.poi_id = p.id AND v.workflow_status = 'rejected'
+      ORDER BY v.version DESC LIMIT 1) AS rejection_reason
   FROM pois p
   JOIN poi_categories c ON c.id = p.category_id`;
 

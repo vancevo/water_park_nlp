@@ -1,0 +1,656 @@
+{
+  "note": "Positions are the tips of the numbered pins on the illustrated park map (public/maps/damsen-map.jpg), converted with its georeference. Estimated, NOT field verified; correct them with the /field screens. Names and numbers come from the park map legend supplied by the team.",
+  "source": "numbered pin map supplied 2026-10-10",
+  "pois": [
+    {
+      "number": 1,
+      "slug": "p01-cong-so-1-duong-lac-long-quan",
+      "nameVi": "Cổng số 1 — đường Lạc Long Quân",
+      "nameEn": "Gate 1 — Lac Long Quan Street",
+      "category": "gate",
+      "pixel": {
+        "x": 1103.6,
+        "y": 399.0
+      },
+      "latitude": 10.7658955,
+      "longitude": 106.6426082
+    },
+    {
+      "number": 2,
+      "slug": "p02-cong-so-1a-duong-hoa-binh",
+      "nameVi": "Cổng số 1A — đường Hòa Bình",
+      "nameEn": "Gate 1A — Hoa Binh Street",
+      "category": "gate",
+      "pixel": {
+        "x": 1010.0,
+        "y": 217.0
+      },
+      "latitude": 10.7671445,
+      "longitude": 106.6419336
+    },
+    {
+      "number": 3,
+      "slug": "p03-quay-ve-van-phong-cong-vien",
+      "nameVi": "Quầy vé, văn phòng Công viên",
+      "nameEn": "Ticket Counter and Park Office",
+      "category": "landmark",
+      "pixel": {
+        "x": 919.1,
+        "y": 342.0
+      },
+      "latitude": 10.7662795,
+      "longitude": 106.6412955
+    },
+    {
+      "number": 4,
+      "slug": "p04-khu-tro-choi-cam-giac-manh",
+      "nameVi": "Khu trò chơi cảm giác mạnh",
+      "nameEn": "Thrill Rides Area",
+      "category": "thrill_ride",
+      "pixel": {
+        "x": 847.6,
+        "y": 273.0
+      },
+      "latitude": 10.7667513,
+      "longitude": 106.6407835
+    },
+    {
+      "number": 5,
+      "slug": "p05-tram-xe-trung-tam",
+      "nameVi": "Trạm xe trung tâm",
+      "nameEn": "Central Vehicle Station",
+      "category": "landmark",
+      "pixel": {
+        "x": 668.3,
+        "y": 321.0
+      },
+      "latitude": 10.7664125,
+      "longitude": 106.6395131
+    },
+    {
+      "number": 6,
+      "slug": "p06-tiem-ca-phe-sai-gon",
+      "nameVi": "Tiệm cà phê Sài Gòn",
+      "nameEn": "Saigon Coffee Shop",
+      "category": "food",
+      "pixel": {
+        "x": 632.0,
+        "y": 364.0
+      },
+      "latitude": 10.7661147,
+      "longitude": 106.639258
+    },
+    {
+      "number": 7,
+      "slug": "p07-ben-thuyen",
+      "nameVi": "Bến thuyền",
+      "nameEn": "Boat Dock",
+      "category": "ride",
+      "pixel": {
+        "x": 647.5,
+        "y": 266.0
+      },
+      "latitude": 10.7667903,
+      "longitude": 106.6393625
+    },
+    {
+      "number": 8,
+      "slug": "p08-ca-phe-vuon-da-dam-sen",
+      "nameVi": "Cà phê Vườn Đá – Đầm Sen",
+      "nameEn": "Stone Garden Café – Dam Sen",
+      "category": "food",
+      "pixel": {
+        "x": 774.9,
+        "y": 269.0
+      },
+      "latitude": 10.7667755,
+      "longitude": 106.6402672
+    },
+    {
+      "number": 9,
+      "slug": "p09-vong-luon-tuoi-tho",
+      "nameVi": "Vòng lượn tuổi thơ",
+      "nameEn": "Childhood Loop Ride",
+      "category": "ride",
+      "pixel": {
+        "x": 737.9,
+        "y": 210.0
+      },
+      "latitude": 10.7671801,
+      "longitude": 106.6400012
+    },
+    {
+      "number": 10,
+      "slug": "p10-rap-phim-cinemax-dam-sen",
+      "nameVi": "Rạp phim Cinemax Đầm Sen",
+      "nameEn": "Cinemax Dam Sen Cinema",
+      "category": "indoor",
+      "pixel": {
+        "x": 709.9,
+        "y": 166.0
+      },
+      "latitude": 10.7674818,
+      "longitude": 106.6397999
+    },
+    {
+      "number": 11,
+      "slug": "p11-khu-tro-choi-thieu-nhi",
+      "nameVi": "Khu trò chơi thiếu nhi",
+      "nameEn": "Children's Play Area",
+      "category": "children",
+      "pixel": {
+        "x": 565.6,
+        "y": 150.0
+      },
+      "latitude": 10.7675853,
+      "longitude": 106.6387745
+    },
+    {
+      "number": 12,
+      "slug": "p12-nha-ga-monorail-1-nha-hang-de-men",
+      "nameVi": "Nhà ga Monorail 1 – Nhà hàng Dế Mèn",
+      "nameEn": "Monorail Station 1 – De Men Restaurant",
+      "category": "ride",
+      "pixel": {
+        "x": 582.5,
+        "y": 75.0
+      },
+      "latitude": 10.7681026,
+      "longitude": 106.6388903
+    },
+    {
+      "number": 13,
+      "slug": "p13-kids-playground",
+      "nameVi": "Kids playground",
+      "nameEn": "Kids Playground",
+      "category": "children",
+      "pixel": {
+        "x": 625.0,
+        "y": 176.0
+      },
+      "latitude": 10.767409,
+      "longitude": 106.6391977
+    },
+    {
+      "number": 14,
+      "slug": "p14-san-khau-de-men",
+      "nameVi": "Sân khấu Dế Mèn",
+      "nameEn": "De Men Stage",
+      "category": "show",
+      "pixel": {
+        "x": 476.9,
+        "y": 161.0
+      },
+      "latitude": 10.7675055,
+      "longitude": 106.6381452
+    },
+    {
+      "number": 15,
+      "slug": "p15-xe-dien-dung-dai-duong",
+      "nameVi": "Xe điện đụng đại dương",
+      "nameEn": "Ocean Bumper Cars",
+      "category": "ride",
+      "pixel": {
+        "x": 466.0,
+        "y": 81.0
+      },
+      "latitude": 10.7680559,
+      "longitude": 106.6380634
+    },
+    {
+      "number": 16,
+      "slug": "p16-cong-so-2-nha-hang-thuy-ta",
+      "nameVi": "Cổng số 2 — Nhà hàng Thủy Tạ",
+      "nameEn": "Gate 2 — Thuy Ta Restaurant",
+      "category": "gate",
+      "pixel": {
+        "x": 377.8,
+        "y": 47.0
+      },
+      "latitude": 10.7682859,
+      "longitude": 106.6374349
+    },
+    {
+      "number": 17,
+      "slug": "p17-quay-ve",
+      "nameVi": "Quầy vé",
+      "nameEn": "Ticket Counter",
+      "category": "landmark",
+      "pixel": {
+        "x": 398.0,
+        "y": 103.0
+      },
+      "latitude": 10.7679012,
+      "longitude": 106.6375819
+    },
+    {
+      "number": 18,
+      "slug": "p18-dam-sen-plaza",
+      "nameVi": "Đầm Sen Plaza",
+      "nameEn": "Dam Sen Plaza",
+      "category": "indoor",
+      "pixel": {
+        "x": 218.7,
+        "y": 153.0
+      },
+      "latitude": 10.7675486,
+      "longitude": 106.6363114
+    },
+    {
+      "number": 19,
+      "slug": "p19-quang-truong-la-ma",
+      "nameVi": "Quảng trường La Mã",
+      "nameEn": "Roman Square",
+      "category": "landmark",
+      "pixel": {
+        "x": 235.8,
+        "y": 344.0
+      },
+      "latitude": 10.7662341,
+      "longitude": 106.636444
+    },
+    {
+      "number": 20,
+      "slug": "p20-dam-sen-square",
+      "nameVi": "Đầm Sen Square",
+      "nameEn": "Dam Sen Square",
+      "category": "landmark",
+      "pixel": {
+        "x": 157.6,
+        "y": 318.0
+      },
+      "latitude": 10.7664095,
+      "longitude": 106.6358873
+    },
+    {
+      "number": 21,
+      "slug": "p21-power-surge",
+      "nameVi": "Power Surge",
+      "nameEn": "Power Surge",
+      "category": "thrill_ride",
+      "pixel": {
+        "x": 299.8,
+        "y": 502.0
+      },
+      "latitude": 10.765149,
+      "longitude": 106.6369073
+    },
+    {
+      "number": 22,
+      "slug": "p22-vong-quay-than-toc",
+      "nameVi": "Vòng quay thần tốc",
+      "nameEn": "Speed Spinner",
+      "category": "thrill_ride",
+      "pixel": {
+        "x": 252.9,
+        "y": 503.0
+      },
+      "latitude": 10.76514,
+      "longitude": 106.636574
+    },
+    {
+      "number": 23,
+      "slug": "p23-tau-xoay-cao-toc",
+      "nameVi": "Tàu xoay cao tốc",
+      "nameEn": "High-Speed Rotor Ride",
+      "category": "thrill_ride",
+      "pixel": {
+        "x": 184.0,
+        "y": 487.0
+      },
+      "latitude": 10.765247,
+      "longitude": 106.636084
+    },
+    {
+      "number": 24,
+      "slug": "p24-vuot-thac",
+      "nameVi": "Vượt thác",
+      "nameEn": "Log Flume",
+      "category": "thrill_ride",
+      "pixel": {
+        "x": 198.7,
+        "y": 566.0
+      },
+      "latitude": 10.7647036,
+      "longitude": 106.636193
+    },
+    {
+      "number": 25,
+      "slug": "p25-du-quay-dung",
+      "nameVi": "Đu quay đứng",
+      "nameEn": "Ferris Wheel",
+      "category": "ride",
+      "pixel": {
+        "x": 298.9,
+        "y": 633.0
+      },
+      "latitude": 10.7642469,
+      "longitude": 106.636908
+    },
+    {
+      "number": 26,
+      "slug": "p26-xe-dien-dung-the-he-moi",
+      "nameVi": "Xe điện đụng thế hệ mới",
+      "nameEn": "New-Generation Bumper Cars",
+      "category": "ride",
+      "pixel": {
+        "x": 460.0,
+        "y": 754.0
+      },
+      "latitude": 10.7634211,
+      "longitude": 106.6380587
+    },
+    {
+      "number": 27,
+      "slug": "p27-bang-dang",
+      "nameVi": "Băng đăng",
+      "nameEn": "Ice Lantern Exhibit",
+      "category": "exhibit",
+      "pixel": {
+        "x": 391.7,
+        "y": 795.0
+      },
+      "latitude": 10.7631356,
+      "longitude": 106.6375761
+    },
+    {
+      "number": 28,
+      "slug": "p28-khu-vuon-khung-long",
+      "nameVi": "Khu vườn Khủng Long",
+      "nameEn": "Dinosaur Garden",
+      "category": "exhibit",
+      "pixel": {
+        "x": 382.2,
+        "y": 898.0
+      },
+      "latitude": 10.7624259,
+      "longitude": 106.6375142
+    },
+    {
+      "number": 29,
+      "slug": "p29-quay-luu-niem-hoa-sen",
+      "nameVi": "Quầy lưu niệm Hoa Sen",
+      "nameEn": "Hoa Sen Souvenir Shop",
+      "category": "landmark",
+      "pixel": {
+        "x": 451.1,
+        "y": 800.0
+      },
+      "latitude": 10.7631039,
+      "longitude": 106.6379981
+    },
+    {
+      "number": 30,
+      "slug": "p30-nha-trung-bay-tieu-ban-dong-thuc-vat",
+      "nameVi": "Nhà trưng bày tiêu bản động thực vật",
+      "nameEn": "Flora and Fauna Specimen Gallery",
+      "category": "exhibit",
+      "pixel": {
+        "x": 385.3,
+        "y": 719.0
+      },
+      "latitude": 10.7636586,
+      "longitude": 106.6375261
+    },
+    {
+      "number": 31,
+      "slug": "p31-nha-ga-monorail-2",
+      "nameVi": "Nhà ga Monorail 2",
+      "nameEn": "Monorail Station 2",
+      "category": "ride",
+      "pixel": {
+        "x": 549.0,
+        "y": 792.0
+      },
+      "latitude": 10.7631635,
+      "longitude": 106.6386927
+    },
+    {
+      "number": 32,
+      "slug": "p32-dau-truong-bo-tot",
+      "nameVi": "Đấu trường Bò Tót",
+      "nameEn": "Bullfighting Arena",
+      "category": "thrill_ride",
+      "pixel": {
+        "x": 555.8,
+        "y": 861.0
+      },
+      "latitude": 10.7626887,
+      "longitude": 106.6387446
+    },
+    {
+      "number": 33,
+      "slug": "p33-chuong-da-dieu-ngua-van-huou-cao-co",
+      "nameVi": "Chuồng đà điểu, ngựa vằn, hươu cao cổ",
+      "nameEn": "Ostrich, Zebra and Giraffe Enclosure",
+      "category": "exhibit",
+      "pixel": {
+        "x": 625.0,
+        "y": 880.0
+      },
+      "latitude": 10.762561,
+      "longitude": 106.6392373
+    },
+    {
+      "number": 34,
+      "slug": "p34-vuon-xuong-rong",
+      "nameVi": "Vườn xương rồng",
+      "nameEn": "Cactus Garden",
+      "category": "garden",
+      "pixel": {
+        "x": 747.1,
+        "y": 730.0
+      },
+      "latitude": 10.7635996,
+      "longitude": 106.6400957
+    },
+    {
+      "number": 35,
+      "slug": "p35-vuon-nhat-ban",
+      "nameVi": "Vườn Nhật Bản",
+      "nameEn": "Japanese Garden",
+      "category": "garden",
+      "pixel": {
+        "x": 740.3,
+        "y": 601.0
+      },
+      "latitude": 10.7644877,
+      "longitude": 106.6400405
+    },
+    {
+      "number": 36,
+      "slug": "p36-thuy-cung",
+      "nameVi": "Thủy cung",
+      "nameEn": "Aquarium",
+      "category": "exhibit",
+      "pixel": {
+        "x": 808.4,
+        "y": 622.0
+      },
+      "latitude": 10.7643462,
+      "longitude": 106.6405248
+    },
+    {
+      "number": 37,
+      "slug": "p37-quang-truong-vua-hung",
+      "nameVi": "Quảng trường Vua Hùng",
+      "nameEn": "Hung Kings Square",
+      "category": "landmark",
+      "pixel": {
+        "x": 897.5,
+        "y": 575.0
+      },
+      "latitude": 10.764674,
+      "longitude": 106.6411549
+    },
+    {
+      "number": 38,
+      "slug": "p38-nam-tu-thuong-uyen",
+      "nameVi": "Nam Tú Thượng Uyển",
+      "nameEn": "Nam Tu Thuong Uyen Garden",
+      "category": "garden",
+      "pixel": {
+        "x": 776.8,
+        "y": 466.0
+      },
+      "latitude": 10.765419,
+      "longitude": 106.6402921
+    },
+    {
+      "number": 39,
+      "slug": "p39-nha-hang",
+      "nameVi": "Nhà hàng",
+      "nameEn": "Restaurant",
+      "category": "food",
+      "pixel": {
+        "x": 647.3,
+        "y": 531.0
+      },
+      "latitude": 10.7649654,
+      "longitude": 106.6393759
+    },
+    {
+      "number": 40,
+      "slug": "p40-quang-truong-au-lac",
+      "nameVi": "Quảng trường Âu Lạc",
+      "nameEn": "Au Lac Square",
+      "category": "landmark",
+      "pixel": {
+        "x": 736.1,
+        "y": 392.0
+      },
+      "latitude": 10.7659267,
+      "longitude": 106.6399988
+    },
+    {
+      "number": 41,
+      "slug": "p41-san-khau-ngoi-sao",
+      "nameVi": "Sân khấu Ngôi Sao",
+      "nameEn": "Star Stage",
+      "category": "show",
+      "pixel": {
+        "x": 477.3,
+        "y": 439.0
+      },
+      "latitude": 10.7655911,
+      "longitude": 106.6381636
+    },
+    {
+      "number": 42,
+      "slug": "p42-bieu-dien-nhac-nuoc",
+      "nameVi": "Biểu diễn nhạc nước",
+      "nameEn": "Water Music Fountain Show",
+      "category": "show",
+      "pixel": {
+        "x": 492.0,
+        "y": 302.0
+      },
+      "latitude": 10.7665352,
+      "longitude": 106.6382605
+    },
+    {
+      "number": 43,
+      "slug": "p43-cau-cuu-khuc",
+      "nameVi": "Cầu Cửu Khúc",
+      "nameEn": "Nine-Bend Bridge",
+      "category": "landmark",
+      "pixel": {
+        "x": 539.8,
+        "y": 575.0
+      },
+      "latitude": 10.7646574,
+      "longitude": 106.6386149
+    },
+    {
+      "number": 44,
+      "slug": "p44-quay-luu-niem-khu-b",
+      "nameVi": "Quầy lưu niệm khu B",
+      "nameEn": "Zone B Souvenir Shop",
+      "category": "landmark",
+      "pixel": {
+        "x": 396.4,
+        "y": 1012.0
+      },
+      "latitude": 10.7616415,
+      "longitude": 106.6376218
+    },
+    {
+      "number": 45,
+      "slug": "p45-lau-dai-kinh-di",
+      "nameVi": "Lâu đài kinh dị",
+      "nameEn": "Haunted Castle",
+      "category": "ride",
+      "pixel": {
+        "x": 269.0,
+        "y": 1173.0
+      },
+      "latitude": 10.7605269,
+      "longitude": 106.6367261
+    },
+    {
+      "number": 46,
+      "slug": "p46-tau-luon-sieu-toc",
+      "nameVi": "Tàu lượn siêu tốc",
+      "nameEn": "Roller Coaster",
+      "category": "thrill_ride",
+      "pixel": {
+        "x": 531.3,
+        "y": 1015.0
+      },
+      "latitude": 10.7616271,
+      "longitude": 106.6385799
+    },
+    {
+      "number": 47,
+      "slug": "p47-vong-xoay-khong-gian",
+      "nameVi": "Vòng xoay không gian",
+      "nameEn": "Space Spinner",
+      "category": "thrill_ride",
+      "pixel": {
+        "x": 459.0,
+        "y": 1075.0
+      },
+      "latitude": 10.7612105,
+      "longitude": 106.6380696
+    },
+    {
+      "number": 48,
+      "slug": "p48-vuon-rau-thuy-canh",
+      "nameVi": "Vườn rau thủy canh",
+      "nameEn": "Hydroponic Vegetable Garden",
+      "category": "garden",
+      "pixel": {
+        "x": 77.9,
+        "y": 1015.0
+      },
+      "latitude": 10.7616061,
+      "longitude": 106.6353604
+    },
+    {
+      "number": 49,
+      "slug": "p49-vuon-chim-thu-thien-nhien",
+      "nameVi": "Vườn chim, thú thiên nhiên",
+      "nameEn": "Bird and Wildlife Garden",
+      "category": "exhibit",
+      "pixel": {
+        "x": 257.2,
+        "y": 872.0
+      },
+      "latitude": 10.7625991,
+      "longitude": 106.6366252
+    },
+    {
+      "number": 50,
+      "slug": "p50-rap-xiec-dam-sen",
+      "nameVi": "Rạp xiếc Đầm Sen",
+      "nameEn": "Dam Sen Circus",
+      "category": "show",
+      "pixel": {
+        "x": 221.3,
+        "y": 926.0
+      },
+      "latitude": 10.7622256,
+      "longitude": 106.6363734
+    }
+  ]
+}
