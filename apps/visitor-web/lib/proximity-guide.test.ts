@@ -6,6 +6,7 @@ import {
   AUTO_TRIGGER_ALSO_NEAR,
   guideDistanceMeters,
   markGuideFired,
+  nearestTargetsWithinRadius,
   type GuideFix,
   type GuideState,
   type GuideTarget,
@@ -125,6 +126,41 @@ describe('auto guide geofence', () => {
     };
     expect(run(null)).toEqual(['a', 'b']);
     expect(run('b')).toEqual(['b', 'a']);
+  });
+
+  it('shows only the two nearest POIs when more are inside 50 metres', () => {
+    const targets = [
+      { id: 'far', location: wheel.location },
+      { id: 'nearest', location: wheel.location },
+      { id: 'middle', location: wheel.location },
+      { id: 'outside', location: wheel.location },
+    ];
+    const visible = nearestTargetsWithinRadius(targets, {
+      far: 42,
+      nearest: 4,
+      middle: 18,
+      outside: 51,
+    });
+
+    expect(visible.map((target) => target.id)).toEqual(['nearest', 'middle']);
+  });
+
+  it('offers the nearest place first when three are reached together', () => {
+    const targets: GuideTarget[] = [
+      { id: 'third', location: north(wheel, 20, 0).point },
+      { id: 'first', location: north(wheel, 2, 0).point },
+      { id: 'second', location: north(wheel, 10, 0).point },
+    ];
+    const at = (atMs: number): GuideFix => ({ ...north(wheel, 0, atMs) });
+    const armed = evaluateAutoGuide(EMPTY_GUIDE_STATE, at(0), targets, 0);
+    const result = evaluateAutoGuide(armed.state, at(2500), targets, 2500);
+
+    expect(result.candidates.map((c) => c.id)).toEqual([
+      'first',
+      'second',
+      'third',
+    ]);
+    expect(result.state.inside.size).toBe(3);
   });
 });
 

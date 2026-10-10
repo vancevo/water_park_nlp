@@ -8,7 +8,7 @@
 - Integration status: `SEARCH_ANALYTICS_POSTGIS_PASS`
 - Active blockers: B01 blocks public map/content release; AI TTS is enabled for the **non-commercial classroom demo** (ADR 0015 §6a) — public go-live still needs T06 blind review + ADR 0015 §6b; B03 resolved locally (pinned MinIO, I04 §9) — AWS S3/staging is T60
 - Last updated: 2026-10-10
-- Updated by: Tú (agent) — redrawn walkways on the official map (REDRAWN-WALKWAYS in the registry), French locale removed; earlier: Công (C01 ADR draft, C04 mp3/m4a, C06 L4, C07 metrics/restore/load — executed by agent)
+- Updated by: Tú (agent) — controller-guided path simulation, POI access paths and removal of five legacy runtime fixtures; earlier: Công (C01 ADR draft, C04 mp3/m4a, C06 L4, C07 metrics/restore/load — executed by agent)
 
 ## Task board
 
@@ -44,6 +44,12 @@
 | T35-SIM2 Auto chibi simulation | DONE | web agent | T35-SIM | Five-second elapsed-time playback, detail closes on guidance, 6-frame indie spritesheet; 6 visitor tests + build pass |
 | T35-SIM3 Compact controls | DONE | web agent | T35-SIM2 | Compact-by-default simulation pill with accessible expand/collapse; visitor checks pass |
 | T35-SIM4 Preserve map zoom | DONE | web agent | T35-SIM3 | Simulation preserves current zoom; real-GPS routes retain fitBounds; visitor checks pass |
+| T35-SIM5 Controller movement | DONE | web agent | T35-SIM4 | On-screen D-pad, Arrow/WASD and browser gamepad move the simulated walker by 2 m; 47 visitor tests/build and browser smoke pass |
+| T35-SIM6 Path-constrained controller | DONE | web agent | T35-SIM5, REDRAWN-WALKWAYS | Placement and controller steps snap to the displayed walkway GeoJSON; intersection direction tests, 50 visitor tests/build and browser smoke pass |
+| T35-SIM7 Nearby POI narration | DONE | web agent | T35-SIM6, VISITOR-AUTO-GUIDE | All public POIs trigger within 50 m; UI shows at most two nearest and plays only one nearest narration; 52 visitor tests/build and browser smoke pass |
+| T35-SIM8 Faster controller + replay | DONE | web agent | T35-SIM6–T35-SIM7 | Controller steps increased to 5 m; simulator re-narrates after a full 70 m exit and 50 m re-entry; 53 visitor tests/build and browser smoke pass |
+| T35-SIM9 POI walkway access | DONE | geo/web agent | T35-SIM6–T35-SIM8, REDRAWN-WALKWAYS | Added six connected access branches for POIs 19, 20, 22–27, 41, 42 and 49; 11/11 route API checks, topology, 53 visitor tests/build and browser smoke pass |
+| T35-SIM10 Remove legacy synthetic POIs | DONE | web/data agent | T20, POI-IMPORT-50, SEED-PARK, T35-SIM9 | Migration 015 up/down/up passed on a clean DB; current DB/API/browser show 50 published POIs and none of the five legacy names; demo gracefully skips its retired synthetic search benchmark; root gate passed |
 | T40 Lexical/spatial search | DONE | search agent | W2, W4 | API + migration 007 + real DB smoke; HTTP eval Recall@10 0.60 → 0.90 after L3 (OR + min-match + category in document; `backend-hybrid-search.md`); L4 direction intent (2026-10-10) → 0.956, ADR 0012 gate (≥0.911) passes |
 | T41 Search evaluation | DONE | search evaluation agent | T40 | 50-query VI/EN dataset reconciled with authoritative fixtures |
 | T42 Embedding pipeline | IN_PROGRESS | worker agent | T41 | Versioned/hash-idempotent pipeline + pgvector schema; production provider benchmark remains |

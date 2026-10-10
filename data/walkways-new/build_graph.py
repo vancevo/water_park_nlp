@@ -29,6 +29,8 @@ MERGE_PX = 2.0  # nodes closer than this are the same node
 JOIN_PX = 70.0  # isolated pieces are joined to the main network when closer than this
 LON0, LAT0 = 106.6385, 10.764
 KX, KY = math.cos(math.radians(LAT0)) * 111320, 110574
+AUTO_GUIDE_ACCESS_PINS = {19, 20, 22, 23, 24, 25, 26, 27, 41, 42, 49}
+AUTO_GUIDE_RADIUS_M = 50.0
 
 
 def seg_intersections(a, b):
@@ -348,6 +350,18 @@ def main():
             }
         )
     (HERE / "damsen-pois-new.json").write_text(json.dumps({"pois": ent_out}, ensure_ascii=False, indent=1))
+    access_failures = []
+    for place in ent_out:
+        if place["number"] not in AUTO_GUIDE_ACCESS_PINS:
+            continue
+        dx = (place["longitude"] - place["entranceLongitude"]) * KX
+        dy = (place["latitude"] - place["entranceLatitude"]) * KY
+        distance_m = math.hypot(dx, dy)
+        if distance_m > AUTO_GUIDE_RADIUS_M:
+            access_failures.append((place["number"], round(distance_m, 1)))
+    if access_failures:
+        raise RuntimeError(f"POI access paths outside {AUTO_GUIDE_RADIUS_M:g} m auto-guide radius: {access_failures}")
+    print(f"auto-guide path access: {len(AUTO_GUIDE_ACCESS_PINS)}/{len(AUTO_GUIDE_ACCESS_PINS)} requested POIs within {AUTO_GUIDE_RADIUS_M:g} m")
     # georeference of the background picture (corners TL, TR, BR, BL) + the bearing that puts it upright
     W, H = 2048, 1315
     corners = ll(np.array([[0, 0], [W, 0], [W, H], [0, H]], float))

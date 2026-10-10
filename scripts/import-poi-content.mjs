@@ -1,5 +1,5 @@
 /* global process, fetch */
-// Loads the written content of the 77 places (data/pois/poi-content.source.txt) into the
+// Loads the written content of the 79 places (data/pois/poi-content.source.txt) into the
 // existing places through the admin API: name, short and long description of the VI
 // translation, and the narration text as a VI narration (transcript; audio can be generated
 // later with the existing "Tạo audio AI" flow). The English narration of the same places

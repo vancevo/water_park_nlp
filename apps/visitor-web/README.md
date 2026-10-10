@@ -37,8 +37,18 @@ tọa độ, lối vào, tình trạng mở cửa và khả năng tiếp cận v
 3. Thẻ POI tự đóng và mascot indie tự đi hết geometry của tuyến với tốc độ chậm (8 m/s, từ 15 đến 100 giây tuỳ độ dài tuyến);
    quãng đường mỗi frame được tính từ tổng chiều dài tuyến và thời gian đã trôi.
 4. Spritesheet 6 frame tạo chu kỳ bước chân trong lúc marker di chuyển.
-5. Khi đến đích, dialog thuyết minh tự mở và Web Speech TTS đọc transcript đã
+5. Có thể điều khiển trực tiếp bằng D-pad trên màn hình, phím mũi tên/WASD hoặc
+   tay cầm gamepad chuẩn của trình duyệt. Mỗi nhịp di chuyển 5 m và sẽ dừng phát
+   lại tuyến tự động hiện tại. Điểm đặt ban đầu và mọi bước điều khiển đều được
+   chiếu lên lối đi gần nhất trong `public/data/damsen-walkways.geojson`.
+6. Khi đến đích, dialog thuyết minh tự mở và Web Speech TTS đọc transcript đã
    được duyệt. Có thể phát lại hoặc dừng đọc trong dialog.
+
+Controller tự bật auto-guide cho phiên mô phỏng. Khi người mô phỏng vào bán
+kính 50 m của một hay nhiều POI, bảng chỉ hiện tối đa 2 POI gần nhất và tự phát
+đúng 1 bài của POI gần nhất vừa đi vào vùng. Hysteresis 70 m ngăn phát lặp khi
+vẫn đứng gần POI; sau khi người mô phỏng rời quá 70 m rồi quay lại trong 50 m,
+POI được thuyết minh lại. GPS thật vẫn giữ cooldown 10 phút.
 
 Mô phỏng chỉ nằm trong state của tab trình duyệt, không thay đổi GPS thật và
 không được gửi lên backend như lịch sử vị trí.

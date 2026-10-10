@@ -146,6 +146,132 @@ Verification commands: visitor lint, typecheck, unit tests and production build.
 - [x] Apply viewport fitting only to real-GPS routes.
 - [x] Run scoped quality checks and update handoff docs.
 
+### T35-SIM5 — Controller-driven simulated walker
+
+```text
+Task ID: T35-SIM5
+Goal: Let a learner directly steer the simulated walker with an on-screen controller, keyboard or gamepad.
+In scope: four-direction movement, D-pad controls, Arrow/WASD input, browser Gamepad API input, local simulation state and localized help text.
+Out of scope: server persistence, real GPS spoofing, collision/path snapping and authoritative navigation.
+Dependencies completed: T35-SIM4.
+Files/modules allowed: apps/visitor-web/**, docs/FEATURE_REGISTRY.md, docs/STATUS.md, docs/AGENT_EXECUTION_PLAN.md.
+Contracts consumed: GeoPoint, WALK-SIMULATOR browser state and VISITOR-AUTO-GUIDE simulated position.
+Contracts produced: reusable cardinal movement helper; no API/schema change.
+Required reading: AGENTS.md, apps/visitor-web/AGENTS.md, docs/STATUS.md, WALK-SIMULATOR and VISITOR-AUTO-GUIDE registry entries.
+Acceptance checks: on-screen D-pad moves the walker; Arrow/WASD and standard gamepad axes/D-pad work; manual input stops automatic route playback; form fields keep normal keyboard behavior; auto-guide receives the updated simulated position; GPS remains separate.
+Verification commands: visitor lint, typecheck, unit tests and production build.
+```
+
+- [x] Reuse the existing simulated marker and browser-local state.
+- [x] Add deterministic metre-based cardinal movement with unit tests.
+- [x] Add accessible on-screen, keyboard and gamepad inputs.
+- [x] Run scoped quality checks and update registry/status.
+
+### T35-SIM6 — Path-constrained controller movement
+
+```text
+Task ID: T35-SIM6
+Goal: Keep controller-driven simulated movement on the redrawn POI walkway network.
+In scope: load the displayed walkway GeoJSON, snap click placement to the nearest path, project controller steps onto connected nearby path segments and test intersections/off-path placement.
+Out of scope: surveyed collision geometry, automatic shortest-path choice, server persistence and real GPS correction.
+Dependencies completed: T35-SIM5, REDRAWN-WALKWAYS.
+Files/modules allowed: apps/visitor-web/**, docs/FEATURE_REGISTRY.md, docs/STATUS.md, docs/AGENT_EXECUTION_PLAN.md.
+Contracts consumed: GeoPoint, `public/data/damsen-walkways.geojson`, WALK-SIMULATOR and REDRAWN-WALKWAYS.
+Contracts produced: reusable walkway GeoJSON parser and path-constrained movement helpers; no API/schema change.
+Required reading: AGENTS.md, apps/visitor-web/AGENTS.md, docs/STATUS.md, WALK-SIMULATOR and REDRAWN-WALKWAYS registry entries.
+Acceptance checks: placement snaps to a drawn walkway; every controller result lies on a walkway; direction chooses the matching branch at an intersection; empty/unavailable path data fails safely; GPS remains separate.
+Verification commands: visitor lint, typecheck, unit tests, production build and browser smoke.
+```
+
+- [x] Reuse the same GeoJSON displayed by MapLibre.
+- [x] Add tested nearest-point and direction-aware path movement helpers.
+- [x] Snap placement and all controller inputs to the walkway network.
+- [x] Run scoped quality checks and update registry/status.
+
+### T35-SIM7 — Nearby POI auto narration
+
+```text
+Task ID: T35-SIM7
+Goal: Automatically narrate one nearby POI while showing at most the two nearest POIs around the simulated walker.
+In scope: all public POIs as proximity targets, 50 m entry radius, nearest-only narration, two-item nearby display, existing 70 m hysteresis/10-minute cooldown and automatic opt-in on controller movement.
+Out of scope: overlapping narration, queueing multiple POIs, background playback without user interaction and field-verified geofences.
+Dependencies completed: T35-SIM6, VISITOR-AUTO-GUIDE.
+Files/modules allowed: apps/visitor-web/**, docs/FEATURE_REGISTRY.md, docs/STATUS.md, docs/AGENT_EXECUTION_PLAN.md.
+Contracts consumed: PoiSummary, WALK-SIMULATOR, VISITOR-AUTO-GUIDE and public POI list.
+Contracts produced: reusable nearest-two proximity selector; no API/schema change.
+Required reading: AGENTS.md, apps/visitor-web/AGENTS.md, docs/STATUS.md, WALK-SIMULATOR and VISITOR-AUTO-GUIDE registry entries.
+Acceptance checks: every POI can trigger inside 50 m; if three or more are nearby only the nearest two are shown; only the nearest newly-entered POI narrates; continued controller movement does not stop that narration; hysteresis/cooldown remain intact.
+Verification commands: visitor lint, typecheck, unit tests, production build and browser smoke.
+```
+
+- [x] Reuse the existing geofence, audio-first narration and cooldown state.
+- [x] Expand proximity targets from two fixed POIs to the public POI catalogue.
+- [x] Add a tested nearest-two display selector while retaining nearest-only trigger.
+- [x] Run scoped quality checks and update registry/status.
+
+### T35-SIM8 — Faster controller and repeat simulated narration
+
+```text
+Task ID: T35-SIM8
+Goal: Make manual simulated walking faster and narrate a POI again after the walker leaves and returns.
+In scope: increase controller movement from 2 m to 5 m per input; retain 50/70 m geofence hysteresis; disable the 10-minute repeat cooldown only for simulated fixes; add regression coverage and update visitor documentation.
+Out of scope: real GPS cooldown changes, POI radius changes, overlapping narration, route playback speed and walkway geometry changes.
+Dependencies completed: T35-SIM6, T35-SIM7, WALK-SIMULATOR, VISITOR-AUTO-GUIDE.
+Files/modules allowed: apps/visitor-web/**, docs/FEATURE_REGISTRY.md, docs/STATUS.md, docs/AGENT_EXECUTION_PLAN.md.
+Contracts consumed: WALK-SIMULATOR and VISITOR-AUTO-GUIDE browser-local state.
+Contracts produced: simulated controller step = 5 m; simulated POI re-entry can trigger immediately after leaving beyond 70 m; no API/schema change.
+Required reading: AGENTS.md, apps/visitor-web/AGENTS.md, docs/STATUS.md, T35-SIM5–T35-SIM7 and WALK-SIMULATOR/VISITOR-AUTO-GUIDE registry entries.
+Acceptance checks: every controller input advances up to 5 m while staying on a walkway; remaining within 70 m does not replay; leaving beyond 70 m then returning inside 50 m replays for the simulator; real GPS keeps the 10-minute cooldown.
+Verification commands: visitor lint, typecheck, unit tests, production build and browser smoke.
+```
+
+- [x] Reuse the existing path projection and geofence option boundary.
+- [x] Increase simulated manual movement to 5 m per input.
+- [x] Keep hysteresis while allowing simulated re-entry narration.
+- [x] Run scoped quality checks and update registry/status.
+
+### T35-SIM9 — Walkway access for unreachable POIs
+
+```text
+Task ID: T35-SIM9
+Goal: Extend the redrawn walkway network so the simulated walker can reach the auto-narration radius of POIs 19, 20, 22–27, 41, 42 and 49.
+In scope: add connected access paths to the authoritative SVG, rebuild GeoJSON/graph/POI entrance artifacts, sync visitor/admin public walkway data, import the rebuilt graph and verify route/proximity reachability for the 11 requested POIs.
+Out of scope: changing POI coordinates, surveyed pedestrian geometry, adding POI 18, changing narration radii or modifying API contracts.
+Dependencies completed: T35-SIM6–T35-SIM8, REDRAWN-WALKWAYS, POI-IMPORT-50.
+Files/modules allowed: data/walkways-new/**, apps/{visitor-web,admin-web}/public/data/damsen-walkways.geojson, apps/admin-web/public/data/osm-walk-nodes.json, docs/FEATURE_REGISTRY.md, docs/STATUS.md, docs/AGENT_EXECUTION_PLAN.md.
+Contracts consumed: WGS84/SRID 4326, `pins.json`, REDRAWN-WALKWAYS and VISITOR-AUTO-GUIDE 50 m radius.
+Contracts produced: one connected walkway graph whose nearest path is within 50 m of each requested pin; no API/schema change.
+Required reading: AGENTS.md, data/walkways-new/README.md, T35-SIM6–T35-SIM8 and REDRAWN-WALKWAYS registry entry.
+Acceptance checks: graph topology remains one component; every requested POI has a reachable entrance and nearest-path distance below 50 m; visitor and admin consume identical GeoJSON; routes from gate 1 succeed for all 11 POIs; visitor controller can traverse the added segments.
+Verification commands: build_graph.py, graph topology/distance validation, import-redrawn-walkways dry run + real import, route API checks, visitor tests/typecheck/build and browser smoke.
+```
+
+- [x] Reuse the existing SVG-to-graph build pipeline and pin coordinates.
+- [x] Add connected access paths for all 11 requested POIs.
+- [x] Rebuild, sync and import generated graph artifacts.
+- [x] Run topology, routing, visitor quality and browser checks.
+
+### T35-SIM10 — Remove legacy synthetic POIs
+
+```text
+Task ID: T35-SIM10
+Goal: Remove the five legacy synthetic POIs from migrated runtime databases so the visitor catalogue contains only the 50 numbered Dam Sen places.
+In scope: additive up/down migration for the five fixed synthetic POI IDs, cleanup of their semantic embeddings, local database migration, public catalogue verification, seed/demo documentation updates and graceful retirement of the synthetic-only demo search benchmark.
+Out of scope: deleting the standalone synthetic GeoJSON/test fixtures, changing the in-memory repository used by automated tests, removing shared categories or deleting external media objects.
+Dependencies completed: T20, POI-IMPORT-50, SEED-PARK, T35-SIM9.
+Files/modules allowed: infra/migrations/**, README.md, scripts/{seed-park,demo/**}.mjs, docs/{AGENT_EXECUTION_PLAN,FEATURE_REGISTRY,STATUS}.md.
+Contracts consumed: POI-SCHEMA, SEED-PARK and the fixed migration-002 fixture IDs.
+Contracts produced: migration 015 removes five runtime fixtures; its down migration restores their base POI data; no API shape change.
+Required reading: AGENTS.md, migrations 001–014, SEED-PARK registry entry and README setup section.
+Acceptance checks: migration applies on the current database; all five slugs are absent; exactly 50 published POIs remain after park seeding; fresh up/down/up migration is repeatable; visitor public API reports 50 places; demo does not score its retired synthetic benchmark against the real catalogue.
+Verification commands: npm run db:migrate; scratch-database up/down/up SQL checks; public API count/name check; root lint/typecheck/test/build.
+```
+
+- [x] Add a forward-safe migration with an explicit rollback.
+- [x] Verify current and fresh database behavior and the public API catalogue.
+- [x] Update setup/demo documentation and feature registry.
+- [x] Run the repository quality gate, commit and push the release changes.
+
 ### T35-SIM2 — Automatic five-second chibi route playback
 
 ```text

@@ -79,6 +79,14 @@ export interface UiText {
   createRouteInCard: string;
   choosePoi: string;
   clearSimulation: string;
+  controllerLabel: string;
+  controllerHint: string;
+  moveNorth: string;
+  moveEast: string;
+  moveSouth: string;
+  moveWest: string;
+  manualControlActive: string;
+  controllerPathsLoading: string;
 
   // Narration playback
   autoplayBlocked: string;
@@ -89,6 +97,8 @@ export interface UiText {
   autoGuideDisable: string;
   autoGuideWaiting: string;
   autoGuideNear: string;
+  autoGuideNarrating: string;
+  autoGuideNoNearby: string;
   autoGuideInaccurate(meters: number): string;
   autoGuideDenied: string;
   autoGuideArrived(name: string): string;
@@ -239,15 +249,25 @@ const vi: UiText = {
   createRouteInCard: 'Tạo tuyến trong thẻ POI',
   choosePoi: 'Chọn một POI',
   clearSimulation: 'Xóa mô phỏng',
+  controllerLabel: 'Bộ điều khiển người mô phỏng',
+  controllerHint: 'Nút, phím mũi tên/WASD hoặc gamepad · luôn bám lối đi',
+  moveNorth: 'Đi lên',
+  moveEast: 'Đi sang phải',
+  moveSouth: 'Đi xuống',
+  moveWest: 'Đi sang trái',
+  manualControlActive: 'Đang điều khiển người mô phỏng.',
+  controllerPathsLoading: 'Lối đi chưa sẵn sàng. Vui lòng thử lại.',
 
   autoplayBlocked: 'Trình duyệt chặn tự phát audio. Hãy bấm nút phát.',
   autoGuideTitle: 'Tự động thuyết minh',
   autoGuideHint:
-    'Bật để hệ thống tự phát thuyết minh khi bạn lại gần các điểm dưới đây, không cần bấm. Cần cho phép định vị.',
+    'Tự phát một bài thuyết minh khi bạn hoặc người mô phỏng đến gần POI. Hiển thị tối đa 2 POI gần nhất.',
   autoGuideEnable: 'Bật tự động',
   autoGuideDisable: 'Tắt tự động',
   autoGuideWaiting: 'Đang chờ vị trí của bạn…',
   autoGuideNear: 'Bạn đang ở gần',
+  autoGuideNarrating: 'Đang tự thuyết minh',
+  autoGuideNoNearby: 'Chưa có POI nào trong bán kính 50 m.',
   autoGuideInaccurate: (meters) =>
     `Tín hiệu GPS yếu (±${meters} m), đang chờ tín hiệu tốt hơn.`,
   autoGuideDenied:
@@ -429,15 +449,25 @@ const en: UiText = {
   createRouteInCard: 'Create a route in the POI card',
   choosePoi: 'Choose a POI',
   clearSimulation: 'Clear simulation',
+  controllerLabel: 'Simulated walker controller',
+  controllerHint: 'Buttons, Arrow/WASD, or gamepad · stays on walkways',
+  moveNorth: 'Move up',
+  moveEast: 'Move right',
+  moveSouth: 'Move down',
+  moveWest: 'Move left',
+  manualControlActive: 'Controlling the simulated walker.',
+  controllerPathsLoading: 'Walkways are not ready yet. Please try again.',
 
   autoplayBlocked: 'The browser blocked autoplay. Press play.',
   autoGuideTitle: 'Auto narration',
   autoGuideHint:
-    'Turn on to hear the narration automatically when you walk up to the places below, no tap needed. Location access is required.',
+    'Automatically plays one narration when you or the simulated walker approaches a POI. Shows at most the two nearest POIs.',
   autoGuideEnable: 'Turn on',
   autoGuideDisable: 'Turn off',
   autoGuideWaiting: 'Waiting for your location…',
   autoGuideNear: 'You are close',
+  autoGuideNarrating: 'Playing automatically',
+  autoGuideNoNearby: 'No POI is within 50 m yet.',
   autoGuideInaccurate: (meters) =>
     `Weak GPS signal (±${meters} m), waiting for a better fix.`,
   autoGuideDenied:

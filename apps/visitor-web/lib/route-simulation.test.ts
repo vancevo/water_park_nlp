@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
+  closestPointOnWalkways,
+  movePointByMeters,
+  movePointOnWalkways,
   routeLengthMeters,
   routeProgressAt,
   simulationDistanceAtTime,
   simulationDurationMs,
+  walkwayLinesFromGeoJson,
 } from './route-simulation';
 
 const route: [number, number][] = [
@@ -13,6 +17,89 @@ const route: [number, number][] = [
 ];
 
 describe('route simulation', () => {
+  it('moves a simulated point by a cardinal distance', () => {
+    const start = { latitude: 10.767, longitude: 106.638 };
+    const north = movePointByMeters(start, 'north', 2);
+    const west = movePointByMeters(start, 'west', 2);
+
+    expect(north.latitude).toBeGreaterThan(start.latitude);
+    expect(north.longitude).toBe(start.longitude);
+    expect(
+      routeLengthMeters([
+        [start.longitude, start.latitude],
+        [north.longitude, north.latitude],
+      ]),
+    ).toBeCloseTo(2, 5);
+    expect(west.longitude).toBeLessThan(start.longitude);
+    expect(west.latitude).toBe(start.latitude);
+  });
+
+  it('does not move for a negative controller distance', () => {
+    const start = { latitude: 10.767, longitude: 106.638 };
+    expect(movePointByMeters(start, 'east', -2)).toEqual(start);
+  });
+
+  it('snaps placement and controller movement onto a walkway', () => {
+    const walkways: [number, number][][] = [
+      [
+        [106.64, 10.76],
+        [106.6401, 10.76],
+      ],
+    ];
+    const offPath = { latitude: 10.76003, longitude: 106.64002 };
+    const snapped = closestPointOnWalkways(offPath, walkways)!;
+    const moved = movePointOnWalkways(offPath, 'east', 2, walkways);
+
+    expect(snapped.latitude).toBeCloseTo(10.76, 8);
+    expect(moved.latitude).toBeCloseTo(10.76, 8);
+    expect(moved.longitude).toBeGreaterThan(snapped.longitude);
+    expect(
+      routeLengthMeters([
+        [snapped.longitude, snapped.latitude],
+        [moved.longitude, moved.latitude],
+      ]),
+    ).toBeCloseTo(2, 3);
+  });
+
+  it('selects the requested branch at a walkway intersection', () => {
+    const center: [number, number] = [106.64, 10.76];
+    const walkways: [number, number][][] = [
+      [[106.6399, 10.76], center, [106.6401, 10.76]],
+      [[106.64, 10.7599], center, [106.64, 10.7601]],
+    ];
+    const moved = movePointOnWalkways(
+      { longitude: center[0], latitude: center[1] },
+      'north',
+      2,
+      walkways,
+    );
+
+    expect(moved.longitude).toBeCloseTo(center[0], 8);
+    expect(moved.latitude).toBeGreaterThan(center[1]);
+  });
+
+  it('parses displayed walkway GeoJSON and fails safely without paths', () => {
+    const parsed = walkwayLinesFromGeoJson({
+      type: 'FeatureCollection',
+      features: [
+        {
+          geometry: {
+            type: 'LineString',
+            coordinates: [
+              [106.64, 10.76],
+              [106.6401, 10.76],
+            ],
+          },
+        },
+      ],
+    });
+    const point = { latitude: 10.76, longitude: 106.64 };
+
+    expect(parsed).toHaveLength(1);
+    expect(walkwayLinesFromGeoJson({ features: [{}] })).toEqual([]);
+    expect(movePointOnWalkways(point, 'north', 2, [])).toEqual(point);
+  });
+
   it('interpolates a short walking step along the route', () => {
     const progress = routeProgressAt(route, 2)!;
     expect(progress.traveledMeters).toBe(2);

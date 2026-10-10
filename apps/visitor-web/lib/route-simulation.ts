@@ -23,6 +23,202 @@ export interface RouteProgress {
   complete: boolean;
 }
 
+export type CardinalDirection = 'north' | 'east' | 'south' | 'west';
+export type WalkwayLines = GeoJsonLineString['coordinates'][];
+
+/** Move a WGS84 point by a small cardinal distance for local simulation. */
+export function movePointByMeters(
+  point: GeoPoint,
+  direction: CardinalDirection,
+  meters: number,
+): GeoPoint {
+  const safeMeters = Math.max(0, meters);
+  const latitudeRadians = (point.latitude * Math.PI) / 180;
+  const latitudeDelta = (safeMeters / EARTH_RADIUS_METERS) * (180 / Math.PI);
+  const longitudeDelta =
+    (safeMeters /
+      (EARTH_RADIUS_METERS * Math.max(Math.cos(latitudeRadians), 0.000001))) *
+    (180 / Math.PI);
+
+  switch (direction) {
+    case 'north':
+      return { ...point, latitude: point.latitude + latitudeDelta };
+    case 'south':
+      return { ...point, latitude: point.latitude - latitudeDelta };
+    case 'east':
+      return { ...point, longitude: point.longitude + longitudeDelta };
+    case 'west':
+      return { ...point, longitude: point.longitude - longitudeDelta };
+  }
+}
+
+interface LocalPoint {
+  x: number;
+  y: number;
+}
+
+function toLocalMeters(
+  origin: GeoPoint,
+  coordinate: [number, number],
+): LocalPoint {
+  const radians = Math.PI / 180;
+  return {
+    x:
+      (coordinate[0] - origin.longitude) *
+      radians *
+      EARTH_RADIUS_METERS *
+      Math.cos(origin.latitude * radians),
+    y: (coordinate[1] - origin.latitude) * radians * EARTH_RADIUS_METERS,
+  };
+}
+
+function fromLocalMeters(origin: GeoPoint, point: LocalPoint): GeoPoint {
+  const degrees = 180 / Math.PI;
+  return {
+    longitude:
+      origin.longitude +
+      (point.x /
+        (EARTH_RADIUS_METERS *
+          Math.max(Math.cos((origin.latitude * Math.PI) / 180), 0.000001))) *
+        degrees,
+    latitude: origin.latitude + (point.y / EARTH_RADIUS_METERS) * degrees,
+  };
+}
+
+function closestPointOnSegment(
+  point: LocalPoint,
+  from: LocalPoint,
+  to: LocalPoint,
+): LocalPoint {
+  const deltaX = to.x - from.x;
+  const deltaY = to.y - from.y;
+  const lengthSquared = deltaX ** 2 + deltaY ** 2;
+  if (lengthSquared === 0) return from;
+  const ratio = Math.min(
+    1,
+    Math.max(
+      0,
+      ((point.x - from.x) * deltaX + (point.y - from.y) * deltaY) /
+        lengthSquared,
+    ),
+  );
+  return { x: from.x + deltaX * ratio, y: from.y + deltaY * ratio };
+}
+
+function localDistance(from: LocalPoint, to: LocalPoint): number {
+  return Math.hypot(to.x - from.x, to.y - from.y);
+}
+
+/** Return the nearest point on any displayed walkway, or null without paths. */
+export function closestPointOnWalkways(
+  point: GeoPoint,
+  walkways: WalkwayLines,
+): GeoPoint | null {
+  let nearest: LocalPoint | null = null;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+  const localPoint = { x: 0, y: 0 };
+
+  for (const line of walkways) {
+    for (let index = 1; index < line.length; index += 1) {
+      const from = toLocalMeters(point, line[index - 1]!);
+      const to = toLocalMeters(point, line[index]!);
+      const candidate = closestPointOnSegment(localPoint, from, to);
+      const distance = localDistance(localPoint, candidate);
+      if (distance < nearestDistance) {
+        nearest = candidate;
+        nearestDistance = distance;
+      }
+    }
+  }
+
+  return nearest ? fromLocalMeters(point, nearest) : null;
+}
+
+/**
+ * Project a cardinal controller step onto path segments connected to the
+ * current position. This prevents jumps to a nearby parallel walkway while
+ * still allowing the matching branch to be selected at an intersection.
+ */
+export function movePointOnWalkways(
+  point: GeoPoint,
+  direction: CardinalDirection,
+  meters: number,
+  walkways: WalkwayLines,
+): GeoPoint {
+  const snapped = closestPointOnWalkways(point, walkways);
+  if (!snapped || meters <= 0) return snapped ?? point;
+
+  const desired = movePointByMeters(snapped, direction, meters);
+  const localCurrent = { x: 0, y: 0 };
+  const localDesired = toLocalMeters(snapped, [
+    desired.longitude,
+    desired.latitude,
+  ]);
+  const connectionRadius = Math.max(1, meters * 1.25);
+  let best: LocalPoint | null = null;
+  let bestScore = Number.POSITIVE_INFINITY;
+
+  for (const line of walkways) {
+    for (let index = 1; index < line.length; index += 1) {
+      const from = toLocalMeters(snapped, line[index - 1]!);
+      const to = toLocalMeters(snapped, line[index]!);
+      const currentProjection = closestPointOnSegment(localCurrent, from, to);
+      if (localDistance(localCurrent, currentProjection) > connectionRadius)
+        continue;
+
+      const candidate = closestPointOnSegment(localDesired, from, to);
+      const directionalProgress =
+        candidate.x * localDesired.x + candidate.y * localDesired.y;
+      if (directionalProgress < -0.01) continue;
+
+      const score = localDistance(candidate, localDesired);
+      if (score < bestScore) {
+        best = candidate;
+        bestScore = score;
+      }
+    }
+  }
+
+  return best ? fromLocalMeters(snapped, best) : snapped;
+}
+
+/** Parse LineString/MultiLineString coordinates from the map GeoJSON. */
+export function walkwayLinesFromGeoJson(value: unknown): WalkwayLines {
+  if (!value || typeof value !== 'object') return [];
+  const features = (value as { features?: unknown }).features;
+  if (!Array.isArray(features)) return [];
+
+  const validLine = (candidate: unknown): candidate is [number, number][] =>
+    Array.isArray(candidate) &&
+    candidate.length >= 2 &&
+    candidate.every(
+      (coordinate) =>
+        Array.isArray(coordinate) &&
+        coordinate.length >= 2 &&
+        Number.isFinite(coordinate[0]) &&
+        Number.isFinite(coordinate[1]),
+    );
+
+  const lines: WalkwayLines = [];
+  for (const feature of features) {
+    if (!feature || typeof feature !== 'object') continue;
+    const geometry = (feature as { geometry?: unknown }).geometry;
+    if (!geometry || typeof geometry !== 'object') continue;
+    const { type, coordinates } = geometry as {
+      type?: unknown;
+      coordinates?: unknown;
+    };
+    if (type === 'LineString' && validLine(coordinates))
+      lines.push(coordinates);
+    if (type === 'MultiLineString' && Array.isArray(coordinates)) {
+      coordinates.forEach((line) => {
+        if (validLine(line)) lines.push(line);
+      });
+    }
+  }
+  return lines;
+}
+
 function distanceMeters(
   from: GeoJsonLineString['coordinates'][number],
   to: GeoJsonLineString['coordinates'][number],

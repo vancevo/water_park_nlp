@@ -42,11 +42,15 @@ import {
 } from '@/lib/ui-text';
 import {
   geoDistanceMeters,
+  movePointOnWalkways,
   routeLengthMeters,
   routeProgressAt,
   simulationDistanceAtTime,
   simulationDurationMs,
+  walkwayLinesFromGeoJson,
+  type CardinalDirection,
   type RouteProgress,
+  type WalkwayLines,
 } from '@/lib/route-simulation';
 import { localeLabel, speechTagFor } from '@/lib/narration-locales';
 import {
@@ -258,6 +262,8 @@ const SIMULATED_FIX_ACCURACY_METERS = 5;
 const PANEL_STORAGE_KEY = 'damsen.visitor.panel.v1';
 /** Away from the app at least this long: coming back asks where to go next. */
 const AWAY_WELCOME_MS = 60_000;
+const CONTROLLER_STEP_METERS = 5;
+const GAMEPAD_REPEAT_MS = 120;
 /** Where the feet are in the 58x122 walker sprite (x 66 %, y 79 %), as a marker offset. */
 const WALKER_FEET_OFFSET: [number, number] = [-38, -96];
 /** Clusters never zoom closer than this; past it they open a list instead. */
@@ -278,6 +284,9 @@ export function VisitorExperience() {
   const detailRef = useRef<HTMLElement>(null);
   const mapPanelRef = useRef<HTMLElement>(null);
   const walkNodesRef = useRef<GeoPoint[]>([]);
+  const walkwaysRef = useRef<WalkwayLines>([]);
+  // Set when the controller switched auto narration on, so clearing the walker switches it off.
+  const controllerStartedGuideRef = useRef(false);
   const mapRef = useRef<MapLibreMap | null>(null);
   const userMarkerRef = useRef<Marker | null>(null);
   const simulationMarkerRef = useRef<Marker | null>(null);
@@ -1147,6 +1156,23 @@ export function VisitorExperience() {
     };
   }, [locale]);
 
+  // The drawn walkways, for the controller (the walker moves along them).
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch('/data/damsen-walkways.geojson', { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json() as Promise<unknown>;
+      })
+      .then((geoJson) => {
+        walkwaysRef.current = walkwayLinesFromGeoJson(geoJson);
+      })
+      .catch(() => {
+        walkwaysRef.current = [];
+      });
+    return () => controller.abort();
+  }, []);
+
   useEffect(() => {
     void loadZones().then(setZones);
     void loadWalkNodes().then((nodes) => {
@@ -1430,6 +1456,7 @@ export function VisitorExperience() {
 
   function toggleAutoGuide() {
     if (autoGuide) {
+      controllerStartedGuideRef.current = false;
       setAutoGuide(false);
       player?.setAutoEnabled(false);
       queuedGuideRef.current = null;
@@ -1577,7 +1604,106 @@ export function VisitorExperience() {
     setRoute(null);
     setArrivalOpen(false);
     setMessage('');
+    // Auto narration that only the controller switched on goes off with the walker.
+    if (controllerStartedGuideRef.current && autoGuide) toggleAutoGuide();
+    controllerStartedGuideRef.current = false;
   }
+
+  /** One controller step (button, arrow/WASD key or gamepad): the walker moves along the walkways. */
+  function moveSimulation(direction: CardinalDirection) {
+    if (walkwaysRef.current.length === 0) {
+      setMessage(t.controllerPathsLoading);
+      return;
+    }
+    if (!autoGuide) {
+      controllerStartedGuideRef.current = true;
+      toggleAutoGuide();
+    }
+    cancelSimulationAnimation();
+    setIsPickingSimulation(false);
+    setRoute(null);
+    setSimulationDistanceMeters(0);
+    setArrivalOpen(false);
+    setMessage(t.manualControlActive);
+    // The marker is the truth between two quick key presses (state may not have caught up).
+    const at = simulationMarkerRef.current?.getLngLat();
+    const current: GeoPoint | null = at
+      ? { latitude: at.lat, longitude: at.lng }
+      : simulationPosition;
+    if (!current) return;
+    const next = movePointOnWalkways(
+      current,
+      direction,
+      CONTROLLER_STEP_METERS,
+      walkwaysRef.current,
+    );
+    simulationMarkerRef.current?.setLngLat([next.longitude, next.latitude]);
+    if (direction === 'east' || direction === 'west') {
+      simulationMarkerRef.current
+        ?.getElement()
+        .style.setProperty('--facing', direction === 'west' ? '-1' : '1');
+    }
+    setSimulationPosition(next);
+  }
+  const moveSimulationRef = useRef(moveSimulation);
+  moveSimulationRef.current = moveSimulation;
+
+  useEffect(() => {
+    if (!simulationPosition) return;
+    const directions: Partial<Record<string, CardinalDirection>> = {
+      ArrowUp: 'north',
+      KeyW: 'north',
+      ArrowRight: 'east',
+      KeyD: 'east',
+      ArrowDown: 'south',
+      KeyS: 'south',
+      ArrowLeft: 'west',
+      KeyA: 'west',
+    };
+    const onControllerKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (
+        target?.isContentEditable ||
+        target?.matches('input, textarea, select')
+      )
+        return;
+      const direction = directions[event.code];
+      if (!direction) return;
+      event.preventDefault();
+      moveSimulationRef.current(direction);
+    };
+    window.addEventListener('keydown', onControllerKey);
+    return () => window.removeEventListener('keydown', onControllerKey);
+  }, [simulationPosition !== null]);
+
+  useEffect(() => {
+    if (!simulationPosition || !navigator.getGamepads) return;
+    let frame = 0;
+    let lastMoveAt = -GAMEPAD_REPEAT_MS;
+    const pollGamepad = (now: number) => {
+      const gamepad = Array.from(navigator.getGamepads()).find(Boolean);
+      if (gamepad && now - lastMoveAt >= GAMEPAD_REPEAT_MS) {
+        const horizontal = gamepad.axes[0] ?? 0;
+        const vertical = gamepad.axes[1] ?? 0;
+        let direction: CardinalDirection | null = null;
+        if (gamepad.buttons[12]?.pressed || vertical < -0.55)
+          direction = 'north';
+        else if (gamepad.buttons[13]?.pressed || vertical > 0.55)
+          direction = 'south';
+        else if (gamepad.buttons[14]?.pressed || horizontal < -0.55)
+          direction = 'west';
+        else if (gamepad.buttons[15]?.pressed || horizontal > 0.55)
+          direction = 'east';
+        if (direction) {
+          moveSimulationRef.current(direction);
+          lastMoveAt = now;
+        }
+      }
+      frame = window.requestAnimationFrame(pollGamepad);
+    };
+    frame = window.requestAnimationFrame(pollGamepad);
+    return () => window.cancelAnimationFrame(frame);
+  }, [simulationPosition !== null]);
 
   return (
     <main className="visitor-shell">
@@ -1605,6 +1731,7 @@ export function VisitorExperience() {
               onReplay={() => {
                 if (route) startAutomaticWalk(route);
               }}
+              onMove={moveSimulation}
             />
             <button
               type="button"
@@ -2171,6 +2298,7 @@ function SimulationControls({
   onClear,
   onPick,
   onReplay,
+  onMove,
 }: {
   t: UiText;
   locale: UiLocale;
@@ -2183,6 +2311,7 @@ function SimulationControls({
   onClear(): void;
   onPick(): void;
   onReplay(): void;
+  onMove(direction: CardinalDirection): void;
 }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const rootRef = useRef<HTMLElement>(null);
@@ -2265,6 +2394,48 @@ function SimulationControls({
         </button>
         {position ? (
           <>
+            <div className="simulation-controller">
+              <div
+                className="controller-pad"
+                role="group"
+                aria-label={t.controllerLabel}
+              >
+                <button
+                  className="controller-up"
+                  type="button"
+                  aria-label={t.moveNorth}
+                  onClick={() => onMove('north')}
+                >
+                  ↑
+                </button>
+                <button
+                  className="controller-left"
+                  type="button"
+                  aria-label={t.moveWest}
+                  onClick={() => onMove('west')}
+                >
+                  ←
+                </button>
+                <span className="controller-center" aria-hidden="true" />
+                <button
+                  className="controller-right"
+                  type="button"
+                  aria-label={t.moveEast}
+                  onClick={() => onMove('east')}
+                >
+                  →
+                </button>
+                <button
+                  className="controller-down"
+                  type="button"
+                  aria-label={t.moveSouth}
+                  onClick={() => onMove('south')}
+                >
+                  ↓
+                </button>
+              </div>
+              <small>{t.controllerHint}</small>
+            </div>
             {route ? (
               <div className="simulation-progress" aria-label={t.progressLabel}>
                 <span style={{ width: `${progressPercent}%` }} />

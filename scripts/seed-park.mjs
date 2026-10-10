@@ -5,8 +5,8 @@
 //   # API running (npm run dev:api) against the migrated database
 //   ADMIN_PASSWORD=... node scripts/seed-park.mjs        # or: npm run seed:park
 //
-// Migrations alone only seed 5 synthetic fixture places, so a fresh clone shows a map
-// without the 50 places until this runs. Safe to repeat: every step skips what exists.
+// Migration 015 removes the old synthetic runtime places, so a fresh clone has no park
+// catalogue until this runs. Safe to repeat: every step skips what exists.
 //   env: API_URL (default http://localhost:3000), ADMIN_EMAIL (default admin@damsen.local),
 //        ADMIN_PASSWORD (required), DATABASE_URL (default: the local docker database)
 import { execFileSync } from 'node:child_process';
@@ -38,6 +38,6 @@ run('import-redrawn-walkways.mjs', flags);
 run('import-pois.mjs', flags);
 // 3. now that the places exist: exact entrance nodes and pin positions.
 run('import-redrawn-walkways.mjs', flags);
-// 4. the written content of the 77 places (descriptions + narration text), through the admin API.
+// 4. the written content of the 79 places (descriptions + narration text), through the admin API.
 run('import-poi-content.mjs', dryRun ? [] : ['--apply']);
 logger.log('\nPark places seeded.');

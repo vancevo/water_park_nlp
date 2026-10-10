@@ -510,6 +510,69 @@ button {
   transition: width 80ms linear;
 }
 
+.simulation-controller {
+  display: grid;
+  grid-template-columns: 104px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.simulation-controller > small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.controller-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 32px);
+  grid-template-rows: repeat(3, 32px);
+  gap: 4px;
+}
+
+.controller-pad button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: white;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  touch-action: manipulation;
+  background: var(--green);
+  border: 0;
+  border-radius: 9px;
+  box-shadow: 0 2px 0 #173f31;
+}
+
+.controller-pad button:active {
+  box-shadow: none;
+  transform: translateY(2px);
+}
+
+.controller-up {
+  grid-area: 1 / 2;
+}
+
+.controller-left {
+  grid-area: 2 / 1;
+}
+
+.controller-center {
+  grid-area: 2 / 2;
+  margin: 9px;
+  background: var(--gold);
+  border-radius: 50%;
+}
+
+.controller-right {
+  grid-area: 2 / 3;
+}
+
+.controller-down {
+  grid-area: 3 / 2;
+}
+
 .simulation-step {
   color: white;
   background: var(--green);

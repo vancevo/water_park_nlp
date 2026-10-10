@@ -21,6 +21,9 @@ diện) để sửa cả xoay/co giãn. Sau khi đổi: `build_graph.py` → `sy
 Ghim trên bản đồ có mũi nhọn nằm đúng toạ độ (không phải tâm ghim).
 
 **Độ chính xác:** toạ độ là ước lượng (~3–8 m): đường được ghép vào ảnh minh họa cũ (đã khớp OSM), không đo thực địa.
-Bản đồ chính thức không vẽ đúng tỉ lệ nên một phép biến đổi affine không khớp mọi nơi. 10 địa điểm
-(18, 19, 20, 22, 23, 24, 25, 27, 42, 49) không có đường vẽ trong ~70 m: lối vào là điểm gần nhất trên đường. Hãy vẽ thêm đường hoặc đo bằng `/field`.
+Bản đồ chính thức không vẽ đúng tỉ lệ nên một phép biến đổi affine không khớp mọi nơi. Các nhánh
+`poi-access-*` nối graph tới POI 19, 20, 22–27, 41, 42 và 49 để controller có thể đi vào vùng
+thuyết minh 50 m; `build_graph.py` sẽ báo lỗi nếu một trong 11 điểm vượt bán kính này. Đây là
+đường mô phỏng theo sơ đồ, chưa phải đường đi đã khảo sát; cần xác minh
+và sửa bằng `/field` trước khi phát hành thực địa.
 Quay lại đường OSM: xem đầu `scripts/import-redrawn-walkways.mjs`.

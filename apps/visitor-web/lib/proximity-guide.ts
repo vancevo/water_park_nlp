@@ -79,6 +79,26 @@ export function guideDistanceMeters(
   return nearest;
 }
 
+/** Select the closest targets inside the narration radius for compact UI. */
+export function nearestTargetsWithinRadius<T extends { id: string }>(
+  targets: readonly T[],
+  distances: Readonly<Record<string, number>>,
+  radiusMeters = AUTO_GUIDE_DEFAULTS.enterMeters,
+  limit = 2,
+): T[] {
+  return targets
+    .filter(
+      (target) =>
+        (distances[target.id] ?? Number.POSITIVE_INFINITY) <= radiusMeters,
+    )
+    .sort(
+      (left, right) =>
+        (distances[left.id] ?? Number.POSITIVE_INFINITY) -
+        (distances[right.id] ?? Number.POSITIVE_INFINITY),
+    )
+    .slice(0, Math.max(0, limit));
+}
+
 export function evaluateAutoGuide(
   state: GuideState,
   fix: GuideFix,
