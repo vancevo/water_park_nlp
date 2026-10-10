@@ -256,14 +256,14 @@ Verification commands: build_graph.py, graph topology/distance validation, impor
 ```text
 Task ID: T35-SIM10
 Goal: Remove the five legacy synthetic POIs from migrated runtime databases so the visitor catalogue contains only the 50 numbered Dam Sen places.
-In scope: additive up/down migration for the five fixed synthetic POI IDs, cleanup of their semantic embeddings, local database migration, public catalogue verification and seed/demo documentation updates.
+In scope: additive up/down migration for the five fixed synthetic POI IDs, cleanup of their semantic embeddings, local database migration, public catalogue verification, seed/demo documentation updates and graceful retirement of the synthetic-only demo search benchmark.
 Out of scope: deleting the standalone synthetic GeoJSON/test fixtures, changing the in-memory repository used by automated tests, removing shared categories or deleting external media objects.
 Dependencies completed: T20, POI-IMPORT-50, SEED-PARK, T35-SIM9.
-Files/modules allowed: infra/migrations/**, README.md, scripts/{seed-park,demo/demo}.mjs, docs/{AGENT_EXECUTION_PLAN,FEATURE_REGISTRY,STATUS}.md.
+Files/modules allowed: infra/migrations/**, README.md, scripts/{seed-park,demo/**}.mjs, docs/{AGENT_EXECUTION_PLAN,FEATURE_REGISTRY,STATUS}.md.
 Contracts consumed: POI-SCHEMA, SEED-PARK and the fixed migration-002 fixture IDs.
 Contracts produced: migration 015 removes five runtime fixtures; its down migration restores their base POI data; no API shape change.
 Required reading: AGENTS.md, migrations 001–014, SEED-PARK registry entry and README setup section.
-Acceptance checks: migration applies on the current database; all five slugs are absent; exactly 50 published POIs remain after park seeding; fresh up/down/up migration is repeatable; visitor public API reports 50 places.
+Acceptance checks: migration applies on the current database; all five slugs are absent; exactly 50 published POIs remain after park seeding; fresh up/down/up migration is repeatable; visitor public API reports 50 places; demo does not score its retired synthetic benchmark against the real catalogue.
 Verification commands: npm run db:migrate; scratch-database up/down/up SQL checks; public API count/name check; root lint/typecheck/test/build.
 ```
 

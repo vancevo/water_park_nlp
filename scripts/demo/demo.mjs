@@ -359,7 +359,11 @@ async function setup() {
       join(demoDir, 'search-calibration.json'),
       `${JSON.stringify(result, null, 2)}\n`,
     );
-    if (result.expand)
+    if (result.skipped)
+      warn(
+        'bỏ qua hiệu chỉnh bằng benchmark synthetic cũ vì các POI đó không còn trong catalogue runtime',
+      );
+    else if (result.expand)
       ok(
         `ngưỡng tương đồng = ${result.floor} (câu vô nghĩa cao nhất ${result.noise}); ` +
           `bắt thêm được ${result.semanticReachable}/${result.semanticTotal} câu hỏi theo ý nghĩa`,
@@ -525,9 +529,14 @@ async function start() {
   step(6, 6, 'Kiểm tra nhanh chất lượng tìm kiếm');
   try {
     const score = await evaluateSearch(URLS.api);
-    ok(
-      `Recall@10 = ${score.recallAt10}, MRR = ${score.mrr}, câu vô nghĩa trả rỗng đúng = ${score.expectedZeroAccuracy * 100}%`,
-    );
+    if (score.skipped)
+      warn(
+        'bỏ qua benchmark tìm kiếm synthetic cũ vì các POI đó không còn trong catalogue runtime',
+      );
+    else
+      ok(
+        `Recall@10 = ${score.recallAt10}, MRR = ${score.mrr}, câu vô nghĩa trả rỗng đúng = ${score.expectedZeroAccuracy * 100}%`,
+      );
   } catch (error) {
     warn(`bỏ qua đánh giá tìm kiếm (${error.message})`);
   }

@@ -67,7 +67,24 @@ export async function calibrateSimilarityFloor({
   } finally {
     await pool.end();
   }
-  if (rows.length === 0) throw new Error('no POI embeddings stored yet');
+  const judgedIds = new Set(
+    queries.flatMap((query) => query.relevant.map((item) => item.poi_id)),
+  );
+  const hasJudgedPoi = rows.some((row) => judgedIds.has(row.id));
+  if (rows.length === 0 || !hasJudgedPoi) {
+    return {
+      skipped: true,
+      reason:
+        rows.length === 0
+          ? 'no-indexed-pois'
+          : 'synthetic-benchmark-not-in-runtime-catalogue',
+      expand: false,
+      floor: MAX_FLOOR,
+      noise: null,
+      semanticReachable: 0,
+      semanticTotal: 0,
+    };
+  }
   const docs = rows.map((r) => ({
     id: r.id,
     locale: r.locale,
@@ -119,6 +136,21 @@ export async function calibrateSimilarityFloor({
 
 export async function evaluateSearch(apiUrl) {
   const queries = loadQueries();
+  const catalogueResponse = await fetch(`${apiUrl}/v1/pois?locale=vi`);
+  if (!catalogueResponse.ok)
+    throw new Error(`POI catalogue answered ${catalogueResponse.status}`);
+  const catalogueIds = new Set(
+    (await catalogueResponse.json()).items.map((item) => item.id),
+  );
+  const hasJudgedPoi = queries.some((query) =>
+    query.relevant.some((item) => catalogueIds.has(item.poi_id)),
+  );
+  if (!hasJudgedPoi) {
+    return {
+      skipped: true,
+      reason: 'synthetic-benchmark-not-in-runtime-catalogue',
+    };
+  }
   let recall = 0;
   let mrr = 0;
   let judged = 0;
