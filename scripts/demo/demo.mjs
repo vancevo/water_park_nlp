@@ -477,7 +477,7 @@ async function start() {
   ok('API và worker sẵn sàng');
 
   step(4, 6, 'Chuẩn bị nội dung demo (50 địa điểm + audio AI)');
-  // Migrations only seed 5 fixture places: load the park's graph and 50 numbered places first.
+  // Load the park's graph and its 50 numbered places into the migrated database.
   await node(['scripts/seed-park.mjs'], {
     env: {
       ...env,

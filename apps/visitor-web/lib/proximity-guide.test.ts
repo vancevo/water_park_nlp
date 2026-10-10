@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   EMPTY_GUIDE_STATE,
   evaluateAutoGuide,
+  nearestTargetsWithinRadius,
   type GuideFix,
   type GuideTarget,
 } from './proximity-guide';
@@ -110,6 +111,48 @@ describe('auto guide geofence', () => {
     expect(later.triggered?.id).toBe('wheel');
   });
 
+  it('can narrate again immediately after a simulated visitor leaves and returns', () => {
+    const simulatedOptions = { cooldownMs: 0 };
+    const entered = evaluateAutoGuide(
+      EMPTY_GUIDE_STATE,
+      north(wheel, 5),
+      [wheel],
+      0,
+      simulatedOptions,
+    );
+    const stillInside = evaluateAutoGuide(
+      entered.state,
+      north(wheel, 60),
+      [wheel],
+      1000,
+      simulatedOptions,
+    );
+    const noReplayWithoutExit = evaluateAutoGuide(
+      stillInside.state,
+      north(wheel, 5),
+      [wheel],
+      2000,
+      simulatedOptions,
+    );
+    expect(noReplayWithoutExit.triggered).toBeNull();
+
+    const left = evaluateAutoGuide(
+      noReplayWithoutExit.state,
+      north(wheel, 80),
+      [wheel],
+      3000,
+      simulatedOptions,
+    );
+    const returned = evaluateAutoGuide(
+      left.state,
+      north(wheel, 5),
+      [wheel],
+      4000,
+      simulatedOptions,
+    );
+    expect(returned.triggered?.id).toBe('wheel');
+  });
+
   it('ignores inaccurate fixes but still reports the distance', () => {
     const result = evaluateAutoGuide(
       EMPTY_GUIDE_STATE,
@@ -133,5 +176,40 @@ describe('auto guide geofence', () => {
     };
     const result = evaluateAutoGuide(EMPTY_GUIDE_STATE, north(a, 2), [b, a], 0);
     expect(result.triggered?.id).toBe('a');
+  });
+
+  it('shows only the two nearest POIs when more are inside 50 metres', () => {
+    const targets = [
+      { id: 'far', location: wheel.location },
+      { id: 'nearest', location: wheel.location },
+      { id: 'middle', location: wheel.location },
+      { id: 'outside', location: wheel.location },
+    ];
+    const visible = nearestTargetsWithinRadius(targets, {
+      far: 42,
+      nearest: 4,
+      middle: 18,
+      outside: 51,
+    });
+
+    expect(visible.map((target) => target.id)).toEqual(['nearest', 'middle']);
+  });
+
+  it('narrates one nearest POI when three are reached together', () => {
+    const targets: GuideTarget[] = [
+      { id: 'third', location: north(wheel, 20).point },
+      { id: 'first', location: north(wheel, 2).point },
+      { id: 'second', location: north(wheel, 10).point },
+    ];
+    const result = evaluateAutoGuide(
+      EMPTY_GUIDE_STATE,
+      { point: wheel.location, accuracyMeters: 5 },
+      targets,
+      0,
+    );
+
+    expect(result.triggered?.id).toBe('first');
+    expect(result.state.inside.size).toBe(3);
+    expect(result.state.lastTriggeredAt.size).toBe(1);
   });
 });

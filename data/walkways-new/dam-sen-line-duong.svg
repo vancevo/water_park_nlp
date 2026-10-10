@@ -24,4 +24,10 @@
 <path id="cuu-khuc-pavilion-access" d="M 1051 607 C 1036 616 1021 620 1005 617"/>
 <path id="khu-b-lake-access" d="M 533 179 L 551 179"/>
 <path id="rides-west-access" d="M 1094 506 L 1103 471"/>
-<path id="circus-access" d="M 687 365 L 744 371"/></g><g fill="none" stroke="#929992" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path id="north-street" d="M 143 60 L 1898 60 C 1907 61 1904 85 1905 108 L 1905 330 C 1904 405 1883 476 1854 546 C 1812 650 1737 777 1645 907 L 1454 1199 C 1426 1238 1411 1267 1395 1280 L 991 1281"/></g></svg>
+<path id="circus-access" d="M 687 365 L 744 371"/>
+<path id="poi-access-19-20" d="M 1523 394 C 1498 342 1474 284 1459 232 L 1448 175"/>
+<path id="poi-access-22-25" d="M 1282 432 L 1253 312 L 1262 261 L 1172 233 L 1088 361 L 1103 471"/>
+<path id="poi-access-26-27" d="M 924 571 L 895 496 L 829 478"/>
+<path id="poi-access-41" d="M 1254 695 L 1293 616"/>
+<path id="poi-access-42" d="M 1392 447 L 1394 554"/>
+<path id="poi-access-49" d="M 652 249 C 695 203 744 146 788 109"/></g><g fill="none" stroke="#929992" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path id="north-street" d="M 143 60 L 1898 60 C 1907 61 1904 85 1905 108 L 1905 330 C 1904 405 1883 476 1854 546 C 1812 650 1737 777 1645 907 L 1454 1199 C 1426 1238 1411 1267 1395 1280 L 991 1281"/></g></svg>

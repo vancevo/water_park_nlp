@@ -1,12 +1,6 @@
 import type { GeoPoint } from '@damsen/shared-types';
 import { geoDistanceMeters } from './route-simulation';
 
-/**
- * Places that narrate on their own when the visitor walks up to them, by fixed
- * map number (see poi-number.ts): 25 Đu quay đứng, 26 Xe điện đụng thế hệ mới.
- */
-export const AUTO_GUIDE_POI_NUMBERS: readonly number[] = [25, 26];
-
 export const AUTO_GUIDE_DEFAULTS = {
   /** Start narrating inside this distance… */
   enterMeters: 50,
@@ -46,6 +40,26 @@ export interface GuideResult {
   triggered: GuideTarget | null;
   /** Fix too inaccurate to trigger or release anything. */
   inaccurate: boolean;
+}
+
+/** Select the closest targets inside the narration radius for compact UI. */
+export function nearestTargetsWithinRadius<T extends { id: string }>(
+  targets: readonly T[],
+  distances: Readonly<Record<string, number>>,
+  radiusMeters = AUTO_GUIDE_DEFAULTS.enterMeters,
+  limit = 2,
+): T[] {
+  return targets
+    .filter(
+      (target) =>
+        (distances[target.id] ?? Number.POSITIVE_INFINITY) <= radiusMeters,
+    )
+    .sort(
+      (left, right) =>
+        (distances[left.id] ?? Number.POSITIVE_INFINITY) -
+        (distances[right.id] ?? Number.POSITIVE_INFINITY),
+    )
+    .slice(0, Math.max(0, limit));
 }
 
 /**

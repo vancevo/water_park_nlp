@@ -37,11 +37,16 @@ import {
   type UiText,
 } from '@/lib/ui-text';
 import {
+  closestPointOnWalkways,
   geoDistanceMeters,
+  movePointOnWalkways,
   routeLengthMeters,
   routeProgressAt,
   simulationDistanceAtTime,
+  walkwayLinesFromGeoJson,
+  type CardinalDirection,
   type RouteProgress,
+  type WalkwayLines,
 } from '@/lib/route-simulation';
 import {
   pickSpeechVoice,
@@ -53,12 +58,11 @@ import {
   readVisitorSession,
   saveVisitorSession,
 } from '@/lib/session';
-import { formatPoiNumber, poiNumber, sortByPoiNumber } from '@/lib/poi-number';
+import { formatPoiNumber, sortByPoiNumber } from '@/lib/poi-number';
 import {
-  AUTO_GUIDE_DEFAULTS,
-  AUTO_GUIDE_POI_NUMBERS,
   EMPTY_GUIDE_STATE,
   evaluateAutoGuide,
+  nearestTargetsWithinRadius,
   type GuideFix,
   type GuideState,
 } from '@/lib/proximity-guide';
@@ -71,6 +75,8 @@ function cameraPadding() {
 }
 
 const FALLBACK_CENTER: [number, number] = [106.63864, 10.76443];
+const CONTROLLER_STEP_METERS = 5;
+const GAMEPAD_REPEAT_MS = 120;
 type MapKind = 'old' | 'new';
 const MAP_TILE_URL = process.env.NEXT_PUBLIC_MAP_TILE_URL;
 const MAP_TILE_ATTRIBUTION =
@@ -236,6 +242,7 @@ interface GuideReading {
   distances: Record<string, number>;
   inaccurate: boolean;
   accuracyMeters: number;
+  narratingId: string | null;
 }
 
 export function VisitorExperience() {
@@ -245,6 +252,7 @@ export function VisitorExperience() {
   const markersRef = useRef<Marker[]>([]);
   const userMarkerRef = useRef<Marker | null>(null);
   const simulationMarkerRef = useRef<Marker | null>(null);
+  const walkwaysRef = useRef<WalkwayLines>([]);
   const animationFrameRef = useRef<number | null>(null);
   const narrationSpeakerRef = useRef<() => void>(() => {});
   const narrationAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -270,6 +278,7 @@ export function VisitorExperience() {
   const [guideReading, setGuideReading] = useState<GuideReading | null>(null);
   const [autoPlayPoiId, setAutoPlayPoiId] = useState<string | null>(null);
   const guideStateRef = useRef<GuideState>(EMPTY_GUIDE_STATE);
+  const simulationEnabledGuideRef = useRef(false);
   const [selected, setSelected] = useState<PoiSummary | null>(null);
   // Attractions inside big places (children's area, ...); `activeChild` is the one tapped.
   const [subPlaces, setSubPlaces] = useState<SubPlaces>({});
@@ -330,6 +339,110 @@ export function VisitorExperience() {
       .forEach((audio) => audio.pause());
   }, []);
 
+  const enableAutoGuide = useCallback((fromSimulation = false) => {
+    // Prime playback from the controller gesture for browser autoplay policy.
+    const audio = narrationAudioRef.current ?? new Audio();
+    narrationAudioRef.current = audio;
+    audio.src = SILENT_WAV;
+    void audio.play().catch(() => {});
+    window.speechSynthesis?.speak(new SpeechSynthesisUtterance(''));
+    guideStateRef.current = EMPTY_GUIDE_STATE;
+    simulationEnabledGuideRef.current = fromSimulation;
+    setGuideDenied(false);
+    setAutoGuide(true);
+  }, []);
+
+  const moveSimulation = useCallback(
+    (direction: CardinalDirection) => {
+      if (walkwaysRef.current.length === 0) {
+        setMessage(t.controllerPathsLoading);
+        return;
+      }
+      if (!autoGuide) enableAutoGuide(true);
+      cancelSimulationAnimation();
+      setIsPickingSimulation(false);
+      setRoute(null);
+      setSimulationDistanceMeters(0);
+      setArrivalOpen(false);
+      setMessage(t.manualControlActive);
+      setSimulationPosition((current) => {
+        if (!current) return current;
+        const next = movePointOnWalkways(
+          current,
+          direction,
+          CONTROLLER_STEP_METERS,
+          walkwaysRef.current,
+        );
+        simulationMarkerRef.current?.setLngLat([next.longitude, next.latitude]);
+        return next;
+      });
+    },
+    [
+      cancelSimulationAnimation,
+      autoGuide,
+      enableAutoGuide,
+      t.controllerPathsLoading,
+      t.manualControlActive,
+    ],
+  );
+
+  useEffect(() => {
+    if (!simulationPosition) return;
+    const directions: Partial<Record<string, CardinalDirection>> = {
+      ArrowUp: 'north',
+      KeyW: 'north',
+      ArrowRight: 'east',
+      KeyD: 'east',
+      ArrowDown: 'south',
+      KeyS: 'south',
+      ArrowLeft: 'west',
+      KeyA: 'west',
+    };
+    const onControllerKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (
+        target?.isContentEditable ||
+        target?.matches('input, textarea, select')
+      )
+        return;
+      const direction = directions[event.code];
+      if (!direction) return;
+      event.preventDefault();
+      moveSimulation(direction);
+    };
+    window.addEventListener('keydown', onControllerKey);
+    return () => window.removeEventListener('keydown', onControllerKey);
+  }, [moveSimulation, simulationPosition]);
+
+  useEffect(() => {
+    if (!simulationPosition || !navigator.getGamepads) return;
+    let frame = 0;
+    let lastMoveAt = -GAMEPAD_REPEAT_MS;
+    const pollGamepad = (now: number) => {
+      const gamepad = Array.from(navigator.getGamepads()).find(Boolean);
+      if (gamepad && now - lastMoveAt >= GAMEPAD_REPEAT_MS) {
+        const horizontal = gamepad.axes[0] ?? 0;
+        const vertical = gamepad.axes[1] ?? 0;
+        let direction: CardinalDirection | null = null;
+        if (gamepad.buttons[12]?.pressed || vertical < -0.55)
+          direction = 'north';
+        else if (gamepad.buttons[13]?.pressed || vertical > 0.55)
+          direction = 'south';
+        else if (gamepad.buttons[14]?.pressed || horizontal < -0.55)
+          direction = 'west';
+        else if (gamepad.buttons[15]?.pressed || horizontal > 0.55)
+          direction = 'east';
+        if (direction) {
+          moveSimulation(direction);
+          lastMoveAt = now;
+        }
+      }
+      frame = window.requestAnimationFrame(pollGamepad);
+    };
+    frame = window.requestAnimationFrame(pollGamepad);
+    return () => window.cancelAnimationFrame(frame);
+  }, [moveSimulation, simulationPosition]);
+
   const openPoi = useCallback(
     (poi: PoiSummary) => {
       cancelSimulationAnimation();
@@ -352,6 +465,25 @@ export function VisitorExperience() {
   );
 
   useEffect(() => setSession(readVisitorSession()), []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch('/data/damsen-walkways.geojson', {
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json() as Promise<unknown>;
+      })
+      .then((geoJson) => {
+        walkwaysRef.current = walkwayLinesFromGeoJson(geoJson);
+      })
+      .catch((error: unknown) => {
+        if (!(error instanceof DOMException && error.name === 'AbortError'))
+          walkwaysRef.current = [];
+      });
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     setSpeechSupported(
@@ -522,11 +654,17 @@ export function VisitorExperience() {
     const canvas = map.getCanvas();
     canvas.classList.add('placing-human');
     const placeHuman = (event: MapMouseEvent) => {
+      const snapped = closestPointOnWalkways(
+        { latitude: event.lngLat.lat, longitude: event.lngLat.lng },
+        walkwaysRef.current,
+      );
+      if (!snapped) {
+        setIsPickingSimulation(false);
+        setMessage(t.controllerPathsLoading);
+        return;
+      }
       cancelSimulationAnimation();
-      setSimulationPosition({
-        latitude: event.lngLat.lat,
-        longitude: event.lngLat.lng,
-      });
+      setSimulationPosition(snapped);
       setSimulationDistanceMeters(0);
       setRoute(null);
       setArrivalOpen(false);
@@ -538,7 +676,13 @@ export function VisitorExperience() {
       canvas.classList.remove('placing-human');
       map.off('click', placeHuman);
     };
-  }, [cancelSimulationAnimation, isPickingSimulation, mapReady]);
+  }, [
+    cancelSimulationAnimation,
+    isPickingSimulation,
+    mapReady,
+    t.controllerPathsLoading,
+    t.simulationPlaced,
+  ]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -865,20 +1009,14 @@ export function VisitorExperience() {
     narrationSpeakerRef.current = speakNarration;
   }, [speakNarration]);
 
-  // The places that narrate by themselves, from the full list (not the search).
+  // All public places can narrate by themselves (independent of search results).
   useEffect(() => {
     let cancelled = false;
     void visitorApi
       .listPois({ locale: contentLocale(locale) })
       .then((response) => {
         if (cancelled) return;
-        setAutoTargets(
-          sortByPoiNumber(
-            response.items.filter((poi) =>
-              AUTO_GUIDE_POI_NUMBERS.includes(poiNumber(poi.slug) ?? -1),
-            ),
-          ),
-        );
+        setAutoTargets(sortByPoiNumber(response.items));
       })
       .catch(() => {});
     return () => {
@@ -888,7 +1026,7 @@ export function VisitorExperience() {
 
   // Live GPS only while the visitor has opted in.
   useEffect(() => {
-    if (!autoGuide) return;
+    if (!autoGuide || simulationPosition) return;
     if (!navigator.geolocation) {
       setGuideDenied(true);
       return;
@@ -911,7 +1049,7 @@ export function VisitorExperience() {
       { enableHighAccuracy: true, maximumAge: 2000, timeout: 20000 },
     );
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [autoGuide]);
+  }, [autoGuide, simulationPosition]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -954,13 +1092,18 @@ export function VisitorExperience() {
       guideFix,
       autoTargets.map((poi) => ({ id: poi.id, location: poi.location })),
       Date.now(),
+      // A simulated visitor should be able to demonstrate the same POI again
+      // immediately after leaving its 70 m exit radius. Real GPS retains the
+      // default cooldown to avoid repeated playback during an actual visit.
+      simulationPosition ? { cooldownMs: 0 } : undefined,
     );
     guideStateRef.current = result.state;
-    setGuideReading({
+    setGuideReading((current) => ({
       distances: result.distances,
       inaccurate: result.inaccurate,
       accuracyMeters: guideFix.accuracyMeters,
-    });
+      narratingId: result.triggered?.id ?? current?.narratingId ?? null,
+    }));
     const arrived = autoTargets.find((poi) => poi.id === result.triggered?.id);
     if (!arrived) return;
     // A walked route already narrates on arrival; do not say it twice.
@@ -1001,6 +1144,7 @@ export function VisitorExperience() {
 
   function toggleAutoGuide() {
     if (autoGuide) {
+      simulationEnabledGuideRef.current = false;
       setAutoGuide(false);
       setGpsFix(null);
       setGuideReading(null);
@@ -1008,15 +1152,7 @@ export function VisitorExperience() {
       setAutoPlayPoiId(null);
       return;
     }
-    // This tap is the user gesture that lets the browser play audio later.
-    const audio = narrationAudioRef.current ?? new Audio();
-    narrationAudioRef.current = audio;
-    audio.src = SILENT_WAV;
-    void audio.play().catch(() => {});
-    window.speechSynthesis?.speak(new SpeechSynthesisUtterance(''));
-    guideStateRef.current = EMPTY_GUIDE_STATE;
-    setGuideDenied(false);
-    setAutoGuide(true);
+    enableAutoGuide(false);
   }
 
   function startAutomaticWalk(nextRoute: RouteResponse) {
@@ -1080,6 +1216,12 @@ export function VisitorExperience() {
     setRoute(null);
     setArrivalOpen(false);
     setMessage('');
+    if (simulationEnabledGuideRef.current) {
+      simulationEnabledGuideRef.current = false;
+      setAutoGuide(false);
+      setGuideReading(null);
+      setAutoPlayPoiId(null);
+    }
   }
 
   return (
@@ -1182,6 +1324,7 @@ export function VisitorExperience() {
             onReplay={() => {
               if (route) startAutomaticWalk(route);
             }}
+            onMove={moveSimulation}
           />
           <button
             className="locate-button"
@@ -1299,12 +1442,17 @@ function AutoGuidePanel({
   onToggle(): void;
 }) {
   if (targets.length === 0) return null;
+  const nearbyTargets =
+    enabled && reading && !reading.inaccurate
+      ? nearestTargetsWithinRadius(targets, reading.distances)
+      : [];
   let status = '';
   if (enabled) {
     if (denied && !hasFix) status = t.autoGuideDenied;
     else if (!hasFix || !reading) status = t.autoGuideWaiting;
     else if (reading.inaccurate)
       status = t.autoGuideInaccurate(Math.round(reading.accuracyMeters));
+    else if (nearbyTargets.length === 0) status = t.autoGuideNoNearby;
   }
   return (
     <section className="auto-guide" aria-label={t.autoGuideTitle}>
@@ -1320,29 +1468,24 @@ function AutoGuidePanel({
         </button>
       </div>
       {enabled ? null : <p>{t.autoGuideHint}</p>}
-      <ul>
-        {targets.map((poi) => {
-          const distance = reading?.distances[poi.id];
-          const near =
-            enabled &&
-            distance !== undefined &&
-            !reading?.inaccurate &&
-            distance <= AUTO_GUIDE_DEFAULTS.enterMeters;
-          return (
-            <li key={poi.id} className={near ? 'near' : ''}>
-              <span className="poi-index">{formatPoiNumber(poi.slug)}</span>
-              <span>{poi.name}</span>
-              <small>
-                {enabled && distance !== undefined
-                  ? near
-                    ? t.autoGuideNear
-                    : formatDistance(distance, locale)
-                  : ''}
-              </small>
-            </li>
-          );
-        })}
-      </ul>
+      {nearbyTargets.length > 0 ? (
+        <ul aria-live="polite">
+          {nearbyTargets.map((poi) => {
+            const distance = reading?.distances[poi.id];
+            return (
+              <li key={poi.id} className="near">
+                <span className="poi-index">{formatPoiNumber(poi.slug)}</span>
+                <span>{poi.name}</span>
+                <small>
+                  {reading?.narratingId === poi.id
+                    ? t.autoGuideNarrating
+                    : `${t.autoGuideNear} · ${formatDistance(distance, locale)}`}
+                </small>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
       {status ? <p role="status">{status}</p> : null}
     </section>
   );
@@ -1510,6 +1653,7 @@ function SimulationControls({
   onClear,
   onPick,
   onReplay,
+  onMove,
 }: {
   t: UiText;
   locale: UiLocale;
@@ -1522,6 +1666,7 @@ function SimulationControls({
   onClear(): void;
   onPick(): void;
   onReplay(): void;
+  onMove(direction: CardinalDirection): void;
 }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const progressPercent = progress?.totalMeters
@@ -1569,6 +1714,48 @@ function SimulationControls({
       </button>
       {position ? (
         <>
+          <div className="simulation-controller">
+            <div
+              className="controller-pad"
+              role="group"
+              aria-label={t.controllerLabel}
+            >
+              <button
+                className="controller-up"
+                type="button"
+                aria-label={t.moveNorth}
+                onClick={() => onMove('north')}
+              >
+                ↑
+              </button>
+              <button
+                className="controller-left"
+                type="button"
+                aria-label={t.moveWest}
+                onClick={() => onMove('west')}
+              >
+                ←
+              </button>
+              <span className="controller-center" aria-hidden="true" />
+              <button
+                className="controller-right"
+                type="button"
+                aria-label={t.moveEast}
+                onClick={() => onMove('east')}
+              >
+                →
+              </button>
+              <button
+                className="controller-down"
+                type="button"
+                aria-label={t.moveSouth}
+                onClick={() => onMove('south')}
+              >
+                ↓
+              </button>
+            </div>
+            <small>{t.controllerHint}</small>
+          </div>
           {route ? (
             <div className="simulation-progress" aria-label={t.progressLabel}>
               <span style={{ width: `${progressPercent}%` }} />
