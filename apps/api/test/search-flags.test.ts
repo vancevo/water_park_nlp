@@ -43,3 +43,27 @@ describe('loadSearchFlags', () => {
     ).toBe(false);
   });
 });
+
+describe('vector expansion flags (C06)', () => {
+  it('defaults to on with a 0.5 similarity floor and 3 additions', () => {
+    expect(loadSearchFlags({}).expand).toEqual({
+      enabled: true,
+      minSimilarity: 0.5,
+      limit: 3,
+    });
+  });
+
+  it('parses overrides and ignores out-of-range similarity', () => {
+    expect(
+      loadSearchFlags({
+        SEARCH_HYBRID_EXPAND: 'false',
+        SEARCH_HYBRID_MIN_SIMILARITY: '0.62',
+        SEARCH_HYBRID_EXPAND_LIMIT: '5',
+      }).expand,
+    ).toEqual({ enabled: false, minSimilarity: 0.62, limit: 5 });
+    expect(
+      loadSearchFlags({ SEARCH_HYBRID_MIN_SIMILARITY: '7' }).expand
+        ?.minSimilarity,
+    ).toBe(0.5);
+  });
+});

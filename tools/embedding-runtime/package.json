@@ -1,0 +1,13 @@
+{
+  "name": "damsen-embedding-runtime",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local, free embedding server (BAAI/bge-m3 via transformers.js) for the demo. Kept outside the npm workspaces so CI never downloads the ONNX runtime.",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "4.3.1"
+  }
+}

@@ -71,3 +71,18 @@ AI01).
 - CI does not run Piper (no engine/GPU); it verifies the adapter via a mocked
   runner. Synthesis and benchmarking happen on your machine.
 - WAV is the baseline output. Encoding to mp3/m4a for release is a later task.
+
+## Windows notes (demo, 2026-10-10)
+
+- Install Piper with pip in a venv: `python -m venv .demo\venv` then
+  `.demo\venv\Scripts\python -m pip install piper-tts==1.8.0` (Windows wheel;
+  CLI accepts `--model`/`--output_file` and reads the text from stdin).
+- Point the worker at it without editing the manifest:
+  `TTS_PIPER_BINARY=<repo>\.demo\venv\Scripts\piper.exe`.
+- Set `PYTHONUTF8=1` (and `PYTHONIOENCODING=utf-8`) for the worker: otherwise
+  Python reads piped stdin in the ANSI code page and Vietnamese diacritics are
+  garbled before synthesis.
+- Child processes are spawned with `windowsHide` and without `detached` on
+  Windows (no console window per synthesis).
+- `node scripts/demo/demo.mjs setup` does all of this and verifies each voice's
+  sha256 against `config/tts-voices.json`.

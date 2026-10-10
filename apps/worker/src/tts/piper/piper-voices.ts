@@ -135,8 +135,17 @@ export function loadPiperVoiceManifest(
   } catch {
     throw new PiperVoiceManifestError(`"${path}" is not valid JSON`);
   }
-  return parsePiperVoiceManifest(parsed);
+  const manifest = parsePiperVoiceManifest(parsed);
+  // Machine-specific Piper location (e.g. a venv's piper.exe on Windows)
+  // without editing the committed manifest.
+  const binaryOverride = env[PIPER_BINARY_ENV]?.trim();
+  return binaryOverride
+    ? { ...manifest, binaryPath: binaryOverride }
+    : manifest;
 }
+
+/** Overrides the manifest `binaryPath` (absolute path to piper / piper.exe). */
+export const PIPER_BINARY_ENV = 'TTS_PIPER_BINARY';
 
 /** Registry built from the manifest voices (for enabled/license/locale lookup). */
 export function toTtsModelRegistry(
