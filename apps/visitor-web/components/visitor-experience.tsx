@@ -29,6 +29,7 @@ import {
   type UiText,
 } from '@/lib/ui-text';
 import {
+  geoDistanceMeters,
   routeLengthMeters,
   routeProgressAt,
   simulationDistanceAtTime,
@@ -44,6 +45,15 @@ import {
   readVisitorSession,
   saveVisitorSession,
 } from '@/lib/session';
+import { formatPoiNumber, poiNumber, sortByPoiNumber } from '@/lib/poi-number';
+import {
+  AUTO_GUIDE_DEFAULTS,
+  AUTO_GUIDE_POI_NUMBERS,
+  EMPTY_GUIDE_STATE,
+  evaluateAutoGuide,
+  type GuideFix,
+  type GuideState,
+} from '@/lib/proximity-guide';
 import { NarrationSection, useVisitorNarration } from './narration-section';
 
 const FALLBACK_CENTER: [number, number] = [106.63853, 10.76433];
@@ -203,6 +213,17 @@ const MAP_STYLE =
 
 type AuthMode = 'login' | 'register';
 
+/** ~8 ms of silence: played on the opt-in tap so later auto-play is allowed. */
+const SILENT_WAV =
+  'data:audio/wav;base64,UklGRmQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA';
+const SIMULATED_FIX_ACCURACY_METERS = 5;
+const GPS_MIN_MOVE_METERS = 15;
+interface GuideReading {
+  distances: Record<string, number>;
+  inaccurate: boolean;
+  accuracyMeters: number;
+}
+
 export function VisitorExperience() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapPanelRef = useRef<HTMLElement>(null);
@@ -223,6 +244,14 @@ export function VisitorExperience() {
     saveUiLocalePreference(next);
   }, []);
   const [pois, setPois] = useState<PoiSummary[]>([]);
+  // Auto narration near fixed places (lib/proximity-guide.ts)
+  const [autoGuide, setAutoGuide] = useState(false);
+  const [autoTargets, setAutoTargets] = useState<PoiSummary[]>([]);
+  const [gpsFix, setGpsFix] = useState<GuideFix | null>(null);
+  const [guideDenied, setGuideDenied] = useState(false);
+  const [guideReading, setGuideReading] = useState<GuideReading | null>(null);
+  const [autoPlayPoiId, setAutoPlayPoiId] = useState<string | null>(null);
+  const guideStateRef = useRef<GuideState>(EMPTY_GUIDE_STATE);
   const [selected, setSelected] = useState<PoiSummary | null>(null);
   const [detail, setDetail] = useState<PoiDetail | null>(null);
   const [route, setRoute] = useState<RouteResponse | null>(null);
@@ -333,7 +362,9 @@ export function VisitorExperience() {
             locale: contentLocale(locale),
             ...locationQuery,
           });
-      setPois(response.items);
+      // Numbers are fixed per place: distance only decorates the list, it
+      // never reorders or renumbers it. Search keeps its relevance order.
+      setPois(query.trim() ? response.items : sortByPoiNumber(response.items));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : t.loadPlacesFailed);
     } finally {
@@ -487,12 +518,12 @@ export function VisitorExperience() {
     void import('maplibre-gl').then((maplibregl) => {
       if (cancelled) return;
       markersRef.current.forEach((marker) => marker.remove());
-      markersRef.current = pois.map((poi, index) => {
+      markersRef.current = pois.map((poi) => {
         const element = document.createElement('button');
         element.className = `map-pin${selected?.id === poi.id ? ' selected' : ''}`;
         element.type = 'button';
         element.ariaLabel = poi.name;
-        element.innerHTML = `<span>${index + 1}</span>`;
+        element.innerHTML = `<span>${formatPoiNumber(poi.slug)}</span>`;
         element.addEventListener('click', () => openPoi(poi));
         return new maplibregl.Marker({ element })
           .setLngLat([poi.location.longitude, poi.location.latitude])
@@ -727,6 +758,160 @@ export function VisitorExperience() {
     narrationSpeakerRef.current = speakNarration;
   }, [speakNarration]);
 
+  // The places that narrate by themselves, from the full list (not the search).
+  useEffect(() => {
+    let cancelled = false;
+    void visitorApi
+      .listPois({ locale: contentLocale(locale) })
+      .then((response) => {
+        if (cancelled) return;
+        setAutoTargets(
+          sortByPoiNumber(
+            response.items.filter((poi) =>
+              AUTO_GUIDE_POI_NUMBERS.includes(poiNumber(poi.slug) ?? -1),
+            ),
+          ),
+        );
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [locale]);
+
+  // Live GPS only while the visitor has opted in.
+  useEffect(() => {
+    if (!autoGuide) return;
+    if (!navigator.geolocation) {
+      setGuideDenied(true);
+      return;
+    }
+    const watchId = navigator.geolocation.watchPosition(
+      (result) => {
+        const point = {
+          latitude: result.coords.latitude,
+          longitude: result.coords.longitude,
+        };
+        setGuideDenied(false);
+        setGpsFix({ point, accuracyMeters: result.coords.accuracy });
+        setPosition((current) =>
+          current && geoDistanceMeters(current, point) < GPS_MIN_MOVE_METERS
+            ? current
+            : point,
+        );
+      },
+      () => setGuideDenied(true),
+      { enableHighAccuracy: true, maximumAge: 2000, timeout: 20000 },
+    );
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, [autoGuide]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!autoGuide || !map || !mapReady || !position || simulationPosition)
+      return;
+    let cancelled = false;
+    void import('maplibre-gl').then((maplibregl) => {
+      if (cancelled) return;
+      if (userMarkerRef.current) {
+        userMarkerRef.current.setLngLat([
+          position.longitude,
+          position.latitude,
+        ]);
+        return;
+      }
+      const element = document.createElement('div');
+      element.className = 'user-location';
+      userMarkerRef.current = new maplibregl.Marker({ element })
+        .setLngLat([position.longitude, position.latitude])
+        .addTo(map);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [autoGuide, mapReady, position, simulationPosition]);
+
+  // Measure visitor → place distance on every fix and narrate on arrival.
+  // The simulated walker counts as a fix, so the flow is testable indoors.
+  const guideFix: GuideFix | null = simulationPosition
+    ? {
+        point: simulationPosition,
+        accuracyMeters: SIMULATED_FIX_ACCURACY_METERS,
+      }
+    : gpsFix;
+  useEffect(() => {
+    if (!autoGuide || !guideFix || autoTargets.length === 0 || isWalking)
+      return;
+    const result = evaluateAutoGuide(
+      guideStateRef.current,
+      guideFix,
+      autoTargets.map((poi) => ({ id: poi.id, location: poi.location })),
+      Date.now(),
+    );
+    guideStateRef.current = result.state;
+    setGuideReading({
+      distances: result.distances,
+      inaccurate: result.inaccurate,
+      accuracyMeters: guideFix.accuracyMeters,
+    });
+    const arrived = autoTargets.find((poi) => poi.id === result.triggered?.id);
+    if (!arrived) return;
+    // A walked route already narrates on arrival; do not say it twice.
+    if (arrivalOpen && selected?.id === arrived.id) return;
+    setMessage(t.autoGuideArrived(arrived.name));
+    setAutoPlayPoiId(arrived.id);
+    if (selected?.id !== arrived.id) openPoi(arrived);
+  }, [
+    arrivalOpen,
+    autoGuide,
+    autoTargets,
+    guideFix,
+    isWalking,
+    openPoi,
+    selected?.id,
+    t,
+  ]);
+
+  // Plays once the arrived place's narration (or its description) is loaded.
+  useEffect(() => {
+    if (!autoPlayPoiId || selected?.id !== autoPlayPoiId) return;
+    if (detail?.id !== autoPlayPoiId) return;
+    const loaded =
+      narrationStatus === 'missing' ||
+      narrationStatus === 'error' ||
+      (narrationStatus === 'ready' && narration?.poiId === autoPlayPoiId);
+    if (!loaded) return;
+    setAutoPlayPoiId(null);
+    speakNarration();
+  }, [
+    autoPlayPoiId,
+    detail?.id,
+    narration?.poiId,
+    narrationStatus,
+    selected?.id,
+    speakNarration,
+  ]);
+
+  function toggleAutoGuide() {
+    if (autoGuide) {
+      setAutoGuide(false);
+      setGpsFix(null);
+      setGuideReading(null);
+      setGuideDenied(false);
+      setAutoPlayPoiId(null);
+      return;
+    }
+    // This tap is the user gesture that lets the browser play audio later.
+    const audio = narrationAudioRef.current ?? new Audio();
+    narrationAudioRef.current = audio;
+    audio.src = SILENT_WAV;
+    void audio.play().catch(() => {});
+    window.speechSynthesis?.speak(new SpeechSynthesisUtterance(''));
+    guideStateRef.current = EMPTY_GUIDE_STATE;
+    setGuideDenied(false);
+    setAutoGuide(true);
+  }
+
   function startAutomaticWalk(nextRoute: RouteResponse) {
     cancelSimulationAnimation();
     stopPlayback();
@@ -823,6 +1008,16 @@ export function VisitorExperience() {
               aria-label={t.searchLabel}
             />
           </label>
+          <AutoGuidePanel
+            t={t}
+            locale={locale}
+            enabled={autoGuide}
+            denied={guideDenied}
+            hasFix={guideFix !== null}
+            reading={guideReading}
+            targets={autoTargets}
+            onToggle={toggleAutoGuide}
+          />
           <div className="list-heading">
             <strong>{query ? t.searchResults : t.placesHeading}</strong>
             <span>{t.placeCount(pois.length)}</span>
@@ -834,15 +1029,13 @@ export function VisitorExperience() {
             {!loading && pois.length === 0 ? (
               <div className="empty-state">{t.noPlaces}</div>
             ) : null}
-            {pois.map((poi, index) => (
+            {pois.map((poi) => (
               <button
                 className={`poi-card${selected?.id === poi.id ? ' active' : ''}`}
                 key={poi.id}
                 onClick={() => openPoi(poi)}
               >
-                <span className="poi-index">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
+                <span className="poi-index">{formatPoiNumber(poi.slug)}</span>
                 <span className="poi-copy">
                   <strong>{poi.name}</strong>
                   <small>
@@ -973,6 +1166,75 @@ export function VisitorExperience() {
         />
       ) : null}
     </main>
+  );
+}
+
+function AutoGuidePanel({
+  t,
+  locale,
+  enabled,
+  denied,
+  hasFix,
+  reading,
+  targets,
+  onToggle,
+}: {
+  t: UiText;
+  locale: UiLocale;
+  enabled: boolean;
+  denied: boolean;
+  hasFix: boolean;
+  reading: GuideReading | null;
+  targets: PoiSummary[];
+  onToggle(): void;
+}) {
+  if (targets.length === 0) return null;
+  let status = '';
+  if (enabled) {
+    if (denied && !hasFix) status = t.autoGuideDenied;
+    else if (!hasFix || !reading) status = t.autoGuideWaiting;
+    else if (reading.inaccurate)
+      status = t.autoGuideInaccurate(Math.round(reading.accuracyMeters));
+  }
+  return (
+    <section className="auto-guide" aria-label={t.autoGuideTitle}>
+      <div className="auto-guide-head">
+        <strong>{t.autoGuideTitle}</strong>
+        <button
+          type="button"
+          className={`auto-guide-toggle${enabled ? ' on' : ''}`}
+          aria-pressed={enabled}
+          onClick={onToggle}
+        >
+          {enabled ? t.autoGuideDisable : t.autoGuideEnable}
+        </button>
+      </div>
+      {enabled ? null : <p>{t.autoGuideHint}</p>}
+      <ul>
+        {targets.map((poi) => {
+          const distance = reading?.distances[poi.id];
+          const near =
+            enabled &&
+            distance !== undefined &&
+            !reading?.inaccurate &&
+            distance <= AUTO_GUIDE_DEFAULTS.enterMeters;
+          return (
+            <li key={poi.id} className={near ? 'near' : ''}>
+              <span className="poi-index">{formatPoiNumber(poi.slug)}</span>
+              <span>{poi.name}</span>
+              <small>
+                {enabled && distance !== undefined
+                  ? near
+                    ? t.autoGuideNear
+                    : formatDistance(distance, locale)
+                  : ''}
+              </small>
+            </li>
+          );
+        })}
+      </ul>
+      {status ? <p role="status">{status}</p> : null}
+    </section>
   );
 }
 

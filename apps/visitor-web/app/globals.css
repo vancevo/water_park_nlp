@@ -1062,3 +1062,64 @@ audio:focus-visible {
   color: white;
   background: var(--green);
 }
+
+.auto-guide {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  margin: 0 0 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+}
+
+.auto-guide p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted, inherit);
+}
+
+.auto-guide-head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auto-guide-toggle {
+  padding: 7px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+}
+
+.auto-guide-toggle.on {
+  color: #fff;
+  background: var(--gold);
+}
+
+.auto-guide ul {
+  display: grid;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.auto-guide li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.auto-guide li small {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.auto-guide li.near small {
+  font-weight: 700;
+  color: var(--gold);
+}

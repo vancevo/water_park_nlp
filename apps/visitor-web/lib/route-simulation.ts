@@ -28,6 +28,14 @@ function distanceMeters(
   );
 }
 
+/** Haversine distance between two WGS84 points, in metres. */
+export function geoDistanceMeters(from: GeoPoint, to: GeoPoint): number {
+  return distanceMeters(
+    [from.longitude, from.latitude],
+    [to.longitude, to.latitude],
+  );
+}
+
 export function routeLengthMeters(
   coordinates: GeoJsonLineString['coordinates'],
 ): number {

@@ -83,6 +83,16 @@ export interface UiText {
 
   // Narration playback
   autoplayBlocked: string;
+  // Auto narration near a place
+  autoGuideTitle: string;
+  autoGuideHint: string;
+  autoGuideEnable: string;
+  autoGuideDisable: string;
+  autoGuideWaiting: string;
+  autoGuideNear: string;
+  autoGuideInaccurate(meters: number): string;
+  autoGuideDenied: string;
+  autoGuideArrived(name: string): string;
   speechUnsupported: string;
   noNarrationToPlay: string;
   noVoice(language: string): string;
@@ -185,6 +195,18 @@ const vi: UiText = {
   clearSimulation: 'Xóa mô phỏng',
 
   autoplayBlocked: 'Trình duyệt chặn tự phát audio. Hãy bấm nút phát.',
+  autoGuideTitle: 'Tự động thuyết minh',
+  autoGuideHint:
+    'Bật để hệ thống tự phát thuyết minh khi bạn lại gần các điểm dưới đây, không cần bấm. Cần cho phép định vị.',
+  autoGuideEnable: 'Bật tự động',
+  autoGuideDisable: 'Tắt tự động',
+  autoGuideWaiting: 'Đang chờ vị trí của bạn…',
+  autoGuideNear: 'Bạn đang ở gần',
+  autoGuideInaccurate: (meters) =>
+    `Tín hiệu GPS yếu (±${meters} m), đang chờ tín hiệu tốt hơn.`,
+  autoGuideDenied:
+    'Không lấy được vị trí. Hãy cho phép định vị (điện thoại cần HTTPS).',
+  autoGuideArrived: (name) => `Bạn đang ở gần ${name} — đang phát thuyết minh.`,
   speechUnsupported: 'Trình duyệt này không hỗ trợ Web Speech TTS.',
   noNarrationToPlay: 'Chưa có nội dung thuyết minh để phát.',
   noVoice: (language) =>
@@ -307,6 +329,18 @@ const en: UiText = {
   clearSimulation: 'Clear simulation',
 
   autoplayBlocked: 'The browser blocked autoplay. Press play.',
+  autoGuideTitle: 'Auto narration',
+  autoGuideHint:
+    'Turn on to hear the narration automatically when you walk up to the places below, no tap needed. Location access is required.',
+  autoGuideEnable: 'Turn on',
+  autoGuideDisable: 'Turn off',
+  autoGuideWaiting: 'Waiting for your location…',
+  autoGuideNear: 'You are close',
+  autoGuideInaccurate: (meters) =>
+    `Weak GPS signal (±${meters} m), waiting for a better fix.`,
+  autoGuideDenied:
+    'Could not get your location. Allow location access (phones need HTTPS).',
+  autoGuideArrived: (name) => `You are near ${name} — playing the narration.`,
   speechUnsupported: 'This browser does not support Web Speech TTS.',
   noNarrationToPlay: 'There is no narration to play yet.',
   noVoice: (language) =>
@@ -430,6 +464,19 @@ const fr: UiText = {
 
   autoplayBlocked:
     'Le navigateur a bloqué la lecture automatique. Appuyez sur lecture.',
+  autoGuideTitle: 'Commentaire automatique',
+  autoGuideHint:
+    "Activez pour entendre le commentaire automatiquement en vous approchant des lieux ci-dessous, sans toucher l'écran. L'accès à la position est requis.",
+  autoGuideEnable: 'Activer',
+  autoGuideDisable: 'Désactiver',
+  autoGuideWaiting: 'En attente de votre position…',
+  autoGuideNear: 'Vous êtes tout près',
+  autoGuideInaccurate: (meters) =>
+    `Signal GPS faible (±${meters} m), en attente d'un meilleur signal.`,
+  autoGuideDenied:
+    'Position introuvable. Autorisez la localisation (HTTPS requis sur mobile).',
+  autoGuideArrived: (name) =>
+    `Vous êtes près de ${name} — lecture du commentaire.`,
   speechUnsupported: 'Ce navigateur ne prend pas en charge Web Speech TTS.',
   noNarrationToPlay: "Aucun commentaire à lire pour l'instant.",
   noVoice: (language) =>
