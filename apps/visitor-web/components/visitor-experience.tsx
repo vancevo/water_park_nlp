@@ -43,6 +43,7 @@ import {
 import {
   geoDistanceMeters,
   movePointOnWalkways,
+  screenDirectionBearing,
   routeLengthMeters,
   routeProgressAt,
   simulationDistanceAtTime,
@@ -263,6 +264,8 @@ const PANEL_STORAGE_KEY = 'damsen.visitor.panel.v1';
 /** Away from the app at least this long: coming back asks where to go next. */
 const AWAY_WELCOME_MS = 60_000;
 const CONTROLLER_STEP_METERS = 5;
+const CONTROLLER_GLIDE_MS = 150;
+const CONTROLLER_IDLE_MS = 260;
 const GAMEPAD_REPEAT_MS = 120;
 /** Where the feet are in the 58x122 walker sprite (x 66 %, y 79 %), as a marker offset. */
 const WALKER_FEET_OFFSET: [number, number] = [-38, -96];
@@ -1609,7 +1612,50 @@ export function VisitorExperience() {
     controllerStartedGuideRef.current = false;
   }
 
-  /** One controller step (button, arrow/WASD key or gamepad): the walker moves along the walkways. */
+  // The walker glides from one controller step to the next and "walks" (sprite animation) while it
+  // moves; the key repeat of a held key keeps it walking, and it stands still shortly after.
+  const glideRef = useRef<{ frame: number | null; idle: number | null }>({
+    frame: null,
+    idle: null,
+  });
+
+  function glideWalker(from: GeoPoint, to: GeoPoint) {
+    const marker = simulationMarkerRef.current;
+    if (!marker) {
+      setSimulationPosition(to);
+      return;
+    }
+    const glide = glideRef.current;
+    if (glide.frame !== null) window.cancelAnimationFrame(glide.frame);
+    if (glide.idle !== null) window.clearTimeout(glide.idle);
+    const element = marker.getElement();
+    element.classList.add('is-walking');
+    const started = performance.now();
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - started) / CONTROLLER_GLIDE_MS);
+      marker.setLngLat([
+        from.longitude + (to.longitude - from.longitude) * progress,
+        from.latitude + (to.latitude - from.latitude) * progress,
+      ]);
+      if (progress < 1) {
+        glide.frame = window.requestAnimationFrame(tick);
+        return;
+      }
+      glide.frame = null;
+      setSimulationPosition(to);
+      glide.idle = window.setTimeout(() => {
+        glide.idle = null;
+        element.classList.remove('is-walking');
+      }, CONTROLLER_IDLE_MS);
+    };
+    glide.frame = window.requestAnimationFrame(tick);
+  }
+
+  /**
+   * One controller step (button, arrow/WASD key or gamepad). The directions are the ones on SCREEN:
+   * the illustrated map is turned (gate 1 at the bottom), so "right" is not compass east. The
+   * walker follows the walkways, glides, walks, faces the way it goes and the map follows it.
+   */
   function moveSimulation(direction: CardinalDirection) {
     if (walkwaysRef.current.length === 0) {
       setMessage(t.controllerPathsLoading);
@@ -1631,19 +1677,38 @@ export function VisitorExperience() {
       ? { latitude: at.lat, longitude: at.lng }
       : simulationPosition;
     if (!current) return;
+    const map = mapRef.current;
+    const bearing = screenDirectionBearing(direction, map?.getBearing() ?? 0);
     const next = movePointOnWalkways(
       current,
-      direction,
+      bearing,
       CONTROLLER_STEP_METERS,
       walkwaysRef.current,
     );
-    simulationMarkerRef.current?.setLngLat([next.longitude, next.latitude]);
     if (direction === 'east' || direction === 'west') {
       simulationMarkerRef.current
         ?.getElement()
         .style.setProperty('--facing', direction === 'west' ? '-1' : '1');
     }
-    setSimulationPosition(next);
+    glideWalker(current, next);
+    // Keep the walker in view: pan when it nears the edge of the map.
+    if (map) {
+      const size = map.getContainer().getBoundingClientRect();
+      const spot = map.project([next.longitude, next.latitude]);
+      const margin = 0.2;
+      if (
+        spot.x < size.width * margin ||
+        spot.x > size.width * (1 - margin) ||
+        spot.y < size.height * margin ||
+        spot.y > size.height * (1 - margin)
+      ) {
+        map.easeTo({
+          center: [next.longitude, next.latitude],
+          duration: 400,
+          padding: cameraPadding(),
+        });
+      }
+    }
   }
   const moveSimulationRef = useRef(moveSimulation);
   moveSimulationRef.current = moveSimulation;
@@ -1925,6 +1990,10 @@ export function VisitorExperience() {
                         ? ''
                         : ` · ${formatDistance(poi.distanceMeters, locale)}`}
                     </small>
+                    {/* A search says why the place is listed (e.g. "there is an ATM next to it"). */}
+                    {query.trim() && poi.shortDescription ? (
+                      <span className="poi-why">{poi.shortDescription}</span>
+                    ) : null}
                   </span>
                   <span className="poi-arrow">→</span>
                 </button>

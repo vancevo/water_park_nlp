@@ -25,31 +25,52 @@ export interface RouteProgress {
 
 export type CardinalDirection = 'north' | 'east' | 'south' | 'west';
 export type WalkwayLines = GeoJsonLineString['coordinates'][];
+/** A cardinal direction, or a compass bearing in degrees (0 = north, 90 = east). */
+export type MoveDirection = CardinalDirection | number;
 
-/** Move a WGS84 point by a small cardinal distance for local simulation. */
+const CARDINAL_BEARING: Record<CardinalDirection, number> = {
+  north: 0,
+  east: 90,
+  south: 180,
+  west: 270,
+};
+
+/**
+ * The compass bearing of a controller direction as the visitor sees it on screen: "up" is where
+ * the top of the map points, "right" is 90° clockwise from it. A map turned by `mapBearing`
+ * (the illustrated map is turned ~267° so that gate 1 is at the bottom) has its top toward that
+ * bearing, so a key press must follow the screen, not the compass.
+ */
+export function screenDirectionBearing(
+  direction: CardinalDirection,
+  mapBearing: number,
+): number {
+  return (((mapBearing + CARDINAL_BEARING[direction]) % 360) + 360) % 360;
+}
+
+/** Move a WGS84 point by a small distance in a cardinal direction or a compass bearing. */
 export function movePointByMeters(
   point: GeoPoint,
-  direction: CardinalDirection,
+  direction: MoveDirection,
   meters: number,
 ): GeoPoint {
   const safeMeters = Math.max(0, meters);
+  const bearing =
+    typeof direction === 'number' ? direction : CARDINAL_BEARING[direction];
+  const radians = (bearing * Math.PI) / 180;
+  const northMeters = Math.cos(radians) * safeMeters;
+  const eastMeters = Math.sin(radians) * safeMeters;
   const latitudeRadians = (point.latitude * Math.PI) / 180;
-  const latitudeDelta = (safeMeters / EARTH_RADIUS_METERS) * (180 / Math.PI);
+  const latitudeDelta = (northMeters / EARTH_RADIUS_METERS) * (180 / Math.PI);
   const longitudeDelta =
-    (safeMeters /
+    (eastMeters /
       (EARTH_RADIUS_METERS * Math.max(Math.cos(latitudeRadians), 0.000001))) *
     (180 / Math.PI);
-
-  switch (direction) {
-    case 'north':
-      return { ...point, latitude: point.latitude + latitudeDelta };
-    case 'south':
-      return { ...point, latitude: point.latitude - latitudeDelta };
-    case 'east':
-      return { ...point, longitude: point.longitude + longitudeDelta };
-    case 'west':
-      return { ...point, longitude: point.longitude - longitudeDelta };
-  }
+  return {
+    ...point,
+    latitude: point.latitude + latitudeDelta,
+    longitude: point.longitude + longitudeDelta,
+  };
 }
 
 interface LocalPoint {
@@ -141,7 +162,7 @@ export function closestPointOnWalkways(
  */
 export function movePointOnWalkways(
   point: GeoPoint,
-  direction: CardinalDirection,
+  direction: MoveDirection,
   meters: number,
   walkways: WalkwayLines,
 ): GeoPoint {

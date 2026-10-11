@@ -1,0 +1,5291 @@
+{
+ "dataset_id": "damsen-park-queries-313",
+ "source": "dam-sen-query-keyword-poi.md (bộ truy vấn của người dùng, 10/10/2026)",
+ "note": "Mã POI của tài liệu đổi sang slug của hệ thống; 51–78 theo bảng đối chiếu trong tài liệu (53 Ẩm thực món ngon = svc-food-2 …). WC và ăn uống là tập ứng viên. 11.x về p11. Bến thuyền 2 (78) chưa có trong dữ liệu. Các dòng điều kiện/lọc không thể kiểm bằng từ khoá (STT 42, 208–211, 214, 215, 218, 219, 221, 241, 246) không đưa vào. STT 305 (ATM) đã có điểm: cây ATM gần Đu quay đứng. STT 306 (tủ gửi đồ) → khu cảm giác mạnh; 308 (vòi nước uống) → nhà ga/quán cà phê; 310–312 (xe lăn, trạm sạc, áo mưa) → nhà ga. 307 (thùng rác) và 309 (câu cá) vẫn chưa có dữ liệu.",
+ "rows": [
+  {
+   "n": 1,
+   "queries": [
+    "Tôi muốn đi về",
+    "muốn ra ngoài"
+   ],
+   "keywords": [
+    "đi về",
+    "ra ngoài",
+    "ra cổng",
+    "cổng ra",
+    "lối ra",
+    "exit"
+   ],
+   "relevant": [
+    "p01-cong-so-1-duong-lac-long-quan",
+    "p02-cong-so-1a-duong-hoa-binh",
+    "p16-cong-so-2-nha-hang-thuy-ta"
+   ],
+   "none": false
+  },
+  {
+   "n": 2,
+   "queries": [
+    "Cổng nào gần tôi nhất?"
+   ],
+   "keywords": [
+    "cổng gần nhất",
+    "thoát ra",
+    "về nhà"
+   ],
+   "relevant": [
+    "p01-cong-so-1-duong-lac-long-quan",
+    "p02-cong-so-1a-duong-hoa-binh",
+    "p16-cong-so-2-nha-hang-thuy-ta"
+   ],
+   "none": false
+  },
+  {
+   "n": 3,
+   "queries": [
+    "Chỉ tôi đường ra Lạc Long Quân"
+   ],
+   "keywords": [
+    "lạc long quân",
+    "lac long quan",
+    "cổng 1"
+   ],
+   "relevant": [
+    "p01-cong-so-1-duong-lac-long-quan"
+   ],
+   "none": false
+  },
+  {
+   "n": 4,
+   "queries": [
+    "Tôi muốn ra đường Hòa Bình"
+   ],
+   "keywords": [
+    "hòa bình",
+    "hoa binh",
+    "cổng hòa bình"
+   ],
+   "relevant": [
+    "p02-cong-so-1a-duong-hoa-binh",
+    "p16-cong-so-2-nha-hang-thuy-ta"
+   ],
+   "none": false
+  },
+  {
+   "n": 5,
+   "queries": [
+    "Tôi muốn ra cổng 1A"
+   ],
+   "keywords": [
+    "cổng 1a",
+    "cổng một a",
+    "gate 1a"
+   ],
+   "relevant": [
+    "p02-cong-so-1a-duong-hoa-binh"
+   ],
+   "none": false
+  },
+  {
+   "n": 6,
+   "queries": [
+    "Đi ra cổng phía Thủy Tạ"
+   ],
+   "keywords": [
+    "cổng thủy tạ",
+    "cổng số 2",
+    "cổng hai"
+   ],
+   "relevant": [
+    "p16-cong-so-2-nha-hang-thuy-ta"
+   ],
+   "none": false
+  },
+  {
+   "n": 7,
+   "queries": [
+    "Tôi cần mua vé",
+    "vé bán ở đâu?"
+   ],
+   "keywords": [
+    "mua vé",
+    "bán vé",
+    "quầy vé",
+    "ticket"
+   ],
+   "relevant": [
+    "p03-quay-ve-van-phong-cong-vien",
+    "p17-quay-ve"
+   ],
+   "none": false
+  },
+  {
+   "n": 8,
+   "queries": [
+    "Tôi muốn đổi vé",
+    "nâng hạng vé"
+   ],
+   "keywords": [
+    "đổi vé",
+    "nâng vé",
+    "vé trọn gói"
+   ],
+   "relevant": [
+    "p03-quay-ve-van-phong-cong-vien",
+    "p17-quay-ve"
+   ],
+   "none": false
+  },
+  {
+   "n": 9,
+   "queries": [
+    "Tôi cần hỏi văn phòng công viên"
+   ],
+   "keywords": [
+    "văn phòng",
+    "thông tin",
+    "hỏi nhân viên"
+   ],
+   "relevant": [
+    "p03-quay-ve-van-phong-cong-vien"
+   ],
+   "none": false
+  },
+  {
+   "n": 10,
+   "queries": [
+    "Tôi muốn đi sang Đầm Sen Nước"
+   ],
+   "keywords": [
+    "đầm sen nước",
+    "cổng liên thông",
+    "qua khu nước"
+   ],
+   "relevant": [
+    "new-cong-lien-thong"
+   ],
+   "none": false
+  },
+  {
+   "n": 11,
+   "queries": [
+    "Tôi đã đi khu nước, muốn quay lại khu khô"
+   ],
+   "keywords": [
+    "về đầm sen khô",
+    "quay lại khu khô",
+    "liên thông"
+   ],
+   "relevant": [
+    "new-cong-lien-thong"
+   ],
+   "none": false
+  },
+  {
+   "n": 12,
+   "queries": [
+    "Tôi hẹn bạn ở cổng chính"
+   ],
+   "keywords": [
+    "cổng chính",
+    "hẹn ở cổng",
+    "gặp ở cổng"
+   ],
+   "relevant": [
+    "p01-cong-so-1-duong-lac-long-quan",
+    "p02-cong-so-1a-duong-hoa-binh",
+    "p16-cong-so-2-nha-hang-thuy-ta"
+   ],
+   "none": false
+  },
+  {
+   "n": 13,
+   "queries": [
+    "Tôi muốn ra cổng gần bãi xe của mình"
+   ],
+   "keywords": [
+    "cổng gần bãi xe",
+    "về lấy xe"
+   ],
+   "relevant": [
+    "p01-cong-so-1-duong-lac-long-quan",
+    "p02-cong-so-1a-duong-hoa-binh",
+    "p16-cong-so-2-nha-hang-thuy-ta",
+    "svc-parking-1",
+    "svc-parking-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 14,
+   "queries": [
+    "Tôi muốn ra cổng nhưng ghé quầy vé trước"
+   ],
+   "keywords": [
+    "quầy vé rồi ra cổng",
+    "ghé vé trước về"
+   ],
+   "relevant": [
+    "p03-quay-ve-van-phong-cong-vien",
+    "p17-quay-ve",
+    "p01-cong-so-1-duong-lac-long-quan",
+    "p02-cong-so-1a-duong-hoa-binh",
+    "p16-cong-so-2-nha-hang-thuy-ta"
+   ],
+   "none": false
+  },
+  {
+   "n": 15,
+   "queries": [
+    "Tôi muốn đi vệ sinh",
+    "mắc tiểu rồi"
+   ],
+   "keywords": [
+    "vệ sinh",
+    "wc",
+    "toilet",
+    "nvs",
+    "mắc tiểu",
+    "đi tè"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 16,
+   "queries": [
+    "Tôi cần nhà vệ sinh gần nhất"
+   ],
+   "keywords": [
+    "wc gần nhất",
+    "vệ sinh gần tôi",
+    "toilet nearby"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 17,
+   "queries": [
+    "Tôi cần rửa tay"
+   ],
+   "keywords": [
+    "rửa tay",
+    "rửa mặt",
+    "bồn rửa"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 18,
+   "queries": [
+    "WC ở khu B đâu?"
+   ],
+   "keywords": [
+    "wc khu b",
+    "vệ sinh khu b"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 19,
+   "queries": [
+    "WC gần khu thiếu nhi"
+   ],
+   "keywords": [
+    "wc trẻ em",
+    "wc khu thiếu nhi",
+    "bé đi vệ sinh"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 20,
+   "queries": [
+    "WC gần Đu quay đứng"
+   ],
+   "keywords": [
+    "wc đu quay",
+    "vệ sinh cạnh đu quay"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 21,
+   "queries": [
+    "WC gần vườn thú"
+   ],
+   "keywords": [
+    "wc vườn thú",
+    "vệ sinh vườn chim"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 22,
+   "queries": [
+    "WC gần sân khấu Ngôi Sao"
+   ],
+   "keywords": [
+    "wc sân khấu ngôi sao",
+    "vệ sinh ngôi sao"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 23,
+   "queries": [
+    "WC gần cổng 1A"
+   ],
+   "keywords": [
+    "wc cổng 1a",
+    "wc quầy vé"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 24,
+   "queries": [
+    "WC gần cổng 2"
+   ],
+   "keywords": [
+    "wc cổng 2",
+    "vệ sinh thủy tạ"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 25,
+   "queries": [
+    "WC gần Băng đăng hoặc ga Monorail 2"
+   ],
+   "keywords": [
+    "wc băng đăng",
+    "wc ga 2"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 26,
+   "queries": [
+    "WC gần Nam Tú Thượng Uyển"
+   ],
+   "keywords": [
+    "wc vườn hoa",
+    "wc nam tú"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 27,
+   "queries": [
+    "WC gần Lâu đài kinh dị"
+   ],
+   "keywords": [
+    "wc lâu đài",
+    "wc nhà ma"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 28,
+   "queries": [
+    "WC gần nhà hàng Cầu Vồng"
+   ],
+   "keywords": [
+    "wc cầu vồng",
+    "wc nhà hàng cầu vồng"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 29,
+   "queries": [
+    "Tôi cần nhà vệ sinh đang mở"
+   ],
+   "keywords": [
+    "wc đang mở",
+    "toilet mở cửa"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 30,
+   "queries": [
+    "Tôi cần chỗ thay đồ"
+   ],
+   "keywords": [
+    "thay đồ",
+    "thay quần áo",
+    "tắm rửa"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 31,
+   "queries": [
+    "Nhà vệ sinh cho người khuyết tật ở đâu?"
+   ],
+   "keywords": [
+    "khuyết tật",
+    "xe lăn",
+    "wc accessible",
+    "nhà vệ sinh hỗ trợ"
+   ],
+   "relevant": [
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 32,
+   "queries": [
+    "Tôi đi xe lăn, cần WC gần nhất"
+   ],
+   "keywords": [
+    "xe lăn",
+    "wc gần nhất",
+    "khó di chuyển"
+   ],
+   "relevant": [
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 33,
+   "queries": [
+    "Tôi đi lại khó, cần WC ít bậc thang"
+   ],
+   "keywords": [
+    "ít bậc",
+    "không cầu thang",
+    "đi lại khó",
+    "wc"
+   ],
+   "relevant": [
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 34,
+   "queries": [
+    "WC có ký hiệu xe lăn gần Đu quay đứng"
+   ],
+   "keywords": [
+    "xe lăn đu quay",
+    "wc hỗ trợ đu quay"
+   ],
+   "relevant": [
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 35,
+   "queries": [
+    "WC hỗ trợ gần khu thiếu nhi"
+   ],
+   "keywords": [
+    "wc xe lăn trẻ em",
+    "wc khuyết tật thiếu nhi"
+   ],
+   "relevant": [
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 36,
+   "queries": [
+    "WC hỗ trợ gần cổng 2"
+   ],
+   "keywords": [
+    "wc khuyết tật cổng 2",
+    "wc xe lăn thủy tạ"
+   ],
+   "relevant": [
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 37,
+   "queries": [
+    "WC hỗ trợ ở phía khu B"
+   ],
+   "keywords": [
+    "wc hỗ trợ khu b",
+    "xe lăn khu b"
+   ],
+   "relevant": [
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 38,
+   "queries": [
+    "Tôi đẩy xe em bé, cần WC tiện đi"
+   ],
+   "keywords": [
+    "xe đẩy em bé",
+    "wc xe đẩy",
+    "ít bậc"
+   ],
+   "relevant": [
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 39,
+   "queries": [
+    "Tôi cần thay tã cho em bé"
+   ],
+   "keywords": [
+    "thay tã",
+    "bàn thay tã",
+    "baby changing"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 40,
+   "queries": [
+    "Tôi cần chỗ cho bé bú"
+   ],
+   "keywords": [
+    "cho bé bú",
+    "phòng mẹ và bé",
+    "nursing room"
+   ],
+   "relevant": [
+    "p03-quay-ve-van-phong-cong-vien"
+   ],
+   "none": false
+  },
+  {
+   "n": 41,
+   "queries": [
+    "Tôi cần đi về bằng lối không có bậc"
+   ],
+   "keywords": [
+    "lối ra xe lăn",
+    "cổng không bậc",
+    "ra cổng xe đẩy"
+   ],
+   "relevant": [
+    "p01-cong-so-1-duong-lac-long-quan",
+    "p02-cong-so-1a-duong-hoa-binh",
+    "p16-cong-so-2-nha-hang-thuy-ta"
+   ],
+   "none": false
+  },
+  {
+   "n": 43,
+   "queries": [
+    "Tôi bị chóng mặt",
+    "cần sơ cứu"
+   ],
+   "keywords": [
+    "chóng mặt",
+    "sơ cứu",
+    "y tế",
+    "mệt trong người"
+   ],
+   "relevant": [
+    "svc-first-aid"
+   ],
+   "none": false
+  },
+  {
+   "n": 44,
+   "queries": [
+    "Tôi bị trầy chân",
+    "chảy máu"
+   ],
+   "keywords": [
+    "trầy chân",
+    "chảy máu",
+    "té ngã",
+    "băng bó"
+   ],
+   "relevant": [
+    "svc-first-aid"
+   ],
+   "none": false
+  },
+  {
+   "n": 45,
+   "queries": [
+    "Tôi bị đau bụng, cần y tế"
+   ],
+   "keywords": [
+    "đau bụng",
+    "y tế",
+    "khám",
+    "sơ cứu"
+   ],
+   "relevant": [
+    "svc-first-aid"
+   ],
+   "none": false
+  },
+  {
+   "n": 46,
+   "queries": [
+    "Tôi cần nhân viên bảo vệ"
+   ],
+   "keywords": [
+    "bảo vệ",
+    "an ninh",
+    "security"
+   ],
+   "relevant": [
+    "svc-security"
+   ],
+   "none": false
+  },
+  {
+   "n": 47,
+   "queries": [
+    "Tôi bị lạc con",
+    "không thấy người thân"
+   ],
+   "keywords": [
+    "lạc con",
+    "thất lạc người thân",
+    "tìm trẻ",
+    "người đi cùng"
+   ],
+   "relevant": [
+    "svc-security",
+    "p03-quay-ve-van-phong-cong-vien"
+   ],
+   "none": false
+  },
+  {
+   "n": 48,
+   "queries": [
+    "Tôi làm mất ví",
+    "điện thoại"
+   ],
+   "keywords": [
+    "mất ví",
+    "đồ thất lạc",
+    "mất điện thoại",
+    "lost and found"
+   ],
+   "relevant": [
+    "svc-security",
+    "p03-quay-ve-van-phong-cong-vien"
+   ],
+   "none": false
+  },
+  {
+   "n": 49,
+   "queries": [
+    "Tôi nhặt được đồ của người khác"
+   ],
+   "keywords": [
+    "nhặt được đồ",
+    "bàn giao đồ",
+    "đồ bỏ quên"
+   ],
+   "relevant": [
+    "svc-security",
+    "p03-quay-ve-van-phong-cong-vien"
+   ],
+   "none": false
+  },
+  {
+   "n": 50,
+   "queries": [
+    "Tôi muốn báo sự cố",
+    "có người gây rối"
+   ],
+   "keywords": [
+    "báo sự cố",
+    "gây rối",
+    "an ninh",
+    "đánh nhau"
+   ],
+   "relevant": [
+    "svc-security"
+   ],
+   "none": false
+  },
+  {
+   "n": 51,
+   "queries": [
+    "Tôi không biết mình đang ở đâu"
+   ],
+   "keywords": [
+    "lạc đường",
+    "không biết vị trí",
+    "nhờ chỉ đường"
+   ],
+   "relevant": [
+    "p03-quay-ve-van-phong-cong-vien",
+    "svc-security"
+   ],
+   "none": false
+  },
+  {
+   "n": 52,
+   "queries": [
+    "Tôi cần gặp nhân viên để hỏi"
+   ],
+   "keywords": [
+    "hỏi nhân viên",
+    "trợ giúp",
+    "quầy thông tin"
+   ],
+   "relevant": [
+    "p03-quay-ve-van-phong-cong-vien",
+    "p17-quay-ve"
+   ],
+   "none": false
+  },
+  {
+   "n": 53,
+   "queries": [
+    "Tôi muốn xin lại đồ bỏ quên trên trò chơi"
+   ],
+   "keywords": [
+    "quên đồ trên tàu",
+    "đồ bỏ quên trò chơi"
+   ],
+   "relevant": [
+    "svc-security",
+    "p03-quay-ve-van-phong-cong-vien"
+   ],
+   "none": false
+  },
+  {
+   "n": 54,
+   "queries": [
+    "Tôi vừa chơi cảm giác mạnh và thấy không khỏe"
+   ],
+   "keywords": [
+    "chơi xong mệt",
+    "buồn nôn sau trò chơi",
+    "sơ cứu"
+   ],
+   "relevant": [
+    "svc-first-aid"
+   ],
+   "none": false
+  },
+  {
+   "n": 55,
+   "queries": [
+    "Tôi muốn lấy xe",
+    "tìm bãi đậu xe"
+   ],
+   "keywords": [
+    "lấy xe",
+    "bãi đậu xe",
+    "bãi giữ xe",
+    "parking"
+   ],
+   "relevant": [
+    "svc-parking-1",
+    "svc-parking-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 56,
+   "queries": [
+    "Bãi xe nào gần tôi nhất?"
+   ],
+   "keywords": [
+    "bãi xe gần nhất",
+    "parking nearby"
+   ],
+   "relevant": [
+    "svc-parking-1",
+    "svc-parking-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 57,
+   "queries": [
+    "Bãi xe gần cổng 1A"
+   ],
+   "keywords": [
+    "bãi xe cổng 1a",
+    "bãi xe cổng 1"
+   ],
+   "relevant": [
+    "svc-parking-1",
+    "svc-parking-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 58,
+   "queries": [
+    "Bãi xe gần cổng 2"
+   ],
+   "keywords": [
+    "bãi xe thủy tạ",
+    "bãi xe cổng 2"
+   ],
+   "relevant": [
+    "svc-parking-1",
+    "svc-parking-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 59,
+   "queries": [
+    "Tôi gửi xe lúc vào cổng 1A, giờ muốn lấy xe"
+   ],
+   "keywords": [
+    "đã gửi xe cổng 1a",
+    "lấy xe cổng 1a"
+   ],
+   "relevant": [
+    "svc-parking-1",
+    "svc-parking-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 60,
+   "queries": [
+    "Tôi không nhớ mình đậu xe ở đâu"
+   ],
+   "keywords": [
+    "quên bãi xe",
+    "không nhớ chỗ xe"
+   ],
+   "relevant": [
+    "svc-parking-1",
+    "svc-parking-2",
+    "svc-security"
+   ],
+   "none": false
+  },
+  {
+   "n": 61,
+   "queries": [
+    "Tôi mỏi chân, muốn đi xe điện tham quan"
+   ],
+   "keywords": [
+    "xe điện tham quan",
+    "ngồi xe",
+    "mỏi chân",
+    "đỡ đi bộ"
+   ],
+   "relevant": [
+    "p05-tram-xe-trung-tam"
+   ],
+   "none": false
+  },
+  {
+   "n": 62,
+   "queries": [
+    "Tôi muốn đi tàu trên cao"
+   ],
+   "keywords": [
+    "tàu trên cao",
+    "monorail",
+    "tàu một ray"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 63,
+   "queries": [
+    "Ga Monorail nào gần tôi nhất?"
+   ],
+   "keywords": [
+    "ga gần nhất",
+    "trạm monorail",
+    "ga tàu điện"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 64,
+   "queries": [
+    "Tôi muốn đi tàu cổ tích"
+   ],
+   "keywords": [
+    "đoàn tàu cổ tích",
+    "tàu cổ tích"
+   ],
+   "relevant": [
+    "p05-tram-xe-trung-tam"
+   ],
+   "none": false
+  },
+  {
+   "n": 65,
+   "queries": [
+    "Tôi muốn chơi xe điện đụng"
+   ],
+   "keywords": [
+    "xe điện đụng",
+    "bumper car",
+    "xe đụng"
+   ],
+   "relevant": [
+    "p15-xe-dien-dung-dai-duong",
+    "p26-xe-dien-dung-the-he-moi"
+   ],
+   "none": false
+  },
+  {
+   "n": 66,
+   "queries": [
+    "Tôi muốn chơi xe điện đụng đại dương"
+   ],
+   "keywords": [
+    "xe đụng đại dương",
+    "đại dương xe điện"
+   ],
+   "relevant": [
+    "p15-xe-dien-dung-dai-duong"
+   ],
+   "none": false
+  },
+  {
+   "n": 67,
+   "queries": [
+    "Tôi muốn chơi xe điện đụng thế hệ mới"
+   ],
+   "keywords": [
+    "xe điện thế hệ mới",
+    "xe đụng mới"
+   ],
+   "relevant": [
+    "p26-xe-dien-dung-the-he-moi"
+   ],
+   "none": false
+  },
+  {
+   "n": 68,
+   "queries": [
+    "Tôi muốn đi thuyền",
+    "đạp vịt"
+   ],
+   "keywords": [
+    "đạp vịt",
+    "pedalo",
+    "đi thuyền",
+    "bến thuyền"
+   ],
+   "relevant": [
+    "p07-ben-thuyen"
+   ],
+   "none": false
+  },
+  {
+   "n": 69,
+   "queries": [
+    "Tôi muốn ngồi phương tiện ngắm công viên"
+   ],
+   "keywords": [
+    "ngắm công viên bằng xe",
+    "ngồi tàu ngắm cảnh"
+   ],
+   "relevant": [
+    "p05-tram-xe-trung-tam",
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 70,
+   "queries": [
+    "Tôi cần gửi xe ô tô",
+    "xe máy"
+   ],
+   "keywords": [
+    "gửi ô tô",
+    "gửi xe máy",
+    "bãi xe"
+   ],
+   "relevant": [
+    "svc-parking-1",
+    "svc-parking-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 71,
+   "queries": [
+    "Tôi đói rồi",
+    "muốn ăn gì đó"
+   ],
+   "keywords": [
+    "đói",
+    "ăn",
+    "ăn uống",
+    "quán ăn",
+    "food"
+   ],
+   "relevant": [
+    "svc-food-1",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-5",
+    "svc-food-6",
+    "svc-food-7",
+    "p39-nha-hang",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy",
+    "p12-nha-ga-monorail-1-nha-hang-de-men"
+   ],
+   "none": false
+  },
+  {
+   "n": 72,
+   "queries": [
+    "Tôi muốn tìm nhà hàng"
+   ],
+   "keywords": [
+    "nhà hàng",
+    "restaurant",
+    "ăn bữa chính"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 73,
+   "queries": [
+    "Nhà hàng nào gần tôi nhất?"
+   ],
+   "keywords": [
+    "nhà hàng gần nhất",
+    "quán ăn gần tôi"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 74,
+   "queries": [
+    "Tôi muốn ăn ở Thủy Tạ"
+   ],
+   "keywords": [
+    "thủy tạ",
+    "nhà hàng thủy tạ"
+   ],
+   "relevant": [
+    "svc-food-3"
+   ],
+   "none": false
+  },
+  {
+   "n": 75,
+   "queries": [
+    "Tôi muốn ăn ở Hương Sen"
+   ],
+   "keywords": [
+    "hương sen",
+    "nhà hàng hương sen"
+   ],
+   "relevant": [
+    "svc-food-4"
+   ],
+   "none": false
+  },
+  {
+   "n": 76,
+   "queries": [
+    "Tôi muốn ăn ở Cầu Vồng"
+   ],
+   "keywords": [
+    "cầu vồng",
+    "nhà hàng cầu vồng"
+   ],
+   "relevant": [
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 77,
+   "queries": [
+    "Tôi muốn tìm Ẩm thực món ngon"
+   ],
+   "keywords": [
+    "ẩm thực món ngon",
+    "am thuc mon ngon"
+   ],
+   "relevant": [
+    "svc-food-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 78,
+   "queries": [
+    "Chỗ ăn trong khu thiếu nhi"
+   ],
+   "keywords": [
+    "ăn khu thiếu nhi",
+    "quán ăn gần trẻ em"
+   ],
+   "relevant": [
+    "svc-food-5",
+    "p12-nha-ga-monorail-1-nha-hang-de-men"
+   ],
+   "none": false
+  },
+  {
+   "n": 79,
+   "queries": [
+    "Tôi muốn ăn gần sân khấu Ngôi Sao"
+   ],
+   "keywords": [
+    "ăn gần ngôi sao",
+    "đồ ăn sân khấu"
+   ],
+   "relevant": [
+    "svc-food-6"
+   ],
+   "none": false
+  },
+  {
+   "n": 80,
+   "queries": [
+    "Tôi muốn ăn gần khu B",
+    "gần vườn thú"
+   ],
+   "keywords": [
+    "ăn khu b",
+    "ăn gần vườn thú"
+   ],
+   "relevant": [
+    "svc-food-1",
+    "svc-food-4"
+   ],
+   "none": false
+  },
+  {
+   "n": 81,
+   "queries": [
+    "Tôi muốn vừa ăn vừa nhìn hồ"
+   ],
+   "keywords": [
+    "ăn view hồ",
+    "nhà hàng ven hồ",
+    "ăn ngắm nước"
+   ],
+   "relevant": [
+    "svc-food-3"
+   ],
+   "none": false
+  },
+  {
+   "n": 82,
+   "queries": [
+    "Tôi muốn ăn vặt"
+   ],
+   "keywords": [
+    "ăn vặt",
+    "snack",
+    "đồ ăn nhanh"
+   ],
+   "relevant": [
+    "svc-food-1",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-5",
+    "svc-food-6",
+    "svc-food-7",
+    "p39-nha-hang",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy",
+    "p12-nha-ga-monorail-1-nha-hang-de-men"
+   ],
+   "none": false
+  },
+  {
+   "n": 83,
+   "queries": [
+    "Tôi muốn mua kem"
+   ],
+   "keywords": [
+    "kem",
+    "ice cream",
+    "mua kem"
+   ],
+   "relevant": [
+    "svc-food-1",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-5",
+    "svc-food-6",
+    "svc-food-7",
+    "p39-nha-hang",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy",
+    "p12-nha-ga-monorail-1-nha-hang-de-men"
+   ],
+   "none": false
+  },
+  {
+   "n": 84,
+   "queries": [
+    "Tôi muốn tìm nước uống",
+    "đang khát"
+   ],
+   "keywords": [
+    "khát",
+    "nước uống",
+    "mua nước",
+    "giải khát"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1",
+    "svc-food-6",
+    "svc-food-7",
+    "svc-food-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 85,
+   "queries": [
+    "Tôi muốn ăn chay"
+   ],
+   "keywords": [
+    "ăn chay",
+    "món chay",
+    "vegetarian"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 86,
+   "queries": [
+    "Tôi cần chỗ ăn không có món hải sản"
+   ],
+   "keywords": [
+    "không hải sản",
+    "dị ứng hải sản",
+    "ăn uống"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 87,
+   "queries": [
+    "Tôi muốn ăn ở chỗ rẻ",
+    "vừa túi tiền"
+   ],
+   "keywords": [
+    "ăn rẻ",
+    "giá mềm",
+    "tiết kiệm",
+    "quán ăn"
+   ],
+   "relevant": [
+    "svc-food-1",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-5",
+    "svc-food-6",
+    "svc-food-7",
+    "p39-nha-hang",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy",
+    "p12-nha-ga-monorail-1-nha-hang-de-men"
+   ],
+   "none": false
+  },
+  {
+   "n": 88,
+   "queries": [
+    "Tôi đi đông người, cần nhà hàng cho cả nhóm"
+   ],
+   "keywords": [
+    "ăn nhóm",
+    "gia đình đông người",
+    "đoàn học sinh"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 89,
+   "queries": [
+    "Tôi muốn đi cà phê"
+   ],
+   "keywords": [
+    "cà phê",
+    "cafe",
+    "coffee",
+    "cf",
+    "quán nước"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy"
+   ],
+   "none": false
+  },
+  {
+   "n": 90,
+   "queries": [
+    "Quán cà phê nào gần tôi?"
+   ],
+   "keywords": [
+    "cf gần",
+    "quán nước gần nhất",
+    "cafe nearby"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy"
+   ],
+   "none": false
+  },
+  {
+   "n": 91,
+   "queries": [
+    "Tôi muốn ngồi nghỉ mát"
+   ],
+   "keywords": [
+    "nghỉ mát",
+    "nghỉ chân",
+    "ngồi nghỉ",
+    "chỗ mát"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "p39-nha-hang",
+    "new-cafe-windy",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 92,
+   "queries": [
+    "Tôi mệt chân nhưng không cần y tế"
+   ],
+   "keywords": [
+    "mỏi chân",
+    "ngồi một chút",
+    "nghỉ thôi"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "p39-nha-hang",
+    "new-cafe-windy",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 93,
+   "queries": [
+    "Tôi muốn uống cà phê Sài Gòn"
+   ],
+   "keywords": [
+    "cà phê sài gòn",
+    "saigon cafe"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon"
+   ],
+   "none": false
+  },
+  {
+   "n": 94,
+   "queries": [
+    "Tôi muốn đến cà phê Vườn Đá"
+   ],
+   "keywords": [
+    "vườn đá",
+    "vuon da",
+    "cafe vườn đá"
+   ],
+   "relevant": [
+    "p08-ca-phe-vuon-da-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 95,
+   "queries": [
+    "Tôi muốn đến cà phê Windy"
+   ],
+   "keywords": [
+    "windy",
+    "win dy",
+    "cf windy"
+   ],
+   "relevant": [
+    "new-cafe-windy"
+   ],
+   "none": false
+  },
+  {
+   "n": 96,
+   "queries": [
+    "Tôi muốn uống cà phê có view hồ"
+   ],
+   "keywords": [
+    "cafe view hồ",
+    "ngắm hồ uống cafe",
+    "cf nhìn hồ"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "new-cafe-windy"
+   ],
+   "none": false
+  },
+  {
+   "n": 97,
+   "queries": [
+    "Tôi muốn uống cà phê gần hồ"
+   ],
+   "keywords": [
+    "cafe gần hồ",
+    "cafe ven hồ"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "new-cafe-windy"
+   ],
+   "none": false
+  },
+  {
+   "n": 98,
+   "queries": [
+    "Tôi muốn uống cà phê nhiều cây xanh"
+   ],
+   "keywords": [
+    "cafe cây xanh",
+    "cafe sân vườn",
+    "quán mát"
+   ],
+   "relevant": [
+    "p08-ca-phe-vuon-da-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 99,
+   "queries": [
+    "Tôi muốn ngồi gần những tảng đá đẹp"
+   ],
+   "keywords": [
+    "cafe đá",
+    "quán có đá",
+    "cafe vườn đá"
+   ],
+   "relevant": [
+    "p08-ca-phe-vuon-da-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 100,
+   "queries": [
+    "Tôi muốn cà phê cạnh nhà hàng"
+   ],
+   "keywords": [
+    "cafe kế nhà hàng",
+    "cf cạnh quán ăn"
+   ],
+   "relevant": [
+    "new-cafe-windy",
+    "svc-food-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 101,
+   "queries": [
+    "Tôi muốn ăn rồi ngồi cà phê luôn"
+   ],
+   "keywords": [
+    "ăn rồi cafe",
+    "ăn uống cùng khu",
+    "nhà hàng gần cafe"
+   ],
+   "relevant": [
+    "svc-food-2",
+    "new-cafe-windy"
+   ],
+   "none": false
+  },
+  {
+   "n": 102,
+   "queries": [
+    "Tôi muốn ngồi nghỉ mà không mua đồ"
+   ],
+   "keywords": [
+    "ngồi miễn phí",
+    "không mua nước",
+    "ghế công viên"
+   ],
+   "relevant": [
+    "p19-quang-truong-la-ma",
+    "p34-vuon-xuong-rong",
+    "p35-vuon-nhat-ban",
+    "p37-quang-truong-vua-hung",
+    "p38-nam-tu-thuong-uyen",
+    "p40-quang-truong-au-lac",
+    "p43-cau-cuu-khuc"
+   ],
+   "none": false
+  },
+  {
+   "n": 103,
+   "queries": [
+    "Tôi muốn tránh nắng ở quán nước"
+   ],
+   "keywords": [
+    "tránh nắng",
+    "quán nước",
+    "ngồi mát"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "p39-nha-hang",
+    "new-cafe-windy",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 104,
+   "queries": [
+    "Tôi cần quán có máy lạnh"
+   ],
+   "keywords": [
+    "máy lạnh",
+    "điều hòa",
+    "quán mát trong nhà"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "p39-nha-hang",
+    "new-cafe-windy",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 105,
+   "queries": [
+    "Tôi muốn quán có chỗ sạc điện thoại"
+   ],
+   "keywords": [
+    "sạc điện thoại",
+    "ổ điện",
+    "cafe"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy"
+   ],
+   "none": false
+  },
+  {
+   "n": 106,
+   "queries": [
+    "Tôi muốn quán có Wi-Fi"
+   ],
+   "keywords": [
+    "wifi",
+    "wi fi",
+    "cafe làm việc"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy"
+   ],
+   "none": false
+  },
+  {
+   "n": 107,
+   "queries": [
+    "Tôi muốn uống trà sữa",
+    "nước trái cây"
+   ],
+   "keywords": [
+    "trà sữa",
+    "nước ép",
+    "nước trái cây"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy"
+   ],
+   "none": false
+  },
+  {
+   "n": 108,
+   "queries": [
+    "Tôi muốn quán cà phê yên tĩnh"
+   ],
+   "keywords": [
+    "yên tĩnh",
+    "ít ồn",
+    "cafe nghỉ ngơi"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy"
+   ],
+   "none": false
+  },
+  {
+   "n": 109,
+   "queries": [
+    "Tôi muốn ngắm cảnh trên cao"
+   ],
+   "keywords": [
+    "trên cao",
+    "ngắm toàn cảnh",
+    "view cao"
+   ],
+   "relevant": [
+    "p25-du-quay-dung",
+    "new-dao-than-tai"
+   ],
+   "none": false
+  },
+  {
+   "n": 110,
+   "queries": [
+    "Tôi muốn ngắm cảnh trên cao mà không quay nhanh"
+   ],
+   "keywords": [
+    "ngắm cao",
+    "quay chậm",
+    "không mạo hiểm"
+   ],
+   "relevant": [
+    "p25-du-quay-dung",
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2",
+    "new-dao-than-tai"
+   ],
+   "none": false
+  },
+  {
+   "n": 111,
+   "queries": [
+    "Tôi muốn ngắm cảnh khi ngồi tàu"
+   ],
+   "keywords": [
+    "tàu ngắm cảnh",
+    "monorail",
+    "ngắm từ trên tàu"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 112,
+   "queries": [
+    "Tôi muốn đến Đảo Thần Tài"
+   ],
+   "keywords": [
+    "đảo thần tài",
+    "dao than tai"
+   ],
+   "relevant": [
+    "new-dao-than-tai"
+   ],
+   "none": false
+  },
+  {
+   "n": 113,
+   "queries": [
+    "Tôi muốn đi dạo quanh hồ"
+   ],
+   "keywords": [
+    "quanh hồ",
+    "dạo hồ",
+    "ven hồ",
+    "đi bộ ngắm hồ"
+   ],
+   "relevant": [
+    "p07-ben-thuyen",
+    "p43-cau-cuu-khuc",
+    "svc-food-3"
+   ],
+   "none": false
+  },
+  {
+   "n": 114,
+   "queries": [
+    "Tôi muốn chụp hình đẹp"
+   ],
+   "keywords": [
+    "chụp ảnh",
+    "check in",
+    "sống ảo",
+    "photo spot"
+   ],
+   "relevant": [
+    "p19-quang-truong-la-ma",
+    "p25-du-quay-dung",
+    "p34-vuon-xuong-rong",
+    "p35-vuon-nhat-ban",
+    "p37-quang-truong-vua-hung",
+    "p38-nam-tu-thuong-uyen",
+    "p40-quang-truong-au-lac",
+    "p43-cau-cuu-khuc",
+    "p49-vuon-chim-thu-thien-nhien"
+   ],
+   "none": false
+  },
+  {
+   "n": 115,
+   "queries": [
+    "Tôi muốn chụp ảnh kiến trúc La Mã"
+   ],
+   "keywords": [
+    "la mã",
+    "roman",
+    "kiến trúc cổ",
+    "chụp quảng trường"
+   ],
+   "relevant": [
+    "p19-quang-truong-la-ma"
+   ],
+   "none": false
+  },
+  {
+   "n": 116,
+   "queries": [
+    "Tôi muốn chụp ảnh phong cách Nhật Bản"
+   ],
+   "keywords": [
+    "nhật bản",
+    "japanese",
+    "vườn nhật"
+   ],
+   "relevant": [
+    "p35-vuon-nhat-ban"
+   ],
+   "none": false
+  },
+  {
+   "n": 117,
+   "queries": [
+    "Tôi muốn chụp ảnh cùng hoa"
+   ],
+   "keywords": [
+    "hoa",
+    "vườn hoa",
+    "chụp hoa"
+   ],
+   "relevant": [
+    "p38-nam-tu-thuong-uyen"
+   ],
+   "none": false
+  },
+  {
+   "n": 118,
+   "queries": [
+    "Tôi muốn chụp ảnh với xương rồng"
+   ],
+   "keywords": [
+    "xương rồng",
+    "cactus",
+    "chụp cây"
+   ],
+   "relevant": [
+    "p34-vuon-xuong-rong"
+   ],
+   "none": false
+  },
+  {
+   "n": 119,
+   "queries": [
+    "Tôi muốn đi trên cây cầu giữa hồ"
+   ],
+   "keywords": [
+    "cầu giữa hồ",
+    "cầu ziczac",
+    "cửu khúc"
+   ],
+   "relevant": [
+    "p43-cau-cuu-khuc"
+   ],
+   "none": false
+  },
+  {
+   "n": 120,
+   "queries": [
+    "Tôi muốn ngắm cảnh hồ mà không đi thuyền"
+   ],
+   "keywords": [
+    "ngắm hồ",
+    "không đi thuyền",
+    "đứng trên cầu"
+   ],
+   "relevant": [
+    "p43-cau-cuu-khuc",
+    "svc-food-3"
+   ],
+   "none": false
+  },
+  {
+   "n": 121,
+   "queries": [
+    "Tôi muốn ngắm hồ trên thuyền"
+   ],
+   "keywords": [
+    "ngắm hồ",
+    "đi thuyền",
+    "đạp vịt"
+   ],
+   "relevant": [
+    "p07-ben-thuyen"
+   ],
+   "none": false
+  },
+  {
+   "n": 122,
+   "queries": [
+    "Tôi muốn chụp hình cả đoàn",
+    "có chỗ rộng"
+   ],
+   "keywords": [
+    "ảnh tập thể",
+    "chụp đoàn",
+    "quảng trường rộng"
+   ],
+   "relevant": [
+    "p19-quang-truong-la-ma",
+    "p37-quang-truong-vua-hung",
+    "p40-quang-truong-au-lac"
+   ],
+   "none": false
+  },
+  {
+   "n": 123,
+   "queries": [
+    "Tôi muốn cảnh đẹp ít đông người"
+   ],
+   "keywords": [
+    "ít người",
+    "ít đông",
+    "chụp ảnh yên tĩnh"
+   ],
+   "relevant": [
+    "p19-quang-truong-la-ma",
+    "p25-du-quay-dung",
+    "p34-vuon-xuong-rong",
+    "p35-vuon-nhat-ban",
+    "p37-quang-truong-vua-hung",
+    "p38-nam-tu-thuong-uyen",
+    "p40-quang-truong-au-lac",
+    "p43-cau-cuu-khuc",
+    "p49-vuon-chim-thu-thien-nhien"
+   ],
+   "none": false
+  },
+  {
+   "n": 124,
+   "queries": [
+    "Tôi muốn chơi cảm giác mạnh"
+   ],
+   "keywords": [
+    "cảm giác mạnh",
+    "mạo hiểm",
+    "thrill",
+    "chơi mạnh"
+   ],
+   "relevant": [
+    "p04-khu-tro-choi-cam-giac-manh",
+    "p21-power-surge",
+    "p22-vong-quay-than-toc",
+    "p23-tau-xoay-cao-toc",
+    "p24-vuot-thac",
+    "p32-dau-truong-bo-tot",
+    "p46-tau-luon-sieu-toc",
+    "p47-vong-xoay-khong-gian"
+   ],
+   "none": false
+  },
+  {
+   "n": 125,
+   "queries": [
+    "Tôi muốn tàu lượn siêu tốc"
+   ],
+   "keywords": [
+    "tàu lượn",
+    "roller coaster",
+    "rollercoaster"
+   ],
+   "relevant": [
+    "p46-tau-luon-sieu-toc"
+   ],
+   "none": false
+  },
+  {
+   "n": 126,
+   "queries": [
+    "Tôi muốn tàu xoay cao tốc"
+   ],
+   "keywords": [
+    "tàu xoay",
+    "spinning coaster",
+    "xoay cao tốc"
+   ],
+   "relevant": [
+    "p23-tau-xoay-cao-toc"
+   ],
+   "none": false
+  },
+  {
+   "n": 127,
+   "queries": [
+    "Tôi muốn chơi Power Surge"
+   ],
+   "keywords": [
+    "power surge",
+    "powersurge",
+    "quay nhiều hướng"
+   ],
+   "relevant": [
+    "p21-power-surge"
+   ],
+   "none": false
+  },
+  {
+   "n": 128,
+   "queries": [
+    "Tôi muốn chơi vượt thác"
+   ],
+   "keywords": [
+    "vượt thác",
+    "tàu vượt thác",
+    "water flume"
+   ],
+   "relevant": [
+    "p24-vuot-thac"
+   ],
+   "none": false
+  },
+  {
+   "n": 129,
+   "queries": [
+    "Tôi muốn chơi vòng quay thần tốc"
+   ],
+   "keywords": [
+    "thần tốc",
+    "vòng quay thần tốc",
+    "ghế bay"
+   ],
+   "relevant": [
+    "p22-vong-quay-than-toc"
+   ],
+   "none": false
+  },
+  {
+   "n": 130,
+   "queries": [
+    "Tôi muốn vòng xoay không gian"
+   ],
+   "keywords": [
+    "không gian",
+    "vòng xoay không gian"
+   ],
+   "relevant": [
+    "p47-vong-xoay-khong-gian"
+   ],
+   "none": false
+  },
+  {
+   "n": 131,
+   "queries": [
+    "Tôi muốn đấu bò tót"
+   ],
+   "keywords": [
+    "bò tót",
+    "đấu trường bò tót",
+    "bull"
+   ],
+   "relevant": [
+    "p32-dau-truong-bo-tot"
+   ],
+   "none": false
+  },
+  {
+   "n": 132,
+   "queries": [
+    "Tôi muốn chơi phượng hoàng bay"
+   ],
+   "keywords": [
+    "phượng hoàng bay",
+    "phoenix",
+    "thuyền đung đưa"
+   ],
+   "relevant": [
+    "p04-khu-tro-choi-cam-giac-manh"
+   ],
+   "none": false
+  },
+  {
+   "n": 133,
+   "queries": [
+    "Tôi muốn chơi cá chép nhào lộn"
+   ],
+   "keywords": [
+    "cá chép",
+    "nhào lộn",
+    "cá chép nhào lộn"
+   ],
+   "relevant": [
+    "p04-khu-tro-choi-cam-giac-manh"
+   ],
+   "none": false
+  },
+  {
+   "n": 134,
+   "queries": [
+    "Tôi muốn chơi xe bay ảo tưởng"
+   ],
+   "keywords": [
+    "xe bay",
+    "ảo tưởng",
+    "xe bay ảo tưởng"
+   ],
+   "relevant": [
+    "p04-khu-tro-choi-cam-giac-manh"
+   ],
+   "none": false
+  },
+  {
+   "n": 135,
+   "queries": [
+    "Tôi muốn chơi trò xoay nhiều",
+    "tốc độ nhanh"
+   ],
+   "keywords": [
+    "xoay nhiều",
+    "quay nhanh",
+    "tốc độ cao"
+   ],
+   "relevant": [
+    "p21-power-surge",
+    "p22-vong-quay-than-toc",
+    "p23-tau-xoay-cao-toc",
+    "p47-vong-xoay-khong-gian"
+   ],
+   "none": false
+  },
+  {
+   "n": 136,
+   "queries": [
+    "Tôi thích cảm giác lao xuống"
+   ],
+   "keywords": [
+    "lao xuống",
+    "rơi",
+    "xuống dốc",
+    "mạo hiểm"
+   ],
+   "relevant": [
+    "p24-vuot-thac",
+    "p46-tau-luon-sieu-toc"
+   ],
+   "none": false
+  },
+  {
+   "n": 137,
+   "queries": [
+    "Tôi muốn cảm giác mạnh ở khu B"
+   ],
+   "keywords": [
+    "mạo hiểm khu b",
+    "tàu lượn khu b"
+   ],
+   "relevant": [
+    "p46-tau-luon-sieu-toc",
+    "p47-vong-xoay-khong-gian"
+   ],
+   "none": false
+  },
+  {
+   "n": 138,
+   "queries": [
+    "Tôi muốn cảm giác mạnh gần cổng 1"
+   ],
+   "keywords": [
+    "mạnh gần cổng 1",
+    "cảm giác mạnh cổng chính"
+   ],
+   "relevant": [
+    "p04-khu-tro-choi-cam-giac-manh"
+   ],
+   "none": false
+  },
+  {
+   "n": 139,
+   "queries": [
+    "Tôi muốn cảm giác mạnh gần đu quay đứng"
+   ],
+   "keywords": [
+    "mạo hiểm gần đu quay",
+    "chơi quanh ferris"
+   ],
+   "relevant": [
+    "p21-power-surge",
+    "p22-vong-quay-than-toc",
+    "p23-tau-xoay-cao-toc",
+    "p24-vuot-thac"
+   ],
+   "none": false
+  },
+  {
+   "n": 140,
+   "queries": [
+    "Tôi muốn vào nhà ma",
+    "chơi kinh dị"
+   ],
+   "keywords": [
+    "nhà ma",
+    "kinh dị",
+    "hù dọa",
+    "haunted house"
+   ],
+   "relevant": [
+    "p45-lau-dai-kinh-di"
+   ],
+   "none": false
+  },
+  {
+   "n": 141,
+   "queries": [
+    "Tôi muốn chơi cảm giác mạnh nhưng không muốn bị ướt"
+   ],
+   "keywords": [
+    "cảm giác mạnh",
+    "không ướt",
+    "khô ráo"
+   ],
+   "relevant": [
+    "p04-khu-tro-choi-cam-giac-manh",
+    "p21-power-surge",
+    "p22-vong-quay-than-toc",
+    "p23-tau-xoay-cao-toc",
+    "p32-dau-truong-bo-tot",
+    "p46-tau-luon-sieu-toc",
+    "p47-vong-xoay-khong-gian"
+   ],
+   "none": false
+  },
+  {
+   "n": 142,
+   "queries": [
+    "Tôi muốn tìm trò cho trẻ em"
+   ],
+   "keywords": [
+    "trẻ em",
+    "thiếu nhi",
+    "cho bé",
+    "kids"
+   ],
+   "relevant": [
+    "p09-vong-luon-tuoi-tho",
+    "p11-khu-tro-choi-thieu-nhi",
+    "p13-kids-playground"
+   ],
+   "none": false
+  },
+  {
+   "n": 143,
+   "queries": [
+    "Tôi muốn đến khu trò chơi thiếu nhi"
+   ],
+   "keywords": [
+    "khu thiếu nhi",
+    "children zone",
+    "khu trẻ em"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false
+  },
+  {
+   "n": 144,
+   "queries": [
+    "Bé muốn chơi Kids playground"
+   ],
+   "keywords": [
+    "kids playground",
+    "playground",
+    "kids play"
+   ],
+   "relevant": [
+    "p13-kids-playground"
+   ],
+   "none": false
+  },
+  {
+   "n": 145,
+   "queries": [
+    "Bé muốn chơi vòng lượn tuổi thơ"
+   ],
+   "keywords": [
+    "vòng lượn tuổi thơ",
+    "tàu lượn cho bé"
+   ],
+   "relevant": [
+    "p09-vong-luon-tuoi-tho"
+   ],
+   "none": false
+  },
+  {
+   "n": 146,
+   "queries": [
+    "Bé muốn chơi thảm bay"
+   ],
+   "keywords": [
+    "thảm bay",
+    "thảm bay thiếu nhi"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false
+  },
+  {
+   "n": 147,
+   "queries": [
+    "Bé muốn chơi tháp xoay"
+   ],
+   "keywords": [
+    "tháp xoay",
+    "thap xoay"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false
+  },
+  {
+   "n": 148,
+   "queries": [
+    "Bé muốn chơi hải cẩu vượt thác"
+   ],
+   "keywords": [
+    "hải cẩu vượt thác",
+    "vượt thác cho bé"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false
+  },
+  {
+   "n": 149,
+   "queries": [
+    "Bé muốn chơi ếch nhảy"
+   ],
+   "keywords": [
+    "ếch nhảy",
+    "frog hop"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false
+  },
+  {
+   "n": 150,
+   "queries": [
+    "Bé muốn chơi xe lửa mini"
+   ],
+   "keywords": [
+    "xe lửa mini",
+    "tàu mini"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false
+  },
+  {
+   "n": 151,
+   "queries": [
+    "Bé muốn chơi khủng long bay"
+   ],
+   "keywords": [
+    "khủng long bay",
+    "dinosaur fly"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false
+  },
+  {
+   "n": 152,
+   "queries": [
+    "Bé muốn chơi siêu nhân Robot"
+   ],
+   "keywords": [
+    "siêu nhân",
+    "robot",
+    "siêu nhân robot"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false
+  },
+  {
+   "n": 153,
+   "queries": [
+    "Bé muốn massage cá"
+   ],
+   "keywords": [
+    "massage cá",
+    "cá rỉa chân"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false
+  },
+  {
+   "n": 154,
+   "queries": [
+    "Bé muốn chơi nhà hơi liên hoàn"
+   ],
+   "keywords": [
+    "nhà hơi",
+    "liên hoàn",
+    "nhún hơi"
+   ],
+   "relevant": [
+    "p04-khu-tro-choi-cam-giac-manh"
+   ],
+   "none": false
+  },
+  {
+   "n": 155,
+   "queries": [
+    "Tôi muốn hoạt động để cả nhà cùng đi"
+   ],
+   "keywords": [
+    "cả gia đình",
+    "cùng trẻ",
+    "gia đình"
+   ],
+   "relevant": [
+    "p07-ben-thuyen",
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p25-du-quay-dung",
+    "p31-nha-ga-monorail-2",
+    "p36-thuy-cung",
+    "p49-vuon-chim-thu-thien-nhien",
+    "p50-rap-xiec-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 156,
+   "queries": [
+    "Tôi muốn đưa bé xem cá"
+   ],
+   "keywords": [
+    "bé xem cá",
+    "trẻ em thủy cung"
+   ],
+   "relevant": [
+    "p36-thuy-cung"
+   ],
+   "none": false
+  },
+  {
+   "n": 157,
+   "queries": [
+    "Tôi muốn đưa bé xem thú"
+   ],
+   "keywords": [
+    "bé xem thú",
+    "cho trẻ đi vườn thú"
+   ],
+   "relevant": [
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co",
+    "p49-vuon-chim-thu-thien-nhien"
+   ],
+   "none": false
+  },
+  {
+   "n": 158,
+   "queries": [
+    "Tôi muốn đưa bé xem xiếc"
+   ],
+   "keywords": [
+    "bé xem xiếc",
+    "xiếc trẻ em"
+   ],
+   "relevant": [
+    "p50-rap-xiec-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 159,
+   "queries": [
+    "Bé cao 1m2 chơi được gì?"
+   ],
+   "keywords": [
+    "bé 1m2",
+    "cao 120cm",
+    "chiều cao trẻ em"
+   ],
+   "relevant": [
+    "p09-vong-luon-tuoi-tho",
+    "p11-khu-tro-choi-thieu-nhi",
+    "p13-kids-playground",
+    "p07-ben-thuyen",
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p15-xe-dien-dung-dai-duong",
+    "p25-du-quay-dung",
+    "p26-xe-dien-dung-the-he-moi",
+    "p31-nha-ga-monorail-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 160,
+   "queries": [
+    "Tôi muốn trẻ chơi, người lớn ngồi nghỉ gần đó"
+   ],
+   "keywords": [
+    "bé chơi",
+    "người lớn nghỉ",
+    "quán ăn gần playground"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi",
+    "p13-kids-playground",
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "svc-food-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 161,
+   "queries": [
+    "Tôi muốn trò nhẹ nhàng, không quay mạnh"
+   ],
+   "keywords": [
+    "nhẹ nhàng",
+    "không quay mạnh",
+    "thư giãn"
+   ],
+   "relevant": [
+    "p07-ben-thuyen",
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p25-du-quay-dung",
+    "p27-bang-dang",
+    "p31-nha-ga-monorail-2",
+    "p36-thuy-cung",
+    "p49-vuon-chim-thu-thien-nhien",
+    "p50-rap-xiec-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 162,
+   "queries": [
+    "Tôi muốn xem động vật sống"
+   ],
+   "keywords": [
+    "động vật",
+    "vườn thú",
+    "zoo",
+    "thú sống"
+   ],
+   "relevant": [
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co",
+    "p49-vuon-chim-thu-thien-nhien"
+   ],
+   "none": false
+  },
+  {
+   "n": 163,
+   "queries": [
+    "Tôi muốn xem hươu cao cổ"
+   ],
+   "keywords": [
+    "hươu cao cổ",
+    "giraffe"
+   ],
+   "relevant": [
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co"
+   ],
+   "none": false
+  },
+  {
+   "n": 164,
+   "queries": [
+    "Tôi muốn xem ngựa vằn"
+   ],
+   "keywords": [
+    "ngựa vằn",
+    "zebra"
+   ],
+   "relevant": [
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co"
+   ],
+   "none": false
+  },
+  {
+   "n": 165,
+   "queries": [
+    "Tôi muốn xem đà điểu"
+   ],
+   "keywords": [
+    "đà điểu",
+    "ostrich"
+   ],
+   "relevant": [
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co"
+   ],
+   "none": false
+  },
+  {
+   "n": 166,
+   "queries": [
+    "Tôi muốn xem chim"
+   ],
+   "keywords": [
+    "chim",
+    "vườn chim",
+    "bird"
+   ],
+   "relevant": [
+    "p49-vuon-chim-thu-thien-nhien"
+   ],
+   "none": false
+  },
+  {
+   "n": 167,
+   "queries": [
+    "Tôi muốn xem cá",
+    "sinh vật dưới nước"
+   ],
+   "keywords": [
+    "xem cá",
+    "thủy cung",
+    "aquarium",
+    "sinh vật biển"
+   ],
+   "relevant": [
+    "p36-thuy-cung"
+   ],
+   "none": false
+  },
+  {
+   "n": 168,
+   "queries": [
+    "Tôi muốn xem mẫu vật động vật"
+   ],
+   "keywords": [
+    "tiêu bản",
+    "mẫu vật",
+    "động vật trưng bày"
+   ],
+   "relevant": [
+    "p30-nha-trung-bay-tieu-ban-dong-thuc-vat"
+   ],
+   "none": false
+  },
+  {
+   "n": 169,
+   "queries": [
+    "Tôi muốn tham quan khủng long"
+   ],
+   "keywords": [
+    "khủng long",
+    "công viên khủng long",
+    "dinosaur park"
+   ],
+   "relevant": [
+    "p28-khu-vuon-khung-long"
+   ],
+   "none": false
+  },
+  {
+   "n": 170,
+   "queries": [
+    "Tôi muốn học về rau thủy canh"
+   ],
+   "keywords": [
+    "thủy canh",
+    "hydroponic",
+    "rau sạch"
+   ],
+   "relevant": [
+    "p48-vuon-rau-thuy-canh"
+   ],
+   "none": false
+  },
+  {
+   "n": 171,
+   "queries": [
+    "Tôi muốn tìm xương rồng"
+   ],
+   "keywords": [
+    "xương rồng",
+    "cactus"
+   ],
+   "relevant": [
+    "p34-vuon-xuong-rong"
+   ],
+   "none": false
+  },
+  {
+   "n": 172,
+   "queries": [
+    "Tôi muốn ngắm hoa"
+   ],
+   "keywords": [
+    "hoa",
+    "vườn hoa",
+    "hoa đẹp"
+   ],
+   "relevant": [
+    "p38-nam-tu-thuong-uyen"
+   ],
+   "none": false
+  },
+  {
+   "n": 173,
+   "queries": [
+    "Tôi muốn đi vườn Nhật"
+   ],
+   "keywords": [
+    "vườn nhật",
+    "nhật bản",
+    "zen garden"
+   ],
+   "relevant": [
+    "p35-vuon-nhat-ban"
+   ],
+   "none": false
+  },
+  {
+   "n": 174,
+   "queries": [
+    "Tôi muốn tìm nơi nhiều cây xanh để đi dạo"
+   ],
+   "keywords": [
+    "cây xanh",
+    "đi dạo",
+    "vườn",
+    "thiên nhiên"
+   ],
+   "relevant": [
+    "p34-vuon-xuong-rong",
+    "p35-vuon-nhat-ban",
+    "p38-nam-tu-thuong-uyen",
+    "p48-vuon-rau-thuy-canh",
+    "p49-vuon-chim-thu-thien-nhien"
+   ],
+   "none": false
+  },
+  {
+   "n": 175,
+   "queries": [
+    "Tôi dẫn học sinh đi học trải nghiệm"
+   ],
+   "keywords": [
+    "học sinh",
+    "trải nghiệm",
+    "tham quan giáo dục"
+   ],
+   "relevant": [
+    "p30-nha-trung-bay-tieu-ban-dong-thuc-vat",
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co",
+    "p36-thuy-cung",
+    "p48-vuon-rau-thuy-canh",
+    "p49-vuon-chim-thu-thien-nhien"
+   ],
+   "none": false
+  },
+  {
+   "n": 176,
+   "queries": [
+    "Tôi muốn giới thiệu lịch sử, văn hóa cho trẻ"
+   ],
+   "keywords": [
+    "văn hóa",
+    "lịch sử",
+    "vua hùng",
+    "giáo dục"
+   ],
+   "relevant": [
+    "p37-quang-truong-vua-hung"
+   ],
+   "none": false
+  },
+  {
+   "n": 177,
+   "queries": [
+    "Tôi muốn cho thú ăn"
+   ],
+   "keywords": [
+    "cho thú ăn",
+    "cho hươu ăn",
+    "cho chim ăn"
+   ],
+   "relevant": [
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co",
+    "p49-vuon-chim-thu-thien-nhien"
+   ],
+   "none": false
+  },
+  {
+   "n": 178,
+   "queries": [
+    "Tôi muốn chụp ảnh cây và hoa trong một vòng đi"
+   ],
+   "keywords": [
+    "chụp cây",
+    "chụp hoa",
+    "tham quan vườn"
+   ],
+   "relevant": [
+    "p34-vuon-xuong-rong",
+    "p35-vuon-nhat-ban",
+    "p38-nam-tu-thuong-uyen",
+    "p48-vuon-rau-thuy-canh"
+   ],
+   "none": false
+  },
+  {
+   "n": 179,
+   "queries": [
+    "Tôi muốn xem xiếc"
+   ],
+   "keywords": [
+    "xiếc",
+    "circus",
+    "rạp xiếc"
+   ],
+   "relevant": [
+    "p50-rap-xiec-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 180,
+   "queries": [
+    "Tôi muốn xem nhạc nước"
+   ],
+   "keywords": [
+    "nhạc nước",
+    "đài phun",
+    "water show"
+   ],
+   "relevant": [
+    "p42-bieu-dien-nhac-nuoc"
+   ],
+   "none": false
+  },
+  {
+   "n": 181,
+   "queries": [
+    "Tôi muốn xem sân khấu Ngôi Sao"
+   ],
+   "keywords": [
+    "sân khấu ngôi sao",
+    "show ngôi sao"
+   ],
+   "relevant": [
+    "p41-san-khau-ngoi-sao"
+   ],
+   "none": false
+  },
+  {
+   "n": 182,
+   "queries": [
+    "Tôi muốn xem sân khấu Dế Mèn"
+   ],
+   "keywords": [
+    "sân khấu dế mèn",
+    "de men stage"
+   ],
+   "relevant": [
+    "p14-san-khau-de-men"
+   ],
+   "none": false
+  },
+  {
+   "n": 183,
+   "queries": [
+    "Tôi muốn xem phim"
+   ],
+   "keywords": [
+    "xem phim",
+    "cinemax",
+    "movie",
+    "rạp phim"
+   ],
+   "relevant": [
+    "p10-rap-phim-cinemax-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 184,
+   "queries": [
+    "Tôi muốn xem phim 8D"
+   ],
+   "keywords": [
+    "8d",
+    "cinemax 8d",
+    "phim cảm giác"
+   ],
+   "relevant": [
+    "p10-rap-phim-cinemax-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 185,
+   "queries": [
+    "Tôi muốn trò tương tác công nghệ"
+   ],
+   "keywords": [
+    "tương tác ảo",
+    "công nghệ",
+    "trải nghiệm phim"
+   ],
+   "relevant": [
+    "p10-rap-phim-cinemax-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 186,
+   "queries": [
+    "Tôi muốn xem biểu diễn ngay bây giờ"
+   ],
+   "keywords": [
+    "biểu diễn đang diễn",
+    "show bây giờ",
+    "suất gần nhất"
+   ],
+   "relevant": [
+    "p14-san-khau-de-men",
+    "p41-san-khau-ngoi-sao",
+    "p42-bieu-dien-nhac-nuoc",
+    "p50-rap-xiec-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 187,
+   "queries": [
+    "Tôi muốn xem show gần chỗ ăn"
+   ],
+   "keywords": [
+    "show gần nhà hàng",
+    "vừa ăn vừa xem"
+   ],
+   "relevant": [
+    "p41-san-khau-ngoi-sao",
+    "p42-bieu-dien-nhac-nuoc",
+    "p50-rap-xiec-dam-sen",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1",
+    "svc-food-6"
+   ],
+   "none": false
+  },
+  {
+   "n": 188,
+   "queries": [
+    "Tôi muốn đến quảng trường có sự kiện"
+   ],
+   "keywords": [
+    "sự kiện",
+    "quảng trường",
+    "hoạt động tập thể"
+   ],
+   "relevant": [
+    "p19-quang-truong-la-ma",
+    "p20-dam-sen-square",
+    "p37-quang-truong-vua-hung",
+    "p40-quang-truong-au-lac"
+   ],
+   "none": false
+  },
+  {
+   "n": 189,
+   "queries": [
+    "Tôi muốn xem nhạc nước khi ngồi ăn"
+   ],
+   "keywords": [
+    "ăn xem nhạc nước",
+    "nhà hàng nhìn biểu diễn"
+   ],
+   "relevant": [
+    "svc-food-3",
+    "p42-bieu-dien-nhac-nuoc"
+   ],
+   "none": false
+  },
+  {
+   "n": 190,
+   "queries": [
+    "Tôi muốn mua quà lưu niệm"
+   ],
+   "keywords": [
+    "lưu niệm",
+    "souvenir",
+    "mua quà"
+   ],
+   "relevant": [
+    "p29-quay-luu-niem-hoa-sen",
+    "p44-quay-luu-niem-khu-b"
+   ],
+   "none": false
+  },
+  {
+   "n": 191,
+   "queries": [
+    "Quầy lưu niệm nào gần tôi?"
+   ],
+   "keywords": [
+    "lưu niệm gần nhất",
+    "quà gần đây"
+   ],
+   "relevant": [
+    "p29-quay-luu-niem-hoa-sen",
+    "p44-quay-luu-niem-khu-b"
+   ],
+   "none": false
+  },
+  {
+   "n": 192,
+   "queries": [
+    "Tôi muốn quầy lưu niệm Hoa Sen"
+   ],
+   "keywords": [
+    "hoa sen",
+    "lưu niệm hoa sen"
+   ],
+   "relevant": [
+    "p29-quay-luu-niem-hoa-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 193,
+   "queries": [
+    "Tôi muốn mua quà ở khu B"
+   ],
+   "keywords": [
+    "mua quà khu b",
+    "lưu niệm khu b"
+   ],
+   "relevant": [
+    "p44-quay-luu-niem-khu-b"
+   ],
+   "none": false
+  },
+  {
+   "n": 194,
+   "queries": [
+    "Tôi muốn mua quà trước khi ra cổng"
+   ],
+   "keywords": [
+    "mua quà rồi về",
+    "quà trên đường ra"
+   ],
+   "relevant": [
+    "p29-quay-luu-niem-hoa-sen",
+    "p44-quay-luu-niem-khu-b",
+    "p01-cong-so-1-duong-lac-long-quan",
+    "p02-cong-so-1a-duong-hoa-binh",
+    "p16-cong-so-2-nha-hang-thuy-ta"
+   ],
+   "none": false
+  },
+  {
+   "n": 195,
+   "queries": [
+    "Tôi muốn mua đồ chơi cho bé"
+   ],
+   "keywords": [
+    "đồ chơi",
+    "quà cho bé"
+   ],
+   "relevant": [
+    "p29-quay-luu-niem-hoa-sen",
+    "p44-quay-luu-niem-khu-b"
+   ],
+   "none": false
+  },
+  {
+   "n": 196,
+   "queries": [
+    "Tôi muốn chỗ mua quà gần nơi ăn"
+   ],
+   "keywords": [
+    "lưu niệm gần nhà hàng",
+    "quà cạnh quán ăn"
+   ],
+   "relevant": [
+    "p29-quay-luu-niem-hoa-sen",
+    "p44-quay-luu-niem-khu-b",
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 197,
+   "queries": [
+    "Tôi muốn xem đồ ở Đầm Sen Plaza"
+   ],
+   "keywords": [
+    "plaza",
+    "đầm sen plaza"
+   ],
+   "relevant": [
+    "p18-dam-sen-plaza"
+   ],
+   "none": false
+  },
+  {
+   "n": 198,
+   "queries": [
+    "Tôi muốn đi tắm"
+   ],
+   "keywords": [
+    "đi tắm",
+    "tắm hồ",
+    "tắm công viên",
+    "tắm đầm sen"
+   ],
+   "relevant": [
+    "new-cong-lien-thong"
+   ],
+   "none": false
+  },
+  {
+   "n": 199,
+   "queries": [
+    "Tôi muốn đi bơi"
+   ],
+   "keywords": [
+    "đi bơi",
+    "hồ bơi",
+    "swimming",
+    "pool"
+   ],
+   "relevant": [
+    "new-cong-lien-thong"
+   ],
+   "none": false
+  },
+  {
+   "n": 200,
+   "queries": [
+    "Tôi muốn chơi cầu trượt nước"
+   ],
+   "keywords": [
+    "trượt nước",
+    "cầu trượt nước",
+    "water park"
+   ],
+   "relevant": [
+    "new-cong-lien-thong"
+   ],
+   "none": false
+  },
+  {
+   "n": 201,
+   "queries": [
+    "Tôi muốn chơi nước ở Đầm Sen Nước"
+   ],
+   "keywords": [
+    "chơi nước",
+    "đầm sen nước",
+    "waterpark"
+   ],
+   "relevant": [
+    "new-cong-lien-thong"
+   ],
+   "none": false
+  },
+  {
+   "n": 202,
+   "queries": [
+    "Tôi muốn bị ướt nhưng vẫn chơi trò ở khu khô"
+   ],
+   "keywords": [
+    "ướt",
+    "khu khô",
+    "vượt thác"
+   ],
+   "relevant": [
+    "p24-vuot-thac",
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false
+  },
+  {
+   "n": 203,
+   "queries": [
+    "Tôi nóng quá, muốn vào xem băng"
+   ],
+   "keywords": [
+    "băng",
+    "lạnh",
+    "băng đăng",
+    "ice"
+   ],
+   "relevant": [
+    "p27-bang-dang"
+   ],
+   "none": false
+  },
+  {
+   "n": 204,
+   "queries": [
+    "Tôi muốn giải nhiệt bằng nước uống"
+   ],
+   "keywords": [
+    "giải khát",
+    "nước uống",
+    "nóng mua nước"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1",
+    "svc-food-6",
+    "svc-food-7",
+    "svc-food-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 205,
+   "queries": [
+    "Tôi muốn ngắm nước chứ không tắm"
+   ],
+   "keywords": [
+    "ngắm nước",
+    "không tắm",
+    "ngắm hồ"
+   ],
+   "relevant": [
+    "p07-ben-thuyen",
+    "p43-cau-cuu-khuc",
+    "svc-food-3"
+   ],
+   "none": false
+  },
+  {
+   "n": 206,
+   "queries": [
+    "Trời mưa, tôi muốn chơi trong nhà"
+   ],
+   "keywords": [
+    "trời mưa",
+    "trong nhà",
+    "có mái che"
+   ],
+   "relevant": [
+    "p10-rap-phim-cinemax-dam-sen",
+    "p27-bang-dang",
+    "p30-nha-trung-bay-tieu-ban-dong-thuc-vat",
+    "p36-thuy-cung"
+   ],
+   "none": false
+  },
+  {
+   "n": 207,
+   "queries": [
+    "Tôi muốn tránh nắng mà vẫn tham quan"
+   ],
+   "keywords": [
+    "tránh nắng",
+    "tham quan trong nhà"
+   ],
+   "relevant": [
+    "p10-rap-phim-cinemax-dam-sen",
+    "p27-bang-dang",
+    "p30-nha-trung-bay-tieu-ban-dong-thuc-vat",
+    "p36-thuy-cung"
+   ],
+   "none": false
+  },
+  {
+   "n": 212,
+   "queries": [
+    "Tôi muốn chỗ tham quan miễn phí"
+   ],
+   "keywords": [
+    "miễn phí",
+    "không mua thêm vé",
+    "tham quan tự do"
+   ],
+   "relevant": [
+    "p19-quang-truong-la-ma",
+    "p20-dam-sen-square",
+    "p28-khu-vuon-khung-long",
+    "p30-nha-trung-bay-tieu-ban-dong-thuc-vat",
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co",
+    "p34-vuon-xuong-rong",
+    "p35-vuon-nhat-ban",
+    "p37-quang-truong-vua-hung",
+    "p38-nam-tu-thuong-uyen",
+    "p40-quang-truong-au-lac",
+    "p43-cau-cuu-khuc",
+    "p48-vuon-rau-thuy-canh",
+    "p49-vuon-chim-thu-thien-nhien"
+   ],
+   "none": false
+  },
+  {
+   "n": 213,
+   "queries": [
+    "Tôi chỉ có vé tham quan, muốn chọn nơi phù hợp"
+   ],
+   "keywords": [
+    "vé tham quan",
+    "không vé trò chơi"
+   ],
+   "relevant": [
+    "p19-quang-truong-la-ma",
+    "p20-dam-sen-square",
+    "p28-khu-vuon-khung-long",
+    "p30-nha-trung-bay-tieu-ban-dong-thuc-vat",
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co",
+    "p34-vuon-xuong-rong",
+    "p35-vuon-nhat-ban",
+    "p37-quang-truong-vua-hung",
+    "p38-nam-tu-thuong-uyen",
+    "p40-quang-truong-au-lac",
+    "p43-cau-cuu-khuc",
+    "p48-vuon-rau-thuy-canh",
+    "p49-vuon-chim-thu-thien-nhien"
+   ],
+   "none": false
+  },
+  {
+   "n": 216,
+   "queries": [
+    "Tôi sợ độ cao, chọn trò giúp tôi"
+   ],
+   "keywords": [
+    "sợ cao",
+    "không trên cao",
+    "không ngắm cao"
+   ],
+   "relevant": [
+    "p10-rap-phim-cinemax-dam-sen",
+    "p27-bang-dang",
+    "p30-nha-trung-bay-tieu-ban-dong-thuc-vat",
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co",
+    "p36-thuy-cung",
+    "p48-vuon-rau-thuy-canh",
+    "p49-vuon-chim-thu-thien-nhien",
+    "p50-rap-xiec-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 217,
+   "queries": [
+    "Tôi không chịu được quay tròn"
+   ],
+   "keywords": [
+    "không quay tròn",
+    "dễ say",
+    "không xoay"
+   ],
+   "relevant": [
+    "p10-rap-phim-cinemax-dam-sen",
+    "p27-bang-dang",
+    "p30-nha-trung-bay-tieu-ban-dong-thuc-vat",
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co",
+    "p34-vuon-xuong-rong",
+    "p35-vuon-nhat-ban",
+    "p36-thuy-cung",
+    "p38-nam-tu-thuong-uyen",
+    "p48-vuon-rau-thuy-canh",
+    "p49-vuon-chim-thu-thien-nhien",
+    "p50-rap-xiec-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 220,
+   "queries": [
+    "Tôi đi với người lớn tuổi"
+   ],
+   "keywords": [
+    "người lớn tuổi",
+    "đi nhẹ",
+    "ít đi bộ"
+   ],
+   "relevant": [
+    "p05-tram-xe-trung-tam",
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p25-du-quay-dung",
+    "p31-nha-ga-monorail-2",
+    "p34-vuon-xuong-rong",
+    "p35-vuon-nhat-ban",
+    "p38-nam-tu-thuong-uyen",
+    "p50-rap-xiec-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 222,
+   "queries": [
+    "Nhà hàng kế quán cà phê"
+   ],
+   "keywords": [
+    "nhà hàng kế cafe",
+    "nhà hàng cạnh cf"
+   ],
+   "relevant": [
+    "svc-food-2",
+    "new-cafe-windy"
+   ],
+   "none": false
+  },
+  {
+   "n": 223,
+   "queries": [
+    "Quán cà phê kế nhà hàng"
+   ],
+   "keywords": [
+    "cafe kế nhà hàng",
+    "cf cạnh nhà hàng"
+   ],
+   "relevant": [
+    "new-cafe-windy",
+    "svc-food-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 224,
+   "queries": [
+    "Nhà hàng kế cà phê Windy"
+   ],
+   "keywords": [
+    "nhà hàng kế windy",
+    "ăn gần windy"
+   ],
+   "relevant": [
+    "svc-food-2",
+    "new-cafe-windy"
+   ],
+   "none": false
+  },
+  {
+   "n": 225,
+   "queries": [
+    "Quán cà phê gần Ẩm thực món ngon"
+   ],
+   "keywords": [
+    "cf gần ẩm thực món ngon",
+    "quán nước cạnh món ngon"
+   ],
+   "relevant": [
+    "new-cafe-windy",
+    "svc-food-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 226,
+   "queries": [
+    "Tôi muốn ăn gần Đu quay đứng"
+   ],
+   "keywords": [
+    "ăn gần đu quay",
+    "nhà hàng cạnh ferris"
+   ],
+   "relevant": [
+    "svc-food-2",
+    "svc-food-4"
+   ],
+   "none": false
+  },
+  {
+   "n": 227,
+   "queries": [
+    "Tôi muốn nghỉ ở quán gần Băng đăng"
+   ],
+   "keywords": [
+    "nghỉ gần băng đăng",
+    "quán nước cạnh khu băng"
+   ],
+   "relevant": [
+    "svc-food-4"
+   ],
+   "none": false
+  },
+  {
+   "n": 228,
+   "queries": [
+    "Tôi muốn tìm WC gần trò vừa chơi"
+   ],
+   "keywords": [
+    "wc gần trò vừa chơi",
+    "vệ sinh sau trò chơi"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 229,
+   "queries": [
+    "Tôi muốn tìm quán gần đây rồi mới ra cổng"
+   ],
+   "keywords": [
+    "quán gần đây",
+    "ăn rồi về"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy",
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1",
+    "p01-cong-so-1-duong-lac-long-quan",
+    "p02-cong-so-1a-duong-hoa-binh",
+    "p16-cong-so-2-nha-hang-thuy-ta"
+   ],
+   "none": false
+  },
+  {
+   "n": 230,
+   "queries": [
+    "Tôi muốn đi WC rồi ghé ăn"
+   ],
+   "keywords": [
+    "wc rồi ăn",
+    "vệ sinh xong ăn"
+   ],
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5",
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 231,
+   "queries": [
+    "Tôi muốn ăn xong xem xiếc"
+   ],
+   "keywords": [
+    "ăn xong xem xiếc",
+    "nhà hàng gần rạp xiếc"
+   ],
+   "relevant": [
+    "svc-food-1",
+    "p50-rap-xiec-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 232,
+   "queries": [
+    "Tôi muốn uống cà phê xong đi đạp vịt"
+   ],
+   "keywords": [
+    "cafe rồi đạp vịt",
+    "ngồi cafe gần bến"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p07-ben-thuyen"
+   ],
+   "none": false
+  },
+  {
+   "n": 233,
+   "queries": [
+    "Tôi muốn tham quan vườn rồi ăn gần đó"
+   ],
+   "keywords": [
+    "vườn hoa rồi ăn",
+    "ăn gần vườn"
+   ],
+   "relevant": [
+    "p34-vuon-xuong-rong",
+    "p35-vuon-nhat-ban",
+    "p38-nam-tu-thuong-uyen",
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 234,
+   "queries": [
+    "Tôi muốn chơi cảm giác mạnh rồi đi khu nước"
+   ],
+   "keywords": [
+    "chơi mạnh rồi tắm",
+    "trò chơi rồi đầm sen nước"
+   ],
+   "relevant": [
+    "p04-khu-tro-choi-cam-giac-manh",
+    "p21-power-surge",
+    "p22-vong-quay-than-toc",
+    "p23-tau-xoay-cao-toc",
+    "p24-vuot-thac",
+    "p32-dau-truong-bo-tot",
+    "p46-tau-luon-sieu-toc",
+    "p47-vong-xoay-khong-gian",
+    "new-cong-lien-thong"
+   ],
+   "none": false
+  },
+  {
+   "n": 235,
+   "queries": [
+    "Tôi muốn đi chơi quanh cổng 1A để về nhanh"
+   ],
+   "keywords": [
+    "gần cổng 1a",
+    "chơi tiện về"
+   ],
+   "relevant": [
+    "p02-cong-so-1a-duong-hoa-binh",
+    "p04-khu-tro-choi-cam-giac-manh",
+    "p06-tiem-ca-phe-sai-gon",
+    "p07-ben-thuyen",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "p09-vong-luon-tuoi-tho"
+   ],
+   "none": false
+  },
+  {
+   "n": 236,
+   "queries": [
+    "Tôi muốn quán nước có WC gần bên"
+   ],
+   "keywords": [
+    "cafe có wc gần",
+    "quán nước gần toilet"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy",
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 237,
+   "queries": [
+    "Tôi muốn nhà hàng gần bãi xe"
+   ],
+   "keywords": [
+    "ăn gần bãi xe",
+    "nhà hàng gần parking"
+   ],
+   "relevant": [
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1",
+    "svc-parking-1",
+    "svc-parking-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 238,
+   "queries": [
+    "Tôi muốn nơi ngắm hồ gần quán cà phê"
+   ],
+   "keywords": [
+    "ngắm hồ gần cf",
+    "view hồ cạnh quán nước"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "new-cafe-windy",
+    "p07-ben-thuyen",
+    "p43-cau-cuu-khuc"
+   ],
+   "none": false
+  },
+  {
+   "n": 239,
+   "queries": [
+    "Tôi muốn chơi gần con tôi đang ở playground"
+   ],
+   "keywords": [
+    "gần playground",
+    "gần nơi bé chơi"
+   ],
+   "relevant": [
+    "p13-kids-playground",
+    "p09-vong-luon-tuoi-tho",
+    "p11-khu-tro-choi-thieu-nhi",
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p14-san-khau-de-men",
+    "p15-xe-dien-dung-dai-duong",
+    "svc-food-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 240,
+   "queries": [
+    "Tôi muốn ra cổng nhưng không quay lại đường cũ"
+   ],
+   "keywords": [
+    "lối ra khác",
+    "không đi lại đường cũ"
+   ],
+   "relevant": [
+    "p01-cong-so-1-duong-lac-long-quan",
+    "p02-cong-so-1a-duong-hoa-binh",
+    "p16-cong-so-2-nha-hang-thuy-ta"
+   ],
+   "none": false
+  },
+  {
+   "n": 242,
+   "queries": [
+    "Tôi muốn ăn gần tôi, đừng dẫn qua cầu"
+   ],
+   "keywords": [
+    "ăn gần",
+    "không qua cầu",
+    "không băng hồ"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1",
+    "svc-food-6",
+    "svc-food-7",
+    "svc-food-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 243,
+   "queries": [
+    "Tôi muốn đi khu B nhưng ghé WC trên đường"
+   ],
+   "keywords": [
+    "khu b",
+    "wc trên đường",
+    "ghé vệ sinh"
+   ],
+   "relevant": [
+    "p44-quay-luu-niem-khu-b",
+    "p45-lau-dai-kinh-di",
+    "p46-tau-luon-sieu-toc",
+    "p47-vong-xoay-khong-gian",
+    "p48-vuon-rau-thuy-canh",
+    "p49-vuon-chim-thu-thien-nhien",
+    "p50-rap-xiec-dam-sen",
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 244,
+   "queries": [
+    "Tôi muốn nghỉ ở điểm nằm trên đường về"
+   ],
+   "keywords": [
+    "nghỉ trên đường về",
+    "quán tiện đường ra"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "p39-nha-hang",
+    "new-cafe-windy",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 245,
+   "queries": [
+    "Nhà hàng khác quán vừa gợi ý nhưng vẫn gần Windy"
+   ],
+   "keywords": [
+    "nhà hàng khác",
+    "cái khác",
+    "vẫn gần windy"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1"
+   ],
+   "none": false
+  },
+  {
+   "n": 247,
+   "queries": [
+    "Tôi muốn uống nước, không đi tắm"
+   ],
+   "keywords": [
+    "uống nước",
+    "không tắm",
+    "khát"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-1",
+    "svc-food-6",
+    "svc-food-7",
+    "svc-food-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 248,
+   "queries": [
+    "Tôi muốn ngắm cảnh trên cao, không cảm giác mạnh"
+   ],
+   "keywords": [
+    "ngắm cao",
+    "không cảm giác mạnh",
+    "view cao nhẹ"
+   ],
+   "relevant": [
+    "p25-du-quay-dung",
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2",
+    "new-dao-than-tai"
+   ],
+   "none": false
+  },
+  {
+   "n": 249,
+   "queries": [
+    "Tôi muốn quán ăn không ở khu B"
+   ],
+   "keywords": [
+    "quán ăn",
+    "không khu b"
+   ],
+   "relevant": [
+    "p39-nha-hang",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-6",
+    "svc-food-7",
+    "svc-food-5"
+   ],
+   "none": false
+  },
+  {
+   "n": 250,
+   "queries": [
+    "Cổng số 1 — đường Lạc Long Quân ở đâu?",
+    "Chỉ đường đến POI 1"
+   ],
+   "keywords": [
+    "Cổng số 1 — đường Lạc Long Quân",
+    "poi 1"
+   ],
+   "relevant": [
+    "p01-cong-so-1-duong-lac-long-quan"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 251,
+   "queries": [
+    "Cổng số 1A — đường Hòa Bình ở đâu?",
+    "Chỉ đường đến POI 2"
+   ],
+   "keywords": [
+    "Cổng số 1A — đường Hòa Bình",
+    "poi 2"
+   ],
+   "relevant": [
+    "p02-cong-so-1a-duong-hoa-binh"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 252,
+   "queries": [
+    "Quầy vé, văn phòng Công viên ở đâu?",
+    "Chỉ đường đến POI 3"
+   ],
+   "keywords": [
+    "Quầy vé, văn phòng Công viên",
+    "poi 3"
+   ],
+   "relevant": [
+    "p03-quay-ve-van-phong-cong-vien"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 253,
+   "queries": [
+    "Khu trò chơi cảm giác mạnh ở đâu?",
+    "Chỉ đường đến POI 4"
+   ],
+   "keywords": [
+    "Khu trò chơi cảm giác mạnh",
+    "poi 4"
+   ],
+   "relevant": [
+    "p04-khu-tro-choi-cam-giac-manh"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 254,
+   "queries": [
+    "Trạm xe trung tâm ở đâu?",
+    "Chỉ đường đến POI 5"
+   ],
+   "keywords": [
+    "Trạm xe trung tâm",
+    "poi 5"
+   ],
+   "relevant": [
+    "p05-tram-xe-trung-tam"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 255,
+   "queries": [
+    "Tiệm cà phê Sài Gòn ở đâu?",
+    "Chỉ đường đến POI 6"
+   ],
+   "keywords": [
+    "Tiệm cà phê Sài Gòn",
+    "poi 6"
+   ],
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 256,
+   "queries": [
+    "Bến thuyền ở đâu?",
+    "Chỉ đường đến POI 7"
+   ],
+   "keywords": [
+    "Bến thuyền",
+    "poi 7"
+   ],
+   "relevant": [
+    "p07-ben-thuyen"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 257,
+   "queries": [
+    "Cà phê Vườn Đá – Đầm Sen ở đâu?",
+    "Chỉ đường đến POI 8"
+   ],
+   "keywords": [
+    "Cà phê Vườn Đá – Đầm Sen",
+    "poi 8"
+   ],
+   "relevant": [
+    "p08-ca-phe-vuon-da-dam-sen"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 258,
+   "queries": [
+    "Vòng lượn tuổi thơ ở đâu?",
+    "Chỉ đường đến POI 9"
+   ],
+   "keywords": [
+    "Vòng lượn tuổi thơ",
+    "poi 9"
+   ],
+   "relevant": [
+    "p09-vong-luon-tuoi-tho"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 259,
+   "queries": [
+    "Rạp phim Cinemax Đầm Sen ở đâu?",
+    "Chỉ đường đến POI 10"
+   ],
+   "keywords": [
+    "Rạp phim Cinemax Đầm Sen",
+    "poi 10"
+   ],
+   "relevant": [
+    "p10-rap-phim-cinemax-dam-sen"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 260,
+   "queries": [
+    "Khu trò chơi thiếu nhi ở đâu?",
+    "Chỉ đường đến POI 11"
+   ],
+   "keywords": [
+    "Khu trò chơi thiếu nhi",
+    "poi 11"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 261,
+   "queries": [
+    "Nhà ga Monorail 1 – Nhà hàng Dế Mèn ở đâu?",
+    "Chỉ đường đến POI 12"
+   ],
+   "keywords": [
+    "Nhà ga Monorail 1 – Nhà hàng Dế Mèn",
+    "poi 12"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 262,
+   "queries": [
+    "Kids playground ở đâu?",
+    "Chỉ đường đến POI 13"
+   ],
+   "keywords": [
+    "Kids playground",
+    "poi 13"
+   ],
+   "relevant": [
+    "p13-kids-playground"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 263,
+   "queries": [
+    "Sân khấu Dế Mèn ở đâu?",
+    "Chỉ đường đến POI 14"
+   ],
+   "keywords": [
+    "Sân khấu Dế Mèn",
+    "poi 14"
+   ],
+   "relevant": [
+    "p14-san-khau-de-men"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 264,
+   "queries": [
+    "Xe điện đụng đại dương ở đâu?",
+    "Chỉ đường đến POI 15"
+   ],
+   "keywords": [
+    "Xe điện đụng đại dương",
+    "poi 15"
+   ],
+   "relevant": [
+    "p15-xe-dien-dung-dai-duong"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 265,
+   "queries": [
+    "Cổng số 2 — Nhà hàng Thủy Tạ ở đâu?",
+    "Chỉ đường đến POI 16"
+   ],
+   "keywords": [
+    "Cổng số 2 — Nhà hàng Thủy Tạ",
+    "poi 16"
+   ],
+   "relevant": [
+    "p16-cong-so-2-nha-hang-thuy-ta"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 266,
+   "queries": [
+    "Quầy vé ở đâu?",
+    "Chỉ đường đến POI 17"
+   ],
+   "keywords": [
+    "Quầy vé",
+    "poi 17"
+   ],
+   "relevant": [
+    "p17-quay-ve"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 267,
+   "queries": [
+    "Đầm Sen Plaza ở đâu?",
+    "Chỉ đường đến POI 18"
+   ],
+   "keywords": [
+    "Đầm Sen Plaza",
+    "poi 18"
+   ],
+   "relevant": [
+    "p18-dam-sen-plaza"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 268,
+   "queries": [
+    "Quảng trường La Mã ở đâu?",
+    "Chỉ đường đến POI 19"
+   ],
+   "keywords": [
+    "Quảng trường La Mã",
+    "poi 19"
+   ],
+   "relevant": [
+    "p19-quang-truong-la-ma"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 269,
+   "queries": [
+    "Đầm Sen Square ở đâu?",
+    "Chỉ đường đến POI 20"
+   ],
+   "keywords": [
+    "Đầm Sen Square",
+    "poi 20"
+   ],
+   "relevant": [
+    "p20-dam-sen-square"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 270,
+   "queries": [
+    "Power Surge ở đâu?",
+    "Chỉ đường đến POI 21"
+   ],
+   "keywords": [
+    "Power Surge",
+    "poi 21"
+   ],
+   "relevant": [
+    "p21-power-surge"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 271,
+   "queries": [
+    "Vòng quay thần tốc ở đâu?",
+    "Chỉ đường đến POI 22"
+   ],
+   "keywords": [
+    "Vòng quay thần tốc",
+    "poi 22"
+   ],
+   "relevant": [
+    "p22-vong-quay-than-toc"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 272,
+   "queries": [
+    "Tàu xoay cao tốc ở đâu?",
+    "Chỉ đường đến POI 23"
+   ],
+   "keywords": [
+    "Tàu xoay cao tốc",
+    "poi 23"
+   ],
+   "relevant": [
+    "p23-tau-xoay-cao-toc"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 273,
+   "queries": [
+    "Vượt thác ở đâu?",
+    "Chỉ đường đến POI 24"
+   ],
+   "keywords": [
+    "Vượt thác",
+    "poi 24"
+   ],
+   "relevant": [
+    "p24-vuot-thac"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 274,
+   "queries": [
+    "Đu quay đứng ở đâu?",
+    "Chỉ đường đến POI 25"
+   ],
+   "keywords": [
+    "Đu quay đứng",
+    "poi 25"
+   ],
+   "relevant": [
+    "p25-du-quay-dung"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 275,
+   "queries": [
+    "Xe điện đụng thế hệ mới ở đâu?",
+    "Chỉ đường đến POI 26"
+   ],
+   "keywords": [
+    "Xe điện đụng thế hệ mới",
+    "poi 26"
+   ],
+   "relevant": [
+    "p26-xe-dien-dung-the-he-moi"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 276,
+   "queries": [
+    "Băng đăng ở đâu?",
+    "Chỉ đường đến POI 27"
+   ],
+   "keywords": [
+    "Băng đăng",
+    "poi 27"
+   ],
+   "relevant": [
+    "p27-bang-dang"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 277,
+   "queries": [
+    "Khu vườn Khủng Long ở đâu?",
+    "Chỉ đường đến POI 28"
+   ],
+   "keywords": [
+    "Khu vườn Khủng Long",
+    "poi 28"
+   ],
+   "relevant": [
+    "p28-khu-vuon-khung-long"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 278,
+   "queries": [
+    "Quầy lưu niệm Hoa Sen ở đâu?",
+    "Chỉ đường đến POI 29"
+   ],
+   "keywords": [
+    "Quầy lưu niệm Hoa Sen",
+    "poi 29"
+   ],
+   "relevant": [
+    "p29-quay-luu-niem-hoa-sen"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 279,
+   "queries": [
+    "Nhà trưng bày tiêu bản động thực vật ở đâu?",
+    "Chỉ đường đến POI 30"
+   ],
+   "keywords": [
+    "Nhà trưng bày tiêu bản động thực vật",
+    "poi 30"
+   ],
+   "relevant": [
+    "p30-nha-trung-bay-tieu-ban-dong-thuc-vat"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 280,
+   "queries": [
+    "Nhà ga Monorail 2 ở đâu?",
+    "Chỉ đường đến POI 31"
+   ],
+   "keywords": [
+    "Nhà ga Monorail 2",
+    "poi 31"
+   ],
+   "relevant": [
+    "p31-nha-ga-monorail-2"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 281,
+   "queries": [
+    "Đấu trường Bò Tót ở đâu?",
+    "Chỉ đường đến POI 32"
+   ],
+   "keywords": [
+    "Đấu trường Bò Tót",
+    "poi 32"
+   ],
+   "relevant": [
+    "p32-dau-truong-bo-tot"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 282,
+   "queries": [
+    "Chuồng đà điểu, ngựa vằn, hươu cao cổ ở đâu?",
+    "Chỉ đường đến POI 33"
+   ],
+   "keywords": [
+    "Chuồng đà điểu, ngựa vằn, hươu cao cổ",
+    "poi 33"
+   ],
+   "relevant": [
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 283,
+   "queries": [
+    "Vườn xương rồng ở đâu?",
+    "Chỉ đường đến POI 34"
+   ],
+   "keywords": [
+    "Vườn xương rồng",
+    "poi 34"
+   ],
+   "relevant": [
+    "p34-vuon-xuong-rong"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 284,
+   "queries": [
+    "Vườn Nhật Bản ở đâu?",
+    "Chỉ đường đến POI 35"
+   ],
+   "keywords": [
+    "Vườn Nhật Bản",
+    "poi 35"
+   ],
+   "relevant": [
+    "p35-vuon-nhat-ban"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 285,
+   "queries": [
+    "Thủy cung ở đâu?",
+    "Chỉ đường đến POI 36"
+   ],
+   "keywords": [
+    "Thủy cung",
+    "poi 36"
+   ],
+   "relevant": [
+    "p36-thuy-cung"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 286,
+   "queries": [
+    "Quảng trường Vua Hùng ở đâu?",
+    "Chỉ đường đến POI 37"
+   ],
+   "keywords": [
+    "Quảng trường Vua Hùng",
+    "poi 37"
+   ],
+   "relevant": [
+    "p37-quang-truong-vua-hung"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 287,
+   "queries": [
+    "Nam Tú Thượng Uyển ở đâu?",
+    "Chỉ đường đến POI 38"
+   ],
+   "keywords": [
+    "Nam Tú Thượng Uyển",
+    "poi 38"
+   ],
+   "relevant": [
+    "p38-nam-tu-thuong-uyen"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 288,
+   "queries": [
+    "Nhà hàng ở đâu?",
+    "Chỉ đường đến POI 39"
+   ],
+   "keywords": [
+    "Nhà hàng",
+    "poi 39"
+   ],
+   "relevant": [
+    "p39-nha-hang"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 289,
+   "queries": [
+    "Quảng trường Âu Lạc ở đâu?",
+    "Chỉ đường đến POI 40"
+   ],
+   "keywords": [
+    "Quảng trường Âu Lạc",
+    "poi 40"
+   ],
+   "relevant": [
+    "p40-quang-truong-au-lac"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 290,
+   "queries": [
+    "Sân khấu Ngôi Sao ở đâu?",
+    "Chỉ đường đến POI 41"
+   ],
+   "keywords": [
+    "Sân khấu Ngôi Sao",
+    "poi 41"
+   ],
+   "relevant": [
+    "p41-san-khau-ngoi-sao"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 291,
+   "queries": [
+    "Biểu diễn nhạc nước ở đâu?",
+    "Chỉ đường đến POI 42"
+   ],
+   "keywords": [
+    "Biểu diễn nhạc nước",
+    "poi 42"
+   ],
+   "relevant": [
+    "p42-bieu-dien-nhac-nuoc"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 292,
+   "queries": [
+    "Cầu Cửu Khúc ở đâu?",
+    "Chỉ đường đến POI 43"
+   ],
+   "keywords": [
+    "Cầu Cửu Khúc",
+    "poi 43"
+   ],
+   "relevant": [
+    "p43-cau-cuu-khuc"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 293,
+   "queries": [
+    "Quầy lưu niệm khu B ở đâu?",
+    "Chỉ đường đến POI 44"
+   ],
+   "keywords": [
+    "Quầy lưu niệm khu B",
+    "poi 44"
+   ],
+   "relevant": [
+    "p44-quay-luu-niem-khu-b"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 294,
+   "queries": [
+    "Lâu đài kinh dị ở đâu?",
+    "Chỉ đường đến POI 45"
+   ],
+   "keywords": [
+    "Lâu đài kinh dị",
+    "poi 45"
+   ],
+   "relevant": [
+    "p45-lau-dai-kinh-di"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 295,
+   "queries": [
+    "Tàu lượn siêu tốc ở đâu?",
+    "Chỉ đường đến POI 46"
+   ],
+   "keywords": [
+    "Tàu lượn siêu tốc",
+    "poi 46"
+   ],
+   "relevant": [
+    "p46-tau-luon-sieu-toc"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 296,
+   "queries": [
+    "Vòng xoay không gian ở đâu?",
+    "Chỉ đường đến POI 47"
+   ],
+   "keywords": [
+    "Vòng xoay không gian",
+    "poi 47"
+   ],
+   "relevant": [
+    "p47-vong-xoay-khong-gian"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 297,
+   "queries": [
+    "Vườn rau thủy canh ở đâu?",
+    "Chỉ đường đến POI 48"
+   ],
+   "keywords": [
+    "Vườn rau thủy canh",
+    "poi 48"
+   ],
+   "relevant": [
+    "p48-vuon-rau-thuy-canh"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 298,
+   "queries": [
+    "Vườn chim, thú thiên nhiên ở đâu?",
+    "Chỉ đường đến POI 49"
+   ],
+   "keywords": [
+    "Vườn chim, thú thiên nhiên",
+    "poi 49"
+   ],
+   "relevant": [
+    "p49-vuon-chim-thu-thien-nhien"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 299,
+   "queries": [
+    "Rạp xiếc Đầm Sen ở đâu?",
+    "Chỉ đường đến POI 50"
+   ],
+   "keywords": [
+    "Rạp xiếc Đầm Sen",
+    "poi 50"
+   ],
+   "relevant": [
+    "p50-rap-xiec-dam-sen"
+   ],
+   "none": false,
+   "kind": "name"
+  },
+  {
+   "n": 300,
+   "queries": [
+    "Chỉ đường đến POI 11.1"
+   ],
+   "keywords": [
+    "poi 11.1",
+    "số 11.1",
+    "điểm 11.1"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false,
+   "kind": "subcode"
+  },
+  {
+   "n": 301,
+   "queries": [
+    "Chỉ đường đến POI 11.2"
+   ],
+   "keywords": [
+    "poi 11.2",
+    "số 11.2",
+    "điểm 11.2"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false,
+   "kind": "subcode"
+  },
+  {
+   "n": 302,
+   "queries": [
+    "Chỉ đường đến POI 11.3"
+   ],
+   "keywords": [
+    "poi 11.3",
+    "số 11.3",
+    "điểm 11.3"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false,
+   "kind": "subcode"
+  },
+  {
+   "n": 303,
+   "queries": [
+    "Chỉ đường đến POI 11.4"
+   ],
+   "keywords": [
+    "poi 11.4",
+    "số 11.4",
+    "điểm 11.4"
+   ],
+   "relevant": [
+    "p11-khu-tro-choi-thieu-nhi"
+   ],
+   "none": false,
+   "kind": "subcode"
+  },
+  {
+   "n": 304,
+   "queries": [
+    "Tôi muốn ăn ở Nhà hàng Dế Mèn"
+   ],
+   "keywords": [
+    "nhà hàng dế mèn",
+    "ăn dế mèn"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men"
+   ],
+   "none": false
+  },
+  {
+   "n": 305,
+   "queries": [
+    "Tôi cần cây ATM",
+    "rút tiền"
+   ],
+   "keywords": [
+    "atm",
+    "rút tiền",
+    "cây rút tiền"
+   ],
+   "relevant": [
+    "p25-du-quay-dung"
+   ],
+   "none": false
+  },
+  {
+   "n": 306,
+   "queries": [
+    "Tôi cần tủ gửi đồ trong khu khô"
+   ],
+   "keywords": [
+    "gửi đồ",
+    "tủ đồ",
+    "locker",
+    "hành lý"
+   ],
+   "relevant": [
+    "p04-khu-tro-choi-cam-giac-manh"
+   ],
+   "none": false
+  },
+  {
+   "n": 307,
+   "queries": [
+    "Tôi cần thùng rác gần nhất"
+   ],
+   "keywords": [
+    "thùng rác",
+    "bỏ rác",
+    "trash bin"
+   ],
+   "relevant": [],
+   "none": true
+  },
+  {
+   "n": 308,
+   "queries": [
+    "Tôi cần vòi nước uống miễn phí"
+   ],
+   "keywords": [
+    "vòi nước",
+    "uống miễn phí",
+    "refill"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2",
+    "new-cafe-windy",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen"
+   ],
+   "none": false
+  },
+  {
+   "n": 309,
+   "queries": [
+    "Tôi muốn câu cá"
+   ],
+   "keywords": [
+    "câu cá",
+    "fishing"
+   ],
+   "relevant": [],
+   "none": true
+  },
+  {
+   "n": 310,
+   "queries": [
+    "Tôi cần chỗ thuê xe lăn"
+   ],
+   "keywords": [
+    "thuê xe lăn",
+    "mượn xe lăn"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 311,
+   "queries": [
+    "Tôi muốn tìm trạm sạc xe điện"
+   ],
+   "keywords": [
+    "sạc xe điện",
+    "sạc ô tô",
+    "charging station"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 312,
+   "queries": [
+    "Tôi muốn mua áo mưa hoặc thuốc"
+   ],
+   "keywords": [
+    "áo mưa",
+    "nhà thuốc",
+    "mua thuốc"
+   ],
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2"
+   ],
+   "none": false
+  },
+  {
+   "n": 313,
+   "queries": [
+    "Tôi muốn nhà hàng có quán cà phê ở ngay bên cạnh, không phải ở xa"
+   ],
+   "keywords": [
+    "nhà hàng",
+    "cafe ngay cạnh",
+    "không xa"
+   ],
+   "relevant": [
+    "svc-food-2",
+    "new-cafe-windy"
+   ],
+   "none": false
+  }
+ ]
+}

@@ -21,6 +21,11 @@ if (!process.env.ADMIN_PASSWORD) {
   process.exit(1);
 }
 const dryRun = process.argv.includes('--dry-run');
+// Optional extras (they need more running services / are bookkeeping, so they are opt-in):
+//   --field-checked   mark every place "checked" on /field except the test spot
+//   --audio           AI-voiced narration audio for every place (needs the TTS worker + Piper)
+const withFieldChecked = process.argv.includes('--field-checked');
+const withAudio = process.argv.includes('--audio');
 
 function run(script, args = []) {
   logger.log(`\n> node scripts/${script} ${args.join(' ')}`.trimEnd());
@@ -40,4 +45,8 @@ run('import-pois.mjs', flags);
 run('import-redrawn-walkways.mjs', flags);
 // 4. the written content of the 79 places (descriptions + narration text), through the admin API.
 run('import-poi-content.mjs', dryRun ? [] : ['--apply']);
+// 5. service notes in the English descriptions (ATM, bag storage, station services).
+run('import-poi-notes.mjs', flags);
+if (withFieldChecked) run('field-mark-checked.mjs', flags);
+if (withAudio && !dryRun) run('generate-narration-audio.mjs');
 logger.log('\nPark places seeded.');

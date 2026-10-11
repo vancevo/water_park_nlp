@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   closestPointOnWalkways,
   movePointByMeters,
+  screenDirectionBearing,
   movePointOnWalkways,
   routeLengthMeters,
   routeProgressAt,
@@ -148,5 +149,30 @@ describe('simulated walk pace', () => {
     expect(simulationDurationMs(400)).toBe(50_000);
     expect(simulationDurationMs(750)).toBeCloseTo(93_750, 0);
     expect(simulationDurationMs(5000)).toBe(100_000); // very long: capped
+  });
+});
+
+describe('controller directions follow the screen, not the compass', () => {
+  it('maps up/right/down/left to bearings from the way the map is turned', () => {
+    // Illustrated map turned ~267°: its top points west, its right side north.
+    expect(screenDirectionBearing('north', 266.56)).toBeCloseTo(266.56, 5);
+    expect(screenDirectionBearing('east', 266.56)).toBeCloseTo(356.56, 5);
+    expect(screenDirectionBearing('south', 266.56)).toBeCloseTo(86.56, 5);
+    expect(screenDirectionBearing('west', 266.56)).toBeCloseTo(176.56, 5);
+    // A north-up map keeps the compass.
+    expect(screenDirectionBearing('east', 0)).toBe(90);
+  });
+
+  it('moves a point along a compass bearing', () => {
+    const start = { latitude: 10.7643, longitude: 106.6385 };
+    const north = movePointByMeters(start, 0, 10);
+    const east = movePointByMeters(start, 90, 10);
+    expect(north.latitude).toBeGreaterThan(start.latitude);
+    expect(east.longitude).toBeGreaterThan(start.longitude);
+    const same = movePointByMeters(start, 'east', 10);
+    expect(same.longitude).toBeCloseTo(east.longitude, 9);
+    const diagonal = movePointByMeters(start, 45, 10);
+    expect(diagonal.latitude).toBeGreaterThan(start.latitude);
+    expect(diagonal.longitude).toBeGreaterThan(start.longitude);
   });
 });

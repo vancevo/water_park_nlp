@@ -1,0 +1,17 @@
+{
+  "note": "Service notes appended to the English long description of a place (the Vietnamese ones live in poi-content.source.txt). The search \"need\" answers (ATM, lockers, wheelchair, raincoat, charging, drinking water) say the same things. Applied by scripts/import-poi-notes.mjs; safe to repeat.",
+  "notes": {
+    "p25-du-quay-dung": {
+      "en": "There is an ATM next to the Ferris wheel where you can withdraw cash."
+    },
+    "p04-khu-tro-choi-cam-giac-manh": {
+      "en": "This area has a bag-storage service."
+    },
+    "p12-nha-ga-monorail-1-nha-hang-de-men": {
+      "en": "Next to the station you can rent a wheelchair, buy a raincoat, use a charging point and buy drinking water."
+    },
+    "p31-nha-ga-monorail-2": {
+      "en": "Next to the station you can rent a wheelchair, buy a raincoat, use a charging point and buy drinking water."
+    }
+  }
+}

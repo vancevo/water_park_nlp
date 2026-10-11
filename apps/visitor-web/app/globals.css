@@ -310,6 +310,18 @@ button {
   transform: translateX(3px);
 }
 
+.poi-why {
+  display: -webkit-box;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--green);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .poi-index {
   color: var(--gold);
   font-family: Georgia, serif;

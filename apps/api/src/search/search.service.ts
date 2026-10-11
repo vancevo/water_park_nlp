@@ -27,6 +27,13 @@ import {
 import { normalizeSearchText } from './search-text.js';
 import { fuseRankings } from './hybrid-ranking.js';
 import {
+  matchNeedIntent,
+  parsePoiNumber,
+  needMatchesPlace,
+  needOrder,
+  type NeedIntent,
+} from './search-need-intent.js';
+import {
   parseDirectionIntent,
   residualText,
   selectDirectionalBand,
@@ -87,6 +94,38 @@ export class SearchService {
       if (directional) return directional;
     }
 
+    // "POI 21", "chỉ đường đến POI 11.1": the map number is the place.
+    const number = parsePoiNumber(query.q);
+    if (number !== null) {
+      const prefix = `p${number.padStart(2, '0')}-`;
+      const universe = await this.repository.search({
+        ...this.repositoryQuery(query, at, {
+          limit: DIRECTION_CANDIDATE_LIMIT,
+          offset: 0,
+        }),
+        matchAll: true,
+      });
+      const found = universe.filter((candidate) =>
+        candidate.record.slug.startsWith(prefix),
+      );
+      if (found.length > 0) {
+        return this.paginate(
+          found.map((candidate) =>
+            this.result(candidate, query, at, new Set()),
+          ),
+          found.length,
+          query,
+        );
+      }
+    }
+
+    // "tôi muốn đi về", "đi tắm", "I am hungry": a need, answered from the curated table.
+    const need = matchNeedIntent(query.q);
+    if (need) {
+      const answered = await this.byNeed(query, at, need);
+      if (answered) return answered;
+    }
+
     if (this.hybrid?.flags.hybridEnabled) {
       const fused = await this.tryHybrid(query, at, this.hybrid);
       if (fused) return fused;
@@ -110,6 +149,107 @@ export class SearchService {
       this.result(candidate, query, at, new Set()),
     );
     return this.paginate(items, total, query);
+  }
+
+  /**
+   * Need intent: the places that satisfy the need, nearest first when the need is about the
+   * visitor's surroundings and a position is given, else in the table's order. Returns null
+   * when the query names a place outright or no place satisfies the need.
+   */
+  private async byNeed(
+    query: SearchQueryDto,
+    at: ClockParts,
+    need: NeedIntent,
+  ): Promise<SearchResponse | null> {
+    const plain = await this.repository.search(
+      this.repositoryQuery(query, at, { limit: 1, offset: 0 }),
+    );
+    if (plain[0]?.exactName || plain[0]?.normalizedName) return null;
+    const universe = await this.repository.search({
+      ...this.repositoryQuery(query, at, {
+        limit: DIRECTION_CANDIDATE_LIMIT,
+        offset: 0,
+      }),
+      matchAll: true,
+    });
+    // "Cổng số 2 — Nhà hàng Thủy Tạ ở đâu?": without the filler it is a place's name.
+    if (
+      need.core &&
+      universe.some((candidate) =>
+        Object.values(candidate.record.translations).some(
+          (translation) =>
+            normalizeSearchText(translation?.name ?? '') === need.core,
+        ),
+      )
+    ) {
+      return null;
+    }
+    const picked = universe.filter((candidate) =>
+      needMatchesPlace(need, candidate.record),
+    );
+    if (picked.length === 0) return null;
+    // Left-over words either name a place of this need ("nhà hàng Hương Sen": that place comes
+    // first), name another place (for needs about the surroundings it is the anchor: "WC gần Đu
+    // quay đứng" = the toilets nearest to the Ferris wheel; otherwise the normal search answers),
+    // or match nothing (just noise).
+    const named = new Set<string>();
+    let anchor: { latitude: number; longitude: number } | null = null;
+    if (need.residual) {
+      const matches = await this.repository.search({
+        ...this.repositoryQuery(query, at, {
+          limit: DIRECTION_CANDIDATE_LIMIT,
+          offset: 0,
+        }),
+        query: need.residual,
+      });
+      if (matches.length > 0) {
+        const inNeed = matches.filter((candidate) =>
+          needMatchesPlace(need, candidate.record),
+        );
+        if (inNeed.length > 0) {
+          inNeed.forEach((candidate) => named.add(candidate.record.id));
+        } else if (need.nearest || need.near) {
+          anchor = matches[0]!.record;
+        } else {
+          return null;
+        }
+      }
+    }
+    const reference =
+      anchor ??
+      (query.lat !== undefined && query.lng !== undefined
+        ? { latitude: query.lat, longitude: query.lng }
+        : null);
+    const away = (candidate: SearchCandidate): number =>
+      anchor || candidate.distanceMeters === undefined
+        ? reference
+          ? distanceMeters(
+              reference.latitude,
+              reference.longitude,
+              candidate.record.latitude,
+              candidate.record.longitude,
+            )
+          : 0
+        : candidate.distanceMeters;
+    const located = (need.nearest && reference !== null) || anchor !== null;
+    const ordered = [...picked].sort(
+      (left, right) =>
+        Number(named.has(right.record.id)) -
+          Number(named.has(left.record.id)) ||
+        (located ? away(left) - away(right) : 0) ||
+        needOrder(need, left.record.slug) -
+          needOrder(need, right.record.slug) ||
+        left.record.slug.localeCompare(right.record.slug),
+    );
+    const items = ordered
+      .slice(query.offset, query.offset + query.limit)
+      .map((candidate) => {
+        const result = this.result(candidate, query, at, new Set());
+        // The reason this place answers the need ("there is an ATM next to it").
+        const note = need.note?.[query.locale];
+        return note ? { ...result, shortDescription: note } : result;
+      });
+    return this.paginate(items, ordered.length, query);
   }
 
   /**

@@ -40,7 +40,7 @@ source .env
 set +a
 npm run db:migrate
 npm run dev:api
-# terminal khác, khi API đã chạy: nạp đồ thị đường đi + 50 địa điểm của bản đồ (xem dưới)
+# terminal khác, khi API đã chạy: nạp đồ thị đường đi + 79 địa điểm (xem dưới)
 ADMIN_PASSWORD="$DEV_ADMIN_PASSWORD" npm run seed:park
 npm run dev:visitor
 ```
@@ -50,6 +50,25 @@ và đồ thị đường đi được nạp bằng `npm run seed:park` (cần A
 nhiều lần vẫn an toàn); nội dung mô tả/thuyết minh nằm trong `data/pois/poi-content.source.txt` và `poi-content.en.txt`
 (`scripts/import-poi-content.mjs`). Chạy demo một chạm (`demo.mjs start`) đã tự gọi bước này. Không có `DATABASE_URL`
 thì API dùng 5 POI tham khảo trong bộ nhớ dành cho phát triển và kiểm thử, không phải catalogue Đầm Sen đầy đủ.
+
+### Chạy ra đúng bản đầy đủ (79 địa điểm, tìm kiếm theo nhu cầu, thuyết minh VI/EN)
+
+Sau `npm run db:migrate` và khi API đang chạy, `seed:park` nạp **toàn bộ** nội dung có trong repo: đồ thị đường đi,
+79 địa điểm (tên VI/EN, mô tả, thuyết minh VI/EN, ghi chú dịch vụ như ATM gần Đu quay đứng), vị trí và lối vào.
+Tìm kiếm theo nhu cầu ("tôi muốn đi về", "đi tắm", "đạp vịt", "rút tiền ATM"…) nằm trong mã API
+(`apps/api/src/search/search-need-intent.ts`) nên có ngay, không cần nạp thêm.
+
+```bash
+ADMIN_PASSWORD="$DEV_ADMIN_PASSWORD" npm run seed:park -- --field-checked   # 79 địa điểm + đánh dấu đã kiểm trên /field
+```
+
+- `--field-checked`: đánh dấu mọi địa điểm là "Đúng vị trí" trên `/field` (chỉ để ghi nhận, không đo GPS), trừ "Điểm thử nghiệm"
+  để còn một điểm thử màn hình đo (mô phỏng). Bỏ cờ này nếu muốn tự kiểm tại hiện trường.
+- **Giọng đọc AI** (audio) không nằm trong git, nó được tạo bằng worker Piper: `demo.mjs start` làm tất cả (docker, worker, nạp
+  dữ liệu, audio AI cho 79 điểm × VI/EN). Có sẵn worker + Piper thì chạy
+  `ADMIN_PASSWORD=… node scripts/generate-narration-audio.mjs` hoặc thêm `--audio` vào `seed:park`.
+  Chưa có audio thì app vẫn đọc bằng giọng trình duyệt (giọng tiếng Anh cần máy có giọng tiếng Anh).
+- Kiểm tra nhanh tìm kiếm: `node scripts/search-intents.mjs` (31+ nhu cầu) và `node scripts/search-doc-queries.mjs` (bộ 313 câu).
 
 Nạp biến từ `.env` theo cách phù hợp với shell/process manager trước khi chạy
 API với database. Visitor web mặc định ở `http://localhost:3002` và admin ở

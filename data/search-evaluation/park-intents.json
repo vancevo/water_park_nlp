@@ -1,0 +1,1312 @@
+{
+ "dataset_id": "damsen-park-intents",
+ "version": 1,
+ "locale_note": "vi và en; có cả câu gõ không dấu",
+ "scope": "79 địa điểm thật của công viên (slug ổn định)",
+ "how_to_read": "Mỗi intent là một nhu cầu của khách. 'relevant' là các slug được coi là đúng (chỉ cần một trong số đó nằm trong top 5 là đạt). 'ranking: nearest' nghĩa là khi có vị trí người dùng, kết quả đúng phải được xếp theo khoảng cách. 'nonsense' phải ra rỗng.",
+ "intents": [
+  {
+   "id": "go-home",
+   "need": "Đi về / ra khỏi công viên: các cổng, xếp cổng gần nhất lên đầu",
+   "relevant": [
+    "p01-cong-so-1-duong-lac-long-quan",
+    "p02-cong-so-1a-duong-hoa-binh",
+    "p16-cong-so-2-nha-hang-thuy-ta"
+   ],
+   "ranking": "nearest",
+   "queries": {
+    "vi": [
+     "tôi muốn đi về",
+     "đi về",
+     "ra về",
+     "về",
+     "lối ra",
+     "cổng ra",
+     "cổng nào gần nhất",
+     "cổng gần nhất",
+     "cổng",
+     "tìm cổng",
+     "đường ra cổng",
+     "đi ra khỏi công viên",
+     "hết giờ chơi muốn về",
+     "di ve",
+     "cong ra"
+    ],
+    "en": [
+     "exit",
+     "gate",
+     "nearest gate",
+     "where is the exit",
+     "I want to go home",
+     "way out",
+     "leave the park"
+    ]
+   },
+   "note": "Kết quả phải là các cổng 1, 1A, 2; xếp theo khoảng cách tới người dùng khi có vị trí."
+  },
+  {
+   "id": "water-park",
+   "need": "Đi tắm / công viên nước: chỉ qua cổng liên thông Đầm Sen nước",
+   "relevant": [
+    "new-cong-lien-thong"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "tôi muốn đi tắm",
+     "đi tắm",
+     "tắm",
+     "bơi",
+     "đi bơi",
+     "hồ bơi",
+     "công viên nước",
+     "đầm sen nước",
+     "chơi nước",
+     "trượt nước",
+     "cổng liên thông",
+     "qua công viên nước",
+     "sang đầm sen nước",
+     "di tam",
+     "cong vien nuoc"
+    ],
+    "en": [
+     "water park",
+     "swimming",
+     "swim",
+     "I want to swim",
+     "connecting gate",
+     "go to the water park",
+     "slides pool"
+    ]
+   },
+   "note": "Chỉ một kết quả đúng: cổng liên thông; có thể kèm giá vé và giờ nhận khách."
+  },
+  {
+   "id": "high-view",
+   "need": "Ngắm cảnh trên cao",
+   "relevant": [
+    "new-dao-than-tai",
+    "p25-du-quay-dung",
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "tôi muốn ngắm cảnh trên cao",
+     "ngắm cảnh trên cao",
+     "ngắm cảnh",
+     "trên cao",
+     "view đẹp",
+     "góc nhìn toàn công viên",
+     "nhìn từ trên cao",
+     "điểm cao",
+     "đu quay",
+     "vòng quay",
+     "tàu một ray",
+     "monorail",
+     "ngam canh tren cao",
+     "du quay"
+    ],
+    "en": [
+     "view from above",
+     "scenic view",
+     "viewpoint",
+     "ferris wheel",
+     "see the whole park",
+     "panorama",
+     "monorail ride"
+    ]
+   },
+   "note": "Ưu tiên Đảo Thần Tài và Đu quay đứng; monorail là phụ."
+  },
+  {
+   "id": "thrill",
+   "need": "Chơi cảm giác mạnh",
+   "relevant": [
+    "p04-khu-tro-choi-cam-giac-manh",
+    "p21-power-surge",
+    "p22-vong-quay-than-toc",
+    "p23-tau-xoay-cao-toc",
+    "p24-vuot-thac",
+    "p32-dau-truong-bo-tot",
+    "p46-tau-luon-sieu-toc",
+    "p47-vong-xoay-khong-gian",
+    "new-truot-phao-tren-tham"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "tôi muốn chơi cảm giác mạnh",
+     "cảm giác mạnh",
+     "trò chơi cảm giác mạnh",
+     "mạo hiểm",
+     "hồi hộp",
+     "kích thích",
+     "tàu lượn",
+     "tàu lượn siêu tốc",
+     "xoay vòng",
+     "đu quay mạnh",
+     "trò mạnh nhất",
+     "adrenaline",
+     "cam giac manh",
+     "tau luon"
+    ],
+    "en": [
+     "thrill rides",
+     "extreme",
+     "roller coaster",
+     "adrenaline",
+     "scary rides",
+     "fast rides",
+     "spinning ride"
+    ]
+   }
+  },
+  {
+   "id": "kids",
+   "need": "Đi cùng trẻ nhỏ",
+   "relevant": [
+    "p09-vong-luon-tuoi-tho",
+    "p11-khu-tro-choi-thieu-nhi",
+    "p13-kids-playground",
+    "p14-san-khau-de-men",
+    "svc-food-5"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "trò chơi cho bé",
+     "cho trẻ em",
+     "khu vui chơi thiếu nhi",
+     "bé chơi gì",
+     "đi với con nhỏ",
+     "con tôi 5 tuổi",
+     "gia đình có trẻ nhỏ",
+     "khu trẻ em",
+     "sân chơi",
+     "cho bé",
+     "tre em",
+     "vui choi thieu nhi"
+    ],
+    "en": [
+     "kids",
+     "children",
+     "playground",
+     "with a toddler",
+     "family with small children",
+     "kids area",
+     "baby friendly"
+    ]
+   }
+  },
+  {
+   "id": "bumper",
+   "need": "Xe điện đụng",
+   "relevant": [
+    "p15-xe-dien-dung-dai-duong",
+    "p26-xe-dien-dung-the-he-moi"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "xe điện đụng",
+     "đụng xe",
+     "lái xe điện",
+     "xe đụng",
+     "xe điện đụng đại dương",
+     "xe điện đụng thế hệ mới",
+     "xe dien dung"
+    ],
+    "en": [
+     "bumper cars",
+     "dodgem",
+     "drive electric cars"
+    ]
+   }
+  },
+  {
+   "id": "toilet",
+   "need": "Nhà vệ sinh",
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "ranking": "nearest",
+   "queries": {
+    "vi": [
+     "nhà vệ sinh",
+     "toilet",
+     "wc",
+     "đi vệ sinh",
+     "tôi muốn đi vệ sinh",
+     "phòng vệ sinh",
+     "nhà vệ sinh gần nhất",
+     "vệ sinh",
+     "đi toilet",
+     "nha ve sinh",
+     "toalet"
+    ],
+    "en": [
+     "toilet",
+     "restroom",
+     "bathroom",
+     "WC",
+     "nearest toilet",
+     "I need the bathroom",
+     "public toilet"
+    ]
+   }
+  },
+  {
+   "id": "toilet-accessible",
+   "need": "Nhà vệ sinh cho người khuyết tật / xe lăn",
+   "relevant": [
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "ranking": "nearest",
+   "queries": {
+    "vi": [
+     "nhà vệ sinh cho người khuyết tật",
+     "nhà vệ sinh người khuyết tật",
+     "vệ sinh khuyết tật",
+     "toilet người khuyết tật",
+     "nhà vệ sinh xe lăn",
+     "lối cho người khuyết tật",
+     "nhà vệ sinh dành cho người già",
+     "nhà vệ sinh cho người đi xe lăn",
+     "nha ve sinh khuyet tat"
+    ],
+    "en": [
+     "accessible toilet",
+     "disabled toilet",
+     "wheelchair restroom",
+     "handicap restroom",
+     "accessible bathroom"
+    ]
+   }
+  },
+  {
+   "id": "food",
+   "need": "Ăn uống / đói",
+   "relevant": [
+    "svc-food-1",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-5",
+    "svc-food-6",
+    "svc-food-7",
+    "p39-nha-hang",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy"
+   ],
+   "ranking": "nearest",
+   "queries": {
+    "vi": [
+     "tôi đói",
+     "muốn ăn",
+     "ăn uống",
+     "ăn trưa",
+     "ăn cơm",
+     "nhà hàng",
+     "quán ăn",
+     "chỗ ăn",
+     "đồ ăn",
+     "ăn gì",
+     "món ngon",
+     "ẩm thực",
+     "ăn nhẹ",
+     "an uong",
+     "nha hang"
+    ],
+    "en": [
+     "restaurant",
+     "food",
+     "I am hungry",
+     "lunch",
+     "where to eat",
+     "snack",
+     "food court",
+     "dining"
+    ]
+   }
+  },
+  {
+   "id": "coffee-drink",
+   "need": "Uống nước / cà phê / giải khát",
+   "relevant": [
+    "svc-food-1",
+    "svc-food-2",
+    "svc-food-3",
+    "svc-food-4",
+    "svc-food-5",
+    "svc-food-6",
+    "svc-food-7",
+    "p39-nha-hang",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy"
+   ],
+   "ranking": "nearest",
+   "queries": {
+    "vi": [
+     "cà phê",
+     "cafe",
+     "quán cà phê",
+     "uống nước",
+     "khát nước",
+     "giải khát",
+     "trà",
+     "nước giải khát",
+     "muốn uống cà phê",
+     "ca phe",
+     "coffee windy",
+     "muốn mua nước uống",
+     "tôi muốn mua nước uống",
+     "mua nước uống",
+     "mua đồ uống",
+     "đồ uống",
+     "mua nước giải khát"
+    ],
+    "en": [
+     "coffee",
+     "cafe",
+     "drink",
+     "thirsty",
+     "tea",
+     "coffee shop",
+     "something to drink",
+     "buy a drink"
+    ]
+   },
+   "note": "Nước uống phải ra quán nước và nhà hàng, không ra Cổng liên thông Công viên nước."
+  },
+  {
+   "id": "rest",
+   "need": "Nghỉ ngơi / mệt",
+   "relevant": [
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen",
+    "new-cafe-windy",
+    "new-dao-than-tai",
+    "svc-food-7",
+    "p19-quang-truong-la-ma"
+   ],
+   "ranking": "nearest",
+   "queries": {
+    "vi": [
+     "nghỉ ngơi",
+     "tôi mệt",
+     "mệt rồi",
+     "chỗ ngồi nghỉ",
+     "nghỉ chân",
+     "chỗ mát",
+     "ngồi nghỉ",
+     "thư giãn",
+     "yên tĩnh",
+     "chỗ nghỉ",
+     "nghi ngoi"
+    ],
+    "en": [
+     "rest",
+     "I am tired",
+     "sit down",
+     "relax",
+     "quiet place",
+     "take a break",
+     "shade"
+    ]
+   }
+  },
+  {
+   "id": "first-aid",
+   "need": "Y tế / sơ cứu",
+   "relevant": [
+    "svc-first-aid"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "y tế",
+     "sơ cứu",
+     "trạm y tế",
+     "bị thương",
+     "bị ngã",
+     "chảy máu",
+     "cần bác sĩ",
+     "cấp cứu",
+     "thuốc",
+     "say nắng",
+     "đau bụng",
+     "co ngat y te",
+     "so cuu"
+    ],
+    "en": [
+     "first aid",
+     "medical",
+     "doctor",
+     "injured",
+     "I need help",
+     "emergency",
+     "nurse",
+     "clinic"
+    ]
+   }
+  },
+  {
+   "id": "security",
+   "need": "An ninh / thất lạc / hỗ trợ",
+   "relevant": [
+    "svc-security",
+    "p03-quay-ve-van-phong-cong-vien"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "bảo vệ",
+     "an ninh",
+     "mất đồ",
+     "mất ví",
+     "lạc con",
+     "trẻ bị lạc",
+     "tìm người",
+     "nhặt được đồ",
+     "báo công an",
+     "phòng bảo vệ",
+     "thất lạc",
+     "bao ve"
+    ],
+    "en": [
+     "security",
+     "lost child",
+     "lost wallet",
+     "lost and found",
+     "help desk",
+     "police",
+     "missing item"
+    ]
+   }
+  },
+  {
+   "id": "tickets",
+   "need": "Vé / thông tin",
+   "relevant": [
+    "p03-quay-ve-van-phong-cong-vien",
+    "p17-quay-ve"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "mua vé",
+     "quầy vé",
+     "vé",
+     "giá vé",
+     "đổi vé",
+     "văn phòng công viên",
+     "hỏi thông tin",
+     "thông tin công viên",
+     "quầy thông tin",
+     "gia ve",
+     "mua ve"
+    ],
+    "en": [
+     "ticket",
+     "buy tickets",
+     "ticket counter",
+     "ticket price",
+     "information desk",
+     "park office"
+    ]
+   }
+  },
+  {
+   "id": "parking",
+   "need": "Gửi xe / lấy xe",
+   "relevant": [
+    "svc-parking-1",
+    "svc-parking-2"
+   ],
+   "ranking": "nearest",
+   "queries": {
+    "vi": [
+     "bãi đậu xe",
+     "gửi xe",
+     "lấy xe",
+     "chỗ để xe",
+     "bãi xe",
+     "đậu xe ở đâu",
+     "bãi giữ xe",
+     "gui xe",
+     "bai xe"
+    ],
+    "en": [
+     "parking",
+     "car park",
+     "where to park",
+     "park my car",
+     "motorbike parking",
+     "pick up my car"
+    ]
+   }
+  },
+  {
+   "id": "show",
+   "need": "Xem biểu diễn / show",
+   "relevant": [
+    "p14-san-khau-de-men",
+    "p41-san-khau-ngoi-sao",
+    "p42-bieu-dien-nhac-nuoc",
+    "p50-rap-xiec-dam-sen"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "xem biểu diễn",
+     "biểu diễn",
+     "show",
+     "sân khấu",
+     "chương trình biểu diễn",
+     "nhạc nước",
+     "xiếc",
+     "xem xiếc",
+     "xem ca nhạc",
+     "giải trí buổi tối",
+     "bieu dien",
+     "nhac nuoc"
+    ],
+    "en": [
+     "show",
+     "performance",
+     "stage",
+     "circus",
+     "music fountain",
+     "water show",
+     "live show"
+    ]
+   }
+  },
+  {
+   "id": "cinema",
+   "need": "Xem phim / trong nhà có điều hòa",
+   "relevant": [
+    "p10-rap-phim-cinemax-dam-sen",
+    "p18-dam-sen-plaza",
+    "p27-bang-dang"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "xem phim",
+     "rạp phim",
+     "chiếu phim",
+     "cinemax",
+     "trốn nắng",
+     "chỗ mát có máy lạnh",
+     "tránh nắng",
+     "chơi trong nhà",
+     "trời mưa chơi gì",
+     "điều hòa",
+     "tranh nang",
+     "xem phim 4d"
+    ],
+    "en": [
+     "cinema",
+     "movie",
+     "indoor",
+     "air conditioning",
+     "escape the heat",
+     "rainy day",
+     "shelter from rain"
+    ]
+   }
+  },
+  {
+   "id": "ice",
+   "need": "Băng đăng / lạnh",
+   "relevant": [
+    "p27-bang-dang"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "băng đăng",
+     "lạnh",
+     "khu băng",
+     "tác phẩm băng",
+     "ice",
+     "trò chơi lạnh",
+     "bang dang"
+    ],
+    "en": [
+     "ice lantern",
+     "ice sculpture",
+     "cold place",
+     "ice hall"
+    ]
+   }
+  },
+  {
+   "id": "animals",
+   "need": "Động vật / thú / chim / thủy cung",
+   "relevant": [
+    "p33-chuong-da-dieu-ngua-van-huou-cao-co",
+    "p49-vuon-chim-thu-thien-nhien",
+    "p36-thuy-cung",
+    "p30-nha-trung-bay-tieu-ban-dong-thuc-vat"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "xem thú",
+     "động vật",
+     "con vật",
+     "hươu cao cổ",
+     "ngựa vằn",
+     "đà điểu",
+     "chim",
+     "vườn thú",
+     "thủy cung",
+     "cá",
+     "thu cung",
+     "dong vat"
+    ],
+    "en": [
+     "animals",
+     "zoo",
+     "giraffe",
+     "zebra",
+     "ostrich",
+     "birds",
+     "aquarium",
+     "fish"
+    ]
+   }
+  },
+  {
+   "id": "dinosaur",
+   "need": "Khủng long",
+   "relevant": [
+    "p28-khu-vuon-khung-long"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "khủng long",
+     "vườn khủng long",
+     "xem khủng long",
+     "khu khủng long",
+     "khung long"
+    ],
+    "en": [
+     "dinosaur",
+     "dinosaur garden",
+     "dino park"
+    ]
+   }
+  },
+  {
+   "id": "garden",
+   "need": "Vườn / cây / hoa",
+   "relevant": [
+    "p34-vuon-xuong-rong",
+    "p35-vuon-nhat-ban",
+    "p38-nam-tu-thuong-uyen",
+    "p48-vuon-rau-thuy-canh"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "vườn",
+     "khu vườn",
+     "ngắm hoa",
+     "cây cảnh",
+     "vườn nhật",
+     "xương rồng",
+     "vườn rau",
+     "thượng uyển",
+     "đi dạo",
+     "dạo vườn",
+     "vuon nhat ban",
+     "ngam hoa"
+    ],
+    "en": [
+     "garden",
+     "flowers",
+     "japanese garden",
+     "cactus",
+     "plants",
+     "botanical",
+     "stroll"
+    ]
+   }
+  },
+  {
+   "id": "photo",
+   "need": "Chụp ảnh / check-in / sống ảo",
+   "relevant": [
+    "p19-quang-truong-la-ma",
+    "p43-cau-cuu-khuc",
+    "p35-vuon-nhat-ban",
+    "p38-nam-tu-thuong-uyen",
+    "new-dao-than-tai",
+    "p25-du-quay-dung",
+    "p42-bieu-dien-nhac-nuoc"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "chụp ảnh",
+     "check in",
+     "sống ảo",
+     "chụp hình đẹp",
+     "địa điểm chụp ảnh",
+     "góc sống ảo",
+     "chụp ảnh cưới",
+     "chup anh",
+     "song ao"
+    ],
+    "en": [
+     "photo spot",
+     "take photos",
+     "instagram",
+     "selfie",
+     "check-in spot",
+     "photography",
+     "scenic photos"
+    ]
+   }
+  },
+  {
+   "id": "romantic",
+   "need": "Hẹn hò / lãng mạn",
+   "relevant": [
+    "p43-cau-cuu-khuc",
+    "p42-bieu-dien-nhac-nuoc",
+    "new-dao-than-tai",
+    "p35-vuon-nhat-ban",
+    "p38-nam-tu-thuong-uyen"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "hẹn hò",
+     "lãng mạn",
+     "đi với người yêu",
+     "đi dạo cặp đôi",
+     "chỗ yên tĩnh ngắm hồ",
+     "date",
+     "hen ho"
+    ],
+    "en": [
+     "romantic",
+     "date spot",
+     "couple",
+     "quiet lakeside walk",
+     "honeymoon"
+    ]
+   }
+  },
+  {
+   "id": "souvenir",
+   "need": "Mua quà / lưu niệm",
+   "relevant": [
+    "p29-quay-luu-niem-hoa-sen",
+    "p44-quay-luu-niem-khu-b"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "mua quà",
+     "quà lưu niệm",
+     "lưu niệm",
+     "mua đồ lưu niệm",
+     "quà cho bạn bè",
+     "mua quà mang về",
+     "qua luu niem"
+    ],
+    "en": [
+     "souvenir",
+     "gift shop",
+     "buy gifts",
+     "keepsake",
+     "souvenir shop"
+    ]
+   }
+  },
+  {
+   "id": "boat-transport",
+   "need": "Di chuyển trong công viên: thuyền, xe, monorail",
+   "relevant": [
+    "p07-ben-thuyen",
+    "p05-tram-xe-trung-tam",
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "đi thuyền",
+     "bến thuyền",
+     "xe điện trong công viên",
+     "trạm xe",
+     "monorail",
+     "tàu điện",
+     "đi lại trong công viên",
+     "mệt đi bộ",
+     "ben thuyen",
+     "di thuyen"
+    ],
+    "en": [
+     "boat ride",
+     "boat dock",
+     "shuttle",
+     "monorail",
+     "get around the park",
+     "bus station"
+    ]
+   }
+  },
+  {
+   "id": "meeting",
+   "need": "Điểm hẹn / tập trung nhóm",
+   "relevant": [
+    "p19-quang-truong-la-ma",
+    "p20-dam-sen-square",
+    "p37-quang-truong-vua-hung",
+    "p40-quang-truong-au-lac",
+    "p03-quay-ve-van-phong-cong-vien"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "điểm hẹn",
+     "hẹn gặp",
+     "tập trung",
+     "quảng trường",
+     "chỗ hẹn nhóm",
+     "gặp bạn",
+     "diem hen",
+     "quang truong"
+    ],
+    "en": [
+     "meeting point",
+     "meet friends",
+     "square",
+     "plaza",
+     "gather the group"
+    ]
+   }
+  },
+  {
+   "id": "scary",
+   "need": "Kinh dị / hồi hộp",
+   "relevant": [
+    "p45-lau-dai-kinh-di",
+    "p32-dau-truong-bo-tot"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "kinh dị",
+     "lâu đài ma",
+     "sợ",
+     "trò chơi ma",
+     "hù doạ",
+     "bò tót",
+     "kinh di",
+     "lau dai ma"
+    ],
+    "en": [
+     "haunted",
+     "horror",
+     "ghost house",
+     "scary castle",
+     "bull arena"
+    ]
+   }
+  },
+  {
+   "id": "water-fun",
+   "need": "Trò chơi ướt nước trong công viên khô",
+   "relevant": [
+    "p24-vuot-thac",
+    "new-truot-phao-tren-tham",
+    "p21-power-surge"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "trò chơi nước",
+     "vượt thác",
+     "trượt phao",
+     "bị ướt",
+     "chơi nước mát",
+     "thác nước",
+     "vuot thac"
+    ],
+    "en": [
+     "water ride",
+     "rapids",
+     "tube slide",
+     "get wet",
+     "cool off ride"
+    ]
+   }
+  },
+  {
+   "id": "cheap-free",
+   "need": "Miễn phí / ít tốn kém",
+   "relevant": [
+    "p19-quang-truong-la-ma",
+    "p34-vuon-xuong-rong",
+    "p35-vuon-nhat-ban",
+    "p38-nam-tu-thuong-uyen",
+    "p43-cau-cuu-khuc"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "miễn phí",
+     "đi dạo miễn phí",
+     "không mất tiền",
+     "chỗ đi dạo",
+     "tham quan nhẹ nhàng",
+     "mien phi"
+    ],
+    "en": [
+     "free",
+     "free to visit",
+     "no ticket needed",
+     "easy walk"
+    ]
+   }
+  },
+  {
+   "id": "name-exact",
+   "need": "Gõ đúng tên địa điểm",
+   "relevant": [
+    "p21-power-surge",
+    "p25-du-quay-dung",
+    "new-dao-than-tai",
+    "p10-rap-phim-cinemax-dam-sen",
+    "new-cafe-windy",
+    "p19-quang-truong-la-ma",
+    "p18-dam-sen-plaza"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "Power Surge",
+     "Đu quay đứng",
+     "Đảo Thần Tài",
+     "Cinemax",
+     "Windy",
+     "đảo thần tài",
+     "du quay dung",
+     "tàu xoay cao tốc",
+     "vòng quay thần tốc",
+     "đảo thần kỳ"
+    ],
+    "en": [
+     "Ferris wheel",
+     "God of Fortune Island",
+     "Windy Cafe",
+     "Dam Sen Plaza",
+     "Roman Square"
+    ]
+   },
+   "note": "Tên cũ 'đảo thần kỳ' nên vẫn tìm ra Đảo Thần Tài nếu có từ đồng nghĩa; không bắt buộc."
+  },
+  {
+   "id": "nonsense",
+   "need": "Từ vô nghĩa: không nên trả kết quả bịa",
+   "relevant": [],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "asdfgh",
+     "xyz123",
+     "qwertyuiop",
+     "bitcoin",
+     "bóng đá world cup"
+    ],
+    "en": [
+     "foobar",
+     "hello world",
+     "stock market"
+    ]
+   },
+   "note": "Kết quả mong đợi: trống hoặc rất ít; không trả địa điểm ngẫu nhiên."
+  },
+  {
+   "id": "pedal-boat",
+   "need": "Đạp vịt / trò chơi nhẹ nhàng cho nhóm 2–4 người: chỉ ra Bến thuyền",
+   "relevant": [
+    "p07-ben-thuyen"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "muốn đạp vịt",
+     "đạp vịt",
+     "tôi muốn đạp vịt",
+     "trò chơi nhẹ nhàng",
+     "trò chơi nhẹ nhàng cho nhóm từ 2 đến 4 người",
+     "chơi nhẹ nhàng cho nhóm nhỏ",
+     "đi thuyền",
+     "dap vit",
+     "tro choi nhe nhang cho nhom 2 den 4 nguoi",
+     "vui chơi nhẹ nhàng",
+     "tôi muốn vui chơi nhẹ nhàng",
+     "chơi nhẹ nhàng",
+     "nhẹ nhàng"
+    ],
+    "en": [
+     "pedal boat",
+     "pedalo",
+     "swan boat",
+     "gentle ride for a small group"
+    ]
+   },
+   "note": "Chỉ Bến thuyền; không kèm các trò khác, nhất là không ra khu cảm giác mạnh."
+  },
+  {
+   "id": "lake-walk",
+   "need": "Vườn sen / đi bộ trên hồ / đường đi giữa hồ: gợi ý Cầu Cửu Khúc (43) và Đảo Thần Tài",
+   "relevant": [
+    "p43-cau-cuu-khuc",
+    "new-dao-than-tai"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "vườn sen",
+     "đi bộ trên hồ",
+     "đường đi giữa hồ",
+     "đi giữa hồ",
+     "đường giữa hồ",
+     "lối đi giữa hồ",
+     "đi trên hồ",
+     "ngắm sen",
+     "hoa sen",
+     "cầu giữa hồ",
+     "cau cuu khuc",
+     "vuon sen",
+     "đi bộ giữa hồ"
+    ],
+    "en": [
+     "lotus garden",
+     "walk on the lake",
+     "walkway over the lake",
+     "bridge on the lake",
+     "path across the lake"
+    ]
+   },
+   "note": "Đúng 2 kết quả: Cầu Cửu Khúc và Đảo Thần Tài."
+  },
+  {
+   "id": "train-tour",
+   "need": "Xe lửa / đi một vòng Đầm Sen / đi du ngoạn: gợi ý các nhà ga Monorail",
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2"
+   ],
+   "ranking": "nearest",
+   "queries": {
+    "vi": [
+     "xe lửa",
+     "đi xe lửa",
+     "tôi muốn đi xe lửa",
+     "đi 1 vòng đầm sen",
+     "đi một vòng đầm sen",
+     "đi vòng quanh đầm sen",
+     "đi một vòng công viên",
+     "đi du ngoạn",
+     "tôi muốn đi du ngoạn",
+     "du ngoạn",
+     "xe lua",
+     "di du ngoan",
+     "di 1 vong dam sen",
+     "tàu hỏa"
+    ],
+    "en": [
+     "train ride",
+     "sightseeing",
+     "scenic tour",
+     "tour the park"
+    ]
+   },
+   "note": "Ra đúng hai nhà ga Monorail (12 và 31), nhà ga gần nhất lên đầu khi có vị trí."
+  },
+  {
+   "id": "atm",
+   "need": "ATM / rút tiền: chỉ tới Đu quay đứng, kèm lý do 'gần Đu quay đứng có cây ATM'",
+   "relevant": [
+    "p25-du-quay-dung"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "atm",
+     "cây atm",
+     "tôi cần rút tiền",
+     "rút tiền",
+     "rút tiền mặt",
+     "cần tiền mặt",
+     "hết tiền mặt",
+     "máy atm ở đâu",
+     "cây rút tiền",
+     "tìm cây atm gần nhất",
+     "ngân hàng",
+     "rut tien"
+    ],
+    "en": [
+     "ATM",
+     "cash machine",
+     "withdraw money",
+     "I need cash",
+     "cash point"
+    ]
+   },
+   "note": "Kết quả duy nhất là Đu quay đứng; dòng mô tả của kết quả nói rõ gần đó có cây ATM."
+  },
+  {
+   "id": "lockers",
+   "need": "Tủ gửi đồ → Khu trò chơi cảm giác mạnh (có dịch vụ gửi đồ)",
+   "relevant": [
+    "p04-khu-tro-choi-cam-giac-manh"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "tủ gửi đồ",
+     "gửi đồ",
+     "tôi cần gửi đồ",
+     "tủ đồ",
+     "gửi hành lý",
+     "gửi balo",
+     "tu gui do"
+    ],
+    "en": [
+     "locker",
+     "bag storage",
+     "left luggage"
+    ]
+   },
+   "note": "Chỉ khu cảm giác mạnh, kèm lý do có dịch vụ gửi đồ."
+  },
+  {
+   "id": "station-services",
+   "need": "Thuê xe lăn / áo mưa / trạm sạc → Nhà ga Monorail (gần đó có dịch vụ)",
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "thuê xe lăn",
+     "mượn xe lăn",
+     "tôi cần thuê xe lăn",
+     "áo mưa",
+     "mua áo mưa",
+     "trạm sạc",
+     "trạm sạc xe điện",
+     "sạc xe điện",
+     "thue xe lan",
+     "ao mua"
+    ],
+    "en": [
+     "rent a wheelchair",
+     "raincoat",
+     "charging station",
+     "wheelchair rental"
+    ]
+   },
+   "note": "Ra hai nhà ga Monorail, nhà ga gần nhất trước, kèm lý do."
+  },
+  {
+   "id": "drinking-water",
+   "need": "Vòi nước uống → nhà ga hoặc quán cà phê (mua nước uống)",
+   "relevant": [
+    "p12-nha-ga-monorail-1-nha-hang-de-men",
+    "p31-nha-ga-monorail-2",
+    "new-cafe-windy",
+    "p06-tiem-ca-phe-sai-gon",
+    "p08-ca-phe-vuon-da-dam-sen"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "vòi nước uống",
+     "vòi nước uống miễn phí",
+     "nước uống miễn phí",
+     "trạm nước uống",
+     "nước lọc",
+     "uống nước miễn phí"
+    ],
+    "en": [
+     "drinking fountain",
+     "free drinking water",
+     "water refill"
+    ]
+   },
+   "note": "Ra nhà ga hoặc quán cà phê để mua nước uống."
+  },
+  {
+   "id": "wash-tap",
+   "need": "Vòi nước rửa chân / rửa gì đó → nhà vệ sinh",
+   "relevant": [
+    "svc-wc-1",
+    "svc-wc-2",
+    "svc-wc-3",
+    "svc-wc-4",
+    "svc-wc-5",
+    "svc-wc-6",
+    "svc-wc-7",
+    "svc-wc-8",
+    "svc-wc-access-1",
+    "svc-wc-access-2",
+    "svc-wc-access-3",
+    "svc-wc-access-4",
+    "svc-wc-access-5"
+   ],
+   "ranking": "relevance",
+   "queries": {
+    "vi": [
+     "vòi nước",
+     "vòi nước rửa chân",
+     "rửa chân",
+     "vòi rửa",
+     "rửa bùn",
+     "rửa cát",
+     "tắm chân",
+     "voi nuoc rua chan"
+    ],
+    "en": [
+     "foot wash",
+     "water tap",
+     "wash my feet"
+    ]
+   },
+   "note": "Ra các nhà vệ sinh, kèm lý do có vòi nước rửa."
+  }
+ ]
+}
