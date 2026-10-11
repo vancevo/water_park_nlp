@@ -131,8 +131,53 @@ describe('need intents', () => {
     expect(matchNeedIntent('vòi nước rửa chân')?.categories).toEqual([
       'restroom',
     ]);
-    // plain "xe lăn" is still the accessible toilet; "thuê xe lăn" is the rental
-    expect(matchNeedIntent('xe lăn')?.id).toBe('toilet-accessible');
+    // plain "xe lăn" is the wheelchair rental at the stations; a toilet word makes it the accessible toilet
+    expect(matchNeedIntent('xe lăn')?.id).toBe('wheelchair-rental');
+    expect(matchNeedIntent('nhà vệ sinh xe lăn')?.id).toBe('toilet-accessible');
+    expect(matchNeedIntent('wc xe lăn')?.id).toBe('toilet-accessible');
+  });
+
+  it('sends singing, dancing, drama and art queries to the stages', () => {
+    for (const query of [
+      'ca hát',
+      'nhảy múa',
+      'xem kịch',
+      'nghệ thuật',
+      'văn nghệ',
+      'dance',
+      'concert',
+    ]) {
+      const need = matchNeedIntent(query)!;
+      expect(need.id).toBe('show');
+      expect(need.slugs?.slice(0, 2)).toEqual([
+        'p41-san-khau-ngoi-sao',
+        'p14-san-khau-de-men',
+      ]);
+    }
+  });
+
+  it('sends "hồ sen" to God of Fortune Island and the Nine-Bend Bridge', () => {
+    const need = matchNeedIntent('hồ sen')!;
+    expect(need.id).toBe('lake-walk');
+    expect(need.slugs).toEqual(['p43-cau-cuu-khuc', 'new-dao-than-tai']);
+  });
+
+  it('reads natural sentences: filler words do not hide the need', () => {
+    const cases: [string, string][] = [
+      ['Con tôi 3 tuổi muốn chơi cái gì nhẹ nhàng', 'kids'],
+      ['tôi muốn xuống hồ bơi tắm', 'water-park'],
+      ['điện thoại hết pin cần sạc', 'charging'],
+      ['tủ để đồ', 'lockers'],
+      ['how do I get out of the park', 'go-home'],
+      ['tôi muốn đi dạo trên hồ', 'lake-walk'],
+      ['xem hoa sen', 'lake-walk'],
+      ['Tôi mỏi chân, muốn đi xe điện tham quan', 'getting-around'],
+      // "near X is there a Y": Y is the need, X the place to measure from
+      ['gần đu quay có nhà vệ sinh không', 'toilet'],
+      ['nhà vệ sinh gần đu quay', 'toilet'],
+    ];
+    for (const [query, id] of cases)
+      expect(matchNeedIntent(query)?.id).toBe(id);
   });
 
   it('keeps the left-over words for the search to judge', () => {

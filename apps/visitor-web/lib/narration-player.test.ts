@@ -105,8 +105,18 @@ describe('who may start audio', () => {
     audio.emit('ended');
     expect(player.getSnapshot().status).toBe('idle');
     expect(await player.request(request('poi-click', 'a'))).toBe('heard');
-    expect(await player.request(request('auto-gps', 'a'))).toBe('heard');
     expect(audio.playCalls).toBe(1);
+  });
+
+  it('coming near a place plays it every time, heard before or not', async () => {
+    player.setAutoEnabled(true);
+    expect(await player.request(request('auto-gps', 'a'))).toBe('played');
+    audio.currentTime = 6;
+    audio.emit('timeupdate');
+    audio.emit('ended');
+    expect(player.getSnapshot().status).toBe('idle');
+    expect(await player.request(request('auto-gps', 'a'))).toBe('played');
+    expect(audio.playCalls).toBe(2);
   });
 
   it('replays on demand even when heard, with the switch off', async () => {

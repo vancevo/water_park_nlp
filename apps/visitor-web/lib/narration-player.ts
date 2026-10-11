@@ -7,8 +7,9 @@ import type { ListenHistory } from './listen-history';
  * started twice. Framework-free so it can be tested with a fake audio element.
  *
  * Rules (see docs/plans PLAN_1): `manual` always plays; `poi-click` and `auto-gps`
- * only play while the auto switch is on and the content was not heard yet; `auto-gps`
- * never interrupts audio that is already playing.
+ * only play while the auto switch is on; a `poi-click` does not restart content that was
+ * heard, `auto-gps` (coming near a place or zone) plays every time; `auto-gps` never
+ * interrupts audio that is already playing.
  */
 export type PlaySource = 'manual' | 'poi-click' | 'auto-gps';
 export type PlayerStatus =
@@ -260,7 +261,8 @@ export class NarrationPlayer {
 
     if (!playable) return 'missing';
     if (source !== 'manual' && !this.autoEnabled) return 'cancelled';
-    if (source !== 'manual' && this.deps.history.has(playable.key)) {
+    // A click does not restart what was heard; coming near a place or zone always plays again.
+    if (source === 'poi-click' && this.deps.history.has(playable.key)) {
       return 'heard';
     }
     if (source === 'auto-gps' && BUSY.has(this.state.status)) return 'busy';

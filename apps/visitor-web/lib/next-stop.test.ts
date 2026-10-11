@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pickNextStop } from './next-stop';
+import { listNextStops, pickNextStop } from './next-stop';
 
 const at = (latitude: number, longitude = 106.64) => ({ latitude, longitude });
 const pois = [
@@ -55,5 +55,25 @@ describe('next stop', () => {
   });
   it('says nothing when there is no such place', () => {
     expect(pickNextStop('home', here, [])).toBeNull();
+  });
+});
+
+describe('every place for a next stop', () => {
+  it('lists the fitting places, nearest first', () => {
+    const toilets = listNextStops('toilet', here, pois);
+    expect(toilets.length).toBeGreaterThan(0);
+    expect(toilets.map((item) => item.poi.slug)[0]).toBe(
+      pickNextStop('toilet', here, pois)?.poi.slug,
+    );
+    const distances = toilets.map((item) => item.distance);
+    expect([...distances].sort((a, b) => a - b)).toEqual(distances);
+  });
+
+  it('agrees with the single pick for every kind', () => {
+    for (const kind of ['eat', 'toilet', 'rest', 'play', 'home'] as const) {
+      expect(listNextStops(kind, here, pois)[0]?.poi.slug).toBe(
+        pickNextStop(kind, here, pois)?.poi.slug,
+      );
+    }
   });
 });

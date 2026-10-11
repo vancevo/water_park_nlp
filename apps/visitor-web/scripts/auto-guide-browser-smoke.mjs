@@ -75,6 +75,10 @@ async function session(geo) {
       return o.call(this);
     };
   });
+  // Outside every zone the nearest place narrates by itself (inside one, only the zone does).
+  await context.route(/\/data\/zones\.json/, (route) =>
+    route.fulfill({ json: { zones: [] } }),
+  );
   const page = await context.newPage();
   page.on('pageerror', (e) => console.log('pageerror', e.message));
   const timer = setInterval(

@@ -116,7 +116,13 @@ export interface UiText {
   nextHome: string;
   nextGoing(name: string, meters: number): string;
   nextNone: string;
+  nextResults(label: string): string;
+  nextClear: string;
   notInPark: string;
+  refreshNarration: string;
+  refreshHint: string;
+  refreshNothingHere: string;
+  refreshNoPosition: string;
   autoGuideCount(count: number): string;
   autoGuideNearest(name: string, distance: string): string;
   autoGuideStale: string;
@@ -288,7 +294,15 @@ const vi: UiText = {
   nextHome: 'Đi về',
   nextGoing: (name, meters) => `Đang dẫn bạn tới ${name} (cách ${meters} m).`,
   nextNone: 'Chưa tìm thấy địa điểm phù hợp gần bạn.',
+  nextResults: (label) => `Gợi ý: ${label}`,
+  nextClear: 'Xoá gợi ý',
   notInPark: 'Có vẻ bạn chưa ở trong công viên Đầm Sen.',
+  refreshNarration: 'Làm mới thuyết minh',
+  refreshHint:
+    'Đứng gần một khu hoặc địa điểm mà chưa nghe thuyết minh? Bấm để phát ngay.',
+  refreshNothingHere: 'Bạn chưa ở gần khu hay địa điểm nào để thuyết minh.',
+  refreshNoPosition:
+    'Chưa có vị trí của bạn: bật vị trí hoặc đặt người mô phỏng.',
   autoGuideCount: (count) =>
     `${count} địa điểm tự thuyết minh khi bạn đứng gần`,
   autoGuideNearest: (name, distance) => `Gần nhất: ${name} · ${distance}`,
@@ -487,7 +501,15 @@ const en: UiText = {
   nextHome: 'Head home',
   nextGoing: (name, meters) => `Guiding you to ${name} (${meters} m away).`,
   nextNone: 'No suitable place found near you.',
+  nextResults: (label) => `Suggestions: ${label}`,
+  nextClear: 'Clear',
   notInPark: 'You do not seem to be in Dam Sen park yet.',
+  refreshNarration: 'Refresh narration',
+  refreshHint:
+    'Standing near an area or a place and hearing nothing? Tap to play it now.',
+  refreshNothingHere: 'You are not near any area or place to narrate.',
+  refreshNoPosition:
+    'No position yet: turn on your location or place the simulated walker.',
   autoGuideCount: (count) =>
     `${count} places narrate by themselves when you stand near`,
   autoGuideNearest: (name, distance) => `Nearest: ${name} · ${distance}`,

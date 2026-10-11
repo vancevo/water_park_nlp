@@ -57,6 +57,7 @@ const RULES: readonly NeedRule[] = [
       'go home', 'leave the park', 'leave', 'đi ra', 'thoát', 'cổng chính', 'main gate',
       'ra ngoài', 'muốn ra ngoài', 'thoát ra', 'về lấy xe', 'ra đường', 'cổng 1', 'cổng 1a', 'cổng 2', 'cổng một', 'cổng hai', 'gate 1', 'gate 2',
       'an exit', 'the exit', 'where is the exit',
+      'get out', 'get out of the park', 'how do i get out', 'exit the park', 'leave',
     ],
   },
   {
@@ -69,6 +70,7 @@ const RULES: readonly NeedRule[] = [
       'water park', 'waterpark', 'swim', 'swimming', 'swimming pool', 'pool', 'slides pool',
       'connecting gate', 'go to the water park',
       'qua khu nước', 'sang khu nước', 'khu nước', 'quay lại khu khô', 'về đầm sen khô', 'khu khô', 'đã đi khu nước', 'chơi nước ở đầm sen nước', 'cầu trượt nước', 'tắm hồ', 'tắm công viên', 'tắm đầm sen',
+      'cầu trượt', 'trò cầu trượt', 'chơi cầu trượt', 'xuống hồ bơi', 'xuống hồ bơi tắm', 'sang khu nước',
     ],
   },
   {
@@ -96,6 +98,7 @@ const RULES: readonly NeedRule[] = [
     phrases: [
       'tủ gửi đồ', 'gửi đồ', 'tủ đồ', 'tủ khóa', 'gửi hành lý', 'hành lý', 'gửi túi', 'gửi balo', 'gửi ba lô',
       'locker', 'lockers', 'luggage', 'bag storage', 'left luggage', 'store my bag', 'cloakroom',
+      'tủ để đồ', 'để đồ', 'cất đồ', 'giữ đồ', 'tủ giữ đồ', 'chỗ để đồ', 'chỗ gửi đồ',
     ],
   },
   {
@@ -109,6 +112,7 @@ const RULES: readonly NeedRule[] = [
     phrases: [
       'thuê xe lăn', 'mượn xe lăn', 'xe lăn thuê', 'cho thuê xe lăn', 'xe lăn cho thuê', 'cần xe lăn', 'thuê xe đẩy',
       'rent a wheelchair', 'wheelchair rental', 'borrow a wheelchair', 'wheelchair hire',
+      'xe lăn', 'xe lăn gần nhất', 'cần xe lăn', 'wheelchair', 'wheel chair', 'xe lăn cho người già', 'mượn xe lăn cho người già',
     ],
   },
   {
@@ -135,6 +139,7 @@ const RULES: readonly NeedRule[] = [
     phrases: [
       'trạm sạc', 'trạm sạc xe điện', 'sạc xe điện', 'sạc ô tô điện', 'sạc xe', 'sạc pin', 'chỗ sạc', 'charging station',
       'charging point', 'charge my car', 'ev charging', 'charger',
+      'sạc điện thoại', 'cần sạc', 'sạc', 'sạc dự phòng', 'hết pin', 'pin điện thoại', 'điện thoại hết pin', 'charge my phone', 'phone charger', 'phone battery',
     ],
   },
   {
@@ -218,7 +223,7 @@ const RULES: readonly NeedRule[] = [
       'vệ sinh xe lăn', 'accessible toilet', 'disabled toilet', 'wheelchair restroom',
       'wheelchair toilet', 'handicap restroom', 'accessible bathroom', 'accessible restroom',
       'accessible wc',
-      'xe lăn', 'khuyết tật', 'ít bậc', 'không cầu thang', 'đi lại khó', 'xe đẩy em bé', 'xe đẩy', 'wc hỗ trợ', 'nhà vệ sinh hỗ trợ', 'wc xe lăn', 'wc khuyết tật', 'wc accessible', 'hỗ trợ xe lăn', 'ký hiệu xe lăn', 'lối không có bậc', 'wheelchair', 'disabled',
+      'khuyết tật', 'ít bậc', 'không cầu thang', 'đi lại khó', 'xe đẩy em bé', 'xe đẩy', 'wc hỗ trợ', 'nhà vệ sinh hỗ trợ', 'wc xe lăn', 'wc khuyết tật', 'wc accessible', 'hỗ trợ xe lăn', 'ký hiệu xe lăn', 'lối không có bậc', 'disabled',
     ],
   },
   {
@@ -259,7 +264,7 @@ const RULES: readonly NeedRule[] = [
       'cà phê', 'cafe', 'quán cà phê', 'uống nước', 'khát', 'khát nước', 'giải khát', 'trà',
       'nước giải khát', 'uống cà phê', 'coffee', 'coffee shop', 'drink', 'drinks', 'thirsty', 'tea',
       'something to drink',
-      'cf', 'mua nước', 'nước ép', 'trà sữa', 'nước trái cây', 'nước uống', 'quán nước', 'quán mát', 'cafe làm việc', 'wifi', 'wi fi', 'sạc điện thoại', 'ổ điện', 'ít ồn', 'cafe view hồ', 'cafe gần hồ', 'cafe ven hồ', 'cafe nhìn hồ', 'cf nhìn hồ', 'ngắm hồ uống cafe', 'cafe sân vườn', 'cafe cây xanh', 'uống cà phê', 'cà phê gần', 'nhiều cây xanh',
+      'cf', 'mua nước', 'nước ép', 'trà sữa', 'nước trái cây', 'nước uống', 'quán nước', 'quán mát', 'cafe làm việc', 'wifi', 'wi fi', 'ít ồn', 'cafe view hồ', 'cafe gần hồ', 'cafe ven hồ', 'cafe nhìn hồ', 'cf nhìn hồ', 'ngắm hồ uống cafe', 'cafe sân vườn', 'cafe cây xanh', 'uống cà phê', 'cà phê gần', 'nhiều cây xanh',
       'mua nước uống', 'muốn mua nước uống', 'mua đồ uống', 'đồ uống', 'mua nước giải khát',
     ],
   },
@@ -331,14 +336,15 @@ const RULES: readonly NeedRule[] = [
     nearest: false,
     slugs: [
       'p41-san-khau-ngoi-sao',
-      'p42-bieu-dien-nhac-nuoc',
       'p14-san-khau-de-men',
+      'p42-bieu-dien-nhac-nuoc',
       'p50-rap-xiec-dam-sen',
     ],
     phrases: [
       'xem biểu diễn', 'biểu diễn', 'show', 'sân khấu', 'chương trình biểu diễn', 'nhạc nước', 'xiếc',
       'xem xiếc', 'xem ca nhạc', 'giải trí buổi tối', 'giải trí', 'performance', 'stage', 'circus',
       'music fountain', 'water show', 'live show', 'shows',
+      'ca hát', 'hát', 'nhảy múa', 'múa', 'nhảy', 'kịch', 'diễn kịch', 'xem kịch', 'kịch nói', 'nghệ thuật', 'nghệ thuật biểu diễn', 'biểu diễn nghệ thuật', 'văn nghệ', 'ca nhạc', 'âm nhạc', 'nhạc', 'hòa nhạc', 'buổi hòa nhạc', 'xem múa', 'xem hát', 'đi xem hát', 'singing', 'sing', 'dance', 'dancing', 'drama', 'theater', 'theatre', 'art', 'arts', 'performing arts', 'music', 'concert', 'musical',
     ],
   },
   {
@@ -486,6 +492,8 @@ const RULES: readonly NeedRule[] = [
       'đường đi trên hồ', 'cầu giữa hồ', 'cầu ziczac', 'cầu cửu khúc', 'đường qua hồ', 'lối đi giữa hồ', 'hoa sen',
       'ngắm sen', 'lotus', 'lotus garden', 'lotus pond', 'walk on the lake', 'walkway over the lake',
       'path across the lake', 'bridge on the lake',
+      'hồ sen', 'ao sen', 'đầm sen hồ', 'ngắm hồ sen', 'lotus lake',
+      'đi dạo trên hồ', 'dạo trên hồ', 'đi dạo hồ', 'đi dạo bên hồ', 'đi dạo cạnh hồ', 'xem hoa sen', 'xem sen', 'ngắm hoa sen',
     ],
   },
   {
@@ -660,6 +668,11 @@ const FILLERS = new Set(
     'đi',
     'thì',
     'của',
+    'nhẹ',
+    'nhàng',
+    'cái',
+    'chơi',
+    'xuống',
     'chỉ',
     'mua',
     'vui',
@@ -768,6 +781,10 @@ function findPhrase(query: readonly Word[], phrase: readonly Word[]): number {
   return -1;
 }
 
+const WISH = new Set(
+  ['muốn', 'cần', 'want', 'need', 'wanna', 'looking'].map(normalizeSearchText),
+);
+
 const PROXIMITY = new Set(
   [
     'gần',
@@ -815,9 +832,23 @@ export function matchNeedIntent(query: string): NeedIntent | null {
       ),
   );
   if (maximal.length === 0) return null;
-  const best = [...maximal].sort(
+  // "Tôi mỏi chân, muốn đi xe điện": what follows "muốn / cần / want" is what is asked for.
+  const wishAt = tokens.findIndex((token) => WISH.has(token.plain));
+  // ("nhẹ nhàng" after "muốn" only describes the wish: "con tôi muốn chơi nhẹ nhàng")
+  const wished =
+    wishAt >= 0
+      ? maximal.filter(
+          (hit) => hit.start > wishAt && hit.compiled.rule.id !== 'pedal-boat',
+        )
+      : [];
+  const ordered = [...(wished.length > 0 ? wished : maximal)].sort(
     (left, right) => left.start - right.start || right.length - left.length,
-  )[0]!;
+  );
+  // "gần Đu quay đứng có nhà vệ sinh không": the "near" comes first, so what follows it is the
+  // need and what precedes it is the place to measure from.
+  const nearAt = tokens.findIndex((token) => PROXIMITY.has(token.plain));
+  const anchorFirst = nearAt >= 0 && ordered[0]!.start > nearAt;
+  const best = anchorFirst ? ordered[ordered.length - 1]! : ordered[0]!;
   // Take every phrase of the winning need out of the query; what is left must be filler.
   const left = [...tokens];
   for (const phrase of best.compiled.phrases) {

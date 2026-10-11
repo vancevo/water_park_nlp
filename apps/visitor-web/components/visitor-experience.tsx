@@ -72,7 +72,7 @@ import {
   type GuideState,
 } from '@/lib/proximity-guide';
 import { narrationKey } from '@/lib/listen-history';
-import { pickNextStop, type NextStopKind } from '@/lib/next-stop';
+import { listNextStops, type NextStopKind } from '@/lib/next-stop';
 import { loadWalkNodes, snapToWalkNode } from '@/lib/snap-to-walkway';
 import { loadZones, type Zone } from '@/lib/zones';
 import { loadPlayable } from '@/lib/narration-load';
@@ -90,6 +90,16 @@ import { NextStopBox, NowPlayingCard, ZoneCard } from './zone-panels';
  * so the pin (turned -45deg about its bottom-left corner, which becomes the tip) lives inside.
  * With anchor 'bottom-left' the tip sits exactly on the place's coordinates.
  */
+function nextStopLabel(t: UiText, kind: NextStopKind): string {
+  return {
+    eat: t.nextEat,
+    toilet: t.nextToilet,
+    rest: t.nextRest,
+    play: t.nextPlay,
+    home: t.nextHome,
+  }[kind];
+}
+
 function pinAnchor(pin: HTMLElement, small = false): HTMLElement {
   const anchor = document.createElement('div');
   anchor.className = `pin-anchor${small ? ' sub' : ''}`;
@@ -341,6 +351,8 @@ export function VisitorExperience() {
   const [panelOpen, setPanelOpen] = useState(true);
   const [arrivalOpen, setArrivalOpen] = useState(false);
   const [query, setQuery] = useState('');
+  // The answer of the "where do you want to go" box: its places are listed in the search area.
+  const [nextStop, setNextStop] = useState<NextStopKind | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [session, setSession] = useState<AuthResponse | null>(null);
@@ -356,6 +368,16 @@ export function VisitorExperience() {
     retryCatalog: retryNarrationCatalog,
   } = useVisitorNarration(selected?.id ?? null, locale);
   const effectivePosition = simulationPosition ?? position;
+  // What the list shows: the places of the box's answer (live, nearest first) or the search/places.
+  const nextStopList = useMemo(() => {
+    if (nextStop === null) return null;
+    const from = effectivePosition ?? gpsFix?.point ?? null;
+    if (!from) return [];
+    return listNextStops(nextStop, from, allPois).map(({ poi, distance }) => ({
+      ...poi,
+      distanceMeters: Math.round(distance),
+    }));
+  }, [allPois, effectivePosition, gpsFix, nextStop]);
   const simulationProgress: RouteProgress | null = route
     ? routeProgressAt(route.geometry.coordinates, simulationDistanceMeters)
     : null;
@@ -1307,6 +1329,7 @@ export function VisitorExperience() {
     readPosition: readGuidePosition,
     onNotInPark: () => setMessage(t.notInPark),
   });
+  const zoneIdRef = zoneGuide.currentZoneRef;
   /** The visitor's Stop: ends the audio and drops what was waiting for it (the next place still plays). */
   function stopNarration() {
     player?.stop();
@@ -1413,12 +1436,17 @@ export function VisitorExperience() {
           nearest,
         });
       }
+      // One narration per approach: inside a zone the zone introduction speaks (the zone guide),
+      // so its places stay quiet; outside every zone only the nearest place speaks.
+      if (zoneIdRef.current !== null) return;
       const candidate = result.candidates[0];
       const poi = candidate
         ? live.targets.find((item) => item.id === candidate.id)
         : undefined;
       if (!poi) return;
-      guideStateRef.current = markGuideFired(guideStateRef.current, poi.id);
+      for (const other of result.candidates) {
+        guideStateRef.current = markGuideFired(guideStateRef.current, other.id);
+      }
       if (player.isBusy()) {
         queuedGuideRef.current = poi;
         return;
@@ -1498,21 +1526,48 @@ export function VisitorExperience() {
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, [autoGuide]);
 
-  /** An answer of the "what next" box: the nearest fitting place, and a route to it. */
+  /**
+   * An answer of the "what next" box: the fitting places, nearest first, are listed in the search
+   * area and the visitor picks one (or answers again). The box stays open for another answer.
+   */
   function chooseNextStop(kind: NextStopKind) {
-    const from = readGuidePosition();
-    zoneGuide.dismissWelcome();
-    if (!from) return;
-    const found = pickNextStop(kind, from, allPois);
-    if (!found) {
-      setMessage(t.nextNone);
+    setNextStop(kind);
+    setQuery('');
+    setSelected(null);
+    setActiveChild(null);
+    if (!readGuidePosition()) setMessage(t.notInPark);
+  }
+
+  /**
+   * The refresh button: speak now for where the visitor stands, whatever was heard or skipped
+   * before. The zone if the visitor is in one, else the nearest place within reach.
+   */
+  function refreshNarration() {
+    const here = readGuidePosition() ?? position;
+    if (!here) {
+      setMessage(t.refreshNoPosition);
       return;
     }
-    setSelected(found.poi);
-    setActiveChild(null);
-    void navigateTo(found.poi).then(() =>
-      setMessage(t.nextGoing(found.poi.name, Math.round(found.distance))),
-    );
+    if (zoneGuide.replayHere(here)) return;
+    let nearest: { poi: PoiSummary; distance: number } | null = null;
+    for (const poi of autoTargets) {
+      const distance = guideDistanceMeters(here, {
+        location: poi.location,
+        alsoNear: alsoNear[poi.slug],
+      });
+      if (
+        distance <= AUTO_GUIDE_DEFAULTS.enterMeters &&
+        (!nearest || distance < nearest.distance)
+      ) {
+        nearest = { poi, distance };
+      }
+    }
+    if (!nearest) {
+      setMessage(t.refreshNothingHere);
+      return;
+    }
+    setMessage('');
+    void requestPlayRef.current(nearest.poi, 'manual');
   }
 
   /** Explicit "new visit": forget what was heard so places narrate again. */
@@ -1851,7 +1906,10 @@ export function VisitorExperience() {
               <span>⌕</span>
               <input
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => {
+                  setNextStop(null);
+                  setQuery(event.target.value);
+                }}
                 placeholder={t.searchPlaceholder}
                 aria-label={t.searchLabel}
               />
@@ -1884,6 +1942,7 @@ export function VisitorExperience() {
                   locale={locale}
                   zone={zoneGuide.welcome.zone}
                   speaking={zoneSpeaking}
+                  chosen={nextStop}
                   onStop={stopNarration}
                   onChoose={chooseNextStop}
                   onClose={zoneGuide.dismissWelcome}
@@ -1962,20 +2021,40 @@ export function VisitorExperience() {
               eligibleCount={autoTargets.length}
               heardCount={player?.history.size ?? 0}
               onToggle={toggleAutoGuide}
+              onRefresh={refreshNarration}
               onNewVisit={startNewVisit}
             />
             <div className="list-heading">
-              <strong>{query ? t.searchResults : t.placesHeading}</strong>
-              <span>{t.placeCount(pois.length)}</span>
+              <strong>
+                {nextStop !== null
+                  ? t.nextResults(nextStopLabel(t, nextStop))
+                  : query
+                    ? t.searchResults
+                    : t.placesHeading}
+              </strong>
+              <span>
+                {nextStop !== null ? (
+                  <button
+                    type="button"
+                    className="list-clear"
+                    onClick={() => setNextStop(null)}
+                  >
+                    {t.nextClear}
+                  </button>
+                ) : null}
+                {t.placeCount((nextStopList ?? pois).length)}
+              </span>
             </div>
             <div className="poi-list">
               {loading ? (
                 <div className="empty-state">{t.loadingPlaces}</div>
               ) : null}
-              {!loading && pois.length === 0 ? (
-                <div className="empty-state">{t.noPlaces}</div>
+              {!loading && (nextStopList ?? pois).length === 0 ? (
+                <div className="empty-state">
+                  {nextStop !== null ? t.nextNone : t.noPlaces}
+                </div>
               ) : null}
-              {pois.map((poi) => (
+              {(nextStopList ?? pois).map((poi) => (
                 <button
                   className={`poi-card${selected?.id === poi.id ? ' active' : ''}`}
                   key={poi.id}
@@ -2128,6 +2207,7 @@ function AutoGuidePanel({
   eligibleCount,
   heardCount,
   onToggle,
+  onRefresh,
   onNewVisit,
 }: {
   t: UiText;
@@ -2139,6 +2219,7 @@ function AutoGuidePanel({
   eligibleCount: number;
   heardCount: number;
   onToggle(): void;
+  onRefresh(): void;
   onNewVisit(): void;
 }) {
   if (eligibleCount === 0) return null;
@@ -2175,6 +2256,15 @@ function AutoGuidePanel({
       {enabled ? null : <p>{t.autoGuideHint}</p>}
       <p className="auto-guide-count">{t.autoGuideCount(eligibleCount)}</p>
       {status ? <p role="status">{status}</p> : null}
+      <button
+        type="button"
+        className="auto-guide-refresh"
+        onClick={onRefresh}
+        title={t.refreshHint}
+        aria-label={`${t.refreshNarration}. ${t.refreshHint}`}
+      >
+        <span aria-hidden="true">↻</span> {t.refreshNarration}
+      </button>
       {heardCount > 0 ? (
         <div className="auto-guide-visit">
           <small>{t.heardCount(heardCount)}</small>

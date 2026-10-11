@@ -8,7 +8,7 @@
 //
 // A: auto narration switched on inside a zone -> the zone is named and the box asks what next;
 //    an answer starts a route. B: walking into another zone speaks its introduction once and
-//    shows the card; coming back does not repeat it. C: English narration speaks English.
+//    shows the card; coming near it again plays it again. C: English narration speaks English.
 // E: a single place narrates by itself when the visitor is near it (a service point too),
 //    but not a toilet. D: the simulated walker, placed and walking, hears the zone it comes near.
 import { pathToFileURL } from 'node:url';
@@ -48,7 +48,12 @@ const check = (name, ok, extra = '') => {
   console.log(ok ? 'PASS' : 'FAIL', name, extra);
 };
 
-async function session(geo, init, viewport = { width: 1400, height: 900 }) {
+async function session(
+  geo,
+  init,
+  viewport = { width: 1400, height: 900 },
+  { noZones = false } = {},
+) {
   const context = await browser.newContext({
     viewport,
     geolocation: geo,
@@ -79,10 +84,17 @@ async function session(geo, init, viewport = { width: 1400, height: 900 }) {
     };
   });
   if (init) await context.addInitScript(init);
+  // Without zones the nearest place narrates by itself (inside a zone only the zone does).
+  if (noZones) {
+    await context.route(/\/data\/zones\.json/, (route) =>
+      route.fulfill({ json: { zones: [] } }),
+    );
+  }
   // The places now have AI audio files; this smoke listens to the browser voice, so the
   // narration answers are served without audio (the audio path has its own checks).
   await context.route(/\/v1\/pois\/[^/]+\/narration/, async (route) => {
-    const response = await route.fetch();
+    const response = await route.fetch().catch(() => null);
+    if (!response) return undefined;
     const body = await response.json().catch(() => null);
     if (!body) return route.fulfill({ response });
     return route.fulfill({ response, json: { ...body, audio: null } });
@@ -141,24 +153,62 @@ const toggleAuto = (page) =>
   );
   const noIntro = !(await s.said()).some((t) => /Bạn đang đến/.test(t));
   check('A: the welcomed zone is not introduced on top of it', noIntro);
-  const routeCall = s.page.waitForRequest(
-    (r) => r.url().endsWith('/v1/routes') && r.method() === 'POST',
-    { timeout: 10000 },
-  );
-  await s.page
-    .locator('.next-stop')
-    .getByRole('button', { name: 'Nhà vệ sinh' })
-    .click();
-  await routeCall;
-  check('A: an answer asks for a route', true);
+  // An answer lists the fitting places in the search area (nearest first); the visitor picks one.
+  const answer = (name) =>
+    s.page.locator('.next-stop').getByRole('button', { name }).click();
+  const listed = () =>
+    s.page.locator('.poi-list .poi-card strong').allInnerTexts();
+  await answer('Nhà vệ sinh');
   await s.page.waitForTimeout(800);
+  const toilets = await listed();
   check(
-    'A: the box closes after the answer',
-    (await s.page.locator('.next-stop').count()) === 0,
+    'A: an answer lists its places in the search area',
+    toilets.length > 3 && toilets.every((name) => /vệ sinh/i.test(name)),
+    toilets.slice(0, 2).join(' | '),
   );
-
-  // Stop the guidance, so reaching the destination later does not open its arrival dialog.
-  await s.page.getByRole('button', { name: 'Dừng dẫn đường' }).click();
+  check(
+    'A: the list is headed with the answer',
+    /Gợi ý: Nhà vệ sinh/.test(
+      await s.page.locator('.list-heading strong').innerText(),
+    ),
+  );
+  check(
+    'A: the box stays open to answer again',
+    (await s.page.locator('.next-stop').count()) === 1,
+  );
+  // answering again replaces the list
+  await answer('Đi ăn');
+  await s.page.waitForTimeout(800);
+  const food = await listed();
+  check(
+    'A: answering again lists the new places',
+    food.length > 3 && !food.some((name) => /vệ sinh/i.test(name)),
+    food.slice(0, 2).join(' | '),
+  );
+  check(
+    'A: the chosen answer is marked',
+    /Đi ăn/.test(
+      await s.page
+        .locator('.next-stop-options button[aria-pressed="true"]')
+        .innerText(),
+    ),
+  );
+  // picking a result opens the place, with the way to go there
+  await s.page.locator('.poi-list .poi-card').first().click();
+  await s.page.locator('.poi-detail').waitFor({ timeout: 8000 });
+  check('A: a picked result opens its card', true);
+  // typing a search ends the answer's list
+  await s.page.locator('.search-box input').fill('Power');
+  await s.page.waitForTimeout(1200);
+  check(
+    'A: typing a search replaces the answer list',
+    /Kết quả tìm kiếm/.test(
+      await s.page.locator('.list-heading strong').innerText(),
+    ),
+  );
+  await s.page.locator('.search-box input').fill('');
+  await s.page.waitForTimeout(600);
+  await s.page.locator('.next-stop .close-button').click();
 
   // ---- B: walk into the garden zone
   await s.move(inGarden);
@@ -200,8 +250,8 @@ const toggleAuto = (page) =>
   await s.move(inGarden);
   await s.page.waitForTimeout(6000);
   check(
-    'B: coming back does not repeat it',
-    (await intros()) === 1,
+    'B: coming near the zone again plays it again',
+    (await intros()) === 2,
     String(await intros()),
   );
 
@@ -271,22 +321,57 @@ const toggleAuto = (page) =>
   await s.context.close();
 }
 
-// ---- E: single places narrate near them, toilets do not
+// ---- E: one narration per approach: the zone if there is one, else the nearest place only
 {
+  // Inside a zone the zone speaks and its places stay quiet.
   const s = await session(at(where('svc-parking-1'), 0.0001));
+  await toggleAuto(s.page);
+  await s.page.waitForTimeout(9000);
+  const said = await s.said();
+  check(
+    'E: inside a zone the zone speaks',
+    said.some((t) => /^Bạn đang ở /.test(t)),
+  );
+  check(
+    'E: its places stay quiet',
+    !said.some((t) => /^Bãi đậu xe số một/.test(t)),
+  );
+  s.stop();
+  await s.context.close();
+}
+{
+  // Outside every zone the nearest place speaks, every time the visitor comes near it.
+  const s = await session(
+    at(where('svc-parking-1'), 0.0001),
+    undefined,
+    { width: 1400, height: 900 },
+    { noZones: true },
+  );
   await toggleAuto(s.page);
   await s.page.waitForFunction(
     () => window.__said.some((t) => /^Bãi đậu xe số một/.test(t)),
     null,
     { timeout: 25000 },
   );
-  check('E: a service point narrates when the visitor is near it', true);
+  check('E: without a zone the nearest place narrates', true);
   await s.move(at(where('svc-wc-3'), 0.00005));
   await s.page.waitForTimeout(9000);
   check(
     'E: a toilet never narrates by itself',
     !(await s.said()).some((t) => /^Nhà vệ sinh số/.test(t)),
   );
+  const count = async () =>
+    (await s.said()).filter((t) => /^Bãi đậu xe số một/.test(t)).length;
+  const before = await count();
+  await s.move(farAway);
+  await s.page.waitForTimeout(8000);
+  await s.move(at(where('svc-parking-1'), 0.0001));
+  await s.page.waitForFunction(
+    (n) => window.__said.filter((t) => /^Bãi đậu xe số một/.test(t)).length > n,
+    before,
+    { timeout: 25000 },
+  );
+  check('E: coming near it again plays it again, heard before or not', true);
   s.stop();
   await s.context.close();
 }
@@ -346,10 +431,84 @@ const toggleAuto = (page) =>
   await s.context.close();
 }
 
+// ---- G: the refresh button forces the narration of where the visitor stands
+{
+  // In a zone: its introduction is spoken now, even though nothing new happened.
+  const s = await session(inThrill);
+  await toggleAuto(s.page);
+  await s.page.locator('.next-stop').waitFor({ timeout: 12000 });
+  await s.page.locator('.next-stop .close-button').click();
+  await s.page.waitForTimeout(1500);
+  const arrivals = async () =>
+    (await s.said()).filter((t) => /^Bạn đang đến /.test(t)).length;
+  const before = await arrivals();
+  await s.page.getByRole('button', { name: /Làm mới thuyết minh/ }).click();
+  await s.page.waitForFunction(
+    (n) => window.__said.filter((t) => /^Bạn đang đến /.test(t)).length > n,
+    before,
+    { timeout: 8000 },
+  );
+  check('G: refresh speaks the zone you stand in', true);
+  check(
+    'G: its card is shown',
+    (await s.page.locator('.zone-card').count()) === 1,
+  );
+  s.stop();
+  await s.context.close();
+}
+{
+  // Outside every zone: the nearest place is spoken, even with the auto switch off.
+  const s = await session(
+    at(where('svc-parking-1'), 0.0001),
+    undefined,
+    { width: 1400, height: 900 },
+    { noZones: true },
+  );
+  await s.page.waitForTimeout(500);
+  await s.page.getByRole('button', { name: /Làm mới thuyết minh/ }).click();
+  await s.page.waitForTimeout(1500);
+  // no position is known while auto narration is off and nothing is placed
+  check(
+    'G: without a position the refresh says so',
+    /Chưa có vị trí của bạn/.test(await s.page.locator('body').innerText()),
+  );
+  await toggleAuto(s.page);
+  await s.page.waitForTimeout(4000);
+  await s.page.getByRole('button', { name: /Làm mới thuyết minh/ }).click();
+  await s.page.waitForFunction(
+    () => window.__said.some((t) => /^Bãi đậu xe số một/.test(t)),
+    null,
+    { timeout: 10000 },
+  );
+  check('G: refresh speaks the nearest place', true);
+  s.stop();
+  await s.context.close();
+}
+{
+  // Far from everything: nothing to narrate, and it says so.
+  const s = await session(farAway);
+  await toggleAuto(s.page);
+  await s.page.waitForTimeout(3000);
+  const spoken = (await s.said()).length;
+  await s.page.getByRole('button', { name: /Làm mới thuyết minh/ }).click();
+  await s.page.waitForTimeout(1500);
+  check(
+    'G: nothing near: nothing is spoken',
+    (await s.said()).length === spoken,
+  );
+  s.stop();
+  await s.context.close();
+}
+
 // ---- F: walking past single places: they narrate, with a Stop button; Stop stops, the next plays
 {
   // The click below is placed for this window size (whole-park view).
-  const s = await session(farAway, undefined, { width: 1440, height: 860 });
+  const s = await session(
+    farAway,
+    undefined,
+    { width: 1440, height: 860 },
+    { noZones: true },
+  );
   const page = s.page;
   await page.click('.panel-handle');
   await page.waitForTimeout(900);
@@ -369,8 +528,8 @@ const toggleAuto = (page) =>
     await page.waitForTimeout(900);
   }
   await toggleAuto(page);
-  await page.locator('.next-stop').waitFor({ timeout: 10000 });
-  await page.locator('.next-stop .close-button').click();
+  // Without zones there is no welcome box: only the places speak.
+  await page.waitForTimeout(1500);
   await page.evaluate(() => (window.__speechMs = 9000));
   await page.locator('.search-box input').fill('Nam Tú');
   await page.waitForTimeout(800);

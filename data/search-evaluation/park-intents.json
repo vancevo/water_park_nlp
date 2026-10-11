@@ -589,7 +589,18 @@
      "xem ca nhạc",
      "giải trí buổi tối",
      "bieu dien",
-     "nhac nuoc"
+     "nhac nuoc",
+     "ca hát",
+     "nhảy múa",
+     "xem kịch",
+     "nghệ thuật",
+     "văn nghệ",
+     "xem múa",
+     "âm nhạc",
+     "hòa nhạc",
+     "tôi muốn xem ca nhạc",
+     "kịch",
+     "nghe hát"
     ],
     "en": [
      "show",
@@ -598,9 +609,16 @@
      "circus",
      "music fountain",
      "water show",
-     "live show"
+     "live show",
+     "singing",
+     "dance",
+     "drama",
+     "theater",
+     "concert",
+     "performing arts"
     ]
-   }
+   },
+   "note": "Ca hát, nhảy múa, kịch, nghệ thuật, văn nghệ… đều gợi ý ra các sân khấu (Ngôi Sao, Dế Mèn, nhạc nước, rạp xiếc)."
   },
   {
    "id": "cinema",
@@ -1109,14 +1127,18 @@
      "cầu giữa hồ",
      "cau cuu khuc",
      "vuon sen",
-     "đi bộ giữa hồ"
+     "đi bộ giữa hồ",
+     "hồ sen",
+     "ao sen",
+     "ngắm hồ sen"
     ],
     "en": [
      "lotus garden",
      "walk on the lake",
      "walkway over the lake",
      "bridge on the lake",
-     "path across the lake"
+     "path across the lake",
+     "lotus lake"
     ]
    },
    "note": "Đúng 2 kết quả: Cầu Cửu Khúc và Đảo Thần Tài."
@@ -1231,13 +1253,17 @@
      "trạm sạc xe điện",
      "sạc xe điện",
      "thue xe lan",
-     "ao mua"
+     "ao mua",
+     "xe lăn",
+     "cần xe lăn",
+     "xe lăn ở đâu"
     ],
     "en": [
      "rent a wheelchair",
      "raincoat",
      "charging station",
-     "wheelchair rental"
+     "wheelchair rental",
+     "wheelchair"
     ]
    },
    "note": "Ra hai nhà ga Monorail, nhà ga gần nhất trước, kèm lý do."

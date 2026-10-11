@@ -76,6 +76,7 @@ export function NextStopBox({
   locale,
   zone,
   speaking,
+  chosen,
   onStop,
   onChoose,
   onClose,
@@ -84,6 +85,8 @@ export function NextStopBox({
   locale: UiLocale;
   zone: Zone | null;
   speaking: boolean;
+  /** The answer whose places are listed in the search area (it can be changed any time). */
+  chosen: NextStopKind | null;
   onStop(): void;
   onChoose(kind: NextStopKind): void;
   onClose(): void;
@@ -110,7 +113,13 @@ export function NextStopBox({
       <p>{t.nextQuestion}</p>
       <div className="next-stop-options">
         {NEXT_STOP_KINDS.map((kind) => (
-          <button key={kind} type="button" onClick={() => onChoose(kind)}>
+          <button
+            key={kind}
+            type="button"
+            className={chosen === kind ? 'active' : undefined}
+            aria-pressed={chosen === kind}
+            onClick={() => onChoose(kind)}
+          >
             <span aria-hidden="true">{NEXT_ICONS[kind]}</span>
             {labels[kind]}
           </button>

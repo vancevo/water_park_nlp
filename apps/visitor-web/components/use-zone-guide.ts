@@ -32,7 +32,7 @@ export interface ZoneGuideState {
 
 /**
  * Zone introductions while auto narration is on: coming near a zone speaks what is there,
- * what to try and what to watch out for (once per language); switching auto narration on
+ * what to try and what to watch out for (every time the visitor comes near it); switching auto narration on
  * (or coming back to the app) says which zone the visitor is in and asks what they want next.
  * It reads the visitor's position (real GPS or the simulated walker) every second, also
  * while the walker is walking.
@@ -66,6 +66,10 @@ export function useZoneGuide({
   dismissWelcome(): void;
   /** The visitor pressed Stop: an introduction that waited for the audio is dropped. */
   clearQueue(): void;
+  /** The id of the zone the visitor is in (null outside every zone): the zone narrates, not its places. */
+  currentZoneRef: { readonly current: string | null };
+  /** Forces the introduction of the zone at this position; false when it is in no zone. */
+  replayHere(position: GeoPoint | null): boolean;
 } {
   const [card, setCard] = useState<Zone | null>(null);
   const [welcome, setWelcome] = useState<{ zone: Zone | null } | null>(null);
@@ -100,24 +104,29 @@ export function useZoneGuide({
   };
 
   const speak = useCallback(
-    (zone: Zone | null, welcoming: boolean): Promise<RequestResult> => {
+    (
+      zone: Zone | null,
+      welcoming: boolean,
+      force = false,
+    ): Promise<RequestResult> => {
       const { player: p, narrationLocale: nl, speechTag: tag } = live.current;
       const locale = nl ?? 'vi';
       if (!p) return Promise.resolve('ignored');
       const name = zone ? zoneText(zone.name, locale) : '';
       const id = zone ? zoneHistoryId(zone.id) : 'zone:park';
-      // An introduction is heard once per language; a welcome is asked again each time.
+      // Coming near a zone plays its introduction every time, heard before or not.
       const key = narrationKey(
         id,
         locale,
-        welcoming ? `welcome-${Date.now()}` : 'v1',
+        `${welcoming ? 'welcome' : 'arrive'}-${Date.now()}`,
       );
       const text = welcoming
         ? zoneWelcomeLine(locale, zone ? name : null)
         : zoneSpeech(zone!, locale, zoneArrivingLine(locale, name));
       // Automatic like the GPS: it never cuts into audio the visitor is listening to.
       return p.request({
-        source: 'auto-gps',
+        // Forced (the refresh button) also cuts into audio that is playing.
+        source: force ? 'manual' : 'auto-gps',
         poiId: id,
         poiName: zone ? name : 'Đầm Sen',
         locale,
@@ -144,6 +153,25 @@ export function useZoneGuide({
         if (outcome === 'played' || outcome === 'busy') setCard(zone);
         if (outcome === 'busy') queuedRef.current = zone.id;
       });
+    },
+    [speak],
+  );
+
+  /** The refresh button: speak the introduction of the zone the visitor stands in, now. */
+  const replayHere = useCallback(
+    (position: GeoPoint | null): boolean => {
+      const { zones: all, locations: where } = live.current;
+      if (!position || all.length === 0 || where.size === 0) return false;
+      const id = resolveZone(
+        currentRef.current,
+        zoneDistances(position, all, where),
+      );
+      const zone = id ? all.find((item) => item.id === id) : undefined;
+      if (!zone) return false;
+      currentRef.current = zone.id;
+      queuedRef.current = null;
+      void speak(zone, false, true).then(() => setCard(zone));
+      return true;
     },
     [speak],
   );
@@ -233,5 +261,7 @@ export function useZoneGuide({
     clearQueue: useCallback(() => {
       queuedRef.current = null;
     }, []),
+    currentZoneRef: currentRef,
+    replayHere,
   };
 }

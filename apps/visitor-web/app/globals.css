@@ -1575,6 +1575,28 @@ audio:focus-visible {
   justify-content: space-between;
 }
 
+.auto-guide-refresh {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 14px;
+  margin-top: 8px;
+  color: var(--green);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  background: var(--green-soft);
+  border: 0;
+  border-radius: 999px;
+}
+
+.auto-guide-refresh:hover {
+  color: white;
+  background: var(--green);
+}
+
 .auto-guide-toggle {
   padding: 7px 14px;
   font-weight: 700;
@@ -1841,6 +1863,19 @@ audio:focus-visible {
   color: var(--muted);
 }
 
+.list-clear {
+  padding: 2px 10px;
+  margin-right: 8px;
+  color: var(--green);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  background: var(--green-soft);
+  border: 0;
+  border-radius: 999px;
+}
+
 .next-stop-options {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1865,6 +1900,11 @@ audio:focus-visible {
 
 .next-stop-options button span {
   font-size: 22px;
+}
+
+.next-stop-options button.active {
+  color: white;
+  background: var(--green);
 }
 
 .next-stop-options button:hover {

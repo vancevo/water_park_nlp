@@ -63,3 +63,26 @@ export function pickNextStop<T extends StopCandidate>(
     (kind === 'rest' ? search((poi) => poi.category === 'food') : null)
   );
 }
+
+/**
+ * Every place for what the visitor wants, nearest first (the "where do you want to go" box shows
+ * them in the search list and the visitor picks one). Same choice of places as `pickNextStop`.
+ */
+export function listNextStops<T extends StopCandidate>(
+  kind: NextStopKind,
+  from: GeoPoint,
+  pois: readonly T[],
+): { poi: T; distance: number }[] {
+  const collect = (test: (poi: StopCandidate) => boolean) =>
+    pois
+      .filter((poi) => test(poi))
+      .map((poi) => ({ poi, distance: geoDistanceMeters(from, poi.location) }))
+      .filter(
+        ({ distance }) => kind !== 'play' || distance >= ALREADY_THERE_METERS,
+      )
+      .sort((left, right) => left.distance - right.distance);
+  const found = collect(matches[kind]);
+  return found.length > 0 || kind !== 'rest'
+    ? found
+    : collect((poi) => poi.category === 'food');
+}
