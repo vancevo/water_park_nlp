@@ -1,4 +1,4 @@
-/* global process, console, fetch, URLSearchParams */
+/* global process, console, fetch, URL, URLSearchParams */
 // Runs the park search intents (data/search-evaluation/park-intents.json) against a live API and
 // reports, per need, how many keyword queries put a right place in the top 5.
 //

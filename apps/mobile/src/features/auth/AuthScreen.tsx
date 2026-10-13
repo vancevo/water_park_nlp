@@ -69,7 +69,9 @@ export function AuthScreen({
         <View style={styles.content}>
           <Text style={styles.eyebrow}>{t('appName')}</Text>
           <Text style={styles.heading}>{t('auth.account')}</Text>
-          <Text style={styles.helper}>{state.user.email}</Text>
+          <Text style={styles.helper}>
+            {state.user.email ?? state.user.phoneMasked ?? 'Demo visitor'}
+          </Text>
           {state.isRefreshing ? (
             <Text style={styles.helper}>{t('auth.refreshing')}</Text>
           ) : null}

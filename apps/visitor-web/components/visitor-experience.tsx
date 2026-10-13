@@ -84,6 +84,9 @@ import { usePoiMarkers } from './use-poi-markers';
 import { useRouteCamera, type CameraMode } from './use-route-camera';
 import { useZoneGuide } from './use-zone-guide';
 import { NextStopBox, NowPlayingCard, ZoneCard } from './zone-panels';
+import { LoyaltyDialog } from './loyalty-dialog';
+import { PresenceShare } from './presence-share';
+import { NearbyVisitorsMap } from './nearby-visitors-map';
 
 /**
  * Wraps a pin so MapLibre can place it: MapLibre overwrites the marker element's own transform,
@@ -267,7 +270,7 @@ const MAP_STYLE =
   GEOAPIFY_MAP_STYLE ??
   DEFAULT_MAP_STYLE;
 
-type AuthMode = 'login' | 'register';
+type AuthMode = 'demo-phone' | 'login' | 'register';
 
 const SIMULATED_FIX_ACCURACY_METERS = 5;
 const PANEL_STORAGE_KEY = 'damsen.visitor.panel.v1';
@@ -356,7 +359,9 @@ export function VisitorExperience() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [session, setSession] = useState<AuthResponse | null>(null);
+  const [ownPresenceId, setOwnPresenceId] = useState<string | null>(null);
   const [authMode, setAuthMode] = useState<AuthMode | null>(null);
+  const [accountOpen, setAccountOpen] = useState(false);
   const {
     catalog: narrationCatalog,
     catalogStatus: narrationCatalogStatus,
@@ -381,6 +386,8 @@ export function VisitorExperience() {
   const simulationProgress: RouteProgress | null = route
     ? routeProgressAt(route.geometry.coordinates, simulationDistanceMeters)
     : null;
+  const liveSimulationPosition =
+    simulationProgress?.position ?? simulationPosition;
 
   const cancelSimulationAnimation = useCallback(() => {
     if (animationFrameRef.current !== null) {
@@ -1869,11 +1876,8 @@ export function VisitorExperience() {
           </>
         }
         onLocaleChange={changeLocale}
-        onLogin={() => setAuthMode('login')}
-        onLogout={() => {
-          clearVisitorSession();
-          setSession(null);
-        }}
+        onLogin={() => setAuthMode('demo-phone')}
+        onAccount={() => setAccountOpen(true)}
       />
       <section
         className={`workspace${panelOpen ? '' : ' panel-closed'}`}
@@ -2087,6 +2091,31 @@ export function VisitorExperience() {
           aria-label={t.mapLabel}
         >
           <div className="map-canvas" ref={mapContainerRef} />
+          <PresenceShare
+            session={session}
+            position={liveSimulationPosition ?? position}
+            simulatedPosition={liveSimulationPosition}
+            destinationPoiId={selected?.id}
+            requestDevicePosition={locate}
+            onUseSimulation={(point) => {
+              cancelSimulationAnimation();
+              setSimulationPosition(point);
+              setSimulationDistanceMeters(0);
+              setIsPickingSimulation(false);
+              setMessage('Đã đặt nhân vật mô phỏng của bạn tại Cổng số 1.');
+              mapRef.current?.flyTo({
+                center: [point.longitude, point.latitude],
+                zoom: Math.max(mapRef.current.getZoom(), 17.5),
+              });
+            }}
+            onPresenceChange={setOwnPresenceId}
+          />
+          <NearbyVisitorsMap
+            session={session}
+            mapRef={mapRef}
+            mapReady={mapReady}
+            ownPresenceId={ownPresenceId}
+          />
           <button
             type="button"
             className="panel-handle"
@@ -2175,6 +2204,17 @@ export function VisitorExperience() {
             saveVisitorSession(next);
             setSession(next);
             setAuthMode(null);
+          }}
+        />
+      ) : null}
+      {accountOpen && session ? (
+        <LoyaltyDialog
+          session={session}
+          onClose={() => setAccountOpen(false)}
+          onLogout={() => {
+            clearVisitorSession();
+            setSession(null);
+            setAccountOpen(false);
           }}
         />
       ) : null}
@@ -2284,7 +2324,7 @@ function Header({
   session,
   onLocaleChange,
   onLogin,
-  onLogout,
+  onAccount,
 }: {
   /** Map tools (simulated walker, my location) shown in the middle of the header. */
   tools: React.ReactNode;
@@ -2293,7 +2333,7 @@ function Header({
   session: AuthResponse | null;
   onLocaleChange(locale: UiLocale): void;
   onLogin(): void;
-  onLogout(): void;
+  onAccount(): void;
 }) {
   return (
     <header className="topbar">
@@ -2331,8 +2371,11 @@ function Header({
           </button>
         </div>
         {session ? (
-          <button className="account-button" onClick={onLogout}>
-            {session.user.email.split('@')[0]} · {t.logout}
+          <button className="account-button" onClick={onAccount}>
+            {session.user.phoneMasked ??
+              session.user.email?.split('@')[0] ??
+              'Tài khoản'}{' '}
+            · Điểm
           </button>
         ) : (
           <button className="account-button" onClick={onLogin}>
@@ -2758,6 +2801,7 @@ function AuthDialog({
   onModeChange(mode: AuthMode): void;
 }) {
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('0901234567');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -2768,13 +2812,18 @@ function AuthDialog({
     setError('');
     try {
       const response =
-        mode === 'login'
-          ? await visitorApi.login({ email, password })
-          : await visitorApi.register({
-              email,
-              password,
+        mode === 'demo-phone'
+          ? await visitorApi.demoPhoneSession({
+              phone,
               preferredLocale: contentLocale(locale),
-            });
+            })
+          : mode === 'login'
+            ? await visitorApi.login({ email, password })
+            : await visitorApi.register({
+                email,
+                password,
+                preferredLocale: contentLocale(locale),
+              });
       onAuthenticated(response);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : t.authFailed);
@@ -2798,38 +2847,74 @@ function AuthDialog({
         >
           ×
         </button>
-        <p className="eyebrow">{t.accountEyebrow}</p>
-        <h2>{mode === 'login' ? t.welcomeBack : t.createAccount}</h2>
-        <p>{t.guestNote}</p>
-        <label>
-          {t.email}
-          <input
-            required
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-          />
-        </label>
-        <label>
-          {t.password}
-          <input
-            required
-            minLength={10}
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
+        <p className="eyebrow">
+          {mode === 'demo-phone' ? 'Tài khoản điểm demo' : t.accountEyebrow}
+        </p>
+        <h2>
+          {mode === 'demo-phone'
+            ? 'Vào bằng số điện thoại'
+            : mode === 'login'
+              ? t.welcomeBack
+              : t.createAccount}
+        </h2>
+        <p>
+          {mode === 'demo-phone'
+            ? 'Không gửi và không xác minh OTP. Chỉ sử dụng số điện thoại thử nghiệm.'
+            : t.guestNote}
+        </p>
+        {mode === 'demo-phone' ? (
+          <label>
+            Số điện thoại demo
+            <input
+              required
+              inputMode="tel"
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+            />
+          </label>
+        ) : (
+          <>
+            <label>
+              {t.email}
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+            </label>
+            <label>
+              {t.password}
+              <input
+                required
+                minLength={10}
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            </label>
+          </>
+        )}
         {error ? <div className="form-error">{error}</div> : null}
         <button className="primary-action" disabled={loading} type="submit">
-          {loading ? t.working : mode === 'login' ? t.login : t.signUp}
+          {loading
+            ? t.working
+            : mode === 'demo-phone'
+              ? 'Mở tài khoản demo'
+              : mode === 'login'
+                ? t.login
+                : t.signUp}
         </button>
         <button
           type="button"
           className="text-action"
-          onClick={() => onModeChange(mode === 'login' ? 'register' : 'login')}
+          onClick={() =>
+            onModeChange(mode === 'demo-phone' ? 'login' : 'demo-phone')
+          }
         >
-          {mode === 'login' ? t.noAccount : t.haveAccount}
+          {mode === 'demo-phone'
+            ? 'Dùng email thay thế'
+            : 'Dùng số điện thoại demo'}
         </button>
       </form>
     </div>

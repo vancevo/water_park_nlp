@@ -9,8 +9,9 @@ import type {
 
 interface UserRow {
   id: string;
-  email: string;
-  password_hash: string;
+  email: string | null;
+  password_hash: string | null;
+  phone_last4: string | null;
   preferred_locale: 'vi' | 'en';
   status: 'active' | 'disabled';
   roles: UserRole[] | string;
@@ -23,11 +24,16 @@ export class PostgresAuthRepository implements AuthRepository {
     return this.findUser('lower(u.email) = lower($1)', email);
   }
 
+  async findUserByPhoneHash(phoneHash: string): Promise<UserRecord | null> {
+    return this.findUser('upi.phone_lookup_hash = $1', phoneHash);
+  }
+
   async findUserById(id: string): Promise<UserRecord | null> {
     return this.findUser('u.id = $1', id);
   }
 
   async createUser(user: UserRecord): Promise<void> {
+    if (!user.email || !user.passwordHash) throw new Error('EMAIL_REQUIRED');
     try {
       await this.client.query(
         `WITH inserted AS (
@@ -48,6 +54,51 @@ export class PostgresAuthRepository implements AuthRepository {
     } catch (error) {
       if ((error as { code?: string }).code === '23505')
         throw new Error('EMAIL_EXISTS');
+      throw error;
+    }
+  }
+
+  async updatePasswordHash(
+    userId: string,
+    passwordHash: string,
+    at: Date,
+  ): Promise<void> {
+    await this.client.query(
+      `WITH updated_user AS (
+         UPDATE users SET password_hash = $2 WHERE id = $1 RETURNING id
+       )
+       UPDATE refresh_tokens
+       SET revoked_at = COALESCE(revoked_at, $3)
+       WHERE user_id IN (SELECT id FROM updated_user)`,
+      [userId, passwordHash, at],
+    );
+  }
+
+  async createDemoPhoneUser(
+    user: UserRecord,
+    phoneHash: string,
+    phoneLast4: string,
+  ): Promise<void> {
+    try {
+      await this.client.query(
+        `WITH inserted_user AS (
+           INSERT INTO users (id, email, password_hash, preferred_locale, status)
+           VALUES ($1, NULL, NULL, $2, $3) RETURNING id
+         ), inserted_role AS (
+           INSERT INTO user_roles (user_id, role_name)
+           SELECT id, 'VISITOR' FROM inserted_user RETURNING user_id
+         ), inserted_phone AS (
+           INSERT INTO user_phone_identities (user_id, phone_lookup_hash, phone_last4)
+           SELECT id, $4, $5 FROM inserted_user RETURNING user_id
+         )
+         INSERT INTO loyalty_accounts (user_id)
+         SELECT id FROM inserted_user`,
+        [user.id, user.preferredLocale, user.status, phoneHash, phoneLast4],
+      );
+    } catch (error) {
+      if ((error as { code?: string }).code === '23505') {
+        throw new Error('PHONE_EXISTS');
+      }
       throw error;
     }
   }
@@ -141,10 +192,12 @@ export class PostgresAuthRepository implements AuthRepository {
     value: string,
   ): Promise<UserRecord | null> {
     const result = await this.client.query<UserRow>(
-      `SELECT u.id, u.email, u.password_hash, u.preferred_locale, u.status,
+      `SELECT u.id, u.email, u.password_hash, upi.phone_last4, u.preferred_locale, u.status,
        COALESCE(array_agg(ur.role_name) FILTER (WHERE ur.role_name IS NOT NULL), ARRAY[]::varchar[]) AS roles
-       FROM users u LEFT JOIN user_roles ur ON ur.user_id = u.id
-       WHERE ${condition} GROUP BY u.id`,
+       FROM users u
+       LEFT JOIN user_roles ur ON ur.user_id = u.id
+       LEFT JOIN user_phone_identities upi ON upi.user_id = u.id
+       WHERE ${condition} GROUP BY u.id, upi.phone_last4`,
       [value],
     );
     const row = result.rows[0];
@@ -158,8 +211,13 @@ export class PostgresAuthRepository implements AuthRepository {
         : row.roles;
     return {
       id: row.id,
-      email: row.email,
-      passwordHash: row.password_hash,
+      ...(row.email ? { email: row.email } : {}),
+      ...(row.password_hash ? { passwordHash: row.password_hash } : {}),
+      ...(row.phone_last4 ? { phoneMasked: `+84•••••${row.phone_last4}` } : {}),
+      authMethods: [
+        ...(row.email ? (['email_password'] as const) : []),
+        ...(row.phone_last4 ? (['demo_phone'] as const) : []),
+      ],
       preferredLocale: row.preferred_locale,
       status: row.status,
       roles,

@@ -1,4 +1,4 @@
-/* global process, console, fetch, URLSearchParams */
+/* global process, console, fetch, URL, URLSearchParams */
 // Runs the 313-row query list (data/search-evaluation/park-queries-313.json) against a live API.
 // Each row has full sentences and keyword variants; a query passes when one of the row's
 // `relevant` places is in the first 5 results. Rows marked `none` (needs with no place in the

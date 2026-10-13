@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "kind": "operations-local-acceptance",
+  "scope": "local-demo-only",
+  "status": "passed",
+  "startedAt": "2026-10-13T01:09:21.894Z",
+  "completedAt": "2026-10-13T01:09:24.406Z",
+  "checks": {
+    "catalog": true,
+    "phoneSession": true,
+    "payment": true,
+    "loyaltyCredit": true,
+    "rewardRedemption": true,
+    "paymentFeed": true,
+    "dashboardReconcile": true,
+    "presenceOptIn": true,
+    "presenceOptOut": true,
+    "piiBoundary": true
+  }
+}

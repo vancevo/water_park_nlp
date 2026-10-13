@@ -60,6 +60,7 @@ const external = process.env.DEMO_EXTERNAL_SERVICES === '1';
 const URLS = {
   visitor: `http://localhost:${PORTS.visitor}`,
   admin: `http://localhost:${PORTS.admin}`,
+  payment: `http://localhost:${PORTS.payment}`,
   api: `http://127.0.0.1:${PORTS.api}`,
   embedding: `http://127.0.0.1:${PORTS.embedding}`,
 };
@@ -75,6 +76,14 @@ function checkNode() {
       `Cần Node.js 24 (máy đang có ${process.versions.node}). Tải bản 24 LTS tại https://nodejs.org rồi chạy lại.`,
     );
   ok(`Node.js ${process.versions.node}`);
+}
+
+function checkDemoCredentials() {
+  if (ADMIN_PASSWORD.length < 10) {
+    throw new DemoError(
+      `Mật khẩu admin demo phải có ít nhất 10 ký tự (hiện có ${ADMIN_PASSWORD.length}). Sửa ADMIN_PASSWORD trong scripts/demo/lib.mjs rồi chạy lại.`,
+    );
+  }
 }
 
 function checkDocker() {
@@ -315,7 +324,11 @@ async function setup() {
   await ensureVoices();
   await smokePiper();
 
-  step(6, total, 'Build ứng dụng (API, worker, admin, visitor) — vài phút');
+  step(
+    6,
+    total,
+    'Build ứng dụng (API, worker, admin, visitor, payment) — vài phút',
+  );
   await npm(['run', 'build'], {
     env: {
       NEXT_PUBLIC_TTS_GENERATION_MODE: 'api',
@@ -387,6 +400,8 @@ async function setup() {
 // ------------------------------------------------------------------ start ---
 
 async function start() {
+  checkNode();
+  checkDemoCredentials();
   if (!existsSync(setupMarker))
     throw new DemoError('Chưa cài đặt. Chạy "1-CAI-DAT-LAN-DAU" trước.');
   say('=== CHẠY DEMO ===');
@@ -395,6 +410,7 @@ async function start() {
     API: PORTS.api,
     admin: PORTS.admin,
     visitor: PORTS.visitor,
+    payment: PORTS.payment,
     embedding: PORTS.embedding,
   })) {
     if (await portInUse(port))
@@ -402,7 +418,8 @@ async function start() {
         `Cổng ${port} (${name}) đang bị chiếm — có thể demo cũ còn chạy. Chạy "3-DUNG-DEMO" rồi thử lại.`,
       );
   }
-  const env = serviceEnv();
+  const demoEnv = await ensureDemoEnv();
+  const env = serviceEnv(demoEnv);
   const children = [];
   let stopping = false;
   const stopAll = async (code = 0) => {
@@ -509,7 +526,7 @@ async function start() {
   });
   ok(`${seeded.created} bài thuyết minh mới, ${seeded.skipped} bài đã có sẵn`);
 
-  step(5, 6, 'Khởi động web khách tham quan + web quản trị');
+  step(5, 6, 'Khởi động web khách tham quan + quản trị + payment demo');
   const nextBin = join(repoRoot, 'node_modules/next/dist/bin/next');
   await launch(
     'visitor',
@@ -523,8 +540,17 @@ async function start() {
     {},
     join(repoRoot, 'apps/admin-web'),
   );
+  await launch(
+    'payment',
+    [nextBin, 'start', '-p', String(PORTS.payment)],
+    { API_ORIGIN: URLS.api },
+    join(repoRoot, 'apps/payment-web'),
+  );
   await waitFor('web khách', () => httpOk(URLS.visitor), { timeoutMs: 90_000 });
   await waitFor('web quản trị', () => httpOk(URLS.admin), {
+    timeoutMs: 90_000,
+  });
+  await waitFor('payment demo', () => httpOk(URLS.payment), {
     timeoutMs: 90_000,
   });
 
@@ -546,12 +572,14 @@ async function start() {
   say('\n==================== DEMO ĐANG CHẠY ====================');
   say(`  Web khách tham quan : ${URLS.visitor}`);
   say(`  Web quản trị        : ${URLS.admin}`);
+  say(`  Web payment demo    : ${URLS.payment}`);
   say(`     đăng nhập        : ${ADMIN_EMAIL}  /  ${ADMIN_PASSWORD}`);
   say('  Giữ cửa sổ này mở trong lúc demo. Nhấn Ctrl+C để dừng.');
   say('========================================================\n');
   if (process.env.DEMO_NO_BROWSER !== '1') {
     openBrowser(URLS.visitor);
     setTimeout(() => openBrowser(URLS.admin), 1500);
+    setTimeout(() => openBrowser(URLS.payment), 3000);
   }
   if (process.env.DEMO_EXIT_AFTER_START === '1') await stopAll(0);
 }
@@ -578,6 +606,7 @@ async function status() {
   const checks = {
     'web khách (3002)': URLS.visitor,
     'web quản trị (3001)': URLS.admin,
+    'web payment (3003)': URLS.payment,
     'API (3000)': `${URLS.api}/health`,
     'embedding (8091)': `${URLS.embedding}/healthz`,
     'worker (9464)': `http://127.0.0.1:${PORTS.workerMetrics}/healthz`,
@@ -600,6 +629,9 @@ try {
   await mkdir(demoDir, { recursive: true });
   await command();
 } catch (error) {
+  if (process.argv[2] === 'start') {
+    await stop().catch(() => undefined);
+  }
   console.error(
     `\n✗ ${error instanceof DemoError ? error.message : (error?.stack ?? error)}`,
   );

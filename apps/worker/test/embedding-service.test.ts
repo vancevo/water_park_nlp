@@ -21,6 +21,11 @@ const source: PoiEmbeddingSource = {
   category: 'garden',
   shortDescription: 'Không gian\n xanh',
   longDescription: 'Khám phá\r\n các loài hoa.',
+  aliases: ['vườn cảnh', ' flower garden '],
+  activities: ['ngắm hoa'],
+  attributes: ['ngoài trời'],
+  audiences: ['gia đình'],
+  intentPhrases: ['tôi muốn ngắm hoa'],
 };
 
 class FakeProvider implements EmbeddingProvider {
@@ -69,12 +74,17 @@ describe('POI embedding document', () => {
   it('uses a stable language-specific template and canonical whitespace', () => {
     expect(buildPoiDocumentContent(source)).toBe(
       [
-        'schema: poi-search-document/v1',
+        'schema: poi-search-document/v2',
         'locale: vi',
         'name: Vườn hoa',
         'category: garden',
         'summary: Không gian xanh',
         'description: Khám phá các loài hoa.',
+        'aliases: vườn cảnh | flower garden',
+        'activities: ngắm hoa',
+        'attributes: ngoài trời',
+        'audiences: gia đình',
+        'intent phrases: tôi muốn ngắm hoa',
       ].join('\n'),
     );
   });

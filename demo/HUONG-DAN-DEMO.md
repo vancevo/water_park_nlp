@@ -2,11 +2,16 @@
 
 Bản demo chạy hoàn toàn trên máy của bạn: bản đồ và danh sách địa điểm, tìm
 kiếm (theo chữ, theo hướng, theo ý nghĩa), thuyết minh có **giọng đọc AI miễn
-phí (Piper)** và trang quản trị để tạo/duyệt audio AI. Không cần API key, không
-tốn phí.
+phí (Piper)**, trang quản trị, tài khoản/điểm, thanh toán QR giả lập và dashboard
+vận hành realtime. Không cần API key, không tốn phí.
 
-> Đây là bản demo phục vụ học tập (phi thương mại). Dữ liệu 5 địa điểm là dữ
+> Đây là bản demo phục vụ học tập (phi thương mại). Dữ liệu 79 địa điểm là dữ
 > liệu giả lập, không phải dữ liệu thật của Đầm Sen.
+
+Xem luồng visitor → payment → loyalty → dashboard → live presence tại
+[`README-LUONG-DEMO.md`](README-LUONG-DEMO.md).
+Hướng dẫn thao tác riêng cho User trên web khách nằm tại
+[`README-LUONG-USER.md`](README-LUONG-USER.md).
 
 ## 1. Cài 3 phần mềm (chỉ một lần)
 
@@ -37,15 +42,16 @@ thì bấm đúp lại file đó — các bước đã xong sẽ được bỏ q
 
 1. Mở **Docker Desktop**, đợi **Engine running**.
 2. Bấm đúp **`demo\2-CHAY-DEMO.cmd`**.
-3. Đợi dòng **"DEMO ĐANG CHẠY"**. Trình duyệt tự mở 2 trang:
+3. Đợi dòng **"DEMO ĐANG CHẠY"**. Trình duyệt tự mở 3 trang:
    - **Web khách tham quan:** http://localhost:3002
    - **Web quản trị:** http://localhost:3001 — đăng nhập ở khung bên trái:
      - Email: `admin@damsen.local`
      - Mật khẩu: `DamSen-Demo-2026`
+   - **Web thanh toán demo:** http://localhost:3003 — dùng cùng tài khoản quản trị.
 4. **Giữ cửa sổ đen mở** trong suốt buổi demo.
 
-Lần chạy đầu tiên, demo tự tạo audio AI cho 5 địa điểm × 2 ngôn ngữ (khoảng 1
-phút), nên khách tham quan mở ra là nghe được ngay.
+Lần chạy đầu tiên, demo tự tạo audio AI cho 79 địa điểm × 2 ngôn ngữ; thời gian
+phụ thuộc cấu hình máy. Những lần sau dùng lại audio đã tạo.
 
 ## 4. Dừng demo
 
@@ -66,7 +72,11 @@ phút), nên khách tham quan mở ra là nghe được ngay.
      trên máy bạn tìm được.
 3. **Dẫn đường:** chọn một địa điểm → **Dẫn đường từ vị trí của tôi**, hoặc
    dùng **Người mô phỏng** để xem nhân vật đi trên bản đồ.
-4. **Web quản trị** (http://localhost:3001): đăng nhập → bấm **Sửa** ở một
+4. **Thanh toán + điểm realtime:** trên web khách đăng nhập bằng một số điện
+   thoại thử nghiệm. Ở web payment, dùng cùng số đó để tạo vé/QR, mở link QR và
+   bấm **Thanh toán demo**. Sau khoảng 2 giây, điểm trên web khách và dashboard
+   quản trị tự cập nhật.
+5. **Web quản trị** (http://localhost:3001): đăng nhập → bấm **Sửa** ở một
    địa điểm → phần thuyết minh → **Tạo lại audio AI** → xem trạng thái chạy →
    nghe thử bản nháp → **Gửi duyệt** → **Duyệt xuất bản**. Nhấn mạnh: AI chỉ
    tạo bản nháp, **con người duyệt** mới được xuất bản.
@@ -76,7 +86,7 @@ phút), nên khách tham quan mở ra là nghe được ngay.
 | Hiện tượng                                      | Cách xử lý                                                                                     |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | "Docker chưa chạy"                              | Mở Docker Desktop, đợi **Engine running**, chạy lại                                            |
-| "Cổng 3000/3001/3002 đang bị chiếm"             | Bấm `3-DUNG-DEMO.cmd`, rồi chạy lại `2-CHAY-DEMO.cmd`. Vẫn lỗi thì khởi động lại máy           |
+| "Cổng 3000/3001/3002/3003 đang bị chiếm"        | Bấm `3-DUNG-DEMO.cmd`, rồi chạy lại `2-CHAY-DEMO.cmd`. Vẫn lỗi thì khởi động lại máy           |
 | Windows Firewall hỏi "Allow access" cho Node.js | Bấm **Allow** (hoặc Cancel — demo trên máy bạn vẫn chạy)                                       |
 | Tìm theo ý nghĩa chậm ở câu đầu                 | Bình thường — model đang "khởi động", các câu sau nhanh hơn                                    |
 | Không nghe được audio                           | Đợi vài giây sau dòng "DEMO ĐANG CHẠY" rồi tải lại trang (F5)                                  |
@@ -91,6 +101,7 @@ chạy lại `1-CAI-DAT-LAN-DAU.cmd`.
 | -------------------- | -------------------------------------------------------------------------------------------------- | ----------------- |
 | Web khách tham quan  | Next.js                                                                                            | 3002              |
 | Web quản trị         | Next.js                                                                                            | 3001              |
+| Web thanh toán demo  | Next.js                                                                                            | 3003              |
 | API                  | NestJS                                                                                             | 3000              |
 | Worker tạo giọng đọc | Node.js + **Piper** (giọng `vi_VN-vais1000-medium`, `en_US-ljspeech-medium`, `fr_FR-siwis-medium`) | 9464 (`/metrics`) |
 | Tìm kiếm ngữ nghĩa   | **BAAI/bge-m3** (miễn phí, chạy trên CPU)                                                          | 8091              |

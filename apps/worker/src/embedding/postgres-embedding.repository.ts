@@ -25,6 +25,11 @@ interface PoiRow extends Record<string, unknown> {
   category: string;
   short_description: string;
   long_description: string;
+  aliases: string[];
+  activities: string[];
+  attributes: string[];
+  audiences: string[];
+  intent_phrases: string[];
 }
 
 interface MetadataRow extends Record<string, unknown> {
@@ -40,10 +45,16 @@ export class PostgresEmbeddingRepository implements EmbeddingRepository {
   async listPublishedPoiSources(): Promise<readonly PoiEmbeddingSource[]> {
     const result = await this.database.query<PoiRow>(`
       SELECT p.id::text, t.locale, t.name, c.slug AS category,
-             t.short_description, t.long_description
+             t.short_description, t.long_description,
+             COALESCE(m.aliases, '{}') AS aliases,
+             COALESCE(m.activities, '{}') AS activities,
+             COALESCE(m.attributes, '{}') AS attributes,
+             COALESCE(m.audiences, '{}') AS audiences,
+             COALESCE(m.intent_phrases, '{}') AS intent_phrases
       FROM pois p
       JOIN poi_categories c ON c.id = p.category_id
       JOIN poi_translations t ON t.poi_id = p.id
+      LEFT JOIN poi_search_metadata m ON m.poi_id = p.id AND m.locale = t.locale
       WHERE p.status = 'published'
       ORDER BY p.id, t.locale
     `);
@@ -54,6 +65,11 @@ export class PostgresEmbeddingRepository implements EmbeddingRepository {
       category: row.category,
       shortDescription: row.short_description,
       longDescription: row.long_description,
+      aliases: row.aliases,
+      activities: row.activities,
+      attributes: row.attributes,
+      audiences: row.audiences,
+      intentPhrases: row.intent_phrases,
     }));
   }
 

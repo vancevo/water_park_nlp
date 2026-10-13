@@ -101,7 +101,13 @@ export interface SearchResponse {
   nextOffset?: number;
 }
 
-export type UserRole = 'VISITOR' | 'EDITOR' | 'REVIEWER' | 'ADMIN';
+export type UserRole =
+  | 'VISITOR'
+  | 'EDITOR'
+  | 'REVIEWER'
+  | 'CASHIER'
+  | 'OPERATIONS'
+  | 'ADMIN';
 export type PoiWorkflowStatus =
   | 'draft'
   | 'pending_review'
@@ -110,7 +116,9 @@ export type PoiWorkflowStatus =
 
 export interface AuthUser {
   id: string;
-  email: string;
+  email?: string;
+  phoneMasked?: string;
+  authMethods?: Array<'email_password' | 'demo_phone'>;
   preferredLocale: SupportedLocale;
   roles: UserRole[];
 }
@@ -486,4 +494,247 @@ export interface FieldCheck extends FieldCheckInput {
 export interface FieldCheckApplyInput {
   /** Required for an entrance: the path node the entrance now snaps to. */
   graphNodeRef?: string;
+}
+
+// ============================================================================
+// Educational operations demo — contract v1 (ADR 0016)
+// ============================================================================
+
+export interface DemoPhoneSessionRequest {
+  phone: string;
+  preferredLocale?: SupportedLocale;
+}
+
+export interface TicketProduct {
+  id: string;
+  code: string;
+  name: string;
+  amountVnd: number;
+  pointsPerItem: number;
+  active: boolean;
+}
+
+export interface CashierCustomerLookupRequest {
+  phone: string;
+}
+
+export interface CashierCustomerLookup {
+  customerToken: string;
+  userId: string;
+  phoneMasked: string;
+  pointsBalance: number;
+  expiresAt: string;
+}
+
+export interface DemoPaymentOrderItemInput {
+  ticketProductId: string;
+  quantity: number;
+}
+
+export interface CreateDemoPaymentOrderRequest {
+  customerToken: string;
+  items: DemoPaymentOrderItemInput[];
+  idempotencyKey: string;
+}
+
+export type DemoPaymentStatus =
+  | 'pending'
+  | 'processing'
+  | 'succeeded'
+  | 'failed'
+  | 'expired'
+  | 'cancelled';
+
+export interface DemoPaymentOrderItem {
+  ticketProductId: string;
+  code: string;
+  name: string;
+  quantity: number;
+  unitAmountVnd: number;
+  unitPoints: number;
+  subtotalVnd: number;
+  points: number;
+}
+
+export interface DemoPaymentOrder {
+  id: string;
+  status: DemoPaymentStatus;
+  phoneMasked: string;
+  items: DemoPaymentOrderItem[];
+  totalAmountVnd: number;
+  totalPoints: number;
+  qrExpiresAt: string;
+  createdAt: string;
+  processingAt?: string;
+  paidAt?: string;
+  qrUrl?: string;
+}
+
+export interface ConfirmDemoPaymentRequest {
+  idempotencyKey: string;
+  simulateOutcome?: 'succeeded' | 'failed';
+}
+
+export interface LoyaltyLedgerEntry {
+  id: string;
+  delta: number;
+  entryType: 'payment_credit' | 'redemption_debit' | 'admin_adjustment';
+  description: string;
+  balanceAfter: number;
+  createdAt: string;
+}
+
+export interface LoyaltyAccountSummary {
+  userId: string;
+  phoneMasked: string;
+  balance: number;
+  entries: LoyaltyLedgerEntry[];
+}
+
+export interface RewardCatalogItem {
+  id: string;
+  code: string;
+  name: string;
+  pointsCost: number;
+  active: boolean;
+}
+
+export interface CreateRewardRedemptionRequest {
+  rewardId: string;
+  idempotencyKey: string;
+}
+
+export interface RewardRedemption {
+  id: string;
+  rewardId: string;
+  rewardName: string;
+  pointsCost: number;
+  status: 'confirmed' | 'fulfilled' | 'cancelled';
+  fulfillmentCode: string;
+  createdAt: string;
+}
+
+export interface AdminLoyaltyAdjustmentRequest {
+  userId: string;
+  delta: number;
+  reason: string;
+  idempotencyKey: string;
+}
+
+export interface DashboardSummary {
+  timezone: 'Asia/Ho_Chi_Minh';
+  generatedAt: string;
+  dataStatus: 'live' | 'delayed' | 'partial';
+  activeVisitorsToday: number;
+  payingUsersToday: number;
+  onlineNow: number;
+  simulatedRevenue: {
+    todayVnd: number;
+    yesterdayVnd: number;
+    weekVnd: number;
+    monthVnd: number;
+  };
+}
+
+export interface AdminPaymentFeedItem {
+  id: string;
+  status: DemoPaymentStatus;
+  phoneMasked: string;
+  totalAmountVnd: number;
+  totalPoints: number;
+  ticketQuantity: number;
+  productNames: string[];
+  createdAt: string;
+  paidAt?: string;
+}
+
+export interface AdminPaymentFeedResponse {
+  items: AdminPaymentFeedItem[];
+  nextCursor?: string;
+}
+
+export interface TrafficBucket {
+  startsAt: string;
+  uniqueVisitors: number;
+}
+
+export interface DashboardTraffic {
+  timezone: 'Asia/Ho_Chi_Minh';
+  bucketMinutes: 15;
+  items: TrafficBucket[];
+  peak?: TrafficBucket;
+  quiet?: TrafficBucket;
+}
+
+export interface PresenceSessionStartRequest {
+  consentVersion: string;
+  shareIdentity?: boolean;
+  visibleToVisitors?: boolean;
+  locationMode?: VisitorPresenceMode;
+}
+
+export type VisitorPresenceMode = 'simulated' | 'shared';
+
+export interface PresenceSession {
+  id: string;
+  pseudonym: string;
+  avatarVariant: number;
+  expiresInSeconds: number;
+}
+
+export interface PresenceUpdate {
+  sessionId: string;
+  sequence: number;
+  latitude: number;
+  longitude: number;
+  accuracyMeters: number;
+  occurredAt: string;
+  destinationPoiId?: string;
+}
+
+export interface AdminPresencePoint {
+  sessionId: string;
+  pseudonym: string;
+  avatarVariant: number;
+  hasPaidTicket: boolean;
+  latitude: number;
+  longitude: number;
+  accuracyMeters: number;
+  destinationPoiId?: string;
+  updatedAt: string;
+}
+
+export interface AdminPresenceSnapshot {
+  generatedAt: string;
+  items: AdminPresencePoint[];
+}
+
+export interface VisitorPresencePoint {
+  presenceId: string;
+  pseudonym: string;
+  avatarVariant: number;
+  latitude: number;
+  longitude: number;
+  locationMode: VisitorPresenceMode;
+  updatedAt: string;
+}
+
+export interface VisitorPresenceSnapshot {
+  generatedAt: string;
+  items: VisitorPresencePoint[];
+}
+
+export interface RealtimeEvent<TPayload = unknown> {
+  eventId: string;
+  schemaVersion: 1;
+  sequence: number;
+  occurredAt: string;
+  type:
+    | 'payment.status.v1'
+    | 'loyalty.balance_changed.v1'
+    | 'dashboard.delta.v1'
+    | 'presence.snapshot.v1'
+    | 'presence.delta.v1'
+    | 'visitor.presence.delta.v1';
+  payload: TPayload;
 }

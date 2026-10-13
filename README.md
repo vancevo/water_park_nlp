@@ -27,6 +27,12 @@ Docker Desktop + Python, rồi bấm đúp `demo/1-CAI-DAT-LAN-DAU.cmd` (một l
 `demo/2-CHAY-DEMO.cmd`. Lệnh tương đương: `node scripts/demo/demo.mjs
 setup|start|stop|status`.
 
+Luồng trình bày đầy đủ từ visitor → quầy/QR → payment → loyalty → dashboard →
+live presence được mô tả tại
+[`demo/README-LUONG-DEMO.md`](demo/README-LUONG-DEMO.md).
+Hướng dẫn riêng cho người dùng cuối nằm tại
+[`demo/README-LUONG-USER.md`](demo/README-LUONG-USER.md).
+
 ## Khởi động local
 
 ```bash

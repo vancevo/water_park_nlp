@@ -1229,6 +1229,216 @@ button {
   border: 0;
 }
 
+.loyalty-dialog {
+  position: relative;
+  width: min(520px, calc(100vw - 32px));
+  max-height: min(760px, calc(100vh - 32px));
+  padding: 28px;
+  overflow: auto;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 28px 80px #14281f45;
+}
+
+.loyalty-dialog h2,
+.loyalty-dialog h3 {
+  margin: 0 0 12px;
+}
+
+.loyalty-dialog h3 {
+  margin-top: 24px;
+  font-size: 15px;
+}
+
+.loyalty-balance {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 18px;
+  color: white;
+  background: linear-gradient(135deg, var(--green), #14936b);
+  border-radius: 18px;
+}
+
+.loyalty-balance strong {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.loyalty-live-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.loyalty-success {
+  padding: 12px;
+  color: #075f46;
+  font-weight: 750;
+  background: #ddf8ec;
+  border-radius: 12px;
+}
+
+.reward-list,
+.loyalty-history {
+  display: grid;
+  gap: 8px;
+}
+
+.reward-item,
+.loyalty-history > div {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: #f4f7f5;
+  border-radius: 12px;
+}
+
+.reward-item span,
+.loyalty-history span {
+  display: grid;
+  gap: 3px;
+}
+
+.reward-item small,
+.loyalty-history small {
+  color: var(--muted);
+}
+
+.reward-item button {
+  padding: 9px 12px;
+  color: white;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  background: var(--green);
+  border: 0;
+  border-radius: 10px;
+}
+
+.reward-item button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.loyalty-history b.positive {
+  color: #078054;
+}
+.loyalty-history b.negative {
+  color: #b23a35;
+}
+
+.presence-share {
+  position: absolute;
+  right: 14px;
+  bottom: 18px;
+  z-index: 5;
+  display: grid;
+  gap: 3px;
+  max-width: min(310px, calc(100% - 28px));
+  padding: 9px 11px;
+  background: rgb(255 255 255 / 94%);
+  border: 1px solid #dce7e1;
+  border-radius: 14px;
+  box-shadow: 0 8px 28px #12231c24;
+}
+
+.presence-share button {
+  padding: 0;
+  color: var(--green);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.presence-share small {
+  color: var(--muted);
+}
+.presence-share span {
+  color: #a33b32;
+  font-size: 11px;
+}
+.presence-share span.presence-message {
+  color: #087052;
+}
+.presence-share.active {
+  border-color: #36a779;
+}
+
+.nearby-visitors-status {
+  position: absolute;
+  bottom: 18px;
+  left: 14px;
+  z-index: 5;
+  padding: 8px 11px;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 700;
+  background: rgb(255 255 255 / 94%);
+  border: 1px solid #dce7e1;
+  border-radius: 999px;
+  box-shadow: 0 8px 24px #12231c1f;
+  backdrop-filter: blur(8px);
+}
+
+.nearby-visitors-status strong {
+  font-size: 14px;
+}
+
+.presence-consent-backdrop {
+  z-index: 70;
+}
+
+.presence-consent-dialog {
+  width: min(520px, 100%);
+  padding: 30px;
+  background: var(--surface);
+  border-radius: 24px;
+  box-shadow: 0 24px 90px #0006;
+}
+
+.presence-consent-dialog h2 {
+  margin: 0 0 12px;
+}
+
+.presence-consent-dialog > p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.presence-consent-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.presence-consent-actions button {
+  padding: 13px 16px;
+  color: var(--green);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  background: var(--green-soft);
+  border: 0;
+  border-radius: 12px;
+}
+
+.presence-consent-actions button.primary {
+  color: white;
+  background: var(--green);
+}
+
+.presence-consent-actions button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
 .narration-bar {
   display: flex;
   gap: 8px;

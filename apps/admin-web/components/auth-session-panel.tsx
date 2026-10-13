@@ -47,7 +47,7 @@ export function AuthSessionPanel() {
   if (session)
     return (
       <div className="auth-session">
-        <b>{session.user.email}</b>
+        <b>{session.user.email ?? session.user.phoneMasked ?? 'Tài khoản'}</b>
         <small>{session.user.roles.join(' · ')}</small>
         <button
           onClick={() => {

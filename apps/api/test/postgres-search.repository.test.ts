@@ -23,6 +23,8 @@ describe('PostgresSearchRepository', () => {
     const [sql, values] = query.mock.calls[0] as [string, unknown[]];
     expect(sql).toContain("p.status = 'published'");
     expect(sql).toContain("to_tsvector('simple', search_normalize");
+    expect(sql).toContain('LEFT JOIN poi_search_metadata');
+    expect(sql).toContain('m.intent_phrases');
     expect(sql).toContain('ST_DWithin');
     expect(sql).toContain('poi_operating_hours');
     expect(sql).toContain('ORDER BY final_score DESC, id ASC');

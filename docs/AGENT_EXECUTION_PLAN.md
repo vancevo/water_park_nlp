@@ -107,6 +107,145 @@ Verification commands: visitor lint, typecheck, unit tests and production build.
 - [x] Handle unsupported Web Speech without breaking arrival UX.
 - [x] Run scoped quality checks and update registry/status.
 
+### N07D — Shared visitor presence map
+
+```text
+Task ID: N07D
+Goal: Let authenticated visitors on localhost:3002 see one another as pseudonymous characters on the same map without exposing payment or identity data.
+In scope: visitor-safe snapshot/event contract; authenticated realtime visitor room; explicit peer visibility consent; deterministic GPS blur; MapLibre clustered layer; snapshot reconciliation and batched delta rendering; multi-user browser acceptance.
+Out of scope: messaging/social features, public unauthenticated tracking, phone/user ID/ticket-state exposure, background GPS, durable location history, production rollout.
+Dependencies completed: N06, N07A–N07C, T35.
+Files/modules allowed: packages/shared-types/**, packages/api-client/**, apps/api/openapi.yaml, apps/api/src/operations/**, apps/api/src/realtime/**, apps/api/test/**, apps/visitor-web/**, docs/AGENT_EXECUTION_PLAN.md, docs/FEATURE_REGISTRY.md, docs/STATUS.md, docs/plans/OPERATIONS_LOYALTY_PAYMENT_REALTIME_MAP_CHECKLIST.md, demo/README-LUONG-USER.md.
+Contracts consumed: ephemeral presence TTL/store, authenticated realtime gateway, visitor MapLibre instance, consented location mode.
+Contracts produced: GET /v1/me/nearby-presence; VisitorPresencePoint/Snapshot; visitor.presence.delta.v1; additive visibleToVisitors/locationMode start fields.
+Required reading: AGENTS.md, apps/api and visitor AGENTS.md, docs/STATUS.md, ADR 0016 presence rules, N07A–N07C packets, LIVE-PRESENCE-DEMO and OPERATIONS-REALTIME registry entries.
+Acceptance checks: two authenticated visitors see one another; own remote marker is filtered; unauthenticated requests fail; visitor payload has no user ID/phone/ticket/destination; actual GPS is deterministically blurred while admin stays exact; removal/TTL/reconnect converge; deltas render at most once per animation frame; 1,000-point source update remains responsive.
+Verification commands: API presence/realtime/privacy tests; visitor helper tests/lint/typecheck/build; API typecheck/test/build; two-browser local acceptance; scoped performance smoke.
+```
+
+- [x] Add visitor-safe snapshot and realtime contracts without reusing admin payloads.
+- [x] Add authenticated visitor room, redaction and deterministic GPS blur.
+- [x] Add a clustered, batched nearby-visitor layer to the existing visitor map.
+- [x] Preserve explicit consent and remove the caller's duplicate remote marker.
+- [x] Run security/performance regressions, browser E2E and update docs/status.
+
+Handoff:
+
+```text
+Task: N07D — DONE
+Changed:
+- Added a visitor-only presence snapshot/event contract, authenticated visitor room and 15 m deterministic blur.
+- Added one clustered MapLibre GeoJSON source with requestAnimationFrame delta batching, snapshot reconciliation and caller filtering.
+- Pooled realtime consumers onto one WebSocket per visitor tab/access token and documented the two-user flow.
+Contracts: GET /v1/me/nearby-presence; visitor.presence.delta.v1; VisitorPresencePoint/Snapshot; additive visibleToVisitors/locationMode.
+Verified: API 193 pass/1 optional Redis skip; visitor 153 pass; scoped lint/typecheck/build pass; 1,000-point helper regression pass; two browser tabs each show one other visitor; browser console clean.
+Reuse: LIVE-PRESENCE-DEMO, OPERATIONS-REALTIME, RealtimeInvalidationGate, existing MapLibre instance and ephemeral presence store.
+Risks/blockers: HTTPS staging capacity/privacy approval remains N09; local demo implementation has no open blocker.
+Next task can start: N09 staging gate when target/approval exists.
+```
+
+### N07E — Realtime visitor movement propagation
+
+```text
+Task ID: N07E
+Goal: Make movement of visitor A's on-map simulated walker appear promptly on visitor B's map without excessive network/render load.
+In scope: connect simulated route/controller progress to presence updates; trailing throttled publishing; request serialization; realtime delta acceptance; two-user browser movement acceptance.
+Out of scope: background location, sub-second raw GPS streaming, durable trails, production capacity rollout, chat/social features.
+Dependencies completed: N07D, T35-SIM5–T35-SIM9.
+Files/modules allowed: apps/visitor-web/components/presence-share.tsx, apps/visitor-web/components/visitor-experience.tsx, apps/visitor-web/lib/presence-publish*, apps/visitor-web/lib/nearby-presence*, apps/api/test/** if needed, docs/AGENT_EXECUTION_PLAN.md, docs/FEATURE_REGISTRY.md, docs/STATUS.md, docs/plans/OPERATIONS_LOYALTY_PAYMENT_REALTIME_MAP_CHECKLIST.md, demo/README-LUONG-USER.md.
+Contracts consumed: presence update sequence/rate boundary; visitor.presence.delta.v1; simulated walker progress; N07D safe visitor payload.
+Contracts produced: none; client behavior only.
+Required reading: AGENTS.md, apps/visitor-web/AGENTS.md, N07D packet/handoff, LIVE-PRESENCE-DEMO registry entry, nearby visitor map and simulation controls.
+Acceptance checks: a 5 m controller step and automatic walking propagate to the other visitor within about 1–2 seconds; latest movement is not lost at the throttle boundary; no overlapping update requests or 429 loop; privacy consent remains unchanged; self marker stays filtered.
+Verification commands: presence publish unit tests; visitor lint/typecheck/test/build; API presence/realtime tests; two-browser local movement acceptance and console check.
+```
+
+- [x] Feed simulated controller/route progress into the active synthetic presence.
+- [x] Add trailing 1-second throttling and serialize update requests.
+- [x] Verify two-user realtime movement, performance and privacy regressions.
+- [x] Update registry/status/user flow and handoff.
+
+Handoff:
+
+```text
+Task: N07E — DONE
+Changed:
+- Connected controller steps and automatic route progress to the existing synthetic presence publisher.
+- Replaced the lossy 5 s/10 m leading-only guard with a 1 s/2 m trailing throttle, serialized requests and retry-rate protection.
+- Kept rendering batched by animation frame, removed a map-style readiness race on reload and added a non-sensitive realtime revision signal for browser acceptance.
+Contracts: none; existing presence update and visitor.presence.delta.v1 contracts reused.
+Verified: visitor 156 tests, lint/typecheck/build pass; focused API realtime/presence 4 tests pass; two-tab browser acceptance saw B's realtime revision advance and A's authoritative point move about 5 m within 1.6 s; both consoles clean.
+Reuse: PresenceShare, visitor.presence.delta.v1, pooled visitor socket, simulated route/controller position and N07D MapLibre source.
+Risks/blockers: local behavior complete; staging capacity/privacy approval remains N09.
+Next task can start: N09 staging gate when target/approval exists.
+```
+
+### N07C — Reopen paid-today visitor location choice
+
+```text
+Task ID: N07C
+Goal: When a visitor who paid today closes and later reopens the visitor app, restore access, ask for device-location sharing again, and retain the automatic Gate 1 simulation when they do not share.
+In scope: Vietnam-day successful-ticket lookup; initial loyalty snapshot detection; per-browser-session prompt deduplication; automatic synthetic presence before a choice; reopen browser acceptance.
+Out of scope: background GPS, persistent location consent, payment-provider integration, cross-device prompt synchronization, production authentication.
+Dependencies completed: N04, N06, N07A, N07B.
+Files/modules allowed: apps/api/src/operations/**, apps/api/test/**, apps/visitor-web/components/presence-share.tsx, apps/visitor-web/lib/payment-presence*, docs/AGENT_EXECUTION_PLAN.md, docs/FEATURE_REGISTRY.md, docs/STATUS.md, docs/plans/OPERATIONS_LOYALTY_PAYMENT_REALTIME_MAP_CHECKLIST.md, demo/README-LUONG-USER.md.
+Contracts consumed: successful payment paidAt, loyalty payment_credit ledger, Asia/Ho_Chi_Minh reporting day, presence session/update/stop.
+Contracts produced: AdminPresencePoint.hasPaidTicket means a succeeded ticket paid during the current Vietnam calendar day; a fresh browser session prompts once when today's payment credit exists.
+Required reading: AGENTS.md, apps/visitor-web/AGENTS.md, docs/STATUS.md, ADR 0016 live-presence section, N07A/N07B packets, LIVE-PRESENCE-DEMO registry entry.
+Acceptance checks: paid-today visitor can reopen normally; every new page/app visit shows the location-choice dialog once; before any choice one synthetic Gate 1 marker exists; decline/GPS failure keeps simulation; share uses the device fix; polling does not repeatedly prompt within one page visit; yesterday-only payment is not labelled paid today.
+Verification commands: payment-presence unit tests; focused API HTTP/time tests; visitor lint/typecheck/test/build; API typecheck/test/build; browser reopen acceptance.
+```
+
+- [x] Restrict map ticket status to succeeded orders paid today in Vietnam.
+- [x] Detect today's payment credit on the first loyalty snapshot after reopen.
+- [x] Prompt once per fresh browser session while retaining Gate 1 fallback.
+- [x] Add boundary/regression tests and browser acceptance evidence.
+- [x] Update user-flow documentation, registry and status.
+
+### N07B — Logged-in visitor map and paid-ticket status
+
+```text
+Task ID: N07B
+Goal: Show every signed-in local-demo visitor on the operations map and let operators see whether that visitor has a succeeded ticket order.
+In scope: automatic privacy-safe simulated Gate 1 presence after visitor login; authoritative paid-ticket lookup; additive AdminPresencePoint status; map/status roster; post-payment consent upgrade to device or simulated location.
+Out of scope: exposing phone numbers or user IDs, inferring a real location before consent, raw GPS history, production authentication/payment, staging/privacy approval.
+Dependencies completed: N02, N04, N06, N07 local, N07A.
+Files/modules allowed: packages/shared-types/**, apps/api/openapi.yaml, apps/api/src/operations/**, apps/api/test/**, apps/visitor-web/**, apps/admin-web/**, docs/adr/0016-demo-phone-loyalty-payment-and-live-operations.md, docs/AGENT_EXECUTION_PLAN.md, docs/FEATURE_REGISTRY.md, docs/STATUS.md, demo/README-LUONG-USER.md.
+Contracts consumed: demo auth session, successful payment_orders, presence session/update/stop, loyalty.balance_changed.v1, dashboard.delta.v1.
+Contracts produced: additive AdminPresencePoint.hasPaidTicket boolean; a signed-in visitor gets a synthetic Gate 1 marker until they explicitly choose a location mode after payment.
+Required reading: AGENTS.md, apps/visitor-web/AGENTS.md, apps/admin-web/AGENTS.md, docs/STATUS.md, ADR 0016 live-presence section, LIVE-PRESENCE-DEMO and OPERATIONS-DASHBOARD registry entries, N07A packet.
+Acceptance checks: login alone creates one distinct simulated Gate 1 marker; the marker and roster say Chưa mua vé before a succeeded order; status changes to Đã mua vé after successful payment; payment prompt still permits explicit device sharing or simulation; multiple users remain visually distinct; no phone/user ID/raw GPS is exposed or persisted.
+Verification commands: focused API presence/operations tests; visitor tests/lint/typecheck/build; admin lint/typecheck/build; OpenAPI/shared type checks; local browser login-before-payment then payment E2E.
+```
+
+- [x] Extend the public presence contract with server-authoritative paid-ticket status.
+- [x] Create a synthetic Gate 1 presence on visitor login without claiming real location.
+- [x] Preserve post-payment consent and replace the login marker without duplicates.
+- [x] Show paid/unpaid status clearly on the admin map and roster.
+- [x] Run scoped checks, local browser acceptance and update registry/status/docs.
+
+### N07A — Post-payment presence onboarding
+
+```text
+Task ID: N07A
+Goal: After a signed-in visitor's demo payment succeeds, ask for location sharing and fall back to a distinct simulated visitor at Gate 1 when the visitor declines or location permission fails.
+In scope: user-scoped payment/loyalty realtime trigger with REST polling fallback, explicit consent UI, Gate 1 simulated position, presence heartbeat reuse, distinct pseudonym/colour/position on the admin live map, tests and demo documentation.
+Out of scope: storing raw GPS history, background tracking, real payment providers, identifying visitors by unmasked phone, staging/privacy approval.
+Dependencies completed: N02, N04, N06; N07 local implementation.
+Files/modules allowed: apps/visitor-web/**, apps/admin-web/components/live-presence-map.tsx, apps/admin-web/app/globals.css, docs/AGENT_EXECUTION_PLAN.md, docs/FEATURE_REGISTRY.md, docs/STATUS.md, docs/plans/OPERATIONS_LOYALTY_PAYMENT_REALTIME_MAP_CHECKLIST.md, demo/README-LUONG-USER.md.
+Contracts consumed: loyalty.balance_changed.v1, GET /v1/me/loyalty, presence session/update/stop, AdminPresencePoint.
+Contracts produced: no public API/schema change; reusable deterministic Gate 1 simulation helper and post-payment consent flow.
+Required reading: AGENTS.md, apps/visitor-web/AGENTS.md, apps/admin-web/AGENTS.md, docs/STATUS.md, LIVE-PRESENCE-DEMO/DEMO-PAYMENT/OPERATIONS-REALTIME registry entries, N07 checklist.
+Acceptance checks: only the paid signed-in user receives the prompt; allow shares a device fix; decline/permission failure creates and publishes a simulated character near Gate 1; two simulated users receive different positions/pseudonyms/colours; admin map exposes labels; opt-out still removes presence; no raw GPS history is persisted.
+Verification commands: visitor unit tests/lint/typecheck/build; admin lint/typecheck/build; focused API presence tests; browser demo with two users when local stack is available.
+```
+
+- [x] Reuse the current user realtime room, loyalty snapshot and presence API.
+- [x] Add explicit post-payment location choice and deterministic Gate 1 fallback.
+- [x] Keep multiple simulated users visually distinguishable on the admin map.
+- [x] Add focused regression tests and update user-flow documentation.
+- [x] Run scoped quality checks and update registry/status.
+
 ### T35-SIM3 — Collapsible simulation controls
 
 ```text
@@ -271,6 +410,28 @@ Verification commands: npm run db:migrate; scratch-database up/down/up SQL check
 - [x] Verify current and fresh database behavior and the public API catalogue.
 - [x] Update setup/demo documentation and feature registry.
 - [x] Run the repository quality gate, commit and push the release changes.
+
+### T43-REAL1 — Real-catalogue semantic search
+
+```text
+Task ID: T43-REAL1
+Goal: Make hybrid search measurable and useful against the 50-place Dam Sen catalogue, including ranking POI 25 first for “Tôi muốn ngắm cảnh trên cao”.
+In scope: versioned Vietnamese search metadata for all 50 POIs; additive metadata schema/import; lexical and embedding document integration; real-catalogue relevance judgments and evaluator; seed/demo integration; tests and live re-index verification.
+Out of scope: adding “Đảo Thần Tài”; claiming field-verified facts; training/fine-tuning an embedding model; changing the public search response contract; an admin metadata editor.
+Dependencies completed: T40–T43, POI-IMPORT-50, SEED-PARK, migration 015.
+Files/modules allowed: data/search-catalog/**, infra/migrations/**, scripts/**, apps/api/src/search/**, apps/api/test/**, apps/worker/src/embedding/**, apps/worker/test/**, package.json, README.md, docs/{AGENT_EXECUTION_PLAN,FEATURE_REGISTRY,STATUS}.md.
+Contracts consumed: 50 stable pNN slugs, SEARCH-LEXICAL, SEARCH-EMBED, SEARCH-HYBRID and the BAAI/bge-m3 1024-dimension model contract.
+Contracts produced: internal poi_search_metadata rows keyed by POI+locale; poi-search-document/v2; real-catalogue query judgments keyed by slug; no public API shape change.
+Required reading: AGENTS.md, docs/STATUS.md, SEARCH-LEXICAL/SEARCH-EMBED/SEARCH-HYBRID/SEED-PARK registry entries, apps/api/src/search/**, apps/worker/src/embedding/**, data/pois/damsen-pois.json.
+Acceptance checks: all 50 slugs have validated Vietnamese metadata; all judgments resolve to catalogue slugs; metadata import is idempotent; v2 documents include aliases/intents; exact-name regression remains; the target scenic query ranks p25 first live; evaluator reports Recall@3/MRR/nDCG/zero-result accuracy; hybrid search can still roll back by flag.
+Verification commands: search catalogue validator/tests; migration up/down/up; API/worker focused tests; seed metadata import twice; force re-index; live target-query and evaluator run; root format/lint/typecheck/test/build.
+```
+
+- [ ] Define and validate metadata for all 50 catalogue POIs.
+- [ ] Add forward-safe storage/import and integrate metadata into lexical/vector documents.
+- [ ] Add real-catalogue judgments, evaluator and regression tests.
+- [ ] Re-index and meet live acceptance checks without lowering thresholds blindly.
+- [ ] Update registry/status and run the full quality gate.
 
 ### T35-SIM2 — Automatic five-second chibi route playback
 

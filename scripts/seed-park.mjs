@@ -41,7 +41,9 @@ const flags = dryRun ? ['--dry-run'] : [];
 run('import-redrawn-walkways.mjs', flags);
 // 2. create / submit / approve the places through the admin API (skips existing slugs).
 run('import-pois.mjs', flags);
-// 3. now that the places exist: exact entrance nodes and pin positions.
+// 3. add versioned search-only aliases, intents and attributes for every place.
+run('import-search-catalog.mjs', flags);
+// 4. now that the places exist: exact entrance nodes and pin positions.
 run('import-redrawn-walkways.mjs', flags);
 // 4. the written content of the 79 places (descriptions + narration text), through the admin API.
 run('import-poi-content.mjs', dryRun ? [] : ['--apply']);

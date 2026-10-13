@@ -1,0 +1,256 @@
+:root {
+  color-scheme: light;
+  --ink: #13251f;
+  --muted: #61736c;
+  --surface: #fffdf7;
+  --line: #dce6df;
+  --green: #0a7756;
+  --green-dark: #07583f;
+  --amber: #f0a21a;
+  --red: #b52f2f;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  color: var(--ink);
+  background: radial-gradient(circle at 10% 0%, #dff7ea, transparent 38%),
+    #f3f5ef;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  border: 0;
+  border-radius: 12px;
+  background: var(--green);
+  color: white;
+  padding: 0.8rem 1.1rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+button:hover {
+  background: var(--green-dark);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+button.secondary {
+  color: var(--ink);
+  background: white;
+  border: 1px solid var(--line);
+}
+input {
+  width: 100%;
+  border: 1px solid #b8c9bf;
+  border-radius: 10px;
+  padding: 0.75rem;
+  background: white;
+}
+label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 650;
+}
+a {
+  color: var(--green-dark);
+  font-weight: 700;
+}
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: -0.05em;
+}
+h2 {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+}
+.page-shell {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.25rem 0 4rem;
+}
+.page-shell.narrow {
+  width: min(560px, calc(100% - 2rem));
+  padding-top: 3rem;
+}
+.demo-banner {
+  position: sticky;
+  top: 0.75rem;
+  z-index: 10;
+  border: 1px solid #d78b00;
+  border-radius: 999px;
+  background: #fff4cf;
+  color: #744600;
+  padding: 0.7rem 1rem;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  padding: 3rem 0 1.2rem;
+}
+.eyebrow {
+  color: var(--green);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: 1rem;
+}
+.card {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  padding: clamp(1.25rem, 4vw, 2rem);
+  box-shadow: 0 18px 50px rgb(27 57 45 / 8%);
+}
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+.row-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem;
+}
+.customer,
+.success {
+  display: grid;
+  gap: 0.3rem;
+  margin: 1rem 0;
+  border-radius: 14px;
+  padding: 1rem;
+  background: #ddf5e8;
+  color: #07583f;
+}
+.ticket-list {
+  display: grid;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+.ticket {
+  display: grid;
+  grid-template-columns: 1fr 76px;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.9rem;
+  background: white;
+}
+.ticket span {
+  display: grid;
+  gap: 0.25rem;
+}
+.ticket small,
+.muted {
+  color: var(--muted);
+}
+.qr-card {
+  text-align: center;
+}
+.qr {
+  width: min(280px, 100%);
+  display: block;
+  margin: 1.2rem auto;
+  border-radius: 16px;
+}
+.status {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  background: #e7ece9;
+  color: #43524c;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.74rem;
+}
+.status.processing {
+  background: #fff0c9;
+  color: #805100;
+}
+.status.succeeded {
+  background: #d8f4e5;
+  color: #086344;
+}
+.status.failed,
+.status.expired,
+.status.cancelled {
+  background: #ffe0df;
+  color: var(--red);
+}
+.payment-card {
+  margin-top: 1rem;
+}
+.summary-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+.summary-list > div,
+.total {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.total {
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+  font-size: 1.2rem;
+}
+.points {
+  margin: 1.2rem 0;
+  color: var(--muted);
+}
+.processing {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: #805100;
+  font-weight: 750;
+}
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #efd69d;
+  border-top-color: #9b6500;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.error {
+  margin-top: 1rem;
+  color: var(--red);
+  font-weight: 700;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .hero {
+    align-items: start;
+  }
+}

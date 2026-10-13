@@ -5,6 +5,9 @@ export interface RuntimeConfig {
   port: number;
   databaseUrl: string;
   redisUrl: string;
+  realtime: {
+    redisEnabled: boolean;
+  };
   objectStorage: {
     enabled: boolean;
     endpoint: string;
@@ -16,6 +19,13 @@ export interface RuntimeConfig {
   auth: {
     accessTokenSecret: string;
     refreshTokenSecret: string;
+  };
+  demo: {
+    enabled: boolean;
+    phoneAuthEnabled: boolean;
+    paymentsEnabled: boolean;
+    phoneHmacSecret: string;
+    paymentProcessingDelayMs: number;
   };
 }
 
@@ -29,6 +39,7 @@ const LOCAL_DEFAULTS = {
   s3SecretKey: 'damsen_local_password',
   accessTokenSecret: 'development-access-secret-change-before-production',
   refreshTokenSecret: 'development-refresh-secret-change-before-production',
+  phoneHmacSecret: 'development-demo-phone-hmac-change-before-production',
 } as const;
 
 function required(
@@ -85,6 +96,43 @@ export function loadRuntimeConfig(
   }
   const production = nodeEnv === 'production';
   const parsedPort = Number(environment.PORT ?? 3000);
+  const demoEnabled = booleanValue(environment, 'DEMO_MODE', false);
+  const demoPhoneAuthEnabled = booleanValue(
+    environment,
+    'DEMO_PHONE_AUTH_ENABLED',
+    false,
+  );
+  const demoPaymentsEnabled = booleanValue(
+    environment,
+    'DEMO_PAYMENTS_ENABLED',
+    false,
+  );
+  const paymentProcessingDelayMs = Number(
+    environment.DEMO_PAYMENT_PROCESSING_DELAY_MS ?? 2_000,
+  );
+
+  if (
+    production &&
+    (demoEnabled || demoPhoneAuthEnabled || demoPaymentsEnabled)
+  ) {
+    throw new Error(
+      'Demo phone and payment features are forbidden in production',
+    );
+  }
+  if ((demoPhoneAuthEnabled || demoPaymentsEnabled) && !demoEnabled) {
+    throw new Error(
+      'DEMO_MODE=true is required for demo phone or payment features',
+    );
+  }
+  if (
+    !Number.isInteger(paymentProcessingDelayMs) ||
+    paymentProcessingDelayMs < 0 ||
+    paymentProcessingDelayMs > 30_000
+  ) {
+    throw new Error(
+      'DEMO_PAYMENT_PROCESSING_DELAY_MS must be an integer from 0 to 30000',
+    );
+  }
 
   if (!Number.isInteger(parsedPort) || parsedPort < 1 || parsedPort > 65_535) {
     throw new Error('PORT must be an integer between 1 and 65535');
@@ -113,6 +161,9 @@ export function loadRuntimeConfig(
     port: parsedPort,
     databaseUrl,
     redisUrl,
+    realtime: {
+      redisEnabled: booleanValue(environment, 'REALTIME_REDIS_ENABLED', false),
+    },
     objectStorage: {
       enabled: booleanValue(environment, 'S3_ENABLED', true),
       endpoint,
@@ -162,6 +213,22 @@ export function loadRuntimeConfig(
         ),
         production,
       ),
+    },
+    demo: {
+      enabled: demoEnabled,
+      phoneAuthEnabled: demoPhoneAuthEnabled,
+      paymentsEnabled: demoPaymentsEnabled,
+      phoneHmacSecret: secureSecret(
+        'DEMO_PHONE_HMAC_SECRET',
+        required(
+          environment,
+          'DEMO_PHONE_HMAC_SECRET',
+          LOCAL_DEFAULTS.phoneHmacSecret,
+          production,
+        ),
+        production,
+      ),
+      paymentProcessingDelayMs,
     },
   };
 }

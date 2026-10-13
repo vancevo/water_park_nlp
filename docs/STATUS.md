@@ -6,14 +6,27 @@
 
 - Current wave: `W5/W6 — Search, analytics and release hardening`
 - Integration status: `SEARCH_ANALYTICS_POSTGIS_PASS`
-- Active blockers: B01 blocks public map/content release; AI TTS is enabled for the **non-commercial classroom demo** (ADR 0015 §6a) — public go-live still needs T06 blind review + ADR 0015 §6b; B03 resolved locally (pinned MinIO, I04 §9) — AWS S3/staging is T60
-- Last updated: 2026-10-10
-- Updated by: Tú (agent) — controller-guided path simulation, POI access paths and removal of five legacy runtime fixtures; earlier: Công (C01 ADR draft, C04 mp3/m4a, C06 L4, C07 metrics/restore/load — executed by agent)
+- Active blockers: B01 blocks public map/content release; operations N09 is blocked on an HTTPS staging target/credentials plus privacy/security approval; N10 additionally needs business/pilot owners. AI TTS is enabled for the **non-commercial classroom demo** (ADR 0015 §6a) — public go-live still needs T06 blind review + ADR 0015 §6b; B03 resolved locally (pinned MinIO, I04 §9) — AWS S3/staging is T60
+- Last updated: 2026-10-13
+- Updated by: Codex (N07E realtime visitor movement); earlier: Tú (controller-guided path simulation/POI access), Công (C01/C04/C06/C07)
+- Parallel initiative: phone identity, loyalty, demo payment/web and realtime/outbox tasks are done; presence/dashboard remain in review. One-command local demo now starts visitor/admin/payment plus phone, loyalty, Redis realtime and outbox; six-service health and a 20-socket/2-admin-map smoke pass. Concurrency/privacy/Redis and API/DB restart, backup/restore and local 1k-socket target-profile smoke also pass. Guarded staging execution and privacy/security owner approval remain open (`docs/plans/OPERATIONS_LOYALTY_PAYMENT_REALTIME_MAP_CHECKLIST.md`).
 
 ## Task board
 
 | Task | Status | Owner | Depends on | Handoff/result |
 |---|---|---|---|---|
+| N00–N01 Operations demo contract/schema | DONE | Codex | T10/T11, T51 | ADR 0016; migration 017 `up/down/up`, OpenAPI/shared types/API client pass |
+| N02–N03 Phone identity/loyalty | DONE | Codex | N01 | Multi-signal rate limit, masked audited lookup, ledger/redemption and ADMIN-only audited/idempotent adjustment pass on real Postgres |
+| N04–N05 Demo payment/web | DONE | Codex | N02, N03, N06 interface | Success/failure/expiry, consumed-token, API-restart replay and browser offline/reconnect pass |
+| N06 Realtime/outbox | DONE | Codex | N01 | Auth rooms, ordering/reconnect, Redis adapter/outage, outbox restart/dead-letter and standalone worker → Redis smoke pass |
+| N07–N08 Presence/live map/dashboard | REVIEW | Codex | N01, N02–N06 | Realtime/snapshot, timezone/open-hour/freshness, masked cursor feed, indexed 100k local plan and 1k-marker browser smoke pass; staging capacity/latency and privacy approval open |
+| N07A Post-payment presence onboarding | DONE | Codex | N02, N04, N06, N07 local | Paid user gets consent prompt; decline/GPS failure creates a distinct Gate 1 simulation; two-user local browser E2E and scoped web gates pass |
+| N07B Logged-in visitor map + ticket state | DONE | Codex | N07A | Login creates a privacy-safe Gate 1 marker; server-authoritative paid/unpaid status appears on map/roster and flips after payment; API + browser E2E and scoped gates pass |
+| N07C Reopen paid-today visitor | DONE | Codex | N07B | Reopening a paid-today account prompts once per page visit; before/after decline exactly one Gate 1 simulation remains; Vietnam-day boundary tests and browser E2E pass |
+| N07D Shared visitor presence map | DONE | Codex | N07C, N06 | Two authenticated visitor tabs see one another on the same map with caller filtering, pseudonym/avatar distinction, safe blurred GPS contract, clustered/RAF-batched rendering, pooled socket and 1k-point regression; API/visitor gates and local browser E2E pass |
+| N07E Realtime visitor movement | DONE | Codex | N07D | Controller and automatic-walk positions propagate to peers with trailing 1 s/2 m throttling and serialized requests; two-tab browser acceptance confirmed an authoritative ~5 m move and B's realtime revision within 1.6 s; visitor/API regressions pass |
+| N09 Operations hardening | BLOCKED | Codex | N05, N07, N08 | All local engineering gates pass: root lint/typecheck/663 tests/7 skipped/build, guarded staging gate/verifier, invariants/restart/load/recovery. Needs external HTTPS staging execution and privacy/security approval; audit 0 Critical, 15 High isolated to legacy mobile under ADR 0006/B04 |
+| N10 Staged rollout/acceptance | BLOCKED | Codex | N09 | Local technical preflight complete: PII-safe acceptance 10/10, guarded reset → restart → acceptance pass, catalog/training/approval pack ready. Rollout remains blocked on staging, business/privacy approval and human pilot evidence |
 | T00 Product contract | DONE | product agent | — | `docs/product/MVP_SCOPE.md` |
 | T00A Stack/provider ADR | DONE | product agent | — | `docs/adr/0001`–`0005` |
 | T01 Monorepo bootstrap | DONE | foundation agent | T00, T00A | Root workspace builds/tests pass |
@@ -54,6 +67,7 @@
 | T41 Search evaluation | DONE | search evaluation agent | T40 | 50-query VI/EN dataset reconciled with authoritative fixtures |
 | T42 Embedding pipeline | IN_PROGRESS | worker agent | T41 | Versioned/hash-idempotent pipeline + pgvector schema; production provider benchmark remains |
 | T43 Hybrid ranking | DONE (demo) | Công backend | T40–T42 | RRF re-ranking + `SEARCH_HYBRID_ENABLED` flag + lexical fallback + `semantic` reason on `codex/cong-ai07-hybrid-search` (ADR 0012); prod embedding endpoint + 50-query eval at I03 |
+| T43-REAL1 Real-catalogue semantic search | IN_PROGRESS | search/data agent | T40–T43, POI-IMPORT-50, SEED-PARK | Building 50-POI metadata + real relevance judgments, document v2 and live evaluator; “Tôi muốn ngắm cảnh trên cao” must rank POI 25 first |
 | T50 Offline/cache | TODO | unassigned | W3, W4 | — |
 | T51 Event batching | DONE | analytics agent | W1 | Migration 008 + consent/idempotency/privacy tests + real DB retry smoke |
 | T52 Observability/security | TODO | unassigned | W1–W5 | — |
@@ -70,6 +84,7 @@ Status hợp lệ: `TODO`, `READY`, `IN_PROGRESS`, `REVIEW`, `DONE`, `BLOCKED`.
 | B01 | Production release | coordinator | Confirm Dam Sen content/map rights and provider terms; field-verify POIs, entrances and OSM paths | OPEN; OSM snapshot powers local research demo only and is visibly marked unverified |
 | B02 | Legacy mobile prototype | mobile/platform | Add SecureStore/Keychain adapter and verify iOS/Android native builds only if native distribution resumes | DEFERRED by ADR-0006; no longer blocks visitor web |
 | B03 | Local media smoke | platform | Rerun `scripts/smoke-media.mjs` on the staging store | RESOLVED locally (2026-10-09, I04 §9): `quay.io`/`minio/minio` withdrawn upstream; compose pins `bitnamilegacy/minio` (digest) with CORS; smoke, tamper/checksum refusal, browser upload and TTS E2E pass. AWS S3/staging smoke + bucket CORS remain T60 |
+| B04 | Legacy mobile dependency audit | mobile/platform | Upgrade Expo/React Native as a dedicated compatibility task; do not force-downgrade. Mobile remains excluded from web demo deployment per ADR 0006 | OPEN; web runtime Next advisory fixed at 16.4.0, remaining prod-tree critical/high chain is rooted in legacy mobile tooling/runtime |
 
 ## Recent decisions
 

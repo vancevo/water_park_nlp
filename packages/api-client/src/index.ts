@@ -45,6 +45,30 @@ export type {
   PublicNarrationAudioProvenance,
   TtsJobArtifactSummary,
   LatestTtsJobResponse,
+  DemoPhoneSessionRequest,
+  TicketProduct,
+  CashierCustomerLookupRequest,
+  CashierCustomerLookup,
+  CreateDemoPaymentOrderRequest,
+  DemoPaymentOrder,
+  ConfirmDemoPaymentRequest,
+  LoyaltyAccountSummary,
+  RewardCatalogItem,
+  CreateRewardRedemptionRequest,
+  RewardRedemption,
+  AdminLoyaltyAdjustmentRequest,
+  DashboardSummary,
+  AdminPaymentFeedResponse,
+  DashboardTraffic,
+  PresenceSessionStartRequest,
+  PresenceSession,
+  PresenceUpdate,
+  AdminPresencePoint,
+  AdminPresenceSnapshot,
+  VisitorPresenceMode,
+  VisitorPresencePoint,
+  VisitorPresenceSnapshot,
+  RealtimeEvent,
 } from '@damsen/shared-types';
 
 import type {
@@ -82,11 +106,54 @@ import type {
   FieldCheck,
   FieldCheckApplyInput,
   FieldCheckInput,
+  DemoPhoneSessionRequest,
+  TicketProduct,
+  CashierCustomerLookupRequest,
+  CashierCustomerLookup,
+  CreateDemoPaymentOrderRequest,
+  DemoPaymentOrder,
+  ConfirmDemoPaymentRequest,
+  LoyaltyAccountSummary,
+  RewardCatalogItem,
+  CreateRewardRedemptionRequest,
+  RewardRedemption,
+  AdminLoyaltyAdjustmentRequest,
+  DashboardSummary,
+  AdminPaymentFeedResponse,
+  DashboardTraffic,
+  PresenceSessionStartRequest,
+  PresenceSession,
+  PresenceUpdate,
+  AdminPresenceSnapshot,
+  VisitorPresenceSnapshot,
+  RealtimeEvent,
 } from '@damsen/shared-types';
 
 export interface ApiClientOptions {
   baseUrl: string;
   fetch?: typeof globalThis.fetch;
+}
+
+export class RealtimeInvalidationGate {
+  private readonly highestSequence = new Map<string, number>();
+
+  accept(event: RealtimeEvent, stream: string = event.type): boolean {
+    if (
+      event.schemaVersion !== 1 ||
+      !Number.isSafeInteger(event.sequence) ||
+      event.sequence < 1
+    ) {
+      return false;
+    }
+    const previous = this.highestSequence.get(stream) ?? 0;
+    if (event.sequence <= previous) return false;
+    this.highestSequence.set(stream, event.sequence);
+    return true;
+  }
+
+  reset(): void {
+    this.highestSequence.clear();
+  }
 }
 
 export class ApiClientError extends Error {
@@ -310,6 +377,161 @@ export class DamSenApiClient {
 
   logout(input: LogoutRequest): Promise<void> {
     return this.request('/v1/auth/logout', { method: 'POST', body: input });
+  }
+
+  demoPhoneSession(input: DemoPhoneSessionRequest): Promise<AuthResponse> {
+    return this.request('/v1/demo-auth/phone-session', {
+      method: 'POST',
+      body: input,
+    });
+  }
+
+  listTicketProducts(accessToken: string): Promise<TicketProduct[]> {
+    return this.request('/v1/cashier/ticket-products', { accessToken });
+  }
+
+  lookupCashierCustomer(
+    input: CashierCustomerLookupRequest,
+    accessToken: string,
+  ): Promise<CashierCustomerLookup> {
+    return this.request('/v1/cashier/customer-lookups', {
+      method: 'POST',
+      body: input,
+      accessToken,
+    });
+  }
+
+  createDemoPaymentOrder(
+    input: CreateDemoPaymentOrderRequest,
+    accessToken: string,
+  ): Promise<DemoPaymentOrder> {
+    return this.request('/v1/cashier/payment-orders', {
+      method: 'POST',
+      body: input,
+      accessToken,
+    });
+  }
+
+  getCashierDemoPaymentOrder(
+    id: string,
+    accessToken: string,
+  ): Promise<DemoPaymentOrder> {
+    return this.request(
+      `/v1/cashier/payment-orders/${encodeURIComponent(id)}`,
+      { accessToken },
+    );
+  }
+
+  cancelDemoPaymentOrder(
+    id: string,
+    accessToken: string,
+  ): Promise<DemoPaymentOrder> {
+    return this.request(
+      `/v1/cashier/payment-orders/${encodeURIComponent(id)}/cancel`,
+      { method: 'POST', accessToken },
+    );
+  }
+
+  getDemoPayment(token: string): Promise<DemoPaymentOrder> {
+    return this.get(`/v1/demo-payments/${encodeURIComponent(token)}`);
+  }
+
+  confirmDemoPayment(
+    token: string,
+    input: ConfirmDemoPaymentRequest,
+  ): Promise<DemoPaymentOrder> {
+    return this.request(
+      `/v1/demo-payments/${encodeURIComponent(token)}/confirm`,
+      { method: 'POST', body: input },
+    );
+  }
+
+  getMyLoyalty(accessToken: string): Promise<LoyaltyAccountSummary> {
+    return this.request('/v1/me/loyalty', { accessToken });
+  }
+
+  listRewards(): Promise<RewardCatalogItem[]> {
+    return this.get('/v1/rewards');
+  }
+
+  createRewardRedemption(
+    input: CreateRewardRedemptionRequest,
+    accessToken: string,
+  ): Promise<RewardRedemption> {
+    return this.request('/v1/me/reward-redemptions', {
+      method: 'POST',
+      body: input,
+      accessToken,
+    });
+  }
+
+  adjustLoyalty(
+    input: AdminLoyaltyAdjustmentRequest,
+    accessToken: string,
+  ): Promise<LoyaltyAccountSummary> {
+    return this.request('/v1/admin/loyalty-adjustments', {
+      method: 'POST',
+      body: input,
+      accessToken,
+    });
+  }
+
+  getOperationsDashboard(accessToken: string): Promise<DashboardSummary> {
+    return this.request('/v1/admin/dashboard/summary', { accessToken });
+  }
+
+  getRecentPayments(
+    accessToken: string,
+    options: { limit?: number; cursor?: string } = {},
+  ): Promise<AdminPaymentFeedResponse> {
+    const query = new URLSearchParams();
+    if (options.limit !== undefined) query.set('limit', String(options.limit));
+    if (options.cursor) query.set('cursor', options.cursor);
+    const suffix = query.size ? `?${query.toString()}` : '';
+    return this.request(`/v1/admin/dashboard/recent-payments${suffix}`, {
+      accessToken,
+    });
+  }
+
+  getOperationsTraffic(accessToken: string): Promise<DashboardTraffic> {
+    return this.request('/v1/admin/dashboard/traffic', { accessToken });
+  }
+
+  startPresenceSession(
+    input: PresenceSessionStartRequest,
+    accessToken: string,
+  ): Promise<PresenceSession> {
+    return this.request('/v1/me/presence/sessions', {
+      method: 'POST',
+      body: input,
+      accessToken,
+    });
+  }
+
+  updatePresence(
+    sessionId: string,
+    input: PresenceUpdate,
+    accessToken: string,
+  ): Promise<void> {
+    return this.request(
+      `/v1/me/presence/sessions/${encodeURIComponent(sessionId)}/locations`,
+      { method: 'POST', body: input, accessToken },
+    );
+  }
+
+  stopPresenceSession(sessionId: string, accessToken: string): Promise<void> {
+    return this.request(
+      `/v1/me/presence/sessions/${encodeURIComponent(sessionId)}`,
+      { method: 'DELETE', accessToken },
+    );
+  }
+
+  getAdminPresence(accessToken: string): Promise<AdminPresenceSnapshot> {
+    return this.request('/v1/admin/presence', { accessToken });
+  }
+
+  getNearbyPresence(accessToken: string): Promise<VisitorPresenceSnapshot> {
+    return this.request('/v1/me/nearby-presence', { accessToken });
   }
 
   listAdminPois(accessToken: string): Promise<AdminPoi[]> {

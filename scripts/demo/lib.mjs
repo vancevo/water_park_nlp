@@ -22,7 +22,7 @@ export const isWindows = process.platform === 'win32';
 export const composeFile = join(repoRoot, 'infra/docker/docker-compose.yml');
 
 export const ADMIN_EMAIL = 'admin@damsen.local';
-export const ADMIN_PASSWORD = 'DamSen-Demo-2026';
+export const ADMIN_PASSWORD = '1234123412';
 export const EMBEDDING_MODEL = 'BAAI/bge-m3';
 export const EMBEDDING_MODEL_VERSION = 'Xenova/bge-m3@q8';
 
@@ -30,6 +30,7 @@ export const PORTS = {
   api: 3000,
   admin: 3001,
   visitor: 3002,
+  payment: 3003,
   embedding: 8091,
   workerMetrics: 9464,
   postgres: 64321,
@@ -221,6 +222,8 @@ export async function ensureDemoEnv() {
       current.ACCESS_TOKEN_SECRET ?? randomBytes(32).toString('hex'),
     REFRESH_TOKEN_SECRET:
       current.REFRESH_TOKEN_SECRET ?? randomBytes(32).toString('hex'),
+    DEMO_PHONE_HMAC_SECRET:
+      current.DEMO_PHONE_HMAC_SECRET ?? randomBytes(32).toString('hex'),
     SEARCH_HYBRID_MIN_SIMILARITY: current.SEARCH_HYBRID_MIN_SIMILARITY ?? '0.5',
     ...current,
   };
@@ -248,6 +251,14 @@ export function serviceEnv(demoEnv = readDemoEnv()) {
     NARRATION_LOCALES_CONFIG_PATH: 'config/narration-locales.json',
     ACCESS_TOKEN_SECRET: demoEnv.ACCESS_TOKEN_SECRET,
     REFRESH_TOKEN_SECRET: demoEnv.REFRESH_TOKEN_SECRET,
+    DEMO_MODE: 'true',
+    DEMO_PHONE_AUTH_ENABLED: 'true',
+    DEMO_PAYMENTS_ENABLED: 'true',
+    DEMO_PHONE_HMAC_SECRET: demoEnv.DEMO_PHONE_HMAC_SECRET,
+    DEMO_PAYMENT_PROCESSING_DELAY_MS: '2000',
+    DEMO_PAYMENT_PUBLIC_BASE_URL: `http://localhost:${PORTS.payment}`,
+    REALTIME_REDIS_ENABLED: 'true',
+    OPERATIONS_OUTBOX_RELAY_ENABLED: 'true',
     DEV_SEED_ADMIN: 'true',
     DEV_ADMIN_EMAIL: ADMIN_EMAIL,
     DEV_ADMIN_PASSWORD: ADMIN_PASSWORD,

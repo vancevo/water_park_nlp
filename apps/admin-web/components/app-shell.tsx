@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { AuthSessionPanel } from './auth-session-panel';
-import { ReviewNavLink } from './review-nav-link';
+import { AdminNav } from './admin-nav';
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -11,16 +11,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <span>DS</span>
           <strong>Đầm Sen Guide</strong>
         </Link>
-        <nav>
-          <Link href="/pois" className="active">
-            Điểm khám phá
-          </Link>
-          <Link href="/field">Hiện trường</Link>
-          <ReviewNavLink />
-          <span>
-            Media <small>Sắp có</small>
-          </span>
-        </nav>
+        <AdminNav />
         <AuthSessionPanel />
         <div className="role-note">
           <strong>Vai trò hiển thị: Editor</strong>

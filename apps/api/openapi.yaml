@@ -1,13 +1,15 @@
 openapi: 3.0.3
 info:
   title: Dam Sen Smart Guide API
-  version: 0.1.3
+  version: 0.1.4
   description: >-
     0.1.1 = narration/TTS contract v1.1 (additive over v1, ADR 0014): TTS error
     responses documented, job artifact summary, latest job per narration,
     admin audio preview and AI provenance on narration audio. 0.1.2 =
     contract v1.2 (additive, ADR 0014 amendment): optional public
     PoiNarration.audio.generatedBy (AI provenance without the internal job id).
+    0.1.4 adds the educational demo phone, loyalty, QR payment, operations
+    dashboard and opt-in ephemeral presence contracts from ADR 0016.
 servers:
   - url: http://localhost:3000
 paths:
@@ -77,6 +79,323 @@ paths:
             schema: { $ref: '#/components/schemas/RefreshRequest' }
       responses:
         '204': { description: Active refresh session revoked }
+  /v1/demo-auth/phone-session:
+    post:
+      operationId: createDemoPhoneSession
+      summary: Open or create a synthetic demo account without OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DemoPhoneSessionRequest' }
+      responses:
+        '200':
+          description: Demo session created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /v1/cashier/ticket-products:
+    get:
+      operationId: listTicketProducts
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Active synthetic ticket products
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TicketProduct' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /v1/cashier/customer-lookups:
+    post:
+      operationId: lookupCashierCustomer
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              { $ref: '#/components/schemas/CashierCustomerLookupRequest' }
+      responses:
+        '200':
+          description: Short-lived customer token and masked account
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CashierCustomerLookup' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /v1/cashier/payment-orders:
+    post:
+      operationId: createDemoPaymentOrder
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              { $ref: '#/components/schemas/CreateDemoPaymentOrderRequest' }
+      responses:
+        '201':
+          description: Pending demo order with an expiring QR URL
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DemoPaymentOrder' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /v1/admin/loyalty-adjustments:
+    post:
+      operationId: adjustLoyalty
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              { $ref: '#/components/schemas/AdminLoyaltyAdjustmentRequest' }
+      responses:
+        '200':
+          description: Updated loyalty account after an audited adjustment
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoyaltyAccountSummary' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /v1/cashier/payment-orders/{id}:
+    get:
+      operationId: getCashierDemoPaymentOrder
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - {
+            name: id,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        '200':
+          description: Current authoritative order state
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DemoPaymentOrder' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /v1/cashier/payment-orders/{id}/cancel:
+    post:
+      operationId: cancelDemoPaymentOrder
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - {
+            name: id,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        '200':
+          description: Cancelled pending order
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DemoPaymentOrder' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /v1/demo-payments/{token}:
+    get:
+      operationId: getDemoPayment
+      parameters:
+        - {
+            name: token,
+            in: path,
+            required: true,
+            schema: { type: string, minLength: 20 },
+          }
+      responses:
+        '200':
+          description: Redacted public demo order
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DemoPaymentOrder' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /v1/demo-payments/{token}/confirm:
+    post:
+      operationId: confirmDemoPayment
+      parameters:
+        - {
+            name: token,
+            in: path,
+            required: true,
+            schema: { type: string, minLength: 20 },
+          }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConfirmDemoPaymentRequest' }
+      responses:
+        '200':
+          description: Simulated payment succeeded and points were credited once
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DemoPaymentOrder' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /v1/me/loyalty:
+    get:
+      operationId: getMyLoyalty
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Loyalty balance and recent immutable ledger
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoyaltyAccountSummary' }
+  /v1/rewards:
+    get:
+      operationId: listRewards
+      responses:
+        '200':
+          description: Active demo rewards
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/RewardCatalogItem' }
+  /v1/me/reward-redemptions:
+    post:
+      operationId: createRewardRedemption
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              { $ref: '#/components/schemas/CreateRewardRedemptionRequest' }
+      responses:
+        '201':
+          description: Reward reserved and points debited atomically
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RewardRedemption' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /v1/admin/dashboard/summary:
+    get:
+      operationId: getOperationsDashboard
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Demo operations summary in Asia/Ho_Chi_Minh
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DashboardSummary' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /v1/admin/dashboard/traffic:
+    get:
+      operationId: getOperationsTraffic
+      summary: Privacy-suppressed 15-minute live visitor buckets
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Busy and quiet periods in Asia/Ho_Chi_Minh
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DashboardTraffic' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /v1/admin/dashboard/recent-payments:
+    get:
+      operationId: getRecentPayments
+      summary: Cursor-paginated demo payment activity for operations staff
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - in: query
+          name: cursor
+          schema: { type: string, maxLength: 256 }
+      responses:
+        '200':
+          description: Newest demo payments ordered by creation time
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminPaymentFeedResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /v1/me/presence/sessions:
+    post:
+      operationId: startPresenceSession
+      summary: Create an ephemeral pseudonymous demo-presence session
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PresenceSessionStartRequest' }
+      responses:
+        '201':
+          description: Ephemeral session with a pseudonymous avatar
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PresenceSession' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /v1/me/presence/sessions/{id}/locations:
+    post:
+      operationId: updatePresence
+      summary: Replace the caller's latest ephemeral location
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - {
+            name: id,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PresenceUpdate' }
+      responses:
+        '204': { description: Latest location accepted }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /v1/me/presence/sessions/{id}:
+    delete:
+      operationId: stopPresenceSession
+      summary: Stop the presence session and remove its live point immediately
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - {
+            name: id,
+            in: path,
+            required: true,
+            schema: { type: string, format: uuid },
+          }
+      responses:
+        '204': { description: Presence removed }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /v1/admin/presence:
+    get:
+      operationId: getAdminPresence
+      summary: Snapshot of non-expired synthetic or consented visitor points
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Pseudonymous live map points
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminPresenceSnapshot' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /v1/me/nearby-presence:
+    get:
+      operationId: getNearbyPresence
+      summary: Pseudonymous visitor-safe presence snapshot
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Non-expired points visible to authenticated visitors
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VisitorPresenceSnapshot' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
   /v1/admin/pois:
     get:
       operationId: listAdminPois
@@ -842,6 +1161,11 @@ components:
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
+    ServiceUnavailable:
+      description: Demo feature is disabled in this environment
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiErrorEnvelope' }
     TtsQuotaExceeded:
       description: >-
         AI08 quota. code rate_limited (per-user window) or concurrency_limited
@@ -888,7 +1212,7 @@ components:
         graphNodeRef: { type: string, pattern: '^[A-Za-z0-9_-]{1,100}$' }
     UserRole:
       type: string
-      enum: [VISITOR, EDITOR, REVIEWER, ADMIN]
+      enum: [VISITOR, EDITOR, REVIEWER, CASHIER, OPERATIONS, ADMIN]
     RegisterRequest:
       type: object
       required: [email, password]
@@ -913,16 +1237,361 @@ components:
       properties:
         user:
           type: object
-          required: [id, email, preferredLocale, roles]
+          required: [id, preferredLocale, roles]
           properties:
             id: { type: string, format: uuid }
             email: { type: string, format: email }
+            phoneMasked: { type: string }
+            authMethods:
+              type: array
+              items: { type: string, enum: [email_password, demo_phone] }
             preferredLocale: { $ref: '#/components/schemas/SupportedLocale' }
             roles:
               { type: array, items: { $ref: '#/components/schemas/UserRole' } }
         accessToken: { type: string, writeOnly: true }
         refreshToken: { type: string, writeOnly: true }
         accessTokenExpiresIn: { type: integer }
+    DemoPhoneSessionRequest:
+      type: object
+      required: [phone]
+      properties:
+        phone: { type: string, example: '0901234567' }
+        preferredLocale: { $ref: '#/components/schemas/SupportedLocale' }
+    TicketProduct:
+      type: object
+      required: [id, code, name, amountVnd, pointsPerItem, active]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        amountVnd: { type: integer, format: int64, minimum: 0 }
+        pointsPerItem: { type: integer, minimum: 0 }
+        active: { type: boolean }
+    CashierCustomerLookupRequest:
+      type: object
+      required: [phone]
+      properties:
+        phone: { type: string }
+    CashierCustomerLookup:
+      type: object
+      required: [customerToken, userId, phoneMasked, pointsBalance, expiresAt]
+      properties:
+        customerToken: { type: string, writeOnly: true }
+        userId: { type: string, format: uuid }
+        phoneMasked: { type: string }
+        pointsBalance: { type: integer, minimum: 0 }
+        expiresAt: { type: string, format: date-time }
+    DemoPaymentOrderItemInput:
+      type: object
+      required: [ticketProductId, quantity]
+      properties:
+        ticketProductId: { type: string, format: uuid }
+        quantity: { type: integer, minimum: 1, maximum: 20 }
+    CreateDemoPaymentOrderRequest:
+      type: object
+      required: [customerToken, items, idempotencyKey]
+      properties:
+        customerToken: { type: string, writeOnly: true, minLength: 20 }
+        items:
+          type: array
+          minItems: 1
+          maxItems: 10
+          items: { $ref: '#/components/schemas/DemoPaymentOrderItemInput' }
+        idempotencyKey: { type: string, format: uuid }
+    DemoPaymentOrderItem:
+      type: object
+      required:
+        [
+          ticketProductId,
+          code,
+          name,
+          quantity,
+          unitAmountVnd,
+          unitPoints,
+          subtotalVnd,
+          points,
+        ]
+      properties:
+        ticketProductId: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        quantity: { type: integer }
+        unitAmountVnd: { type: integer, format: int64 }
+        unitPoints: { type: integer }
+        subtotalVnd: { type: integer, format: int64 }
+        points: { type: integer }
+    DemoPaymentOrder:
+      type: object
+      required:
+        [
+          id,
+          status,
+          phoneMasked,
+          items,
+          totalAmountVnd,
+          totalPoints,
+          qrExpiresAt,
+          createdAt,
+        ]
+      properties:
+        id: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [pending, processing, succeeded, failed, expired, cancelled]
+        phoneMasked: { type: string }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/DemoPaymentOrderItem' }
+        totalAmountVnd: { type: integer, format: int64 }
+        totalPoints: { type: integer }
+        qrExpiresAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        processingAt: { type: string, format: date-time }
+        paidAt: { type: string, format: date-time }
+        qrUrl: { type: string, format: uri }
+    ConfirmDemoPaymentRequest:
+      type: object
+      required: [idempotencyKey]
+      properties:
+        idempotencyKey: { type: string, format: uuid }
+        simulateOutcome:
+          { type: string, enum: [succeeded, failed], default: succeeded }
+    LoyaltyLedgerEntry:
+      type: object
+      required: [id, delta, entryType, description, balanceAfter, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        delta: { type: integer }
+        entryType:
+          {
+            type: string,
+            enum: [payment_credit, redemption_debit, admin_adjustment],
+          }
+        description: { type: string }
+        balanceAfter: { type: integer, minimum: 0 }
+        createdAt: { type: string, format: date-time }
+    LoyaltyAccountSummary:
+      type: object
+      required: [userId, phoneMasked, balance, entries]
+      properties:
+        userId: { type: string, format: uuid }
+        phoneMasked: { type: string }
+        balance: { type: integer, minimum: 0 }
+        entries:
+          type: array
+          items: { $ref: '#/components/schemas/LoyaltyLedgerEntry' }
+    AdminLoyaltyAdjustmentRequest:
+      type: object
+      required: [userId, delta, reason, idempotencyKey]
+      properties:
+        userId: { type: string, format: uuid }
+        delta: { type: integer, minimum: -100000, maximum: 100000 }
+        reason: { type: string, minLength: 3, maxLength: 240 }
+        idempotencyKey: { type: string, format: uuid }
+    RewardCatalogItem:
+      type: object
+      required: [id, code, name, pointsCost, active]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        pointsCost: { type: integer, minimum: 1 }
+        active: { type: boolean }
+    CreateRewardRedemptionRequest:
+      type: object
+      required: [rewardId, idempotencyKey]
+      properties:
+        rewardId: { type: string, format: uuid }
+        idempotencyKey: { type: string, format: uuid }
+    RewardRedemption:
+      type: object
+      required:
+        [
+          id,
+          rewardId,
+          rewardName,
+          pointsCost,
+          status,
+          fulfillmentCode,
+          createdAt,
+        ]
+      properties:
+        id: { type: string, format: uuid }
+        rewardId: { type: string, format: uuid }
+        rewardName: { type: string }
+        pointsCost: { type: integer }
+        status: { type: string, enum: [confirmed, fulfilled, cancelled] }
+        fulfillmentCode: { type: string }
+        createdAt: { type: string, format: date-time }
+    DashboardSummary:
+      type: object
+      required:
+        [
+          timezone,
+          generatedAt,
+          dataStatus,
+          activeVisitorsToday,
+          payingUsersToday,
+          onlineNow,
+          simulatedRevenue,
+        ]
+      properties:
+        timezone: { type: string, enum: [Asia/Ho_Chi_Minh] }
+        generatedAt: { type: string, format: date-time }
+        dataStatus: { type: string, enum: [live, delayed, partial] }
+        activeVisitorsToday: { type: integer, minimum: 0 }
+        payingUsersToday: { type: integer, minimum: 0 }
+        onlineNow: { type: integer, minimum: 0 }
+        simulatedRevenue:
+          type: object
+          required: [todayVnd, yesterdayVnd, weekVnd, monthVnd]
+          properties:
+            todayVnd: { type: integer, format: int64 }
+            yesterdayVnd: { type: integer, format: int64 }
+            weekVnd: { type: integer, format: int64 }
+            monthVnd: { type: integer, format: int64 }
+    AdminPaymentFeedItem:
+      type: object
+      required:
+        [
+          id,
+          status,
+          phoneMasked,
+          totalAmountVnd,
+          totalPoints,
+          ticketQuantity,
+          productNames,
+          createdAt,
+        ]
+      properties:
+        id: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [pending, processing, succeeded, failed, expired, cancelled]
+        phoneMasked: { type: string }
+        totalAmountVnd: { type: integer, format: int64, minimum: 0 }
+        totalPoints: { type: integer, minimum: 0 }
+        ticketQuantity: { type: integer, minimum: 0 }
+        productNames:
+          type: array
+          items: { type: string }
+        createdAt: { type: string, format: date-time }
+        paidAt: { type: string, format: date-time }
+    AdminPaymentFeedResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/AdminPaymentFeedItem' }
+        nextCursor: { type: string }
+    TrafficBucket:
+      type: object
+      required: [startsAt, uniqueVisitors]
+      properties:
+        startsAt: { type: string, format: date-time }
+        uniqueVisitors: { type: integer, minimum: 0 }
+    DashboardTraffic:
+      type: object
+      required: [timezone, bucketMinutes, items]
+      properties:
+        timezone: { type: string, enum: [Asia/Ho_Chi_Minh] }
+        bucketMinutes: { type: integer, enum: [15] }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/TrafficBucket' }
+        peak: { $ref: '#/components/schemas/TrafficBucket' }
+        quiet: { $ref: '#/components/schemas/TrafficBucket' }
+    PresenceSessionStartRequest:
+      type: object
+      required: [consentVersion]
+      properties:
+        consentVersion: { type: string, minLength: 1, maxLength: 40 }
+        visibleToVisitors: { type: boolean, default: false }
+        locationMode:
+          type: string
+          enum: [simulated, shared]
+        shareIdentity: { type: boolean, default: false }
+    PresenceSession:
+      type: object
+      required: [id, pseudonym, avatarVariant, expiresInSeconds]
+      properties:
+        id: { type: string, format: uuid }
+        pseudonym: { type: string }
+        avatarVariant: { type: integer, minimum: 0, maximum: 7 }
+        expiresInSeconds: { type: integer, enum: [45] }
+    PresenceUpdate:
+      type: object
+      additionalProperties: false
+      required:
+        [sessionId, sequence, latitude, longitude, accuracyMeters, occurredAt]
+      properties:
+        sessionId: { type: string, format: uuid }
+        sequence: { type: integer, minimum: 1 }
+        latitude: { type: number, minimum: -90, maximum: 90 }
+        longitude: { type: number, minimum: -180, maximum: 180 }
+        accuracyMeters: { type: number, minimum: 0, maximum: 1000 }
+        occurredAt: { type: string, format: date-time }
+        destinationPoiId: { type: string, format: uuid }
+    AdminPresencePoint:
+      type: object
+      required:
+        [
+          sessionId,
+          pseudonym,
+          avatarVariant,
+          hasPaidTicket,
+          latitude,
+          longitude,
+          accuracyMeters,
+          updatedAt,
+        ]
+      properties:
+        sessionId: { type: string, format: uuid }
+        pseudonym: { type: string }
+        avatarVariant: { type: integer, minimum: 0, maximum: 7 }
+        hasPaidTicket: { type: boolean }
+        latitude: { type: number }
+        longitude: { type: number }
+        accuracyMeters: { type: number }
+        destinationPoiId: { type: string, format: uuid }
+        updatedAt: { type: string, format: date-time }
+    AdminPresenceSnapshot:
+      type: object
+      required: [generatedAt, items]
+      properties:
+        generatedAt: { type: string, format: date-time }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/AdminPresencePoint' }
+    VisitorPresencePoint:
+      type: object
+      required:
+        [
+          presenceId,
+          pseudonym,
+          avatarVariant,
+          latitude,
+          longitude,
+          locationMode,
+          updatedAt,
+        ]
+      properties:
+        presenceId: { type: string, format: uuid }
+        pseudonym: { type: string }
+        avatarVariant: { type: integer, minimum: 0, maximum: 7 }
+        latitude: { type: number }
+        longitude: { type: number }
+        locationMode: { type: string, enum: [simulated, shared] }
+        updatedAt: { type: string, format: date-time }
+    VisitorPresenceSnapshot:
+      type: object
+      required: [generatedAt, items]
+      properties:
+        generatedAt: { type: string, format: date-time }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/VisitorPresencePoint' }
     AdminPoiInput:
       type: object
       required:

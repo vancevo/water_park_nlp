@@ -7,6 +7,11 @@ export interface PoiEmbeddingSource {
   category: string;
   shortDescription: string;
   longDescription: string;
+  aliases: readonly string[];
+  activities: readonly string[];
+  attributes: readonly string[];
+  audiences: readonly string[];
+  intentPhrases: readonly string[];
 }
 
 export interface EmbeddingDocument {

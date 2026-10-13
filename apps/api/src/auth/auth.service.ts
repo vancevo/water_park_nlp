@@ -1,15 +1,27 @@
 import { randomUUID } from 'node:crypto';
 
 import {
+  BadRequestException,
   ConflictException,
   Inject,
   Injectable,
   type OnModuleInit,
   UnauthorizedException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import type { AuthResponse, AuthUser } from '@damsen/shared-types';
+import { loadRuntimeConfig } from '@damsen/config';
 
-import type { LoginDto, RegisterDto } from './auth.dto.js';
+import type { DemoPhoneSessionDto, LoginDto, RegisterDto } from './auth.dto.js';
+import {
+  hashDemoPhone,
+  last4DemoPhone,
+  normalizeDemoPhone,
+} from './demo-phone.js';
+import {
+  DemoRateLimiter,
+  type DemoRequestSignals,
+} from './demo-rate-limiter.js';
 import {
   AUTH_CLOCK,
   AUTH_REPOSITORY,
@@ -24,6 +36,9 @@ const REFRESH_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class AuthService implements OnModuleInit {
+  private readonly demoConfig = loadRuntimeConfig().demo;
+  private readonly demoRateLimiter = new DemoRateLimiter();
+
   constructor(
     @Inject(AUTH_REPOSITORY) private readonly repository: AuthRepository,
     @Inject(PASSWORD_HASHER) private readonly passwords: PasswordHasher,
@@ -48,12 +63,22 @@ export class AuthService implements OnModuleInit {
         'DEV_ADMIN_PASSWORD must contain at least 10 characters when DEV_SEED_ADMIN=true',
       );
     }
-    if (await this.repository.findUserByEmail(email)) return;
+    const existing = await this.repository.findUserByEmail(email);
+    const passwordHash = await this.passwords.hash(password);
+    if (existing) {
+      await this.repository.updatePasswordHash(
+        existing.id,
+        passwordHash,
+        this.now(),
+      );
+      await this.repository.setRoles(existing.id, ['ADMIN']);
+      return;
+    }
 
     await this.repository.createUser({
       id: randomUUID(),
       email,
-      passwordHash: await this.passwords.hash(password),
+      passwordHash,
       preferredLocale: 'vi',
       roles: ['ADMIN'],
       status: 'active',
@@ -88,11 +113,74 @@ export class AuthService implements OnModuleInit {
     if (
       !user ||
       user.status !== 'active' ||
+      !user.passwordHash ||
       !(await this.passwords.verify(user.passwordHash, input.password))
     ) {
       throw new UnauthorizedException('Invalid email or password');
     }
     return this.createSession(user);
+  }
+
+  async demoPhoneSession(
+    input: DemoPhoneSessionDto,
+    signals: DemoRequestSignals = {},
+  ): Promise<AuthResponse> {
+    const user = await this.resolveDemoPhoneUser(
+      input.phone,
+      input.preferredLocale,
+      signals,
+    );
+    return this.createSession(user);
+  }
+
+  async resolveDemoPhoneUser(
+    phone: string,
+    preferredLocale: 'vi' | 'en' = 'vi',
+    signals: DemoRequestSignals = {},
+  ): Promise<UserRecord> {
+    if (!this.demoConfig.enabled || !this.demoConfig.phoneAuthEnabled) {
+      throw new ServiceUnavailableException('Demo phone login is disabled');
+    }
+
+    let normalized: string;
+    try {
+      normalized = normalizeDemoPhone(phone);
+    } catch {
+      throw new BadRequestException('Invalid Vietnamese demo phone number');
+    }
+    const phoneHash = hashDemoPhone(
+      normalized,
+      this.demoConfig.phoneHmacSecret,
+    );
+    this.demoRateLimiter.check(phoneHash, signals, this.now().getTime());
+
+    let user = await this.repository.findUserByPhoneHash(phoneHash);
+    if (!user) {
+      const candidate: UserRecord = {
+        id: randomUUID(),
+        preferredLocale,
+        roles: ['VISITOR'],
+        status: 'active',
+        phoneMasked: `+84•••••${last4DemoPhone(normalized)}`,
+        authMethods: ['demo_phone'],
+      };
+      try {
+        await this.repository.createDemoPhoneUser(
+          candidate,
+          phoneHash,
+          last4DemoPhone(normalized),
+        );
+        user = candidate;
+      } catch (error) {
+        if (error instanceof Error && error.message === 'PHONE_EXISTS') {
+          user = await this.repository.findUserByPhoneHash(phoneHash);
+        } else {
+          throw error;
+        }
+      }
+    }
+    if (!user || user.status !== 'active') throw new UnauthorizedException();
+    return user;
   }
 
   async refresh(refreshToken: string): Promise<AuthResponse> {
@@ -141,7 +229,10 @@ export class AuthService implements OnModuleInit {
   private publicUser(user: UserRecord): AuthUser {
     return {
       id: user.id,
-      email: user.email,
+      ...(user.email ? { email: user.email } : {}),
+      ...(user.phoneMasked ? { phoneMasked: user.phoneMasked } : {}),
+      authMethods:
+        user.authMethods ?? (user.email ? ['email_password'] : undefined),
       preferredLocale: user.preferredLocale,
       roles: user.roles,
     };

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { AuthController } from './auth.controller.js';
+import { DemoAuthController } from './demo-auth.controller.js';
 import { AUTH_CLOCK, AUTH_REPOSITORY, PASSWORD_HASHER } from './auth.models.js';
 import { AuthService } from './auth.service.js';
 import { InMemoryAuthRepository } from './in-memory-auth.repository.js';
@@ -21,7 +22,7 @@ function createAuthRepository(): AuthRepository {
 }
 
 @Module({
-  controllers: [AuthController],
+  controllers: [AuthController, DemoAuthController],
   providers: [
     AuthService,
     TokenService,

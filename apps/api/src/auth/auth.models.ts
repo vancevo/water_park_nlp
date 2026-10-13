@@ -2,8 +2,10 @@ import type { SupportedLocale, UserRole } from '@damsen/shared-types';
 
 export interface UserRecord {
   id: string;
-  email: string;
-  passwordHash: string;
+  email?: string;
+  passwordHash?: string;
+  phoneMasked?: string;
+  authMethods?: Array<'email_password' | 'demo_phone'>;
   preferredLocale: SupportedLocale;
   roles: UserRole[];
   status: 'active' | 'disabled';
@@ -19,8 +21,19 @@ export interface RefreshSessionRecord {
 
 export interface AuthRepository {
   findUserByEmail(email: string): Promise<UserRecord | null>;
+  findUserByPhoneHash(phoneHash: string): Promise<UserRecord | null>;
   findUserById(id: string): Promise<UserRecord | null>;
   createUser(user: UserRecord): Promise<void>;
+  updatePasswordHash(
+    userId: string,
+    passwordHash: string,
+    at: Date,
+  ): Promise<void>;
+  createDemoPhoneUser(
+    user: UserRecord,
+    phoneHash: string,
+    phoneLast4: string,
+  ): Promise<void>;
   setRoles(userId: string, roles: UserRole[]): Promise<void>;
   findSession(id: string): Promise<RefreshSessionRecord | null>;
   saveSession(session: RefreshSessionRecord): Promise<void>;

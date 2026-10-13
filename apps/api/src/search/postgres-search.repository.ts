@@ -51,7 +51,18 @@ function rowToCandidate(row: SearchRow): SearchCandidate {
   };
 }
 
-const DOCUMENT_TSV = `to_tsvector('simple', search_normalize(t.name || ' ' || t.short_description || ' ' || t.long_description))`;
+const METADATA_TEXT = `concat_ws(' ',
+  array_to_string(COALESCE(m.aliases, '{}'), ' '),
+  array_to_string(COALESCE(m.activities, '{}'), ' '),
+  array_to_string(COALESCE(m.attributes, '{}'), ' '),
+  array_to_string(COALESCE(m.audiences, '{}'), ' '),
+  array_to_string(COALESCE(m.intent_phrases, '{}'), ' ')
+)`;
+const DOCUMENT_TSV = `to_tsvector('simple', search_normalize(t.name || ' ' || t.short_description || ' ' || t.long_description || ' ' || ${METADATA_TEXT}))`;
+const ALIAS_EXACT = `EXISTS (
+  SELECT 1 FROM unnest(COALESCE(m.aliases, '{}')) AS alias(value)
+  WHERE search_normalize(alias.value) = search_normalize($1)
+)`;
 
 export class PostgresSearchRepository implements SearchRepository {
   constructor(private readonly client: SqlClient) {}
@@ -121,6 +132,7 @@ export class PostgresSearchRepository implements SearchRepository {
           (CASE
              WHEN lower(trim(t.name)) = lower(trim($1)) THEN 4.0
              WHEN search_normalize(t.name) = search_normalize($1) THEN 3.0
+             WHEN ${ALIAS_EXACT} THEN 2.75
              ELSE 0.0
            END
            + 1.5 * ts_rank_cd(${DOCUMENT_TSV}, to_tsquery('simple', ${orQueryParam}))
@@ -135,6 +147,7 @@ export class PostgresSearchRepository implements SearchRepository {
           ORDER BY CASE WHEN pt.locale = $2 THEN 0 ELSE 1 END
           LIMIT 1
         ) t ON true
+        LEFT JOIN poi_search_metadata m ON m.poi_id = p.id AND m.locale = t.locale
         WHERE ${filters.join(' AND ')}
       ), ranked AS (
         SELECT candidates.*,

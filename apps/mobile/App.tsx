@@ -87,7 +87,9 @@ function AppContent() {
     <MapScreen
       accountLabel={
         auth.state.status === 'authenticated'
-          ? auth.state.user.email
+          ? (auth.state.user.email ??
+            auth.state.user.phoneMasked ??
+            i18n.t('auth.guest'))
           : i18n.t('auth.guest')
       }
       client={poiClient}

@@ -41,3 +41,15 @@ export class RefreshDto {
 }
 
 export class LogoutDto extends RefreshDto {}
+
+export class DemoPhoneSessionDto {
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
+  @IsString()
+  phone!: string;
+
+  @IsOptional()
+  @IsIn(['vi', 'en'])
+  preferredLocale: 'vi' | 'en' = 'vi';
+}
